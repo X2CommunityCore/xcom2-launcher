@@ -162,7 +162,7 @@ namespace XCOM2Launcher.XCOM
 
         public void UpdateTimestamp()
         {
-            long timestamp = (new DateTimeOffset(File.GetLastAccessTime(DefaultFile))).ToUnixTimeSeconds();
+            long timestamp = (new DateTimeOffset(File.GetLastWriteTimeUtc(DefaultFile))).ToUnixTimeSeconds();
 
             Remove("IniVersion");
             Add("IniVersion", "0", timestamp + ".000000");
