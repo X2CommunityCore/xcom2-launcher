@@ -186,12 +186,13 @@ namespace XCOM2Launcher
             modlist_objectlistview.GroupExpandingCollapsing += ModListGroupExpandingCollapsing;
             modlist_objectlistview.KeyUp += ModListKeyUp;
             modlist_objectlistview.KeyDown += ModListKeyDown;
+
             // Content
             modlist_objectlistview.AllColumns.AddRange(columns);
             modlist_objectlistview.Columns.AddRange(columns);
 
             // Restore State
-            if (Settings.Windows["main"]?.Data != null)
+            if (Settings.Windows.ContainsKey("main") && Settings.Windows["main"].Data != null)
                 modlist_objectlistview.RestoreState(Settings.Windows["main"].Data);
 
             RefreshModList();

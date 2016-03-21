@@ -26,14 +26,21 @@ namespace XCOM2Launcher
                     MessageBox.Show("Please start steam first!");
                     return;
                 }
-
+                // SteamWorkshop.StartCallbackService();
 
 
                 Settings settings = initializeSettings();
                 if (settings == null)
                     return;
 
-                // SteamWorkshop.StartCallbackService();
+                // clean up old files
+                if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
+                {
+                    // Restore backup
+                    File.Copy(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini", true);
+                    File.Delete(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
+                }
+
                 Application.Run(new MainForm(settings));
 
                 Steamworks.SteamAPI.Shutdown();

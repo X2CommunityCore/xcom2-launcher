@@ -351,6 +351,12 @@ namespace XCOM2Launcher
         {
             StringBuilder str = new StringBuilder();
 
+            if (!Mods.Active.Any())
+            {
+                export_richtextbox.Text = "";
+                return;
+            }
+
             int name_length = Mods.Active.Max(m => m.Name.Length) + 1;
             int id_length = Mods.Active.Max(m => m.ID.Length) + 1;
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
