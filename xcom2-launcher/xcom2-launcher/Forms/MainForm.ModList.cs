@@ -325,7 +325,7 @@ namespace XCOM2Launcher
         private ContextMenu CreateModListContextMenu(ModEntry m)
         {
             ContextMenu menu = new ContextMenu();
-            if (m.ID == null)
+            if (m == null || m.ID == null)
                 return menu;
 
             MenuItem item = new MenuItem("Rename");
