@@ -68,6 +68,7 @@ namespace XCOM2Launcher
             modinfo_readme_richtextbox.LinkClicked += ControlLinkClicked;
             modinfo_description_richtextbox.LinkClicked += ControlLinkClicked;
             export_richtextbox.LinkClicked += ControlLinkClicked;
+            modinfo_changelog_richtextbox.LinkClicked += ControlLinkClicked;
 
             // TabControl (mainly for the changelog)
             tabControl1.Selected += Tab_Selected;
@@ -122,13 +123,18 @@ namespace XCOM2Launcher
 
         private void Tab_Selected(object sender, TabControlEventArgs e)
         {
-            CheckAndUpdateChangeLog(e.TabPage.Name, modlist_objectlistview.SelectedObject as ModEntry);
+            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
         }
 
-        private void CheckAndUpdateChangeLog(String tabName, ModEntry m)
+        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
         {
-            if (tabName.Equals("tabPage5") && m != null) {
-                ModChangelogCache.GetChangeLog(m.WorkshopID, (string str) => { modinfo_changelog_richtextbox.Text = str; });
+            if (tab == tabPage5 && m != null) {
+                /*ModChangelogCache.GetChangeLogAsync(m.WorkshopID).ContinueWith((changelog) =>
+                {
+                    modinfo_changelog_richtextbox.Text = changelog.Result;
+                });*/
+                modinfo_changelog_richtextbox.Text = "Loading...";
+                modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
             }
         }
 

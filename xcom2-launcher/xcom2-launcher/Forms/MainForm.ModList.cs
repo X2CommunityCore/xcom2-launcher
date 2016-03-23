@@ -413,7 +413,7 @@ namespace XCOM2Launcher
 
             ModEntry m = modlist_objectlistview.SelectedObject as ModEntry;
             UpdateModInfo(m);
-            CheckAndUpdateChangeLog(tabControl1.SelectedTab.Name, m);
+            CheckAndUpdateChangeLog(tabControl1.SelectedTab, m);
 
             if (m != null)
             {
