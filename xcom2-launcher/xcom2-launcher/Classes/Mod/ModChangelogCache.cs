@@ -32,7 +32,8 @@ namespace XCOM2Launcher.Classes.Mod
                     changelogFormatted += m.Groups[1].ToString() + "\n" + htmlstrip.Replace(desc, "") + "\n\n";
                 }
                 changelogdownload.Dispose();
-                changelogDict.Add(WorkshopID, changelogFormatted);
+                if (changelogDict.ContainsKey(WorkshopID) == false)
+                    changelogDict.Add(WorkshopID, changelogFormatted);
                 action(changelogDict[WorkshopID]);
 
             }
