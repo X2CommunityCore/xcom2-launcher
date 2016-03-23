@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace XCOM2Launcher.Classes.Mod
+namespace XCOM2Launcher.Mod
 {
     public static class ModChangelogCache
     {

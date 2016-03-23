@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
