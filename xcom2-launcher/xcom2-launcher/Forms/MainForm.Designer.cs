@@ -80,11 +80,13 @@
             this.ColumnInternalClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnModClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.export_group_checkbox = new System.Windows.Forms.CheckBox();
             this.export_background_panel = new System.Windows.Forms.Panel();
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
             this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
             this.run_game_button = new System.Windows.Forms.Button();
-            this.export_group_checkbox = new System.Windows.Forms.CheckBox();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.modinfo_changelog_richtextbox = new System.Windows.Forms.RichTextBox();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -104,6 +106,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.conflicts_datagrid)).BeginInit();
             this.tabPage4.SuspendLayout();
             this.export_background_panel.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             this.SuspendLayout();
             // 
             // main_statusstrip
@@ -221,7 +224,7 @@
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // importActiveModsToolStripMenuItem
@@ -302,6 +305,7 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Controls.Add(this.modinfo_config_tab);
+            this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Location = new System.Drawing.Point(204, 6);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -502,13 +506,13 @@
             this.modinfo_image_picturebox.TabIndex = 8;
             this.modinfo_image_picturebox.TabStop = false;
             // 
-            // overrides_tab
+            // conflicts_tab
             // 
             this.conflicts_tab.Controls.Add(this.label3);
             this.conflicts_tab.Controls.Add(this.conflicts_textbox);
             this.conflicts_tab.Controls.Add(this.conflicts_datagrid);
             this.conflicts_tab.Location = new System.Drawing.Point(4, 22);
-            this.conflicts_tab.Name = "overrides_tab";
+            this.conflicts_tab.Name = "conflicts_tab";
             this.conflicts_tab.Padding = new System.Windows.Forms.Padding(3);
             this.conflicts_tab.Size = new System.Drawing.Size(892, 474);
             this.conflicts_tab.TabIndex = 1;
@@ -591,6 +595,19 @@
             this.tabPage4.Text = "Export";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
+            // export_group_checkbox
+            // 
+            this.export_group_checkbox.AutoSize = true;
+            this.export_group_checkbox.Checked = true;
+            this.export_group_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.export_group_checkbox.Location = new System.Drawing.Point(9, 7);
+            this.export_group_checkbox.Name = "export_group_checkbox";
+            this.export_group_checkbox.Size = new System.Drawing.Size(107, 17);
+            this.export_group_checkbox.TabIndex = 2;
+            this.export_group_checkbox.Text = "Include Grouping";
+            this.export_group_checkbox.UseVisualStyleBackColor = true;
+            this.export_group_checkbox.CheckedChanged += new System.EventHandler(this.export_group_checkbox_CheckedChanged);
+            // 
             // export_background_panel
             // 
             this.export_background_panel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -637,18 +654,26 @@
             this.run_game_button.Text = "Run XCOM 2";
             this.run_game_button.UseVisualStyleBackColor = true;
             // 
-            // export_group_checkbox
+            // tabPage5
             // 
-            this.export_group_checkbox.AutoSize = true;
-            this.export_group_checkbox.Checked = true;
-            this.export_group_checkbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.export_group_checkbox.Location = new System.Drawing.Point(9, 7);
-            this.export_group_checkbox.Name = "export_group_checkbox";
-            this.export_group_checkbox.Size = new System.Drawing.Size(107, 17);
-            this.export_group_checkbox.TabIndex = 2;
-            this.export_group_checkbox.Text = "Include Grouping";
-            this.export_group_checkbox.UseVisualStyleBackColor = true;
-            this.export_group_checkbox.CheckedChanged += new System.EventHandler(this.export_group_checkbox_CheckedChanged);
+            this.tabPage5.Controls.Add(this.modinfo_changelog_richtextbox);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(668, 202);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Changelog";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox1
+            // 
+            this.modinfo_changelog_richtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.modinfo_changelog_richtextbox.Location = new System.Drawing.Point(3, 3);
+            this.modinfo_changelog_richtextbox.Name = "modinfo_changelog_richtextbox";
+            this.modinfo_changelog_richtextbox.ReadOnly = true;
+            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(662, 196);
+            this.modinfo_changelog_richtextbox.TabIndex = 0;
+            this.modinfo_changelog_richtextbox.Text = "";
             // 
             // MainForm
             // 
@@ -687,6 +712,7 @@
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
             this.export_background_panel.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -750,6 +776,8 @@
         private System.Windows.Forms.RichTextBox export_richtextbox;
         private System.Windows.Forms.CheckBox export_workshop_link_checkbox;
         private System.Windows.Forms.CheckBox export_group_checkbox;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.RichTextBox modinfo_changelog_richtextbox;
     }
 }
 

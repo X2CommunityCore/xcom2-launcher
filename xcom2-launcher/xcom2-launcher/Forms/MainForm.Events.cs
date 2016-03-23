@@ -67,7 +67,10 @@ namespace XCOM2Launcher
             modinfo_readme_richtextbox.LinkClicked += ControlLinkClicked;
             modinfo_description_richtextbox.LinkClicked += ControlLinkClicked;
             export_richtextbox.LinkClicked += ControlLinkClicked;
+            modinfo_changelog_richtextbox.LinkClicked += ControlLinkClicked;
 
+            // TabControl (mainly for the changelog)
+            tabControl1.Selected += Tab_Selected;
 
             // Mod Updater
             UpdateWorker.DoWork += Updater_DoWork;
@@ -115,6 +118,23 @@ namespace XCOM2Launcher
             m = Mods.All.Single(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
             MessageBox.Show($"{m.Name} finished download.");
+        }
+
+        private void Tab_Selected(object sender, TabControlEventArgs e)
+        {
+            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
+        }
+
+        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
+        {
+            if (tab == tabPage5 && m != null) {
+                /*ModChangelogCache.GetChangeLogAsync(m.WorkshopID).ContinueWith((changelog) =>
+                {
+                    modinfo_changelog_richtextbox.Text = changelog.Result;
+                });*/
+                modinfo_changelog_richtextbox.Text = "Loading...";
+                modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
+            }
         }
 
 
