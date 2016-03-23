@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
@@ -68,6 +69,8 @@ namespace XCOM2Launcher
             modinfo_description_richtextbox.LinkClicked += ControlLinkClicked;
             export_richtextbox.LinkClicked += ControlLinkClicked;
 
+            // TabControl (mainly for the changelog)
+            tabControl1.Selected += Tab_Selected;
 
             // Mod Updater
             UpdateWorker.DoWork += Updater_DoWork;
@@ -115,6 +118,18 @@ namespace XCOM2Launcher
             m = Mods.All.Single(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
             MessageBox.Show($"{m.Name} finished download.");
+        }
+
+        private void Tab_Selected(object sender, TabControlEventArgs e)
+        {
+            CheckAndUpdateChangeLog(e.TabPage.Name, modlist_objectlistview.SelectedObject as ModEntry);
+        }
+
+        private void CheckAndUpdateChangeLog(String tabName, ModEntry m)
+        {
+            if (tabName.Equals("tabPage5") && m != null) {
+                ModChangelogCache.GetChangeLog(m.WorkshopID, (string str) => { modinfo_changelog_richtextbox.Text = str; });
+            }
         }
 
 
