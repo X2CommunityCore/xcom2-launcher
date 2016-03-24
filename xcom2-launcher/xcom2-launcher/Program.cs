@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -49,11 +48,11 @@ namespace XCOM2Launcher
                         client.Headers.Add("User-Agent: Other");
                         var json = client.DownloadString("https://api.github.com/repos/aEnigmatic/xcom2-launcher/releases/latest");
                         var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
-                        var current_version = GetCurrentVersion();
+                        var currentVersion = GetCurrentVersion();
 
-                        if (current_version != release.tag_name)
+                        if (currentVersion != release.tag_name)
                             // New version available
-                            new UpdateAvailableDialog(release, current_version).ShowDialog();
+                            new UpdateAvailableDialog(release, currentVersion).ShowDialog();
                     }
                 }
                 catch (System.Net.WebException)
@@ -142,7 +141,6 @@ namespace XCOM2Launcher
         public static string GetCurrentVersion()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var assemblyName = assembly.GetName();
             var fields = assembly.GetType("XCOM2Launcher.GitVersionInformation").GetFields();
 
             var major = fields.Single(f => f.Name == "Major").GetValue(null);

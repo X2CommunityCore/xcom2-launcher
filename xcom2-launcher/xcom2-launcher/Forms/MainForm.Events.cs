@@ -37,7 +37,13 @@ namespace XCOM2Launcher.Forms
                 Reset();
             };
             searchForModsToolStripMenuItem.Click += delegate { Settings.ImportMods(); };
+            updateEntriesToolStripMenuItem.Click += delegate
+            {
+                if (_updateWorker.IsBusy)
+                    return;
 
+                _updateWorker.RunWorkerAsync();
+            };
             // -> Settings
             // show hidden
             showHiddenModsToolStripMenuItem.Click += delegate

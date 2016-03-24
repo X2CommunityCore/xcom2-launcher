@@ -87,6 +87,7 @@
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
             this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
             this.run_game_button = new System.Windows.Forms.Button();
+            this.updateEntriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -149,6 +150,7 @@
             this.reloadToolStripMenuItem,
             this.toolStripSeparator1,
             this.searchForModsToolStripMenuItem,
+            this.updateEntriesToolStripMenuItem,
             this.toolStripSeparator2,
             this.exitToolStripMenuItem});
             this.runToolStripMenuItem.Name = "runToolStripMenuItem";
@@ -464,7 +466,7 @@
             this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(662, 196);
             this.modinfo_inspect_propertygrid.TabIndex = 9;
             this.modinfo_inspect_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_inspect_propertygrid_Layout);
-             //
+            // 
             // modinfo_config_tab
             // 
             this.modinfo_config_tab.Controls.Add(this.modinfo_config_save_button);
@@ -677,6 +679,12 @@
             this.run_game_button.Text = "Run XCOM 2";
             this.run_game_button.UseVisualStyleBackColor = true;
             // 
+            // updateEntriesToolStripMenuItem
+            // 
+            this.updateEntriesToolStripMenuItem.Name = "updateEntriesToolStripMenuItem";
+            this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.updateEntriesToolStripMenuItem.Text = "Update entries";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -780,6 +788,7 @@
         private System.Windows.Forms.CheckBox export_group_checkbox;
         private System.Windows.Forms.TabPage modinfo_changelog_tab;
         private System.Windows.Forms.RichTextBox modinfo_changelog_richtextbox;
+        private System.Windows.Forms.ToolStripMenuItem updateEntriesToolStripMenuItem;
     }
 }
 
