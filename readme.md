@@ -1,7 +1,7 @@
 This is an alternative launcher / mod manager for the game XCOM2.
 
 # Links
-[Latest Release](https://github.com/aEnigmatic/xcom2-launcher/releases/latest)
+[Latest Release](https://github.com/aEnigmatic/xcom2-launcher/releases/latest)  
 [Screenshots](http://imgur.com/a/wcpey)
 
 
@@ -20,7 +20,7 @@ This is an alternative launcher / mod manager for the game XCOM2.
 * Steam running
 
 #Setup
-Extract all files where-ever you want and run the exe. The launcher should detect game path etc. automatically.
+Extract all files where-ever you want and run the exe. The launcher should detect game path etc. automatically.  
 You can use Tools > Import active mods for a quicker first time setup, if you want.
 
 #Licence
