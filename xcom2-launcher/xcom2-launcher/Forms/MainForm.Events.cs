@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using XCOM2Launcher.Forms;
@@ -175,10 +176,8 @@ namespace XCOM2Launcher
         private void Updater_DoWork(object sender, DoWorkEventArgs e)
         {
             UpdateWorker.ReportProgress(0);
-            // Don't start immediately
-            System.Threading.Thread.Sleep(2000);
-            int i = 1;
-            foreach (ModEntry m in Mods.All.ToList())
+            int numCompletedMods = 0;
+            Parallel.ForEach(Mods.All.ToList(), mod =>
             {
                 if (UpdateWorker.CancellationPending || Disposing || IsDisposed)
                 {
@@ -186,14 +185,15 @@ namespace XCOM2Launcher
                     return;
                 }
 
-                Mods.UpdateMod(m);
+                Mods.UpdateMod(mod);
 
-                //if (!Updater.CancellationPending && !Disposing && !IsDisposed)
-                //    UpdateMod(m);
-
-
-                UpdateWorker.ReportProgress(i++, m);
-            }
+                lock (UpdateWorker)
+                {
+                    numCompletedMods++;
+                    UpdateWorker.ReportProgress(numCompletedMods, mod);
+                }
+                
+            });
         }
 
         private void Updater_ProgressChanged(object sender, ProgressChangedEventArgs e)
