@@ -41,6 +41,7 @@ namespace XCOM2Launcher.Forms
                 // Behavior
                 FullRowSelect = true,
                 CellEditActivation = ObjectListView.CellEditActivateMode.DoubleClick,
+                AllowColumnReorder = true,
 
                 // Sorting
                 ShowSortIndicators = true,
@@ -84,14 +85,14 @@ namespace XCOM2Launcher.Forms
 
             var columns = new[]
             {
-                new OLVColumn
+                // first column is marked as primary column
+                new OLVColumn 
                 {
                     Text = "Name",
                     AspectName = "Name",
                     Width = 500,
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
-                    DisplayIndex = 2,
                     IsEditable = true
                 },
                 new OLVColumn
@@ -101,26 +102,6 @@ namespace XCOM2Launcher.Forms
                     Width = 200,
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
-                    DisplayIndex = 3,
-                    IsEditable = false
-                },
-                new OLVColumn
-                {
-                    Text = "Size",
-                    AspectName = "Size",
-                    AspectToStringConverter = size => ((long) size).FormatAsFileSize(),
-                    TextAlign = HorizontalAlignment.Right,
-                    Width = 100,
-                    DisplayIndex = 4,
-                    IsEditable = false
-                },
-                new OLVColumn
-                {
-                    Text = "Last Update",
-                    AspectName = "DateUpdated",
-                    Width = 120,
-                    TextAlign = HorizontalAlignment.Right,
-                    DisplayIndex = 5,
                     IsEditable = false
                 },
 
@@ -131,8 +112,7 @@ namespace XCOM2Launcher.Forms
                     //Groupable = false,
                     //Sortable = false,
                     IsEditable = false,
-                    Width = 30,
-                    DisplayIndex = 0,
+                    Width = 40,
                     AspectGetter = o =>
                     {
                         var mod = o as ModEntry;
@@ -162,18 +142,62 @@ namespace XCOM2Launcher.Forms
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
                     IsEditable = false,
-                    DisplayIndex = 1
-                }
+                },
+
+                new OLVColumn
+                {
+                    Text = "Size",
+                    AspectName = "Size",
+                    AspectToStringConverter = size => ((long) size).FormatAsFileSize(),
+                    TextAlign = HorizontalAlignment.Right,
+                    Width = 100,
+                    IsEditable = false
+                },
+                new OLVColumn
+                {
+                    Text = "Last Update",
+                    AspectName = "DateUpdated",
+                    Width = 120,
+                    TextAlign = HorizontalAlignment.Right,
+                    IsEditable = false
+                },
+                new OLVColumn
+                {
+                    Text = "Date Added",
+                    AspectName = "DateAdded",
+                    Width = 120,
+                    TextAlign = HorizontalAlignment.Right,
+                    IsEditable = false,
+                    IsVisible = false,
+                },
+                new OLVColumn
+                {
+                    Text = "Date Created",
+                    AspectName = "DateCreated",
+                    Width = 120,
+                    TextAlign = HorizontalAlignment.Right,
+                    IsEditable = false,
+                    IsVisible = false,
+                },
+                new OLVColumn
+                {
+                    Text = "Path",
+                    AspectName = "Path",
+                    Width = 160,
+                    IsEditable = false,
+                    IsVisible = false,
+                    GroupKeyGetter = o => Path.GetDirectoryName((o as ModEntry)?.Path)
+                },
             };
 
             // size groupies
-            columns[2].MakeGroupies(
+            columns.Single(c => c.AspectName == "Size").MakeGroupies(
                 new[] { 1024, 1024 * 1024, (long)50 * 1024 * 1024, (long)100 * 1024 * 1024 },
                 new[] { "< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB" }
                 );
 
             // date updated groupies
-            columns[3].MakeGroupies(
+            columns.Single(c => c.AspectName == "DateUpdated").MakeGroupies(
                 new[]
                 {
                     DateTime.Now.Subtract(TimeSpan.FromHours(24*30)), DateTime.Now.Subtract(TimeSpan.FromHours(24*7)),
@@ -197,7 +221,10 @@ namespace XCOM2Launcher.Forms
 
             // Content
             modlist_objectlistview.AllColumns.AddRange(columns);
-            modlist_objectlistview.Columns.AddRange(columns);
+            modlist_objectlistview.RebuildColumns();
+
+            // move state to the beginning
+            columns.Single(c => c.Text == "State").DisplayIndex = 0;
 
             // Restore State
             if (Settings.Windows.ContainsKey("main") && Settings.Windows["main"].Data != null)
@@ -359,7 +386,7 @@ namespace XCOM2Launcher.Forms
             moveToCategory.MenuItems.Add("-");
 
             // ... existing category
-            foreach (var category in Settings.Mods.Categories)
+            foreach (var category in Settings.Mods.Categories.OrderBy(c => c))
             {
                 if (category == Mods.GetCategory(m))
                     continue;
