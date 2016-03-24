@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.SuspendLayout();
             // 
@@ -38,7 +39,7 @@
             this.propertyGrid1.Name = "propertyGrid1";
             this.propertyGrid1.Size = new System.Drawing.Size(599, 312);
             this.propertyGrid1.TabIndex = 0;
-            this.propertyGrid1.Layout += new System.Windows.Forms.LayoutEventHandler(this.propertyGrid1_Layout);
+            this.propertyGrid1.Layout += propertyGrid1_Layout;
             // 
             // SettingsDialog
             // 
@@ -46,13 +47,18 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(599, 312);
             this.Controls.Add(this.propertyGrid1);
-            this.Icon = global::XCOM2Launcher.Properties.Resources.xcom;
+            this.Icon = ((System.Drawing.Icon) XCOM2Launcher.Properties.Resources.xcom);
             this.Name = "SettingsDialog";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Settings";
             this.ResumeLayout(false);
 
+        }
+
+        private void PropertyGrid1_Layout(object sender, System.Windows.Forms.LayoutEventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
 
         #endregion

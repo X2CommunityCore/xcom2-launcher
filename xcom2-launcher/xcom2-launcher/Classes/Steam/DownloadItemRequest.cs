@@ -1,21 +1,22 @@
 ﻿using Steamworks;
 
-namespace XCOM2Launcher
+namespace XCOM2Launcher.Steam
 {
     public class DownloadItemRequest
     {
-        private Callback<DownloadItemResult_t> callback;
-        private ulong id;
+        // ReSharper disable once NotAccessedField.Local
+        private readonly Callback<DownloadItemResult_t> _callback;
+        private readonly ulong _id;
 
         public DownloadItemRequest(ulong id, Callback<DownloadItemResult_t>.DispatchDelegate callback)
         {
-            this.id = id;
-            this.callback = Callback<DownloadItemResult_t>.Create(callback);
+            _id = id;
+            _callback = Callback<DownloadItemResult_t>.Create(callback);
         }
 
         public void Send()
         {
-            SteamUGC.DownloadItem(new PublishedFileId_t(id), true);
+            SteamUGC.DownloadItem(new PublishedFileId_t(_id), true);
         }
     }
 }

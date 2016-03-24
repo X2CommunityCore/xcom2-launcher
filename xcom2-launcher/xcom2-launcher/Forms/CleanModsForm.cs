@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using XCOM2Launcher.Mod;
 
@@ -14,7 +9,6 @@ namespace XCOM2Launcher.Forms
 {
     public partial class CleanModsForm : Form
     {
-        ModList Mods { get; set; }
         public CleanModsForm(Settings settings)
         {
             InitializeComponent();
@@ -27,16 +21,18 @@ namespace XCOM2Launcher.Forms
             button1.Click += onStartButtonClicked;
         }
 
+        private ModList Mods { get; }
+
         private void onStartButtonClicked(object sender, EventArgs e)
         {
             var result = MessageBox.Show("Are you sure?\r\nThis might cause problems and can not be undone.", "Confirm", MessageBoxButtons.OKCancel);
             if (result != DialogResult.OK)
                 return;
+            
+            var source_mode = source_groupbox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked).Name;
+            var shader_mode = shader_groupbox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked).Name;
 
-            string source_mode = source_groupbox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked).Name;
-            string shader_mode = shader_groupbox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked).Name;
-
-            foreach (ModEntry m in Mods.All)
+            foreach (var m in Mods.All)
             {
                 // Source Files
                 if (hasSourceFiles(m))
@@ -63,7 +59,7 @@ namespace XCOM2Launcher.Forms
 
             Close();
         }
-        
+
 
         internal static bool hasModShaderCache(ModEntry m)
         {
@@ -72,7 +68,7 @@ namespace XCOM2Launcher.Forms
 
         internal static bool hasEmptyModShaderCache(ModEntry m)
         {
-            string file = Path.Combine(m.Path, "Content", m.ID + "_ModShaderCache.upk");
+            var file = Path.Combine(m.Path, "Content", m.ID + "_ModShaderCache.upk");
             return File.Exists(file) && new FileInfo(file).Length == 371;
         }
 

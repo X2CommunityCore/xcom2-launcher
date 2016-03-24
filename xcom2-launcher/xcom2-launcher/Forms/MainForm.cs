@@ -1,29 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using XCOM2Launcher.Forms;
-using System.Reflection;
-using XCOM2Launcher.Classes.PropertyGrid;
+using Steamworks;
 using XCOM2Launcher.Classes.Steam;
-using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
+using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 
-namespace XCOM2Launcher
+namespace XCOM2Launcher.Forms
 {
-    public partial class MainForm : Form
+    public partial class MainForm
     {
         private const string StatusBarIdleString = "Ready.";
-
-        public Settings Settings { get; set; }
 
         public MainForm(Settings settings)
         {
@@ -43,7 +33,7 @@ namespace XCOM2Launcher
 #endif
 
             // Init interface
-            initObjectListView();
+            InitObjectListView();
             UpdateInterface();
             RegisterEvents();
 
@@ -56,13 +46,15 @@ namespace XCOM2Launcher
             {
                 CheckSteamForNewMods();
 
-                Timer t = new Timer();
+                var t = new Timer();
                 t.Tick += (sender, e) => { CheckSteamForNewMods(); };
                 t.Interval = 30000;
                 t.Start();
             }
 #endif
         }
+
+        public Settings Settings { get; set; }
 
         private void CheckSteamForNewMods()
         {
@@ -71,7 +63,7 @@ namespace XCOM2Launcher
             ulong[] subscribedIDs;
             try
             {
-                subscribedIDs = Steam.Workshop.GetSubscribedItems();
+                subscribedIDs = Workshop.GetSubscribedItems();
             }
             catch (InvalidOperationException)
             {
@@ -82,41 +74,37 @@ namespace XCOM2Launcher
             }
 
             var change = false;
-            foreach (ulong id in subscribedIDs)
+            foreach (var id in subscribedIDs)
             {
-                var status = Steam.Workshop.GetDownloadStatus(id);
-                if (id == 622560612)
-                    status.ToString();
+                var status = Workshop.GetDownloadStatus(id);
 
-                if (status.HasFlag(Steamworks.EItemState.k_EItemStateInstalled))
+                if (status.HasFlag(EItemState.k_EItemStateInstalled))
                     // already installed
                     continue;
 
-                if (Downloads.Any(d => d.WorkshopID == (long)id))
+                if (Downloads.Any(d => d.WorkshopID == (long) id))
                     // already observing
                     continue;
 
                 // Get info
-                var detailsRequest = new Steam.ItemDetailsRequest(id).Send().waitForResult();
+                var detailsRequest = new ItemDetailsRequest(id).Send().WaitForResult();
                 var details = detailsRequest.Result;
                 var link = detailsRequest.GetPreviewURL();
 
-                ModEntry downloadMod = new ModEntry
+                var downloadMod = new ModEntry
                 {
                     Name = details.m_rgchTitle,
                     DateCreated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeCreated).DateTime,
                     DateUpdated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeUpdated).DateTime,
-
-
                     Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
                     Image = link,
                     Source = ModSource.SteamWorkshop,
-                    WorkshopID = (int)id,
+                    WorkshopID = (int) id,
                     State = ModState.New | ModState.NotInstalled
                 };
 
                 // Start download
-                Steam.Workshop.DownloadItem(id);
+                Workshop.DownloadItem(id);
                 //
                 Downloads.Add(downloadMod);
                 change = true;
@@ -133,22 +121,21 @@ namespace XCOM2Launcher
             progress_toolstrip_progressbar.Value = 0;
             progress_toolstrip_progressbar.Maximum = Mods.All.Count();
             progress_toolstrip_progressbar.Visible = true;
-            UpdateWorker.RunWorkerAsync();
+            _updateWorker.RunWorkerAsync();
         }
 
-
-
         #region Basic
+
         private void Reset()
         {
-            UpdateWorker.CancelAsync();
+            _updateWorker.CancelAsync();
             // let's hope it cancels fast enough...
 
             modlist_objectlistview.Clear();
 
-            Settings = Program.initializeSettings();
+            Settings = Program.InitializeSettings();
 
-            initObjectListView();
+            InitObjectListView();
 
             //UpdateWorker.RunWorkerAsync();
             //RefreshModList();
@@ -156,24 +143,25 @@ namespace XCOM2Launcher
 
         private void Save()
         {
-            XCOM2.setActiveMods(Mods.Active.ToList());
-            Settings.saveFile("settings.json");
+            XCOM2.SetActiveMods(Mods.Active.ToList());
+            Settings.SaveFile("settings.json");
         }
 
         private void RunGame()
         {
-            UpdateWorker.CancelAsync();
+            _updateWorker.CancelAsync();
             Save();
 
             XCOM2.RunGame(Settings.GamePath, Settings.Arguments.ToString());
 
             if (Settings.CloseAfterLaunch)
-                this.Close();
+                Close();
         }
+
         #endregion
 
-
         #region Interface updates
+
         private void UpdateInterface()
         {
             error_provider.Clear();
@@ -189,6 +177,7 @@ namespace XCOM2Launcher
 
             UpdateLabels();
         }
+
         private void UpdateLabels()
         {
             //
@@ -197,36 +186,35 @@ namespace XCOM2Launcher
             //
             modlist_tab.Text = $"Mods ({Mods.Active.Count()} / {Mods.All.Count()})";
             conflicts_tab.Text = "Conflicts";
-            if (num_conflicts > 0)
-                conflicts_tab.Text += $" ({num_conflicts})";
+            if (NumConflicts > 0)
+                conflicts_tab.Text += $" ({NumConflicts})";
         }
 
 
-
-        public int num_conflicts = 0;
+        public int NumConflicts;
 
         private void UpdateConflicts()
         {
-            num_conflicts = 0;
+            NumConflicts = 0;
 
             // Datagrid
             conflicts_datagrid.Rows.Clear();
 
-            foreach (ModEntry m in Mods.Active)
+            foreach (var m in Mods.Active)
             {
-                foreach (ModClassOverride classOverride in m.GetClassOverrides())
+                foreach (var classOverride in m.GetClassOverrides())
                 {
-                    conflicts_datagrid.Rows.Add(new object[] { m.Name, classOverride.OldClass, classOverride.NewClass });
+                    conflicts_datagrid.Rows.Add(m.Name, classOverride.OldClass, classOverride.NewClass);
                 }
             }
 
             // Conflict log
             Mods.MarkDuplicates();
 
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
-            var duplicates = Mods.GetDuplicates();
-            if (duplicates.Count() > 0)
+            var duplicates = Mods.GetDuplicates().ToList();
+            if (duplicates.Any())
             {
                 str.AppendLine("Mods with colliding package ids found!");
                 str.AppendLine("These can only be (de-)activated together.");
@@ -234,11 +222,11 @@ namespace XCOM2Launcher
 
                 foreach (var grouping in duplicates)
                 {
-                    num_conflicts++;
+                    NumConflicts++;
 
                     str.AppendLine(grouping.Key);
 
-                    foreach (ModEntry m in grouping)
+                    foreach (var m in grouping)
                         str.AppendLine($"\t{m.Name}");
 
 
@@ -249,28 +237,27 @@ namespace XCOM2Launcher
             }
 
             // Override conflicts
-            Dictionary<string, List<ModEntry>> overrides = Mods.getOverrides(Mods.Active);
-            var conflicts = from a in overrides where a.Value.Count > 1 select a;
-
+            var overrides = Mods.GetOverrides(Mods.Active);
+            var conflicts = overrides.Where(a => a.Value.Count > 1).ToList();
             if (conflicts.Any())
             {
                 str.AppendLine("Mods with colliding overrides found!");
                 str.AppendLine("These mods will not (fully) work when run together.");
                 str.AppendLine();
 
-                foreach (KeyValuePair<string, List<ModEntry>> entry in conflicts)
+                foreach (var entry in conflicts)
                 {
                     str.AppendLine($"Conflict found for '{entry.Key}':");
 
-                    foreach (ModEntry m in entry.Value)
+                    foreach (var m in entry.Value)
                         str.AppendLine($"\t{m.Name}");
 
                     str.AppendLine();
 
-                    num_conflicts++;
+                    NumConflicts++;
                 }
 
-                error_provider.SetError(label3, "Found " + num_conflicts + " conflicts");
+                error_provider.SetError(conflicts_log_label, "Found " + NumConflicts + " conflicts");
             }
 
             conflicts_textbox.Text = str.ToString();
@@ -293,17 +280,16 @@ namespace XCOM2Launcher
             // 
             modinfo_title_textbox.Text = m.Name;
             modinfo_author_textbox.Text = m.Author;
-            modinfo_date_created_textbox.Text = (m.DateCreated == null) ? "" : m.DateCreated.Value.ToString();
-            modinfo_date_added_textbox.Text = (m.DateAdded == null) ? "" : m.DateAdded.Value.ToString();
+            modinfo_date_created_textbox.Text = m.DateCreated?.ToString() ?? "";
+            modinfo_date_added_textbox.Text = m.DateAdded?.ToString() ?? "";
             modinfo_description_richtextbox.Text = m.GetDescription();
             modinfo_readme_richtextbox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
 
-            modinfo_details_propertygrid.SelectedObject = m;
-            return;
-
+            modinfo_inspect_propertygrid.SelectedObject = m;
 
             #region Config
+
             // config files
             //string[] configFiles = m.getConfigFiles();
 
@@ -337,17 +323,19 @@ namespace XCOM2Launcher
 
             //    modinfo_config_propertygrid.SelectedObjects = configs.ToArray
             //}
+
             #endregion
         }
-
 
         #endregion
 
         #region Export
+
         private void export_group_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             UpdateExport();
         }
+
         private void export_workshop_link_checkbox_CheckedChanged(object sender, EventArgs e)
         {
             UpdateExport();
@@ -355,7 +343,7 @@ namespace XCOM2Launcher
 
         private void UpdateExport()
         {
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
             if (!Mods.Active.Any())
             {
@@ -367,12 +355,12 @@ namespace XCOM2Launcher
             int id_length = Mods.Active.Max(m => m.ID.Length) + 1;
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
             {
-                var mods = entry.Value.Entries.Where(m => m.isActive);
+                var mods = entry.Value.Entries.Where(m => m.isActive).ToList();
 
                 if (export_group_checkbox.Checked)
                     str.AppendLine($"{entry.Key} ({mods.Count()}):");
 
-                foreach (ModEntry mod in mods)
+                foreach (var mod in mods)
                 {
                     str.Append(String.Format("\t{0,-" + name_length + "} ", mod.Name));
                     str.Append(String.Format("{0,-" + id_length + "} ", mod.ID));
@@ -387,7 +375,6 @@ namespace XCOM2Launcher
                         str.Append(mod.WorkshopID.ToString());
 
                     str.AppendLine();
-
                 }
 
                 if (export_group_checkbox.Checked)
@@ -396,7 +383,7 @@ namespace XCOM2Launcher
 
             export_richtextbox.Text = str.ToString();
         }
+
         #endregion
     }
 }
-

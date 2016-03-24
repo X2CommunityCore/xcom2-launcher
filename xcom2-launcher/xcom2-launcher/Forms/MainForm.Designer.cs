@@ -1,4 +1,4 @@
-﻿namespace XCOM2Launcher
+﻿namespace XCOM2Launcher.Forms
 {
     partial class MainForm
     {
@@ -52,8 +52,8 @@
             this.modlist_tab = new System.Windows.Forms.TabPage();
             this.horizontal_splitcontainer = new System.Windows.Forms.SplitContainer();
             this.modinfo_groupbox = new System.Windows.Forms.GroupBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
+            this.modinfo_details_tab = new System.Windows.Forms.TabPage();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.modinfo_date_added_textbox = new System.Windows.Forms.TextBox();
@@ -64,24 +64,24 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.modinfo_description_richtextbox = new System.Windows.Forms.RichTextBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.modinfo_readme_tab = new System.Windows.Forms.TabPage();
             this.modinfo_readme_richtextbox = new System.Windows.Forms.RichTextBox();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.modinfo_details_propertygrid = new System.Windows.Forms.PropertyGrid();
+            this.modinfo_inspect_tab = new System.Windows.Forms.TabPage();
+            this.modinfo_inspect_propertygrid = new System.Windows.Forms.PropertyGrid();
             this.modinfo_config_tab = new System.Windows.Forms.TabPage();
-            this.button1 = new System.Windows.Forms.Button();
+            this.modinfo_config_save_button = new System.Windows.Forms.Button();
             this.modinfo_config_propertygrid = new System.Windows.Forms.PropertyGrid();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.modinfo_changelog_tab = new System.Windows.Forms.TabPage();
             this.modinfo_changelog_richtextbox = new System.Windows.Forms.RichTextBox();
             this.modinfo_image_picturebox = new System.Windows.Forms.PictureBox();
             this.conflicts_tab = new System.Windows.Forms.TabPage();
-            this.label3 = new System.Windows.Forms.Label();
+            this.conflicts_log_label = new System.Windows.Forms.Label();
             this.conflicts_textbox = new System.Windows.Forms.TextBox();
             this.conflicts_datagrid = new System.Windows.Forms.DataGridView();
             this.ColumnModName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnInternalClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnModClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.export_tab = new System.Windows.Forms.TabPage();
             this.export_group_checkbox = new System.Windows.Forms.CheckBox();
             this.export_background_panel = new System.Windows.Forms.Panel();
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
@@ -96,16 +96,16 @@
             this.horizontal_splitcontainer.Panel2.SuspendLayout();
             this.horizontal_splitcontainer.SuspendLayout();
             this.modinfo_groupbox.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.modinfo_tabcontrol.SuspendLayout();
+            this.modinfo_details_tab.SuspendLayout();
+            this.modinfo_readme_tab.SuspendLayout();
+            this.modinfo_inspect_tab.SuspendLayout();
             this.modinfo_config_tab.SuspendLayout();
-            this.tabPage5.SuspendLayout();
+            this.modinfo_changelog_tab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).BeginInit();
             this.conflicts_tab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.conflicts_datagrid)).BeginInit();
-            this.tabPage4.SuspendLayout();
+            this.export_tab.SuspendLayout();
             this.export_background_panel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -224,7 +224,7 @@
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // importActiveModsToolStripMenuItem
@@ -251,7 +251,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.main_tabcontrol.Controls.Add(this.modlist_tab);
             this.main_tabcontrol.Controls.Add(this.conflicts_tab);
-            this.main_tabcontrol.Controls.Add(this.tabPage4);
+            this.main_tabcontrol.Controls.Add(this.export_tab);
             this.main_tabcontrol.Location = new System.Drawing.Point(0, 27);
             this.main_tabcontrol.Name = "main_tabcontrol";
             this.main_tabcontrol.SelectedIndex = 0;
@@ -286,7 +286,7 @@
             // 
             // modinfo_groupbox
             // 
-            this.modinfo_groupbox.Controls.Add(this.tabControl1);
+            this.modinfo_groupbox.Controls.Add(this.modinfo_tabcontrol);
             this.modinfo_groupbox.Controls.Add(this.modinfo_image_picturebox);
             this.modinfo_groupbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.modinfo_groupbox.Location = new System.Drawing.Point(0, 0);
@@ -296,41 +296,41 @@
             this.modinfo_groupbox.TabStop = false;
             this.modinfo_groupbox.Text = "Mod Info";
             // 
-            // tabControl1
+            // modinfo_tabcontrol
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.modinfo_tabcontrol.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.modinfo_config_tab);
-            this.tabControl1.Controls.Add(this.tabPage5);
-            this.tabControl1.Location = new System.Drawing.Point(204, 6);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(676, 228);
-            this.tabControl1.TabIndex = 9;
+            this.modinfo_tabcontrol.Controls.Add(this.modinfo_details_tab);
+            this.modinfo_tabcontrol.Controls.Add(this.modinfo_readme_tab);
+            this.modinfo_tabcontrol.Controls.Add(this.modinfo_inspect_tab);
+            this.modinfo_tabcontrol.Controls.Add(this.modinfo_config_tab);
+            this.modinfo_tabcontrol.Controls.Add(this.modinfo_changelog_tab);
+            this.modinfo_tabcontrol.Location = new System.Drawing.Point(204, 6);
+            this.modinfo_tabcontrol.Name = "modinfo_tabcontrol";
+            this.modinfo_tabcontrol.SelectedIndex = 0;
+            this.modinfo_tabcontrol.Size = new System.Drawing.Size(676, 228);
+            this.modinfo_tabcontrol.TabIndex = 9;
             // 
-            // tabPage1
+            // modinfo_details_tab
             // 
-            this.tabPage1.Controls.Add(this.label5);
-            this.tabPage1.Controls.Add(this.label6);
-            this.tabPage1.Controls.Add(this.modinfo_date_added_textbox);
-            this.tabPage1.Controls.Add(this.modinfo_date_created_textbox);
-            this.tabPage1.Controls.Add(this.label4);
-            this.tabPage1.Controls.Add(this.modinfo_title_textbox);
-            this.tabPage1.Controls.Add(this.modinfo_author_textbox);
-            this.tabPage1.Controls.Add(this.label2);
-            this.tabPage1.Controls.Add(this.label1);
-            this.tabPage1.Controls.Add(this.modinfo_description_richtextbox);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(668, 202);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Info";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.modinfo_details_tab.Controls.Add(this.label5);
+            this.modinfo_details_tab.Controls.Add(this.label6);
+            this.modinfo_details_tab.Controls.Add(this.modinfo_date_added_textbox);
+            this.modinfo_details_tab.Controls.Add(this.modinfo_date_created_textbox);
+            this.modinfo_details_tab.Controls.Add(this.label4);
+            this.modinfo_details_tab.Controls.Add(this.modinfo_title_textbox);
+            this.modinfo_details_tab.Controls.Add(this.modinfo_author_textbox);
+            this.modinfo_details_tab.Controls.Add(this.label2);
+            this.modinfo_details_tab.Controls.Add(this.label1);
+            this.modinfo_details_tab.Controls.Add(this.modinfo_description_richtextbox);
+            this.modinfo_details_tab.Location = new System.Drawing.Point(4, 22);
+            this.modinfo_details_tab.Name = "modinfo_details_tab";
+            this.modinfo_details_tab.Padding = new System.Windows.Forms.Padding(3);
+            this.modinfo_details_tab.Size = new System.Drawing.Size(668, 202);
+            this.modinfo_details_tab.TabIndex = 0;
+            this.modinfo_details_tab.Text = "Info";
+            this.modinfo_details_tab.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -422,16 +422,16 @@
             this.modinfo_description_richtextbox.TabIndex = 8;
             this.modinfo_description_richtextbox.Text = "";
             // 
-            // tabPage2
+            // modinfo_readme_tab
             // 
-            this.tabPage2.Controls.Add(this.modinfo_readme_richtextbox);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(668, 202);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "ReadMe";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.modinfo_readme_tab.Controls.Add(this.modinfo_readme_richtextbox);
+            this.modinfo_readme_tab.Location = new System.Drawing.Point(4, 22);
+            this.modinfo_readme_tab.Name = "modinfo_readme_tab";
+            this.modinfo_readme_tab.Padding = new System.Windows.Forms.Padding(3);
+            this.modinfo_readme_tab.Size = new System.Drawing.Size(668, 202);
+            this.modinfo_readme_tab.TabIndex = 1;
+            this.modinfo_readme_tab.Text = "ReadMe";
+            this.modinfo_readme_tab.UseVisualStyleBackColor = true;
             // 
             // modinfo_readme_richtextbox
             // 
@@ -444,30 +444,30 @@
             this.modinfo_readme_richtextbox.TabIndex = 0;
             this.modinfo_readme_richtextbox.Text = "";
             // 
-            // tabPage3
+            // modinfo_inspect_tab
             // 
-            this.tabPage3.Controls.Add(this.modinfo_details_propertygrid);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(668, 202);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Inspect";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.modinfo_inspect_tab.Controls.Add(this.modinfo_inspect_propertygrid);
+            this.modinfo_inspect_tab.Location = new System.Drawing.Point(4, 22);
+            this.modinfo_inspect_tab.Name = "modinfo_inspect_tab";
+            this.modinfo_inspect_tab.Padding = new System.Windows.Forms.Padding(3);
+            this.modinfo_inspect_tab.Size = new System.Drawing.Size(668, 202);
+            this.modinfo_inspect_tab.TabIndex = 2;
+            this.modinfo_inspect_tab.Text = "Inspect";
+            this.modinfo_inspect_tab.UseVisualStyleBackColor = true;
             // 
-            // modinfo_details_propertygrid
+            // modinfo_inspect_propertygrid
             // 
-            this.modinfo_details_propertygrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.modinfo_details_propertygrid.HelpVisible = false;
-            this.modinfo_details_propertygrid.Location = new System.Drawing.Point(3, 3);
-            this.modinfo_details_propertygrid.Name = "modinfo_details_propertygrid";
-            this.modinfo_details_propertygrid.Size = new System.Drawing.Size(662, 196);
-            this.modinfo_details_propertygrid.TabIndex = 9;
-            this.modinfo_details_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_details_propertygrid_Layout);
-            // 
+            this.modinfo_inspect_propertygrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modinfo_inspect_propertygrid.HelpVisible = false;
+            this.modinfo_inspect_propertygrid.Location = new System.Drawing.Point(3, 3);
+            this.modinfo_inspect_propertygrid.Name = "modinfo_inspect_propertygrid";
+            this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(662, 196);
+            this.modinfo_inspect_propertygrid.TabIndex = 9;
+            this.modinfo_inspect_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_inspect_propertygrid_Layout);
+             //
             // modinfo_config_tab
             // 
-            this.modinfo_config_tab.Controls.Add(this.button1);
+            this.modinfo_config_tab.Controls.Add(this.modinfo_config_save_button);
             this.modinfo_config_tab.Controls.Add(this.modinfo_config_propertygrid);
             this.modinfo_config_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_config_tab.Name = "modinfo_config_tab";
@@ -477,14 +477,14 @@
             this.modinfo_config_tab.Text = "Config";
             this.modinfo_config_tab.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // modinfo_config_save_button
             // 
-            this.button1.Location = new System.Drawing.Point(584, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Save";
-            this.button1.UseVisualStyleBackColor = true;
+            this.modinfo_config_save_button.Location = new System.Drawing.Point(584, 3);
+            this.modinfo_config_save_button.Name = "modinfo_config_save_button";
+            this.modinfo_config_save_button.Size = new System.Drawing.Size(75, 23);
+            this.modinfo_config_save_button.TabIndex = 3;
+            this.modinfo_config_save_button.Text = "Save";
+            this.modinfo_config_save_button.UseVisualStyleBackColor = true;
             // 
             // modinfo_config_propertygrid
             // 
@@ -495,20 +495,21 @@
             this.modinfo_config_propertygrid.Size = new System.Drawing.Size(662, 196);
             this.modinfo_config_propertygrid.TabIndex = 10;
             // 
-            // tabPage5
+            // modinfo_changelog_tab
             // 
-            this.tabPage5.Controls.Add(this.modinfo_changelog_richtextbox);
-            this.tabPage5.Location = new System.Drawing.Point(4, 22);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(668, 202);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Changelog";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            this.modinfo_changelog_tab.Controls.Add(this.modinfo_changelog_richtextbox);
+            this.modinfo_changelog_tab.Location = new System.Drawing.Point(4, 22);
+            this.modinfo_changelog_tab.Name = "modinfo_changelog_tab";
+            this.modinfo_changelog_tab.Padding = new System.Windows.Forms.Padding(3);
+            this.modinfo_changelog_tab.Size = new System.Drawing.Size(668, 202);
+            this.modinfo_changelog_tab.TabIndex = 4;
+            this.modinfo_changelog_tab.Text = "Changelog";
+            this.modinfo_changelog_tab.UseVisualStyleBackColor = true;
             // 
             // modinfo_changelog_richtextbox
             // 
             this.modinfo_changelog_richtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.modinfo_changelog_richtextbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.modinfo_changelog_richtextbox.Location = new System.Drawing.Point(3, 3);
             this.modinfo_changelog_richtextbox.Name = "modinfo_changelog_richtextbox";
             this.modinfo_changelog_richtextbox.ReadOnly = true;
@@ -530,7 +531,7 @@
             // 
             // conflicts_tab
             // 
-            this.conflicts_tab.Controls.Add(this.label3);
+            this.conflicts_tab.Controls.Add(this.conflicts_log_label);
             this.conflicts_tab.Controls.Add(this.conflicts_textbox);
             this.conflicts_tab.Controls.Add(this.conflicts_datagrid);
             this.conflicts_tab.Location = new System.Drawing.Point(4, 22);
@@ -541,15 +542,15 @@
             this.conflicts_tab.Text = "Class Overrides";
             this.conflicts_tab.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // conflicts_log_label
             // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(594, 6);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(28, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Log:";
+            this.conflicts_log_label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.conflicts_log_label.AutoSize = true;
+            this.conflicts_log_label.Location = new System.Drawing.Point(594, 6);
+            this.conflicts_log_label.Name = "conflicts_log_label";
+            this.conflicts_log_label.Size = new System.Drawing.Size(28, 13);
+            this.conflicts_log_label.TabIndex = 8;
+            this.conflicts_log_label.Text = "Log:";
             // 
             // conflicts_textbox
             // 
@@ -604,18 +605,18 @@
             this.ColumnModClass.Name = "ColumnModClass";
             this.ColumnModClass.ReadOnly = true;
             // 
-            // tabPage4
+            // export_tab
             // 
-            this.tabPage4.Controls.Add(this.export_group_checkbox);
-            this.tabPage4.Controls.Add(this.export_background_panel);
-            this.tabPage4.Controls.Add(this.export_workshop_link_checkbox);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(892, 474);
-            this.tabPage4.TabIndex = 2;
-            this.tabPage4.Text = "Export";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.export_tab.Controls.Add(this.export_group_checkbox);
+            this.export_tab.Controls.Add(this.export_background_panel);
+            this.export_tab.Controls.Add(this.export_workshop_link_checkbox);
+            this.export_tab.Location = new System.Drawing.Point(4, 22);
+            this.export_tab.Name = "export_tab";
+            this.export_tab.Padding = new System.Windows.Forms.Padding(3);
+            this.export_tab.Size = new System.Drawing.Size(892, 474);
+            this.export_tab.TabIndex = 2;
+            this.export_tab.Text = "Export";
+            this.export_tab.UseVisualStyleBackColor = true;
             // 
             // export_group_checkbox
             // 
@@ -700,19 +701,19 @@
             ((System.ComponentModel.ISupportInitialize)(this.horizontal_splitcontainer)).EndInit();
             this.horizontal_splitcontainer.ResumeLayout(false);
             this.modinfo_groupbox.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage3.ResumeLayout(false);
+            this.modinfo_tabcontrol.ResumeLayout(false);
+            this.modinfo_details_tab.ResumeLayout(false);
+            this.modinfo_details_tab.PerformLayout();
+            this.modinfo_readme_tab.ResumeLayout(false);
+            this.modinfo_inspect_tab.ResumeLayout(false);
             this.modinfo_config_tab.ResumeLayout(false);
-            this.tabPage5.ResumeLayout(false);
+            this.modinfo_changelog_tab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).EndInit();
             this.conflicts_tab.ResumeLayout(false);
             this.conflicts_tab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.conflicts_datagrid)).EndInit();
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
+            this.export_tab.ResumeLayout(false);
+            this.export_tab.PerformLayout();
             this.export_background_panel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -730,7 +731,7 @@
         private System.Windows.Forms.TabControl main_tabcontrol;
         private System.Windows.Forms.TabPage modlist_tab;
         private System.Windows.Forms.TabPage conflicts_tab;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label conflicts_log_label;
         private System.Windows.Forms.TextBox conflicts_textbox;
         private System.Windows.Forms.DataGridView conflicts_datagrid;
         private System.Windows.Forms.Button run_game_button;
@@ -743,8 +744,8 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SplitContainer horizontal_splitcontainer;
         private System.Windows.Forms.GroupBox modinfo_groupbox;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabControl modinfo_tabcontrol;
+        private System.Windows.Forms.TabPage modinfo_details_tab;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox modinfo_date_added_textbox;
         private System.Windows.Forms.TextBox modinfo_date_created_textbox;
@@ -754,12 +755,12 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.RichTextBox modinfo_description_richtextbox;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage modinfo_readme_tab;
         private System.Windows.Forms.RichTextBox modinfo_readme_richtextbox;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.PropertyGrid modinfo_details_propertygrid;
+        private System.Windows.Forms.TabPage modinfo_inspect_tab;
+        private System.Windows.Forms.PropertyGrid modinfo_inspect_propertygrid;
         private System.Windows.Forms.TabPage modinfo_config_tab;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button modinfo_config_save_button;
         private System.Windows.Forms.PropertyGrid modinfo_config_propertygrid;
         private System.Windows.Forms.PictureBox modinfo_image_picturebox;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
@@ -772,12 +773,12 @@
         private System.Windows.Forms.ToolStripProgressBar progress_toolstrip_progressbar;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage export_tab;
         private System.Windows.Forms.Panel export_background_panel;
         private System.Windows.Forms.RichTextBox export_richtextbox;
         private System.Windows.Forms.CheckBox export_workshop_link_checkbox;
         private System.Windows.Forms.CheckBox export_group_checkbox;
-        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.TabPage modinfo_changelog_tab;
         private System.Windows.Forms.RichTextBox modinfo_changelog_richtextbox;
     }
 }

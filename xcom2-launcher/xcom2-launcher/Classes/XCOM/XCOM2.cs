@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Steamworks;
-using System.Windows.Forms;
 using System.Linq;
+using System.Windows.Forms;
+using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 
@@ -14,75 +14,58 @@ namespace XCOM2Launcher.XCOM
     {
         public const uint APPID = 268500;
 
-        private static string _game_dir = null;
+        private static string _gameDir;
+
         public static string GameDir
         {
-            get
-            {
-                if (_game_dir == null)
-                    _game_dir = DetectGameDir();
-
-                return _game_dir;
-            }
-
-            set { _game_dir = value; }
+            get { return _gameDir ?? (_gameDir = DetectGameDir()); }
+            set { _gameDir = value; }
         }
 
         public static string UserConfigDir
-        {
-            get
-            {
-                return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM2\XComGame\Config";
-            }
-        }
+            => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM2\XComGame\Config";
 
-        public static string DefaultConfigDir
-        {
-            get
-            {
-                // Todo improve
-                return Path.Combine(GameDir, @"XComGame\Config");
-            }
-        }
+        public static string DefaultConfigDir => Path.Combine(GameDir, @"XComGame\Config");
 
         public static string DetectGameDir()
         {
-
             // try steam
             string gamedir;
-            if (SteamApps.GetAppInstallDir((AppId_t)APPID, out gamedir, 100) > 0 && Directory.Exists(gamedir))
+            if (SteamApps.GetAppInstallDir((AppId_t) APPID, out gamedir, 100) > 0 && Directory.Exists(gamedir))
             {
-                _game_dir = gamedir;
+                _gameDir = gamedir;
                 return gamedir;
             }
 
             // try modding dirs
-            string[] dirs = DetectModDirs();
-            foreach (string dir in dirs)
+            var dirs = DetectModDirs();
+            foreach (var dir in dirs)
                 if (dir.ToLower().Contains("\\steamapps\\"))
                 {
-                    _game_dir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
-                    return _game_dir;
+                    _gameDir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
+                    return _gameDir;
                 }
 
             // abandon hope
             return "";
         }
 
-        public static void RunGame(string game_dir, string args)
+        public static void RunGame(string gameDir, string args)
         {
             if (!SteamAPIWrapper.Init())
-            {
                 MessageBox.Show("Could not connect to steam.");
-            }
 
-            string bin_dir = game_dir + @"\Binaries\Win64";
 
-            Process p = new Process();
+            var p = new Process
+            {
+                StartInfo =
+                {
+                    Arguments = args,
+                    FileName = gameDir + @"\Binaries\Win64\XCom2.exe",
+                    WorkingDirectory = gameDir
+                }
+            };
 
-            p.StartInfo.Arguments = args;
-            p.StartInfo.FileName = bin_dir + @"\XCom2.exe";
-            p.StartInfo.WorkingDirectory = game_dir;
             p.Start();
 
             SteamAPIWrapper.Shutdown();
@@ -91,21 +74,21 @@ namespace XCOM2Launcher.XCOM
         internal static void ImportActiveMods(Settings settings)
         {
             // load active mods
-            foreach (string internalName in XCOM2.getActiveMods())
-                foreach (ModEntry mod in settings.Mods.All.Where(m => m.ID == internalName))
+            foreach (var internalName in GetActiveMods())
+                foreach (var mod in settings.Mods.All.Where(m => m.ID == internalName))
                     mod.isActive = true;
         }
 
         public static string[] DetectModDirs()
         {
-            List<string> dirs = new List<string>();
+            var dirs = new List<string>();
 
-            foreach (string line in File.ReadLines(Path.Combine(UserConfigDir, "XComEngine.ini")))
+            foreach (var line in File.ReadLines(Path.Combine(UserConfigDir, "XComEngine.ini")))
             {
                 if (!line.StartsWith("ModRootDirs="))
                     continue;
 
-                string dir = line.Substring(12);
+                var dir = line.Substring(12);
 
                 if (!Path.IsPathRooted(dir))
                     dir = Path.GetFullPath(Path.Combine(GameDir, "bin", "Win64", dir));
@@ -117,59 +100,46 @@ namespace XCOM2Launcher.XCOM
             return dirs.ToArray();
         }
 
-        public static string[] getActiveMods()
+        public static string[] GetActiveMods()
         {
-            List<string> list = new List<string>();
-
-            foreach (string line in File.ReadLines(Path.Combine(UserConfigDir, "XComModOptions.ini")))
-            {
-                if (!line.StartsWith("ActiveMods="))
-                    continue;
-
-                list.Add(line.Substring(11));
-            }
-
-            return list.ToArray();
+            return File.ReadLines(Path.Combine(UserConfigDir, "XComModOptions.ini")).Where(line => line.StartsWith("ActiveMods=")).Select(line => line.Substring(11)).ToArray();
         }
 
-        public static void setActiveMods(List<ModEntry> mods)
+        public static void SetActiveMods(List<ModEntry> mods)
         {
-            string file;
-
-
             // XComModOptions
-            file = Path.Combine(UserConfigDir, "XComModOptions.ini");
+            var file = Path.Combine(UserConfigDir, "XComModOptions.ini");
 
             if (!File.Exists(file + ".bak"))
                 // create backup
                 File.Copy(file, file + ".bak");
 
-            ConfigFile ModOptions = new ConfigFile("ModOptions", false);
+            var modOptions = new ConfigFile("ModOptions", false);
 
-            foreach (ModEntry m in mods.OrderBy(m => m.Index))
-                ModOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
+            foreach (var m in mods.OrderBy(m => m.Index))
+                modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
 
-            ModOptions.UpdateTimestamp();
-            ModOptions.Save();
+            modOptions.UpdateTimestamp();
+            modOptions.Save();
 
             //// XComEngine
             file = Path.Combine(UserConfigDir, "XComEngine.ini");
 
             // Create back up
-            string backup = file + ".bak";
+            var backup = file + ".bak";
             File.Copy(file, backup, true);
 
             // Write
-            using (FileStream in_stream = new FileStream(backup, FileMode.Open))
-            using (FileStream out_stream = new FileStream(file, FileMode.Truncate))
-            using (StreamReader reader = new StreamReader(in_stream))
-            using (StreamWriter writer = new StreamWriter(out_stream))
+            using (var inStream = new FileStream(backup, FileMode.Open))
+            using (var outStream = new FileStream(file, FileMode.Truncate))
+            using (var reader = new StreamReader(inStream))
+            using (var writer = new StreamWriter(outStream))
             {
                 while (!reader.EndOfStream)
                 {
-                    string line = reader.ReadLine();
+                    var line = reader.ReadLine();
 
-                    if (line.StartsWith("+ModClassOverrides=") || line.StartsWith("ModClassOverrides="))
+                    if (line == null || line.StartsWith("+ModClassOverrides=") || line.StartsWith("ModClassOverrides="))
                         // Skip old mod entries
                         continue;
 
@@ -177,6 +147,5 @@ namespace XCOM2Launcher.XCOM
                 }
             }
         }
-
     }
 }

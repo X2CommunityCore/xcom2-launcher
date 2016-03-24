@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using XCOM2Launcher.Classes.PropertyGrid;
-using XCOM2Launcher.Mod;
+using XCOM2Launcher.PropertyGrid;
 
 namespace XCOM2Launcher.Forms
 {
     public partial class SettingsDialog : Form
     {
-        protected Settings Settings { get; set; }
-        protected bool Changed { get; set; } = false;
-
         public SettingsDialog(Settings settings)
         {
             InitializeComponent();
@@ -28,12 +18,15 @@ namespace XCOM2Launcher.Forms
 
 
             propertyGrid1.ContextMenu = new ContextMenu();
-            propertyGrid1.ContextMenu.MenuItems.Add("Reset", new EventHandler(propertyGrid_reset_Click));
+            propertyGrid1.ContextMenu.MenuItems.Add("Reset", propertyGrid_reset_Click);
             propertyGrid1.PropertyValueChanged += PropertyGrid1_PropertyValueChanged;
 
             Shown += SettingsDialog_Shown;
             FormClosing += SettingsDialog_FormClosing;
         }
+
+        protected Settings Settings { get; set; }
+        protected bool Changed { get; set; }
 
         private void PropertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
@@ -44,13 +37,14 @@ namespace XCOM2Launcher.Forms
         {
             if (Settings.Windows.ContainsKey("settings"))
                 Bounds = Settings.Windows["settings"].Bounds;
+
         }
 
         private void SettingsDialog_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Clean bad mods
-            var brokenMods = Settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.getModInfoFile())).ToList();
-            foreach (ModEntry m in brokenMods)
+            var brokenMods = Settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
+            foreach (var m in brokenMods)
             {
                 MessageBox.Show($"Mod '{m.Name}' is invalid.");
                 Settings.Mods.RemoveMod(m);
@@ -74,4 +68,3 @@ namespace XCOM2Launcher.Forms
         }
     }
 }
-

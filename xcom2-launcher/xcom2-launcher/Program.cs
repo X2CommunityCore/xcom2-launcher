@@ -1,20 +1,23 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using XCOM2Launcher.Classes.Steam;
+using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        private static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -22,29 +25,55 @@ namespace XCOM2Launcher
             try
             {
 #endif
-                if (!SteamAPIWrapper.Init())
+            if (!SteamAPIWrapper.Init())
+            {
+                MessageBox.Show("Please start steam first!");
+                return;
+            }
+            // SteamWorkshop.StartCallbackService();
+
+
+            // Load settings
+            var settings = InitializeSettings();
+            if (settings == null)
+                return;
+
+#if !DEBUG
+            // Check for update
+            if (settings.CheckForUpdates)
+            {
+                try
                 {
-                    MessageBox.Show("Please start steam first!");
-                    return;
+                    using (var client = new System.Net.WebClient())
+                    {
+                        client.Headers.Add("User-Agent: Other");
+                        var json = client.DownloadString("https://api.github.com/repos/aEnigmatic/xcom2-launcher/releases/latest");
+                        var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
+                        var current_version = GetCurrentVersion();
+
+                        if (current_version != release.tag_name)
+                            // New version available
+                            new UpdateAvailableDialog(release, current_version).ShowDialog();
+                    }
                 }
-                // SteamWorkshop.StartCallbackService();
-
-
-                Settings settings = initializeSettings();
-                if (settings == null)
-                    return;
-
-                // clean up old files
-                if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
+                catch (System.Net.WebException)
                 {
-                    // Restore backup
-                    File.Copy(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini", true);
-                    File.Delete(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
+                    // No internet?
                 }
+            }
+#endif
 
-                Application.Run(new MainForm(settings));
+            // clean up old files
+            if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
+            {
+                // Restore backup
+                File.Copy(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini", true);
+                File.Delete(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
+            }
 
-                SteamAPIWrapper.Shutdown();
+            Application.Run(new MainForm(settings));
+
+            SteamAPIWrapper.Shutdown();
 #if !DEBUG
             }
             catch (Exception e)
@@ -55,17 +84,17 @@ namespace XCOM2Launcher
 #endif
         }
 
-        public static Settings initializeSettings()
+        public static Settings InitializeSettings()
         {
-            bool first_run = !File.Exists("settings.json");
+            bool firstRun = !File.Exists("settings.json");
 
             Settings settings;
-            if (first_run)
+            if (firstRun)
                 settings = new Settings();
 
             else try
                 {
-                    settings = Settings.fromFile("settings.json");
+                    settings = Settings.FromFile("settings.json");
                 }
                 catch (Newtonsoft.Json.JsonSerializationException)
                 {
@@ -83,7 +112,7 @@ namespace XCOM2Launcher
             // Verify Mod Paths
             var oldPaths = settings.ModPaths.Where(modPath => !Directory.Exists(modPath)).ToList();
             foreach (string modPath in oldPaths)
-                    settings.ModPaths.Remove(modPath);
+                settings.ModPaths.Remove(modPath);
 
             foreach (string modPath in XCOM2.DetectModDirs())
                 if (!settings.ModPaths.Contains(modPath))
@@ -94,10 +123,10 @@ namespace XCOM2Launcher
                 MessageBox.Show("Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
 
             // Verify Mods 
-            var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.getModInfoFile())).ToList();
+            var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
             if (brokenMods.Count > 0)
             {
-                MessageBox.Show($"{brokenMods.Count} mods no longer exists and have been removed:\r\n\r\n" + String.Join("\r\n", brokenMods.Select(m => m.Name)));
+                MessageBox.Show($"{brokenMods.Count} mods no longer exists and have been removed:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
 
                 foreach (ModEntry m in brokenMods)
                     settings.Mods.RemoveMod(m);
@@ -110,5 +139,18 @@ namespace XCOM2Launcher
             return settings;
         }
 
+        public static string GetCurrentVersion()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var assemblyName = assembly.GetName();
+            var fields = assembly.GetType("XCOM2Launcher.GitVersionInformation").GetFields();
+
+            var major = fields.Single(f => f.Name == "Major").GetValue(null);
+            var minor = fields.Single(f => f.Name == "Minor").GetValue(null);
+            var patch = fields.Single(f => f.Name == "Patch").GetValue(null);
+
+
+            return $"v{major}.{minor}.{patch}";
+        }
     }
 }

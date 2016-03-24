@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace XCOM2Launcher.Mod
 {
@@ -12,9 +7,5 @@ namespace XCOM2Launcher.Mod
         public bool Collapsed { get; set; } = false;
 
         public List<ModEntry> Entries { get; set; } = new List<ModEntry>();
-
-
-        public ModCategory() { }
-        
     }
 }
