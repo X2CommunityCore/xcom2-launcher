@@ -56,7 +56,7 @@ namespace XCOM2Launcher.Mod
                         overrides[overwrite.OldClass].Add(mod);
 
                     else
-                        overrides[overwrite.OldClass] = new List<ModEntry> {mod};
+                        overrides[overwrite.OldClass] = new List<ModEntry> { mod };
                 }
 
             return overrides;
@@ -184,26 +184,20 @@ namespace XCOM2Launcher.Mod
                     m.Source = ModSource.SteamWorkshop;
 
                 else
-                // in workshop path but not loaded via steam
+                    // in workshop path but not loaded via steam
                     m.Source = ModSource.Manual;
             }
 
             // Ensure source ID exists
-            if (m.WorkshopID == -1)
+            if (m.WorkshopID <= 0)
             {
                 long sourceID;
 
-                if (m.Source == ModSource.SteamWorkshop)
-                {
-                    if (!long.TryParse(Path.GetFileName(m.Path), out sourceID))
-                        m.Source = ModSource.Manual;
-                }
-                else
-                {
-                    var info = new ModInfo(m.GetModInfoFile());
+                if (m.Source == ModSource.SteamWorkshop && long.TryParse(Path.GetFileName(m.Path), out sourceID))
+                    m.Source = ModSource.Manual;
 
-                    sourceID = info.PublishedFileID;
-                }
+                else
+                    sourceID = new ModInfo(m.GetModInfoFile()).PublishedFileID;
 
                 m.WorkshopID = sourceID;
             }
@@ -216,7 +210,7 @@ namespace XCOM2Launcher.Mod
             // Check Workshop for infos
             if (m.WorkshopID != -1)
             {
-                var publishedID = (ulong) m.WorkshopID;
+                var publishedID = (ulong)m.WorkshopID;
 
                 var value = Workshop.GetDetails(publishedID);
 
@@ -238,7 +232,7 @@ namespace XCOM2Launcher.Mod
                 // Check Workshop for updates
                 if (m.Source == ModSource.SteamWorkshop)
                     if (
-                        Workshop.GetDownloadStatus((ulong) m.WorkshopID)
+                        Workshop.GetDownloadStatus((ulong)m.WorkshopID)
                             .HasFlag(EItemState.k_EItemStateNeedsUpdate))
                         m.State |= ModState.UpdateAvailable;
             }
