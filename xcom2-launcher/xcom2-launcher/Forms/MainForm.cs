@@ -12,6 +12,7 @@ using Microsoft.VisualBasic;
 using XCOM2Launcher.Forms;
 using System.Reflection;
 using XCOM2Launcher.Classes.PropertyGrid;
+using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
@@ -30,7 +31,7 @@ namespace XCOM2Launcher
             InitializeComponent();
 
             // Settings
-            Steamworks.SteamAPI.InitSafe();
+            SteamAPIWrapper.InitSafe();
             Settings = settings;
 
             // Restore states 

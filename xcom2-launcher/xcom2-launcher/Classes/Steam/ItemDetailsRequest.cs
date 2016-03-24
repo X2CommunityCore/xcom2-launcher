@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher.Steam
 {
@@ -49,7 +50,7 @@ namespace XCOM2Launcher.Steam
             while (!Finished && !Cancelled)
             {
                 Thread.Sleep(10);
-                SteamAPI.RunCallbacks();
+                SteamAPIWrapper.RunCallbacks();
             }
 
             if (Cancelled)
