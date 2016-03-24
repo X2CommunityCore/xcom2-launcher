@@ -219,7 +219,7 @@ namespace XCOM2Launcher
             }
 
             progress_toolstrip_progressbar.Visible = false;
-            status_toolstrip_label.Text = "Ready.";
+            status_toolstrip_label.Text = StatusBarIdleString;
             RefreshModList();
         }
         #endregion
