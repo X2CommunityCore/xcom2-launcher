@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace XCOM2Launcher.Mod
 {
@@ -17,6 +12,6 @@ namespace XCOM2Launcher.Mod
         UpdateAvailable = 4,
 
         ModConflict = 8,
-        DuplicateID = 16,
+        DuplicateID = 16
     }
 }

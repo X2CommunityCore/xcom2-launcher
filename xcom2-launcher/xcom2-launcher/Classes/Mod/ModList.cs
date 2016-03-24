@@ -1,31 +1,43 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using Steamworks;
+using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Mod
 {
     public class ModList
     {
-        public Dictionary<string, ModCategory> Entries { get; private set; } = new Dictionary<string, ModCategory>();
+        public Dictionary<string, ModCategory> Entries { get; } = new Dictionary<string, ModCategory>();
 
         [JsonIgnore]
-        public IEnumerable<ModEntry> All { get { return Entries.SelectMany(c => c.Value.Entries); } }
+        public IEnumerable<ModEntry> All => Entries.SelectMany(c => c.Value.Entries);
 
         [JsonIgnore]
-        public IEnumerable<string> Categories { get { return Entries.Select(c => c.Key); } }
+        public IEnumerable<string> Categories => Entries.Select(c => c.Key);
 
         [JsonIgnore]
-        public IEnumerable<ModEntry> Active { get { return All.Where(m => m.isActive); } }
+        public IEnumerable<ModEntry> Active => All.Where(m => m.isActive);
 
+        public virtual ModCategory this[string category]
+        {
+            get
+            {
+                ModCategory cat;
+                Entries.TryGetValue(category, out cat);
+
+                if (cat == null)
+                {
+                    cat = new ModCategory();
+                    Entries.Add(category, cat);
+                }
+
+                return cat;
+            }
+        }
 
 
         public ModEntry FindByPath(string path)
@@ -33,18 +45,18 @@ namespace XCOM2Launcher.Mod
             return All.SingleOrDefault(m => m.Path == path);
         }
 
-        public Dictionary<string, List<ModEntry>> getOverrides(IEnumerable<ModEntry> mod_subset)
+        public Dictionary<string, List<ModEntry>> GetOverrides(IEnumerable<ModEntry> mods)
         {
-            Dictionary<string, List<ModEntry>> overrides = new Dictionary<string, List<ModEntry>>();
+            var overrides = new Dictionary<string, List<ModEntry>>();
 
-            foreach (ModEntry mod in mod_subset)
-                foreach (ModClassOverride overwrite in mod.GetClassOverrides())
+            foreach (var mod in mods)
+                foreach (var overwrite in mod.GetClassOverrides())
                 {
                     if (overrides.ContainsKey(overwrite.OldClass))
                         overrides[overwrite.OldClass].Add(mod);
 
                     else
-                        overrides[overwrite.OldClass] = new List<ModEntry> { mod };
+                        overrides[overwrite.OldClass] = new List<ModEntry> {mod};
                 }
 
             return overrides;
@@ -56,13 +68,13 @@ namespace XCOM2Launcher.Mod
                 return;
 
             // (try to) load mods
-            foreach (string mod_dir in Directory.GetDirectories(dir))
+            foreach (var modDir in Directory.GetDirectories(dir))
             {
-                ModSource source = (mod_dir.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1)
+                var source = modDir.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1
                     ? ModSource.SteamWorkshop
                     : ModSource.Manual;
 
-                Import(mod_dir, source);
+                Import(modDir, source);
             }
         }
 
@@ -80,63 +92,60 @@ namespace XCOM2Launcher.Mod
             }
             catch (InvalidOperationException)
             {
-                MessageBox.Show($"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
+                MessageBox.Show(
+                    $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
                 return null;
             }
 
             if (infoFile == null)
                 return null;
 
-            string modID = Path.GetFileNameWithoutExtension(infoFile);
-            ModInfo modinfo = null;
-            bool isDupe = All.Any(m => m.ID == modID && m.Path != modDir);
+            var modID = Path.GetFileNameWithoutExtension(infoFile);
+            var isDupe = All.Any(m => m.ID == modID && m.Path != modDir);
 
             // Check if mod with package name alreay exists
-                // todo: move rename ID somewhere?
+            // todo: move rename ID somewhere?
 
-                //// Parse .XComMod file
-                //modinfo = new ModInfo(infoFile);
+            //// Parse .XComMod file
+            //modinfo = new ModInfo(infoFile);
 
-                //string msg =
-                //    $"'{modinfo.Title}' could not be imported:\r\n" +
-                //    $"ID '{modID}' is already used by '{existingMod.Name}'\r\n\r\n" +
-                //    $"Do you want to change the package name for '{modinfo.Title}'?\r\nWarning: This might break the mod\r\n\r\n" +
-                //    $"Additional informations:\r\n{modinfo.Title}: {modDir}\r\n{existingMod.Name}: {existingMod.Path}";
+            //string msg =
+            //    $"'{modinfo.Title}' could not be imported:\r\n" +
+            //    $"ID '{modID}' is already used by '{existingMod.Name}'\r\n\r\n" +
+            //    $"Do you want to change the package name for '{modinfo.Title}'?\r\nWarning: This might break the mod\r\n\r\n" +
+            //    $"Additional informations:\r\n{modinfo.Title}: {modDir}\r\n{existingMod.Name}: {existingMod.Path}";
 
-                //var result = MessageBox.Show(msg, "Error", MessageBoxButtons.YesNo);
-                //if (result == DialogResult.No)
-                //    return null;
+            //var result = MessageBox.Show(msg, "Error", MessageBoxButtons.YesNo);
+            //if (result == DialogResult.No)
+            //    return null;
 
-                //string oldModID = modID;
-                //do
-                //{
-                //    modID = Microsoft.VisualBasic.Interaction.InputBox($"Package name {modID} already exists!\r\nPlease enter the new package name for '{modinfo.Title}'.\r\nLeave empty to cancel.", "Rename package");
+            //string oldModID = modID;
+            //do
+            //{
+            //    modID = Microsoft.VisualBasic.Interaction.InputBox($"Package name {modID} already exists!\r\nPlease enter the new package name for '{modinfo.Title}'.\r\nLeave empty to cancel.", "Rename package");
 
-                //    if (modID == "")
-                //        return null;
-                //}
-                //while (FindByID(modID) != null);
+            //    if (modID == "")
+            //        return null;
+            //}
+            //while (FindByID(modID) != null);
 
-                //// Rename
-                //var files = Directory.GetFiles(modDir, $"*{oldModID}*.*", SearchOption.AllDirectories);
-                //foreach (string file in files)
-                //{
-                //    File.Move(file, file.Replace(oldModID, modID));
-                //}
+            //// Rename
+            //var files = Directory.GetFiles(modDir, $"*{oldModID}*.*", SearchOption.AllDirectories);
+            //foreach (string file in files)
+            //{
+            //    File.Move(file, file.Replace(oldModID, modID));
+            //}
 
             // Parse .XComMod file
-            if (modinfo == null)
-                modinfo = new ModInfo(infoFile);
+            var modinfo = new ModInfo(infoFile);
 
-            ModEntry mod = new ModEntry
+            var mod = new ModEntry
             {
                 ID = modID,
                 Name = modinfo.Title ?? "Unnamed Mod",
                 Path = modDir,
-
                 Source = source,
                 isActive = false,
-
                 DateAdded = DateTime.Now,
                 State = ModState.New
             };
@@ -145,27 +154,10 @@ namespace XCOM2Launcher.Mod
 
             // mark dupes
             if (isDupe)
-                foreach (ModEntry m in All.Where(m => m.ID == modID))
+                foreach (var m in All.Where(m => m.ID == modID))
                     m.State |= ModState.DuplicateID;
 
             return mod;
-        }
-
-        public virtual ModCategory this[string category]
-        {
-            get
-            {
-                ModCategory cat = null;
-                Entries.TryGetValue(category, out cat);
-
-                if (cat == null)
-                {
-                    cat = new ModCategory();
-                    Entries.Add(category, cat);
-                }
-
-                return cat;
-            }
         }
 
         public void AddMod(string category, ModEntry mod)
@@ -177,7 +169,7 @@ namespace XCOM2Launcher.Mod
 
         public void RemoveMod(ModEntry mod)
         {
-            string category = GetCategory(mod);
+            var category = GetCategory(mod);
             this[category].Entries.Remove(mod);
         }
 
@@ -192,29 +184,28 @@ namespace XCOM2Launcher.Mod
                     m.Source = ModSource.SteamWorkshop;
 
                 else
-                    // in workshop path but not loaded via steam
+                // in workshop path but not loaded via steam
                     m.Source = ModSource.Manual;
             }
 
             // Ensure source ID exists
             if (m.WorkshopID == -1)
             {
-                long source_id = m.WorkshopID;
+                long sourceID;
 
                 if (m.Source == ModSource.SteamWorkshop)
                 {
-                    if (!long.TryParse(Path.GetFileName(m.Path), out source_id))
+                    if (!long.TryParse(Path.GetFileName(m.Path), out sourceID))
                         m.Source = ModSource.Manual;
                 }
                 else
                 {
-                    var info = new ModInfo(m.getModInfoFile());
+                    var info = new ModInfo(m.GetModInfoFile());
 
-                    source_id = info.publishedFileID;
+                    sourceID = info.PublishedFileID;
                 }
 
-                m.WorkshopID = source_id;
-
+                m.WorkshopID = sourceID;
             }
 
             // Fill Date Added
@@ -222,13 +213,12 @@ namespace XCOM2Launcher.Mod
                 m.DateAdded = DateTime.Now;
 
 
-
             // Check Workshop for infos
             if (m.WorkshopID != -1)
             {
-                ulong publishedID = (ulong)m.WorkshopID;
+                var publishedID = (ulong) m.WorkshopID;
 
-                Steamworks.SteamUGCDetails_t value = Steam.Workshop.GetDetails(publishedID);
+                var value = Workshop.GetDetails(publishedID);
 
                 if (!m.ManualName)
                     m.Name = value.m_rgchTitle;
@@ -247,21 +237,17 @@ namespace XCOM2Launcher.Mod
 
                 // Check Workshop for updates
                 if (m.Source == ModSource.SteamWorkshop)
-                    if (Steam.Workshop.GetDownloadStatus((ulong)m.WorkshopID).HasFlag(Steamworks.EItemState.k_EItemStateNeedsUpdate))
+                    if (
+                        Workshop.GetDownloadStatus((ulong) m.WorkshopID)
+                            .HasFlag(EItemState.k_EItemStateNeedsUpdate))
                         m.State |= ModState.UpdateAvailable;
             }
             else
             {
                 // Update directory size
                 // slow, but necessary ?
-                long size = 0;
-
-                foreach (var fileName in Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories))
-                    size += new FileInfo(fileName).Length;
-
-                m.Size = size;
+                m.Size = Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length);
             }
-
         }
 
         public string GetCategory(ModEntry mod)
@@ -278,12 +264,11 @@ namespace XCOM2Launcher.Mod
         {
             return All.GroupBy(m => m.ID).Where(g => g.Count() > 1);
         }
+
         public void MarkDuplicates()
         {
-            foreach (IGrouping<string, ModEntry> group in GetDuplicates())
-                foreach (ModEntry m in group)
-                    m.State |= ModState.DuplicateID;
+            foreach (var m in GetDuplicates().SelectMany(@group => @group))
+                m.State |= ModState.DuplicateID;
         }
     }
-
 }

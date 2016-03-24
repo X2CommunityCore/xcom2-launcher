@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace XCOM2Launcher.XCOM
 {
     public class ConfigFile
     {
-        public string FileName { get; private set; }
+        public string FileName { get; }
 
-        public string Path { get { return $"{XCOM2.UserConfigDir}/XCom{FileName}.ini"; } }
+        public string Path => $"{XCOM2.UserConfigDir}/XCom{FileName}.ini";
 
         /// <summary>
         /// Default{FileName}.ini from which this one is build
@@ -22,7 +19,7 @@ namespace XCOM2Launcher.XCOM
         public Dictionary<string, Dictionary<string, List<string>>> Entries { get; set; } = new Dictionary<string, Dictionary<string, List<string>>>();
 
 
-        public ConfigFile(string filename, bool loadData)
+        public ConfigFile(string filename, bool loadData = true)
         {
             FileName = filename;
             DefaultFile = $"{XCOM2.DefaultConfigDir}/Default{FileName}.ini";
@@ -33,39 +30,37 @@ namespace XCOM2Launcher.XCOM
 
         public void Load(string file)
         {
-            using (FileStream stream = new FileStream(file, FileMode.Open))
-            using (StreamReader reader = new StreamReader(stream))
+            using (var stream = new FileStream(file, FileMode.Open))
+            using (var reader = new StreamReader(stream))
             {
-                string line = "";
-                string current_section = "";
+                var currentSection = "";
                 while (!reader.EndOfStream)
                 {
+                    var line = reader.ReadLine()?.Trim();
 
-                    line = reader.ReadLine().Trim();
-
-                    if (line.Length == 0)
+                    if (string.IsNullOrEmpty(line))
                         continue;
 
                     if (line.StartsWith("[") && line.EndsWith("]"))
-                        current_section = line.Substring(1, line.Length - 2);
+                        currentSection = line.Substring(1, line.Length - 2);
 
                     else
                     {
-                        int pos = line.IndexOf('=');
+                        var pos = line.IndexOf('=');
 
                         if (pos == -1)
                             // invalid syntax, previous line possibly missing \
                             // -> skip
                             continue;
 
-                        string current_key = line.Substring(0, pos);
-                        string current_value = line.Substring(pos + 1);
+                        var currentKey = line.Substring(0, pos);
+                        var currentValue = line.Substring(pos + 1);
 
                         // multi line
-                        while (current_value.Length > 2 && current_value.Substring(current_value.Length - 2) == "\\\\")
-                            current_value = current_value.Substring(0, current_value.Length - 2) + "\n" + reader.ReadLine();
+                        while (currentValue.Length > 2 && currentValue.Substring(currentValue.Length - 2) == "\\\\")
+                            currentValue = currentValue.Substring(0, currentValue.Length - 2) + "\n" + reader.ReadLine();
 
-                        Add(current_section, current_key, current_value);
+                        Add(currentSection, currentKey, currentValue);
                     }
                 }
             }
@@ -114,8 +109,7 @@ namespace XCOM2Launcher.XCOM
 
             else
             {
-                var newSection = new Dictionary<string, List<string>>();
-                newSection.Add(key, value);
+                var newSection = new Dictionary<string, List<string>> {{key, value}};
                 Entries.Add(section, newSection);
             }
         }
@@ -132,8 +126,7 @@ namespace XCOM2Launcher.XCOM
 
             else
             {
-                var newSection = new Dictionary<string, List<string>>();
-                newSection.Add(key, new List<string> { value });
+                var newSection = new Dictionary<string, List<string>> {{key, new List<string> {value}}};
                 Entries.Add(section, newSection);
             }
         }
@@ -162,7 +155,7 @@ namespace XCOM2Launcher.XCOM
 
         public void UpdateTimestamp()
         {
-            long timestamp = (new DateTimeOffset(File.GetLastWriteTimeUtc(DefaultFile))).ToUnixTimeSeconds();
+            var timestamp = (new DateTimeOffset(File.GetLastWriteTimeUtc(DefaultFile))).ToUnixTimeSeconds();
 
             Remove("IniVersion");
             Add("IniVersion", "0", timestamp + ".000000");

@@ -1,39 +1,37 @@
-﻿using Steamworks;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
+using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher.Steam
 {
-    internal class ItemDetailsRequest
+    public class ItemDetailsRequest
     {
-        private CallResult<SteamUGCQueryCompleted_t> OnSteamUGCQueryCompletedCallResult;
+        private CallResult<SteamUGCQueryCompleted_t> _onQueryCompleted;
 
-        private ulong id;
-
-        private UGCQueryHandle_t m_UGCQueryHandle;
-
-
-        public bool Finished { get; private set; }
-        public bool Cancelled { get; private set; }
-
-        public SteamUGCDetails_t Result { get; private set; }
+        private UGCQueryHandle_t _queryHandle;
 
         public ItemDetailsRequest(ulong id)
         {
-            this.id = id;
+            ID = id;
         }
+
+
+        public ulong ID { get; }
+
+        public bool Success { get; private set; }
+        public bool Finished { get; private set; }
+        public bool Cancelled { get; private set; }
+
+
+        public SteamUGCDetails_t Result { get; private set; }
 
         public ItemDetailsRequest Send()
         {
-            this.OnSteamUGCQueryCompletedCallResult = CallResult<SteamUGCQueryCompleted_t>.Create(OnSteamUGCQueryCompleted);
-            m_UGCQueryHandle = SteamUGC.CreateQueryUGCDetailsRequest(new PublishedFileId_t[] { new PublishedFileId_t(id) }, 1);
-            SteamAPICall_t api_call = SteamUGC.SendQueryUGCRequest(m_UGCQueryHandle);
-            OnSteamUGCQueryCompletedCallResult.Set(api_call);
+            _onQueryCompleted = CallResult<SteamUGCQueryCompleted_t>.Create(QueryCompleted);
+            _queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(new[] {ID.ToPublishedFileID()}, 1);
+
+            var apiCall = SteamUGC.SendQueryUGCRequest(_queryHandle);
+            _onQueryCompleted.Set(apiCall);
 
             return this;
         }
@@ -44,7 +42,7 @@ namespace XCOM2Launcher.Steam
             return !Finished;
         }
 
-        public ItemDetailsRequest waitForResult()
+        public ItemDetailsRequest WaitForResult()
         {
             // Wait for Response
             while (!Finished && !Cancelled)
@@ -57,9 +55,8 @@ namespace XCOM2Launcher.Steam
                 return this;
 
             // Retrieve Value
-            var result = new SteamUGCDetails_t();
-            bool ret = SteamUGC.GetQueryUGCResult(m_UGCQueryHandle, 0, out result);
-            
+            SteamUGCDetails_t result;
+            Success = SteamUGC.GetQueryUGCResult(_queryHandle, 0, out result);
 
             Result = result;
             return this;
@@ -70,13 +67,13 @@ namespace XCOM2Launcher.Steam
             if (!Finished)
                 return null;
 
-            string url = "";
+            string url;
 
-            SteamUGC.GetQueryUGCPreviewURL(m_UGCQueryHandle, 0, out url, 1000);
+            SteamUGC.GetQueryUGCPreviewURL(_queryHandle, 0, out url, 1000);
             return url;
         }
 
-        public void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
+        private void QueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
         {
             Finished = true;
         }

@@ -1,35 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace XCOM2Launcher.Mod
 {
     public class ModInfo
     {
-        public int publishedFileID { get; set; } = -1;
-        public string Title { get; set; } = null;
+        public ModInfo(string filepath)
+        {
+            LoadFile(filepath);
+        }
+
+        public int PublishedFileID { get; set; } = -1;
+        public string Title { get; set; }
         public string Category { get; set; } = "Unsorted";
         public string Description { get; set; } = "";
         public string Tags { get; set; } = "";
         public string ContentImage { get; set; } = "ModPreview.jpg";
 
-        public ModInfo(string filepath)
-        {
-            loadFile(filepath);
-        }
-
-        protected void loadFile(string filepath)
+        protected void LoadFile(string filepath)
         {
             if (!File.Exists(filepath))
                 return;
 
-            string[] keys = new string[] { "publishedfileid", "title", "category", "description", "tags", "contentimage" };
-            Dictionary<string, string> values = new Dictionary<string, string>();
+            string[] keys = { "publishedfileid", "title", "category", "description", "tags", "contentimage" };
+            var values = new Dictionary<string, string>();
 
-            using (FileStream stream = new FileStream(filepath, FileMode.Open))
-            using (StreamReader reader = new StreamReader(stream))
+            using (var stream = new FileStream(filepath, FileMode.Open))
+            using (var reader = new StreamReader(stream))
             {
                 string key = null;
                 string val;
@@ -38,12 +38,13 @@ namespace XCOM2Launcher.Mod
 
                 while (!reader.EndOfStream)
                 {
-                    string line = reader.ReadLine();
+                    var line = reader.ReadLine();
+                    Contract.Assume(line != null);
 
                     if (key == null || line.Contains("="))
                     {
-                        var data = line.Split(new char[] {'='}, 2);
-                        string temp = data[0].Trim().ToLower();
+                        var data = line.Split(new[] { '=' }, 2);
+                        var temp = data[0].Trim().ToLower();
 
                         if (key == null || keys.Contains(temp))
                         {
@@ -55,6 +56,7 @@ namespace XCOM2Launcher.Mod
                             {
                                 // wow, someone knew what they were doing ?!?!
                                 line = reader.ReadLine();
+                                Contract.Assume(line != null);
                                 val += "\r\n" + line;
                             }
 
@@ -86,10 +88,11 @@ namespace XCOM2Launcher.Mod
             try
             {
                 if (values.ContainsKey("publishedfileid"))
-                    publishedFileID = int.Parse(values["publishedfileid"]);
-            } catch (FormatException)
+                    PublishedFileID = int.Parse(values["publishedfileid"]);
+            }
+            catch (FormatException)
             {
-                publishedFileID = -1;
+                PublishedFileID = -1;
             }
 
             if (values.ContainsKey("description"))
@@ -100,15 +103,19 @@ namespace XCOM2Launcher.Mod
 
             if (values.ContainsKey("contentimage"))
             {
-                string val = values["contentimage"].Trim(new char[] { '\r', '\n', '\t', ' ' });
+                var val = values["contentimage"].Trim('\r', '\n', '\t', ' ');
                 // todo fix illegal chars?
                 try
                 {
-                    if (val.Length > 0 && File.Exists(Path.Combine(Path.GetDirectoryName(filepath), val)))
+                    var path = Path.GetDirectoryName(filepath);
+                    Contract.Assert(path != null);
+
+                    if (val.Length > 0 && File.Exists(Path.Combine(path, val)))
                         ContentImage = values["contentimage"];
                 }
-                catch (Exception)
+                catch
                 {
+                    // ignored
                 }
             }
         }

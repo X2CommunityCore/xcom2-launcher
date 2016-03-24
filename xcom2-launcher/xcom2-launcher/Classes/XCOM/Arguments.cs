@@ -86,7 +86,7 @@ namespace XCOM2Launcher.XCOM
                 args += " -autoDebug";
 
 
-            if (Custom != null && Custom.Length > 0)
+            if (!string.IsNullOrEmpty(Custom))
                 args += " " + Custom;
 
 

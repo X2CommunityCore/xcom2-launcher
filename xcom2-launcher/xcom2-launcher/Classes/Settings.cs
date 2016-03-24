@@ -1,15 +1,10 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using XCOM2Launcher.XCOM;
-using XCOM2Launcher.Forms;
-using System.Windows.Forms;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Serialization;
 
@@ -17,15 +12,15 @@ namespace XCOM2Launcher
 {
     public class Settings
     {
-        private string _game_path;
+        private string _gamePath;
         [Category("Paths")]
         [Description("Game Path (should be set automatically)")]
         public string GamePath
         {
-            get { return _game_path; }
+            get { return _gamePath; }
             set
             {
-                _game_path = value;
+                _gamePath = value;
                 XCOM2.GameDir = value;
             }
         }
@@ -71,17 +66,11 @@ namespace XCOM2Launcher
 
         public string GetWorkshopPath()
         {
-            foreach (string modPath in ModPaths)
-            {
-                if (modPath.IndexOf("steamapps\\workshop\\content\\268500\\", StringComparison.OrdinalIgnoreCase) != -1)
-                    return modPath;
-            }
-
-            return null;
+            return ModPaths.FirstOrDefault(modPath => modPath.IndexOf("steamapps\\workshop\\content\\268500\\", StringComparison.OrdinalIgnoreCase) != -1);
         }
 
         #region Serialization
-        public static Settings fromFile(string file)
+        public static Settings FromFile(string file)
         {
             if (!File.Exists(file))
                 throw new FileNotFoundException(file);
@@ -96,7 +85,7 @@ namespace XCOM2Launcher
                 return (Settings)serializer.Deserialize(reader, typeof(Settings));
             }
         }
-        public void saveFile(string file)
+        public void SaveFile(string file)
         {
             var settings = new JsonSerializerSettings
             {

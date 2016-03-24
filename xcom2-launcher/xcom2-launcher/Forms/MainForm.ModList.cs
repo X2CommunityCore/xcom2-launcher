@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using XCOM2Launcher.Mod;
-using XCOM2Launcher.Helper;
-using System.Drawing;
 using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
+using Steamworks;
 using XCOM2Launcher.Classes.Steam;
+using XCOM2Launcher.Helper;
+using XCOM2Launcher.Mod;
 
-namespace XCOM2Launcher
+namespace XCOM2Launcher.Forms
 {
     public partial class MainForm : Form
     {
+        protected ObjectListView modlist_objectlistview;
+
         public ModList Mods => Settings.Mods;
 
         public TypedObjectListView<ModEntry> ModList { get; private set; }
 
         public List<ModEntry> Downloads { get; } = new List<ModEntry>();
 
-        protected BrightIdeasSoftware.ObjectListView modlist_objectlistview;
-
-        public void initObjectListView()
+        public void InitObjectListView()
         {
             modlist_objectlistview?.Dispose();
 
@@ -33,9 +33,9 @@ namespace XCOM2Launcher
             {
                 // General
                 Name = "modlist_objectlistview",
-                Size = new System.Drawing.Size(886, 222),
-                Location = new System.Drawing.Point(0, 0),
-                Dock = System.Windows.Forms.DockStyle.Fill,
+                Size = new Size(886, 222),
+                Location = new Point(0, 0),
+                Dock = DockStyle.Fill,
                 TabIndex = 0,
 
                 // Behavior
@@ -51,131 +51,139 @@ namespace XCOM2Launcher
 
                 // Checkbox
                 CheckBoxes = true,
-                CheckedAspectName = "isActive",
+                CheckedAspectName = "isActive"
             };
 
             horizontal_splitcontainer.Panel1.Controls.Add(modlist_objectlistview);
             //modlist_objectlistview.Update();
 
-            var CategoryGroupingDelegate = new GroupKeyGetterDelegate((object o) =>
-            {
-                return Mods.GetCategory((o as ModEntry));
-            });
+            var categoryGroupingDelegate = new GroupKeyGetterDelegate(o => Mods.GetCategory(o as ModEntry));
 
-            var CategoryFormatterDelegate = new GroupFormatterDelegate((OLVGroup group, GroupingParameters parameters) =>
+            var categoryFormatterDelegate = new GroupFormatterDelegate((@group, parameters) =>
             {
-                string GroupName = group.Key as string;
-                group.Collapsed = Mods.Entries[GroupName].Collapsed;
+                var groupName = group.Key as string;
+                if (groupName == null)
+                    return;
 
-                if (GroupName == "Unsorted")
-                    parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => {
+                // Restore collapsed state
+                group.Collapsed = Mods.Entries[groupName].Collapsed;
+
+                // Move Unsorted to the top
+                if (groupName == "Unsorted")
+                    parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) =>
+                    {
                         if (a.Key as string == "Unsorted")
                             return -1;
 
                         if (b.Key as string == "Unsorted")
                             return 1;
 
-                        return String.Compare(a.ToString(), b.ToString());
+                        return string.CompareOrdinal(a.ToString(), b.ToString());
                     });
             });
 
-            var columns = new OLVColumn[]
+            var columns = new[]
             {
-                new OLVColumn{
+                new OLVColumn
+                {
                     Text = "Name",
                     AspectName = "Name",
                     Width = 500,
-                    GroupKeyGetter = CategoryGroupingDelegate,
-                    GroupFormatter = CategoryFormatterDelegate,
+                    GroupKeyGetter = categoryGroupingDelegate,
+                    GroupFormatter = categoryFormatterDelegate,
                     DisplayIndex = 2,
                     IsEditable = true
                 },
-
-                new OLVColumn{
+                new OLVColumn
+                {
                     Text = "ID",
                     AspectName = "ID",
                     Width = 200,
-                    GroupKeyGetter = CategoryGroupingDelegate,
-                    GroupFormatter = CategoryFormatterDelegate,
+                    GroupKeyGetter = categoryGroupingDelegate,
+                    GroupFormatter = categoryFormatterDelegate,
                     DisplayIndex = 3,
-                    IsEditable = false,
+                    IsEditable = false
                 },
-
-                new OLVColumn {
+                new OLVColumn
+                {
                     Text = "Size",
                     AspectName = "Size",
-                    AspectToStringConverter = (object size) => { return XCOM2Launcher.Helper.FileSizeFormatExtension.FormatAsFileSize((long) size);  },
+                    AspectToStringConverter = size => ((long) size).FormatAsFileSize(),
                     TextAlign = HorizontalAlignment.Right,
                     Width = 100,
                     DisplayIndex = 4,
-                    IsEditable = false,
+                    IsEditable = false
                 },
-
-                new OLVColumn{
+                new OLVColumn
+                {
                     Text = "Last Update",
                     AspectName = "DateUpdated",
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     DisplayIndex = 5,
-                    IsEditable = false,
+                    IsEditable = false
                 },
-                
+
                 // State
-                new OLVColumn {
+                new OLVColumn
+                {
                     Text = "State",
                     //Groupable = false,
                     //Sortable = false,
                     IsEditable = false,
                     Width = 30,
                     DisplayIndex = 0,
-                    AspectGetter = (object o) =>
+                    AspectGetter = o =>
                     {
                         var mod = o as ModEntry;
-
 
                         if (mod.State.HasFlag(ModState.ModConflict))
                             return "Conflict";
 
-                        else if (mod.State.HasFlag(ModState.DuplicateID))
+                        if (mod.State.HasFlag(ModState.DuplicateID))
                             return "Duplicate ID";
 
-                        else if (mod.State.HasFlag(ModState.New))
+                        if (mod.State.HasFlag(ModState.New))
                             return "New";
 
-                        else if (mod.State.HasFlag(ModState.UpdateAvailable))
+                        if (mod.State.HasFlag(ModState.UpdateAvailable))
                             return "Update Available";
 
                         return "OK";
                     }
                 },
-
-                new OLVColumn{
+                new OLVColumn
+                {
                     Text = "Order",
                     AspectName = "Index",
                     TextAlign = HorizontalAlignment.Right,
                     HeaderTextAlign = HorizontalAlignment.Center,
                     Width = 50,
-                    GroupKeyGetter = CategoryGroupingDelegate,
-                    GroupFormatter = CategoryFormatterDelegate,
+                    GroupKeyGetter = categoryGroupingDelegate,
+                    GroupFormatter = categoryFormatterDelegate,
                     IsEditable = false,
-                    DisplayIndex = 1,
-                },
+                    DisplayIndex = 1
+                }
             };
 
             // size groupies
             columns[2].MakeGroupies(
-                new long[] { 1024, 1024 * 1024, (long)50 * 1024 * 1024, (long)100 * 1024 * 1024 },
-                new string[] { "< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB" }
+                new[] { 1024, 1024 * 1024, (long)50 * 1024 * 1024, (long)100 * 1024 * 1024 },
+                new[] { "< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB" }
                 );
 
             // date updated groupies
             columns[3].MakeGroupies(
-                new DateTime[] { DateTime.Now.Subtract(TimeSpan.FromHours(24 * 30)), DateTime.Now.Subtract(TimeSpan.FromHours(24 * 7)), DateTime.Now.Date },
-                new string[] { "Older than one month", "Last Month", "This Week", "Today" }
+                new[]
+                {
+                    DateTime.Now.Subtract(TimeSpan.FromHours(24*30)), DateTime.Now.Subtract(TimeSpan.FromHours(24*7)),
+                    DateTime.Now.Date
+                },
+                new[] { "Older than one month", "Last Month", "This Week", "Today" }
                 );
 
             // Wrapper
-            ModList = new TypedObjectListView<ModEntry>(this.modlist_objectlistview);
+            ModList = new TypedObjectListView<ModEntry>(modlist_objectlistview);
 
             // Events
             modlist_objectlistview.SelectionChanged += ModListSelectionChanged;
@@ -205,7 +213,6 @@ namespace XCOM2Launcher
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 horizontal_splitcontainer.Panel2Collapsed = true;
-                return;
             }
         }
 
@@ -216,16 +223,25 @@ namespace XCOM2Launcher
         private void ModListGroupExpandingCollapsing(object sender, GroupExpandingCollapsingEventArgs e)
         {
             // only handle if grouped by name or id
-            if (modlist_objectlistview.PrimarySortColumn.AspectName != "Name" && modlist_objectlistview.PrimarySortColumn.AspectName != "ID")
+            if (modlist_objectlistview.PrimarySortColumn.AspectName != "Name" &&
+                modlist_objectlistview.PrimarySortColumn.AspectName != "ID")
                 return;
 
-            var category = Mods.Entries[e.Group.Key as string];
-            category.Collapsed = !e.IsExpanding;
+            if (e.Group.Key == null)
+                return;
+
+            var key = e.Group.Key as string;
+            Contract.Assume(key != null);
+
+            if (Mods.Entries.ContainsKey(key))
+                Mods.Entries[key].Collapsed = !e.IsExpanding;
         }
 
         private void ModListFormatRow(object sender, FormatRowEventArgs e)
         {
             var mod = e.Model as ModEntry;
+            Contract.Assume(mod != null);
+
             var item = e.Item;
 
             if (mod.State.HasFlag(ModState.ModConflict) || mod.State.HasFlag(ModState.DuplicateID))
@@ -256,19 +272,19 @@ namespace XCOM2Launcher
             SteamAPIWrapper.InitSafe();
 
             // Confirmation dialog
-            string text = (modlist_objectlistview.SelectedItems.Count == 1)
-                ? $"Are you sure you want to delete '{(modlist_objectlistview.SelectedObject as ModEntry).Name}'?"
-                : $"Are you sure you want to delete {modlist_objectlistview.SelectedItems.Count} mods?";
+            var text = modlist_objectlistview.SelectedObjects.Count == 1
+                ? $"Are you sure you want to delete '{(modlist_objectlistview.SelectedObjects[0] as ModEntry)?.Name}'?"
+                : $"Are you sure you want to delete {modlist_objectlistview.SelectedObjects.Count} mods?";
 
             text += "\r\nThis can not be undone.";
 
-            DialogResult r = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel);
+            var r = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel);
             if (r != DialogResult.OK)
                 return;
 
             // Delete
-            List<ModEntry> mods = ModList.SelectedObjects.ToList();
-            foreach (ModEntry mod in mods)
+            var mods = ModList.SelectedObjects.ToList();
+            foreach (var mod in mods)
             {
                 modlist_objectlistview.RemoveObject(mod);
                 Mods.RemoveMod(mod);
@@ -276,14 +292,14 @@ namespace XCOM2Launcher
                 Directory.Delete(mod.Path, true);
                 // unsubscribe
                 if (mod.Source == ModSource.SteamWorkshop)
-                    Steamworks.SteamUGC.UnsubscribeItem(new Steamworks.PublishedFileId_t((ulong)mod.WorkshopID));
+                    SteamUGC.UnsubscribeItem(new PublishedFileId_t((ulong)mod.WorkshopID));
             }
         }
 
         private void MoveMods(string category)
         {
             modlist_objectlistview.BeginUpdate();
-            foreach (ModEntry mod in ModList.SelectedObjects)
+            foreach (var mod in ModList.SelectedObjects)
             {
                 Mods.RemoveMod(mod);
                 Mods.AddMod(category, mod);
@@ -304,12 +320,8 @@ namespace XCOM2Launcher
             // add elements
             modlist_objectlistview.ClearObjects();
 
-            if (Settings.ShowHiddenElements)
-                modlist_objectlistview.Objects = Mods.All;
+            modlist_objectlistview.Objects = Settings.ShowHiddenElements ? Mods.All : Mods.All.Where(m => !m.isHidden);
 
-            else
-                modlist_objectlistview.Objects = Mods.All.Where(m => !m.isHidden);
-            
             modlist_objectlistview.EndUpdate();
 
             // Re-register events
@@ -324,46 +336,44 @@ namespace XCOM2Launcher
 
         private ContextMenu CreateModListContextMenu(ModEntry m)
         {
-            ContextMenu menu = new ContextMenu();
-            if (m == null || m.ID == null)
+            var menu = new ContextMenu();
+            if (m?.ID == null)
                 return menu;
 
-            MenuItem item = new MenuItem("Rename");
+            var item = new MenuItem("Rename");
             item.Click += (a, b) => { modlist_objectlistview.EditModel(m); };
             menu.MenuItems.Add(item);
 
             // Move to ...
-            MenuItem moveToGroupMenu = new MenuItem("Move to Category...");
-            // ... new group
-            moveToGroupMenu.MenuItems.Add("New category", new EventHandler(
-                    (object a, EventArgs b) =>
-                    {
-                        string group = Interaction.InputBox("Please enter the name of the new category", "Create category", "New category");
-                        if (group == "")
-                            return;
-
-                        MoveMods(group);
-                    })
-                );
-            moveToGroupMenu.MenuItems.Add("-");
-
-            // ... existing group
-            foreach (string group in Settings.Mods.Categories)
+            var moveToCategory = new MenuItem("Move to Category...");
+            // ... new category
+            moveToCategory.MenuItems.Add("New category", delegate
             {
-                if (group == Mods.GetCategory(m))
+                var category = Interaction.InputBox("Please enter the name of the new category", "Create category", "New category");
+                if (category == "")
+                    return;
+
+                MoveMods(category);
+            });
+
+            moveToCategory.MenuItems.Add("-");
+
+            // ... existing category
+            foreach (var category in Settings.Mods.Categories)
+            {
+                if (category == Mods.GetCategory(m))
                     continue;
 
-                moveToGroupMenu.MenuItems.Add(group, new EventHandler((object a, EventArgs b) => { MoveMods(group); }));
+                moveToCategory.MenuItems.Add(category, delegate { MoveMods(category); });
             }
-            menu.MenuItems.Add(moveToGroupMenu);
+            menu.MenuItems.Add(moveToCategory);
 
 
-            var toggleVisibility = new MenuItem();
-            toggleVisibility.Text = m.isHidden ? "Unhide" : "Hide";
-            toggleVisibility.Click += (object sender, EventArgs e) =>
+            var toggleVisibility = new MenuItem { Text = m.isHidden ? "Unhide" : "Hide" };
+            toggleVisibility.Click += delegate
             {
                 // save as new list so we can remove mods if they are being hidden
-                foreach (ModEntry mod in ModList.SelectedObjects.ToList())
+                foreach (var mod in ModList.SelectedObjects.ToList())
                 {
                     mod.isHidden = !m.isHidden;
 
@@ -378,16 +388,15 @@ namespace XCOM2Launcher
 
             menu.MenuItems.Add("-");
 
-            menu.MenuItems.Add(new MenuItem("Delete / Unsubscribe", new EventHandler((object a, EventArgs b) => { DeleteMods(); })));
+            menu.MenuItems.Add(new MenuItem("Delete / Unsubscribe", delegate { DeleteMods(); }));
 
 
             menu.MenuItems.Add("-");
 
-            menu.MenuItems.Add(new MenuItem("Show in Explorer", new EventHandler((object a, EventArgs b) => { m.ShowInExplorer(); })));
+            menu.MenuItems.Add(new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); }));
 
             if (m.WorkshopID != -1)
-                menu.MenuItems.Add(new MenuItem("Show on Steam", new EventHandler((object a, EventArgs b) => { m.ShowOnSteam(); })));
-
+                menu.MenuItems.Add(new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); }));
 
 
             return menu;
@@ -408,12 +417,13 @@ namespace XCOM2Launcher
 
         private void ModListSelectionChanged(object sender, EventArgs e)
         {
-            //if (modlist_objectlistview.SelectedObjects.Count > 1)
-            //    return;
+            if (modlist_objectlistview.SelectedObjects.Count > 1)
+                return;
 
-            ModEntry m = modlist_objectlistview.SelectedObject as ModEntry;
+            var m = modlist_objectlistview.SelectedObject as ModEntry;
+
             UpdateModInfo(m);
-            CheckAndUpdateChangeLog(tabControl1.SelectedTab, m);
+            CheckAndUpdateChangeLog(modinfo_tabcontrol.SelectedTab, m);
 
             if (m != null)
             {
@@ -425,11 +435,12 @@ namespace XCOM2Launcher
         private void ModListEditFinished(object sender, CellEditEventArgs e)
         {
             var mod = e.RowObject as ModEntry;
+            Contract.Assume(mod != null);
 
             switch (e.Column.AspectName)
             {
                 case "Name":
-                    mod.ManualName = (e.NewValue as string).Length > 0;
+                    mod.ManualName = !string.IsNullOrEmpty(e.NewValue as string);
 
                     if (!mod.ManualName)
                         // Restore name
