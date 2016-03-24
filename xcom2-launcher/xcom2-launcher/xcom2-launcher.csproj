@@ -118,6 +118,7 @@
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\Steam\DownloadItemRequest.cs" />
     <Compile Include="Classes\Steam\ItemDetailsRequest.cs" />
+    <Compile Include="Classes\Steam\SteamAPIWrapper.cs" />
     <Compile Include="Classes\Steam\SteamManager.cs" />
     <Compile Include="Classes\WindowSetting.cs" />
     <Compile Include="Classes\XCOM\Arguments.cs" />

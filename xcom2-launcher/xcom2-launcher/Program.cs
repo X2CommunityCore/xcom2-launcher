@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
@@ -21,7 +22,7 @@ namespace XCOM2Launcher
             try
             {
 #endif
-            if (!Steamworks.SteamAPI.Init())
+                if (!SteamAPIWrapper.Init())
                 {
                     MessageBox.Show("Please start steam first!");
                     return;
@@ -43,7 +44,7 @@ namespace XCOM2Launcher
 
                 Application.Run(new MainForm(settings));
 
-                Steamworks.SteamAPI.Shutdown();
+                SteamAPIWrapper.Shutdown();
 #if !DEBUG
             }
             catch (Exception e)

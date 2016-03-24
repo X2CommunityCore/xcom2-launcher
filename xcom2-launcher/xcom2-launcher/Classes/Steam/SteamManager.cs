@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using Steamworks;
 using System.Diagnostics;
+using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher.Steam
 {
@@ -87,7 +88,7 @@ namespace XCOM2Launcher.Steam
                 // Once you get a Steam AppID assigned by Valve, you need to replace AppId_t.Invalid with it and
                 // remove steam_appid.txt from the game depot. eg: "(AppId_t)480" or "new AppId_t(480)".
                 // See the Valve documentation for more information: https://partner.steamgames.com/documentation/drm#FAQ
-                if (SteamAPI.RestartAppIfNecessary(AppId_t.Invalid))
+                if (SteamAPIWrapper.RestartAppIfNecessary(AppId_t.Invalid))
                 {
                     System.Windows.Forms.Application.Exit();
                     return;
@@ -113,7 +114,7 @@ namespace XCOM2Launcher.Steam
 
             // If you're running into Init issues try running DbgView prior to launching to get the internal output from Steam.
             // http://technet.microsoft.com/en-us/sysinternals/bb896647.aspx
-            m_bInitialized = SteamAPI.Init();
+            m_bInitialized = SteamAPIWrapper.Init();
             if (!m_bInitialized)
             {
                 Debug.Fail("[Steamworks.NET] SteamAPI_Init() failed. Refer to Valve's documentation or the comment above this line for more information.");
@@ -164,7 +165,7 @@ namespace XCOM2Launcher.Steam
                 return;
             }
 
-            SteamAPI.Shutdown();
+            SteamAPIWrapper.Shutdown();
         }
 
         private void Update()
@@ -175,7 +176,7 @@ namespace XCOM2Launcher.Steam
             }
 
             // Run Steam client callbacks
-            SteamAPI.RunCallbacks();
+            SteamAPIWrapper.RunCallbacks();
         }
     }
 }

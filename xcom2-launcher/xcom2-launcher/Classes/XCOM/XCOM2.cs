@@ -5,6 +5,7 @@ using System.IO;
 using Steamworks;
 using System.Windows.Forms;
 using System.Linq;
+using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.XCOM
@@ -70,7 +71,7 @@ namespace XCOM2Launcher.XCOM
 
         public static void RunGame(string game_dir, string args)
         {
-            if (!SteamAPI.Init())
+            if (!SteamAPIWrapper.Init())
             {
                 MessageBox.Show("Could not connect to steam.");
             }
@@ -84,7 +85,7 @@ namespace XCOM2Launcher.XCOM
             p.StartInfo.WorkingDirectory = game_dir;
             p.Start();
 
-            SteamAPI.Shutdown();
+            SteamAPIWrapper.Shutdown();
         }
 
         internal static void ImportActiveMods(Settings settings)

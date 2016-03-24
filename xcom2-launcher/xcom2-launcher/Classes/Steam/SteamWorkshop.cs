@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher.Steam
 {
@@ -58,7 +59,7 @@ namespace XCOM2Launcher.Steam
 
         public static Steamworks.EItemState GetDownloadStatus(ulong id)
         {
-            SteamAPI.Init();
+            SteamAPIWrapper.Init();
             return (Steamworks.EItemState)SteamUGC.GetItemState(new PublishedFileId_t(id));
         }
 

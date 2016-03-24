@@ -11,6 +11,7 @@ using XCOM2Launcher.Helper;
 using System.Drawing;
 using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
+using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher
 {
@@ -252,7 +253,7 @@ namespace XCOM2Launcher
 
         private void DeleteMods()
         {
-            Steamworks.SteamAPI.InitSafe();
+            SteamAPIWrapper.InitSafe();
 
             // Confirmation dialog
             string text = (modlist_objectlistview.SelectedItems.Count == 1)
