@@ -43,6 +43,10 @@ namespace XCOM2Launcher
         public Arguments Arguments { get; set; } = new Arguments();
 
         [Category("Launcher")]
+        [Description("Check for updates on start-up?")]
+        public bool CheckForUpdates { get; set; } = true;
+
+        [Category("Launcher")]
         [Description("Display hidden elements in the list?")]
         public bool ShowHiddenElements { get; set; } = false;
 

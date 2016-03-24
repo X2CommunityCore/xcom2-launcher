@@ -38,6 +38,31 @@ namespace XCOM2Launcher
             if (settings == null)
                 return;
 
+#if !DEBUG
+            // Check for update
+            if (settings.CheckForUpdates)
+            {
+                try
+                {
+                    using (var client = new System.Net.WebClient())
+                    {
+                        client.Headers.Add("User-Agent: Other");
+                        var json = client.DownloadString("https://api.github.com/repos/aEnigmatic/xcom2-launcher/releases/latest");
+                        var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
+                        var current_version = GetCurrentVersion();
+
+                        if (current_version != release.tag_name)
+                            // New version available
+                            new UpdateAvailableDialog(release, current_version).ShowDialog();
+                    }
+                }
+                catch (System.Net.WebException)
+                {
+                    // No internet?
+                }
+            }
+#endif
+
             // clean up old files
             if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
             {
