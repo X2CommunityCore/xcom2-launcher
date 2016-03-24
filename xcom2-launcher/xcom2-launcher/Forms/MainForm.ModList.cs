@@ -16,7 +16,7 @@ namespace XCOM2Launcher
 {
     public partial class MainForm : Form
     {
-        public ModList Mods { get { return Settings.Mods; } }
+        public ModList Mods => Settings.Mods;
 
         public TypedObjectListView<ModEntry> ModList { get; private set; }
 
@@ -26,8 +26,7 @@ namespace XCOM2Launcher
 
         public void initObjectListView()
         {
-            if (modlist_objectlistview != null)
-                modlist_objectlistview.Dispose();
+            modlist_objectlistview?.Dispose();
 
             modlist_objectlistview = new ObjectListView
             {

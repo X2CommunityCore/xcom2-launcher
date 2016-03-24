@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using XCOM2Launcher.Forms;
 using System.Reflection;
+using XCOM2Launcher.Classes.PropertyGrid;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
@@ -391,7 +392,6 @@ namespace XCOM2Launcher
             export_richtextbox.Text = str.ToString();
         }
         #endregion
-
     }
 }
 

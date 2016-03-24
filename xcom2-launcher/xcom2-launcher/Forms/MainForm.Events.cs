@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XCOM2Launcher.Classes.PropertyGrid;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
@@ -148,10 +149,7 @@ namespace XCOM2Launcher
                 DesktopBounds = setting.Bounds;
                 WindowState = setting.State;
             }
-
-            modinfo_details_propertygrid.SetLabelColumnWidth(100);
         }
-
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -231,6 +229,12 @@ namespace XCOM2Launcher
         private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.LinkText);
+        }
+
+        // Make sure property grid columns are properly sized
+        private void modinfo_details_propertygrid_Layout(object sender, LayoutEventArgs e)
+        {
+            modinfo_details_propertygrid.SetLabelColumnWidth(100);
         }
 
         #endregion
