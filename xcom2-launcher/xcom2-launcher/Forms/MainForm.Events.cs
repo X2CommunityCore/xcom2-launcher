@@ -5,8 +5,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XCOM2Launcher.Classes.PropertyGrid;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
@@ -147,10 +149,7 @@ namespace XCOM2Launcher
                 DesktopBounds = setting.Bounds;
                 WindowState = setting.State;
             }
-
-            modinfo_details_propertygrid.SetLabelColumnWidth(100);
         }
-
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -175,10 +174,8 @@ namespace XCOM2Launcher
         private void Updater_DoWork(object sender, DoWorkEventArgs e)
         {
             UpdateWorker.ReportProgress(0);
-            // Don't start immediately
-            System.Threading.Thread.Sleep(2000);
-            int i = 1;
-            foreach (ModEntry m in Mods.All.ToList())
+            int numCompletedMods = 0;
+            Parallel.ForEach(Mods.All.ToList(), mod =>
             {
                 if (UpdateWorker.CancellationPending || Disposing || IsDisposed)
                 {
@@ -186,14 +183,15 @@ namespace XCOM2Launcher
                     return;
                 }
 
-                Mods.UpdateMod(m);
+                Mods.UpdateMod(mod);
 
-                //if (!Updater.CancellationPending && !Disposing && !IsDisposed)
-                //    UpdateMod(m);
-
-
-                UpdateWorker.ReportProgress(i++, m);
-            }
+                lock (UpdateWorker)
+                {
+                    numCompletedMods++;
+                    UpdateWorker.ReportProgress(numCompletedMods, mod);
+                }
+                
+            });
         }
 
         private void Updater_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -221,7 +219,7 @@ namespace XCOM2Launcher
             }
 
             progress_toolstrip_progressbar.Visible = false;
-            status_toolstrip_label.Text = "Ready.";
+            status_toolstrip_label.Text = StatusBarIdleString;
             RefreshModList();
         }
         #endregion
@@ -231,6 +229,12 @@ namespace XCOM2Launcher
         private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.LinkText);
+        }
+
+        // Make sure property grid columns are properly sized
+        private void modinfo_details_propertygrid_Layout(object sender, LayoutEventArgs e)
+        {
+            modinfo_details_propertygrid.SetLabelColumnWidth(100);
         }
 
         #endregion

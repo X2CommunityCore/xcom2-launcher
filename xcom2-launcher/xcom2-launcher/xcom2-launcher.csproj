@@ -113,6 +113,7 @@
     <Compile Include="Classes\Mod\ModSource.cs" />
     <Compile Include="Classes\PropertyGrid\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Classes\PropertyGrid\PropertyCheckbox.cs" />
+    <Compile Include="Classes\PropertyGrid\PropertyGridExtensions.cs" />
     <Compile Include="Classes\Serialization\ModListConverter.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\Steam\DownloadItemRequest.cs" />
@@ -151,7 +152,6 @@
     <Compile Include="Classes\Steam\SteamWorkshop.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserElements\StaticExtensions.cs" />
     <EmbeddedResource Include="Forms\CleanModsForm.resx">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
     </EmbeddedResource>

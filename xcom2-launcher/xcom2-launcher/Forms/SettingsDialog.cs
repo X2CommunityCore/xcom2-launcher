@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XCOM2Launcher.Classes.PropertyGrid;
 using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Forms
@@ -43,8 +44,6 @@ namespace XCOM2Launcher.Forms
         {
             if (Settings.Windows.ContainsKey("settings"))
                 Bounds = Settings.Windows["settings"].Bounds;
-
-            propertyGrid1.SetLabelColumnWidth(170);
         }
 
         private void SettingsDialog_FormClosing(object sender, FormClosingEventArgs e)
@@ -67,6 +66,11 @@ namespace XCOM2Launcher.Forms
                 return;
 
             propertyGrid1.ResetSelectedProperty();
+        }
+
+        private void propertyGrid1_Layout(object sender, LayoutEventArgs e)
+        {
+            propertyGrid1.SetLabelColumnWidth(170);
         }
     }
 }

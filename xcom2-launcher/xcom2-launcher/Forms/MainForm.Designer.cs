@@ -71,6 +71,8 @@
             this.modinfo_config_tab = new System.Windows.Forms.TabPage();
             this.button1 = new System.Windows.Forms.Button();
             this.modinfo_config_propertygrid = new System.Windows.Forms.PropertyGrid();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.modinfo_changelog_richtextbox = new System.Windows.Forms.RichTextBox();
             this.modinfo_image_picturebox = new System.Windows.Forms.PictureBox();
             this.conflicts_tab = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
@@ -85,8 +87,6 @@
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
             this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
             this.run_game_button = new System.Windows.Forms.Button();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.modinfo_changelog_richtextbox = new System.Windows.Forms.RichTextBox();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -101,12 +101,12 @@
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.modinfo_config_tab.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).BeginInit();
             this.conflicts_tab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.conflicts_datagrid)).BeginInit();
             this.tabPage4.SuspendLayout();
             this.export_background_panel.SuspendLayout();
-            this.tabPage5.SuspendLayout();
             this.SuspendLayout();
             // 
             // main_statusstrip
@@ -463,6 +463,7 @@
             this.modinfo_details_propertygrid.Name = "modinfo_details_propertygrid";
             this.modinfo_details_propertygrid.Size = new System.Drawing.Size(662, 196);
             this.modinfo_details_propertygrid.TabIndex = 9;
+            this.modinfo_details_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_details_propertygrid_Layout);
             // 
             // modinfo_config_tab
             // 
@@ -493,6 +494,27 @@
             this.modinfo_config_propertygrid.Name = "modinfo_config_propertygrid";
             this.modinfo_config_propertygrid.Size = new System.Drawing.Size(662, 196);
             this.modinfo_config_propertygrid.TabIndex = 10;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.modinfo_changelog_richtextbox);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(668, 202);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Changelog";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // modinfo_changelog_richtextbox
+            // 
+            this.modinfo_changelog_richtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.modinfo_changelog_richtextbox.Location = new System.Drawing.Point(3, 3);
+            this.modinfo_changelog_richtextbox.Name = "modinfo_changelog_richtextbox";
+            this.modinfo_changelog_richtextbox.ReadOnly = true;
+            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(662, 196);
+            this.modinfo_changelog_richtextbox.TabIndex = 0;
+            this.modinfo_changelog_richtextbox.Text = "";
             // 
             // modinfo_image_picturebox
             // 
@@ -654,27 +676,6 @@
             this.run_game_button.Text = "Run XCOM 2";
             this.run_game_button.UseVisualStyleBackColor = true;
             // 
-            // tabPage5
-            // 
-            this.tabPage5.Controls.Add(this.modinfo_changelog_richtextbox);
-            this.tabPage5.Location = new System.Drawing.Point(4, 22);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(668, 202);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Changelog";
-            this.tabPage5.UseVisualStyleBackColor = true;
-            // 
-            // richTextBox1
-            // 
-            this.modinfo_changelog_richtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.modinfo_changelog_richtextbox.Location = new System.Drawing.Point(3, 3);
-            this.modinfo_changelog_richtextbox.Name = "modinfo_changelog_richtextbox";
-            this.modinfo_changelog_richtextbox.ReadOnly = true;
-            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(662, 196);
-            this.modinfo_changelog_richtextbox.TabIndex = 0;
-            this.modinfo_changelog_richtextbox.Text = "";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -705,6 +706,7 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.modinfo_config_tab.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).EndInit();
             this.conflicts_tab.ResumeLayout(false);
             this.conflicts_tab.PerformLayout();
@@ -712,7 +714,6 @@
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
             this.export_background_panel.ResumeLayout(false);
-            this.tabPage5.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using XCOM2Launcher.Forms;
 using System.Reflection;
+using XCOM2Launcher.Classes.PropertyGrid;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
@@ -19,6 +20,8 @@ namespace XCOM2Launcher
 {
     public partial class MainForm : Form
     {
+        private const string StatusBarIdleString = "Ready.";
+
         public Settings Settings { get; set; }
 
         public MainForm(Settings settings)
@@ -62,7 +65,7 @@ namespace XCOM2Launcher
 
         private void CheckSteamForNewMods()
         {
-            status_toolstrip_label.Text = "Checking...";
+            status_toolstrip_label.Text = "Checking for new mods...";
 
             ulong[] subscribedIDs;
             try
@@ -73,7 +76,7 @@ namespace XCOM2Launcher
             {
                 // Steamworks not initialized?
                 // Game taking over?
-                status_toolstrip_label.Text = "Error.";
+                status_toolstrip_label.Text = "Error checking for new mods.";
                 return;
             }
 
@@ -120,6 +123,8 @@ namespace XCOM2Launcher
 
             if (change)
                 RefreshModList();
+
+            status_toolstrip_label.Text = StatusBarIdleString;
         }
 
         private void CheckSteamForUpdates()
@@ -391,7 +396,6 @@ namespace XCOM2Launcher
             export_richtextbox.Text = str.ToString();
         }
         #endregion
-
     }
 }
 
