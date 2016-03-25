@@ -24,6 +24,7 @@ namespace XCOM2Launcher.Forms
             // save on close
             Shown += MainForm_Shown;
             FormClosing += MainForm_FormClosing;
+
             // Menu
             // -> File
             saveToolStripMenuItem.Click += delegate { Save(); };
@@ -75,8 +76,9 @@ namespace XCOM2Launcher.Forms
             export_richtextbox.LinkClicked += ControlLinkClicked;
             modinfo_changelog_richtextbox.LinkClicked += ControlLinkClicked;
 
-            // TabControl (mainly for the changelog)
-            modinfo_tabcontrol.Selected += Tab_Selected;
+            // Tab Controls
+            main_tabcontrol.Selected += MainTabSelected;
+            modinfo_tabcontrol.Selected += ModInfoTabSelected;
 
             // Mod Updater
             _updateWorker.DoWork += Updater_DoWork;
@@ -85,9 +87,14 @@ namespace XCOM2Launcher.Forms
 
             // Steam Events
             Workshop.OnItemDownloaded += SteamWorkshop_OnItemDownloaded;
+
+            // Main Tabs
+            // Export
+            export_workshop_link_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
+            export_group_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
         }
 
-
+#if DEBUG
         private void SteamWorkshop_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
         {
             if (e.Result.m_eResult != EResult.k_EResultOK)
@@ -125,33 +132,7 @@ namespace XCOM2Launcher.Forms
 
             MessageBox.Show($"{m.Name} finished download.");
         }
-
-        private void Tab_Selected(object sender, TabControlEventArgs e)
-        {
-            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
-        }
-
-        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
-        {
-            if (tab == modinfo_changelog_tab && m != null)
-            {
-                /*ModChangelogCache.GetChangeLogAsync(m.WorkshopID).ContinueWith((changelog) =>
-                {
-                    modinfo_changelog_richtextbox.Text = changelog.Result;
-                });*/
-                modinfo_changelog_richtextbox.Text = "Loading...";
-                modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
-            }
-        }
-
-        #region Event Handlers
-
-        private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            Process.Start(e.LinkText);
-        }
-
-        #endregion
+#endif
 
         #region Form
 
@@ -244,5 +225,37 @@ namespace XCOM2Launcher.Forms
         }
 
         #endregion
+
+        #region Event Handlers
+        private void MainTabSelected(object sender, TabControlEventArgs e)
+        {
+            if (e.TabPage == export_tab)
+                UpdateExport();
+        }
+
+        private void ExportCheckboxCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateExport();
+        }
+
+        private void ModInfoTabSelected(object sender, TabControlEventArgs e)
+        {
+            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
+        }
+
+        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
+        {
+            if (tab != modinfo_changelog_tab || m == null)
+                return;
+
+            modinfo_changelog_richtextbox.Text = "Loading...";
+            modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
+        }
+
+        private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            Process.Start(e.LinkText);
+        }
+#endregion
     }
 }

@@ -38,6 +38,7 @@
             this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.searchForModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateEntriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -87,7 +88,6 @@
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
             this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
             this.run_game_button = new System.Windows.Forms.Button();
-            this.updateEntriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -179,6 +179,12 @@
             this.searchForModsToolStripMenuItem.Name = "searchForModsToolStripMenuItem";
             this.searchForModsToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.searchForModsToolStripMenuItem.Text = "Search for mods";
+            // 
+            // updateEntriesToolStripMenuItem
+            // 
+            this.updateEntriesToolStripMenuItem.Name = "updateEntriesToolStripMenuItem";
+            this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.updateEntriesToolStripMenuItem.Text = "Update entries";
             // 
             // toolStripSeparator2
             // 
@@ -631,7 +637,6 @@
             this.export_group_checkbox.TabIndex = 2;
             this.export_group_checkbox.Text = "Include Grouping";
             this.export_group_checkbox.UseVisualStyleBackColor = true;
-            this.export_group_checkbox.CheckedChanged += new System.EventHandler(this.export_group_checkbox_CheckedChanged);
             // 
             // export_background_panel
             // 
@@ -667,7 +672,6 @@
             this.export_workshop_link_checkbox.TabIndex = 0;
             this.export_workshop_link_checkbox.Text = "Include Workshop Link";
             this.export_workshop_link_checkbox.UseVisualStyleBackColor = true;
-            this.export_workshop_link_checkbox.CheckedChanged += new System.EventHandler(this.export_workshop_link_checkbox_CheckedChanged);
             // 
             // run_game_button
             // 
@@ -678,12 +682,6 @@
             this.run_game_button.TabIndex = 0;
             this.run_game_button.Text = "Run XCOM 2";
             this.run_game_button.UseVisualStyleBackColor = true;
-            // 
-            // updateEntriesToolStripMenuItem
-            // 
-            this.updateEntriesToolStripMenuItem.Name = "updateEntriesToolStripMenuItem";
-            this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.updateEntriesToolStripMenuItem.Text = "Update entries";
             // 
             // MainForm
             // 
