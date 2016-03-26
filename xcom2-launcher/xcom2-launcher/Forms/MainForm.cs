@@ -191,9 +191,6 @@ namespace XCOM2Launcher.Forms
         private void UpdateLabels()
         {
             //
-            UpdateExport();
-
-            //
             bool hasConflicts = (NumConflicts > 0);
             modlist_tab.Text = $"Mods ({Mods.Active.Count()} / {Mods.All.Count()})";
             conflicts_tab.Text = "Overrides" + (hasConflicts ? $" ({NumConflicts} Conflicts)" : "");
@@ -319,8 +316,7 @@ namespace XCOM2Launcher.Forms
             // show panel
             horizontal_splitcontainer.Panel2Collapsed = false;
 
-
-            // 
+            // Update data
             modinfo_title_textbox.Text = m.Name;
             modinfo_author_textbox.Text = m.Author;
             modinfo_date_created_textbox.Text = m.DateCreated?.ToString() ?? "";
@@ -374,39 +370,36 @@ namespace XCOM2Launcher.Forms
 
         #region Export
 
-        private void export_group_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateExport();
-        }
-
-        private void export_workshop_link_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateExport();
-        }
-
         private void UpdateExport()
         {
             var str = new StringBuilder();
 
             if (!Mods.Active.Any())
             {
-                export_richtextbox.Text = "";
+                export_richtextbox.Text = "No active mods.";
                 return;
             }
 
-            int name_length = Mods.Active.Max(m => m.Name.Length) + 1;
-            int id_length = Mods.Active.Max(m => m.ID.Length) + 1;
+            var nameLength = Mods.Active.Max(m => m.Name.Length);
+            var idLength = Mods.Active.Max(m => m.ID.Length);
+            var showCategories = export_group_checkbox.Checked;
+
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
             {
                 var mods = entry.Value.Entries.Where(m => m.isActive).ToList();
 
-                if (export_group_checkbox.Checked)
+                if (showCategories)
                     str.AppendLine($"{entry.Key} ({mods.Count()}):");
 
                 foreach (var mod in mods)
                 {
-                    str.Append(String.Format("\t{0,-" + name_length + "} ", mod.Name));
-                    str.Append(String.Format("{0,-" + id_length + "} ", mod.ID));
+                    if (showCategories)
+                        str.Append("\t");
+
+                    str.Append(string.Format(("{0,-" + nameLength + "} "), mod.Name));
+                    str.Append("\t");
+                    str.Append(string.Format(("{0,-" + idLength + "} "), mod.ID));
+                    str.Append("\t");
 
                     if (mod.WorkshopID == -1)
                         str.Append("Unknown");

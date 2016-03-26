@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Steamworks;
@@ -24,6 +26,7 @@ namespace XCOM2Launcher.Forms
             // save on close
             Shown += MainForm_Shown;
             FormClosing += MainForm_FormClosing;
+
             // Menu
             // -> File
             saveToolStripMenuItem.Click += delegate { Save(); };
@@ -75,8 +78,9 @@ namespace XCOM2Launcher.Forms
             export_richtextbox.LinkClicked += ControlLinkClicked;
             modinfo_changelog_richtextbox.LinkClicked += ControlLinkClicked;
 
-            // TabControl (mainly for the changelog)
-            modinfo_tabcontrol.Selected += Tab_Selected;
+            // Tab Controls
+            main_tabcontrol.Selected += MainTabSelected;
+            modinfo_tabcontrol.Selected += ModInfoTabSelected;
 
             // Mod Updater
             _updateWorker.DoWork += Updater_DoWork;
@@ -84,10 +88,19 @@ namespace XCOM2Launcher.Forms
             _updateWorker.RunWorkerCompleted += Updater_RunWorkerCompleted;
 
             // Steam Events
+#if DEBUG
             Workshop.OnItemDownloaded += SteamWorkshop_OnItemDownloaded;
+#endif
+
+            // Main Tabs
+            // Export
+            export_workshop_link_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
+            export_group_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
+            export_save_button.Click += ExportSaveButtonClick;
+            export_load_button.Click += ExportLoadButtonClick;
         }
 
-
+#if DEBUG
         private void SteamWorkshop_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
         {
             if (e.Result.m_eResult != EResult.k_EResultOK)
@@ -96,7 +109,7 @@ namespace XCOM2Launcher.Forms
                 return;
             }
 
-            var m = Downloads.SingleOrDefault(x => x.WorkshopID == (long) e.Result.m_nPublishedFileId.m_PublishedFileId);
+            var m = Downloads.SingleOrDefault(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
             if (m != null)
             {
@@ -121,39 +134,13 @@ namespace XCOM2Launcher.Forms
                 //var item = modlist_listview.Items.Cast<ListViewItem>().Single(i => (i.Tag as ModEntry).SourceID == m.SourceID);
                 //UpdateModListItem(item, info.Category);
             }
-            m = Mods.All.Single(x => x.WorkshopID == (long) e.Result.m_nPublishedFileId.m_PublishedFileId);
+            m = Mods.All.Single(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
             MessageBox.Show($"{m.Name} finished download.");
         }
+#endif
 
-        private void Tab_Selected(object sender, TabControlEventArgs e)
-        {
-            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
-        }
-
-        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
-        {
-            if (tab == modinfo_changelog_tab && m != null)
-            {
-                /*ModChangelogCache.GetChangeLogAsync(m.WorkshopID).ContinueWith((changelog) =>
-                {
-                    modinfo_changelog_richtextbox.Text = changelog.Result;
-                });*/
-                modinfo_changelog_richtextbox.Text = "Loading...";
-                modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
-            }
-        }
-
-        #region Event Handlers
-
-        private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            Process.Start(e.LinkText);
-        }
-
-        #endregion
-
-        #region Form
+#region Form
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
@@ -171,7 +158,7 @@ namespace XCOM2Launcher.Forms
             _updateWorker.CancelAsync();
 
             // Save dimensions
-            Settings.Windows["main"] = new WindowSettings(this) {Data = modlist_objectlistview.SaveState()};
+            Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_objectlistview.SaveState() };
 
             Save();
         }
@@ -182,9 +169,9 @@ namespace XCOM2Launcher.Forms
             modinfo_inspect_propertygrid.SetLabelColumnWidth(100);
         }
 
-        #endregion
+#endregion
 
-        #region Mod Updater
+#region Mod Updater
 
         private readonly BackgroundWorker _updateWorker = new BackgroundWorker
         {
@@ -216,7 +203,7 @@ namespace XCOM2Launcher.Forms
 
         private void Updater_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (((BackgroundWorker) sender).CancellationPending)
+            if (((BackgroundWorker)sender).CancellationPending)
                 return;
 
             progress_toolstrip_progressbar.Value = e.ProgressPercentage;
@@ -243,6 +230,171 @@ namespace XCOM2Launcher.Forms
             RefreshModList();
         }
 
-        #endregion
+#endregion
+
+#region Event Handlers
+        private void MainTabSelected(object sender, TabControlEventArgs e)
+        {
+            if (e.TabPage == export_tab)
+                UpdateExport();
+        }
+
+        private void ExportCheckboxCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateExport();
+        }
+        private void ExportLoadButtonClick(object sender, EventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Text files|*.txt",
+                DefaultExt = "txt",
+                CheckPathExists = true,
+                CheckFileExists = true,
+                Multiselect = false,
+            };
+
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            // parse file
+
+            var regex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)$", RegexOptions.Compiled | RegexOptions.Multiline);
+
+            var mods = Mods.All.ToList();
+            var activeMods = new List<ModEntry>();
+            var missingMods = new List<Match>();
+
+            foreach (var line in File.ReadAllLines(dialog.FileName))
+            {
+                var match = regex.Match(line);
+                if (!match.Success)
+                    continue;
+
+                var entries = mods.Where(mod => mod.ID == match.Groups["id"].Value).ToList();
+
+                if (entries.Count == 0)
+                {
+                    // Mod missing
+                    // -> add to list
+                    missingMods.Add(match);
+                    continue;
+                }
+
+                activeMods.AddRange(entries);
+
+                if (entries.Count > 1)
+                {
+                    // More than 1 mod
+                    // Add warning?
+                }
+            }
+
+            // Check entries
+            if (activeMods.Count == 0)
+            {
+                MessageBox.Show("No mods found. Bad profile?");
+                return;
+            }
+
+            // Check missing
+            if (missingMods.Count > 0)
+            {
+                var steamMissingMods = missingMods.Where(match => match.Groups["sourceID"].Value != "Unknown").ToList();
+
+                var text = $"This profile contains {missingMods.Count} mod(s) that are not currently installed:\r\n\r\n";
+
+                foreach (var match in missingMods)
+                {
+                    text += match.Groups["name"].Value;
+
+                    if (steamMissingMods.Contains(match))
+                        text += "*";
+
+                    text += "\r\n";
+                }
+
+                if (steamMissingMods.Count != 0)
+                {
+                    text += "\r\nDo you want to subscribe to the mods marked with an asterisk on Steam?";
+
+                    var result = MessageBox.Show(this, text, "Mods missing!", MessageBoxButtons.YesNoCancel);
+
+                    if (result == DialogResult.Cancel)
+                        return;
+
+                    if (result == DialogResult.Yes)
+                    {
+                        // subscribe
+                        foreach (var id in steamMissingMods.Select(match => ulong.Parse(match.Groups["sourceID"].Value)))
+                        {
+                            SteamUGC.SubscribeItem(id.ToPublishedFileID());
+                        }
+
+                        MessageBox.Show("Done. Close the launcher, wait for steam to download the mod(s) and try again.");
+                        return;
+                    }
+                }
+                else
+                {
+                    text += "\r\nDo you wish to continue?";
+
+                    if (MessageBox.Show(this, text, "Mods missing!", MessageBoxButtons.YesNo) == DialogResult.No)
+                        return;
+                }
+            }
+
+            // Confirm
+            if (MessageBox.Show(this, $"Adopt profile? {activeMods.Count} mods found.", "Confirm", MessageBoxButtons.YesNo) == DialogResult.No)
+                return;
+
+            // Apply changes
+            foreach (var mod in mods)
+                mod.isActive = false;
+
+            foreach (var mod in activeMods)
+                mod.isActive = true;
+
+            modlist_objectlistview.UpdateObjects(mods);
+
+            UpdateExport();
+            UpdateLabels();
+        }
+
+        private void ExportSaveButtonClick(object sender, EventArgs eventArgs)
+        {
+            var dialog = new SaveFileDialog
+            {
+                Filter = "Text files|*.txt",
+                DefaultExt = "txt",
+                OverwritePrompt = true,
+                AddExtension = true,
+            };
+
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            File.WriteAllText(dialog.FileName, export_richtextbox.Text);
+        }
+
+        private void ModInfoTabSelected(object sender, TabControlEventArgs e)
+        {
+            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
+        }
+
+        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
+        {
+            if (tab != modinfo_changelog_tab || m == null)
+                return;
+
+            modinfo_changelog_richtextbox.Text = "Loading...";
+            modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
+        }
+
+        private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            Process.Start(e.LinkText);
+        }
+#endregion
     }
 }
