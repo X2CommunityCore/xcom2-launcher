@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
+using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Mod
@@ -39,29 +40,24 @@ namespace XCOM2Launcher.Mod
             }
         }
 
-
         public ModEntry FindByPath(string path)
         {
             return All.SingleOrDefault(m => m.Path == path);
         }
 
-        public Dictionary<string, List<ModEntry>> GetOverrides(IEnumerable<ModEntry> mods)
+        public IEnumerable<ModConflict> GetActiveConflicts()
         {
-            var overrides = new Dictionary<string, List<ModEntry>>();
+            IEnumerable<ModClassOverride> allOverrides = Active.SelectMany(o => o.GetOverrides()).ToList();
+            IEnumerable<string> classesOverriden = allOverrides
+                .Select(o => o.OldClass)
+                .Distinct(StringComparer.InvariantCultureIgnoreCase);
 
-            foreach (var mod in mods)
-            {
-                foreach (var overwrite in mod.GetOverrides())
-                {
-                    if (overrides.ContainsKey(overwrite.OldClass))
-                        overrides[overwrite.OldClass].Add(mod);
-
-                    else
-                        overrides[overwrite.OldClass] = new List<ModEntry> {mod};
-                }
-            }
-
-            return overrides;
+            return from className in classesOverriden
+                   let overridesForThisClass = allOverrides.Where(o => 
+                        o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
+                   where overridesForThisClass.Count > 1
+                        && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class) //If every mod uses a UIScreenListener, there is no conflict
+                   select new ModConflict(className, overridesForThisClass);
         }
 
         public void ImportMods(string dir)

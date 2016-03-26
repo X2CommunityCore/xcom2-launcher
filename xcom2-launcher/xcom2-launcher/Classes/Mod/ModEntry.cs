@@ -58,7 +58,10 @@ namespace XCOM2Launcher.Mod
             get { return _image ?? FilePath.Combine(Path ?? "", "ModPreview.jpg"); }
             set { _image = value; }
         }
-        
+
+        [JsonIgnore]
+        private IEnumerable<ModClassOverride> _overrides;
+
         public string GetDescription()
         {
             var info = new ModInfo(GetModInfoFile());
@@ -66,9 +69,13 @@ namespace XCOM2Launcher.Mod
             return info.Description;
         }
 
-        public IEnumerable<ModClassOverride> GetOverrides()
+        public IEnumerable<ModClassOverride> GetOverrides(bool forceUpdate = false)
         {
-            return GetUIScreenListenerOverrides().Union(GetClassOverrides()).ToList();
+            if (_overrides == null || forceUpdate)
+            {
+                _overrides = GetUIScreenListenerOverrides().Union(GetClassOverrides()).ToList();
+            }
+            return _overrides;
         }
 
         private IEnumerable<ModClassOverride> GetUIScreenListenerOverrides()
@@ -98,21 +105,17 @@ namespace XCOM2Launcher.Mod
                     var match = screenClassRegex.Match(line);
                     if (match.Success)
                     {
-                        string className = match.Groups[1].Value;
-                        if (className.ToLower() == "none")
+                        string oldClass = match.Groups[1].Value;
+                        if (oldClass.ToLower() == "none")
                         {
                             //'ScreenClass = none' means it runs against every UI screen
                             continue;
                         }
 
+                        string newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
                         lock (overrides)
                         {
-                            overrides.Add(new ModClassOverride
-                            {
-                                OverrideType = ModClassOverrideType.UIScreenListener,
-                                OldClass = match.Groups[1].Value,
-                                NewClass = FilePath.GetFileNameWithoutExtension(sourceFile)
-                            });
+                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener));
                         }
                     }
                 }
@@ -123,7 +126,6 @@ namespace XCOM2Launcher.Mod
 
         private IEnumerable<ModClassOverride> GetClassOverrides()
         {
-            // string 
             var file = FilePath.Combine(Path, "Config", "XComEngine.ini");
 
             if(!File.Exists(file))
@@ -135,12 +137,7 @@ namespace XCOM2Launcher.Mod
                 select r.Match(line.Replace(" ", ""))
                 into m
                 where m.Success
-                select new ModClassOverride
-                {
-                    OldClass = m.Groups[1].Value,
-                    NewClass = m.Groups[2].Value,
-                    OverrideType = ModClassOverrideType.Class
-                };
+                select new ModClassOverride(this, m.Groups[2].Value, m.Groups[1].Value, ModClassOverrideType.Class);
         }
 
         public void ShowOnSteam()
