@@ -47,17 +47,37 @@ namespace XCOM2Launcher.Mod
 
         public IEnumerable<ModConflict> GetActiveConflicts()
         {
+            var activeConflicts = GetActiveConflictsImplementation().ToList();
+            UpdateModsConflictState(activeConflicts);
+            return activeConflicts;
+        }
+
+        private IEnumerable<ModConflict> GetActiveConflictsImplementation()
+        {
             IEnumerable<ModClassOverride> allOverrides = Active.SelectMany(o => o.GetOverrides()).ToList();
             IEnumerable<string> classesOverriden = allOverrides
                 .Select(o => o.OldClass)
                 .Distinct(StringComparer.InvariantCultureIgnoreCase);
 
             return from className in classesOverriden
-                   let overridesForThisClass = allOverrides.Where(o => 
+                   let overridesForThisClass = allOverrides.Where(o =>
                         o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
                    where overridesForThisClass.Count > 1
                         && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class) //If every mod uses a UIScreenListener, there is no conflict
                    select new ModConflict(className, overridesForThisClass);
+        }
+
+        private void UpdateModsConflictState(IEnumerable<ModConflict> activeConflicts)
+        {
+            foreach (var mod in All)
+            {
+                mod.State &= ~ModState.ModConflict;
+            }
+
+            foreach (var classOverride in activeConflicts.SelectMany(conflict => conflict.Overrides))
+            {
+                classOverride.Mod.State |= ModState.ModConflict;
+            }
         }
 
         public void ImportMods(string dir)

@@ -176,11 +176,11 @@ namespace XCOM2Launcher.Forms
         {
             error_provider.Clear();
 
-            // ModEntry list
-            RefreshModList();
-
             // Incompability warnings and overwrites grid
             UpdateConflicts();
+
+            // ModEntry list
+            RefreshModList();
 
             // ModEntry details
             UpdateModInfo(modlist_objectlistview.SelectedObject as ModEntry);
