@@ -109,6 +109,7 @@
     <Compile Include="Classes\GitHub\User.cs" />
     <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
     <Compile Include="Classes\Mod\ModChangelogCache.cs" />
+    <Compile Include="Classes\Mod\ModConflict.cs" />
     <Compile Include="Classes\Mod\ModEntry.cs" />
     <Compile Include="Classes\Mod\ModCategory.cs" />
     <Compile Include="Classes\Mod\ModInfo.cs" />

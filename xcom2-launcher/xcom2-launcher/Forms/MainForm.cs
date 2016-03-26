@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace XCOM2Launcher.Forms
     public partial class MainForm
     {
         private const string StatusBarIdleString = "Ready.";
+        private const string ExclamationIconKey = "Exclamation";
 
         public MainForm(Settings settings)
         {
@@ -37,6 +39,9 @@ namespace XCOM2Launcher.Forms
             UpdateInterface();
             RegisterEvents();
 
+            //Other intialization
+            InitializeTabImages();
+
             // Check for Updates
             CheckSteamForUpdates();
 
@@ -52,6 +57,11 @@ namespace XCOM2Launcher.Forms
                 t.Start();
             }
 #endif
+        }
+
+        private void InitializeTabImages()
+        {
+            tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
         }
 
         public Settings Settings { get; set; }
@@ -166,11 +176,11 @@ namespace XCOM2Launcher.Forms
         {
             error_provider.Clear();
 
-            // ModEntry list
-            RefreshModList();
-
             // Incompability warnings and overwrites grid
             UpdateConflicts();
+
+            // ModEntry list
+            RefreshModList();
 
             // ModEntry details
             UpdateModInfo(modlist_objectlistview.SelectedObject as ModEntry);
@@ -181,10 +191,10 @@ namespace XCOM2Launcher.Forms
         private void UpdateLabels()
         {
             //
+            bool hasConflicts = (NumConflicts > 0);
             modlist_tab.Text = $"Mods ({Mods.Active.Count()} / {Mods.All.Count()})";
-            conflicts_tab.Text = "Conflicts";
-            if (NumConflicts > 0)
-                conflicts_tab.Text += $" ({NumConflicts})";
+            conflicts_tab.Text = "Overrides" + (hasConflicts ? $" ({NumConflicts} Conflicts)" : "");
+            conflicts_tab.ImageKey = (hasConflicts ? ExclamationIconKey : null);
         }
 
 
@@ -199,15 +209,26 @@ namespace XCOM2Launcher.Forms
 
             foreach (var m in Mods.Active)
             {
-                foreach (var classOverride in m.GetClassOverrides())
+                foreach (var classOverride in m.GetOverrides(true))
                 {
-                    conflicts_datagrid.Rows.Add(m.Name, classOverride.OldClass, classOverride.NewClass);
+                    string oldClass = classOverride.OldClass;
+                    if (classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
+                    {
+                        oldClass += " (UIScreenListener)";
+                    }
+                    conflicts_datagrid.Rows.Add(m.Name, oldClass, classOverride.NewClass);
                 }
             }
 
             // Conflict log
             Mods.MarkDuplicates();
 
+            conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
+            UpdateLabels();
+        }
+
+        private string GetDuplicatesString()
+        {
             var str = new StringBuilder();
 
             var duplicates = Mods.GetDuplicates().ToList();
@@ -232,22 +253,39 @@ namespace XCOM2Launcher.Forms
 
                 str.AppendLine();
             }
+            return str.ToString();
+        }
 
-            // Override conflicts
-            var overrides = Mods.GetOverrides(Mods.Active);
-            var conflicts = overrides.Where(a => a.Value.Count > 1).ToList();
-            if (conflicts.Any())
+        private string GetOverridesString()
+        {
+            StringBuilder str = new StringBuilder();
+
+            bool showUIScreenListenerMessage = false;
+
+            var conflicts = Mods.GetActiveConflicts().ToList();
+            if(conflicts.Any())
             {
                 str.AppendLine("Mods with colliding overrides found!");
                 str.AppendLine("These mods will not (fully) work when run together.");
                 str.AppendLine();
 
-                foreach (var entry in conflicts)
+                foreach(var conflict in conflicts)
                 {
-                    str.AppendLine($"Conflict found for '{entry.Key}':");
+                    str.AppendLine($"Conflict found for '{conflict.ClassName}':");
+                    bool hasMultipleUIScreenListeners = (conflict.Overrides.Count(o => o.OverrideType == ModClassOverrideType.UIScreenListener) > 1);
 
-                    foreach (var m in entry.Value)
-                        str.AppendLine($"\t{m.Name}");
+                    foreach (var classOverride in conflict.Overrides.OrderBy(o => o.OverrideType).ThenBy(o => o.Mod.Name))
+                    {
+                        if (hasMultipleUIScreenListeners && classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
+                        {
+                            showUIScreenListenerMessage = true;
+                            str.AppendLine($"\t* {classOverride.Mod.Name}");
+                        }
+                        else
+                        {
+                            str.AppendLine($"\t{classOverride.Mod.Name}");
+                        }
+                    }
 
                     str.AppendLine();
 
@@ -255,10 +293,15 @@ namespace XCOM2Launcher.Forms
                 }
 
                 error_provider.SetError(conflicts_log_label, "Found " + NumConflicts + " conflicts");
+
+                if(showUIScreenListenerMessage)
+                {
+                    str.AppendLine("* (These mods use UIScreenListeners, meaning they do not conflict with each other)");
+                    str.AppendLine();
+                }
             }
 
-            conflicts_textbox.Text = str.ToString();
-            UpdateLabels();
+            return str.ToString();
         }
 
         private void UpdateModInfo(ModEntry m)

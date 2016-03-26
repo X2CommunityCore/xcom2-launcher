@@ -89,6 +89,7 @@
             this.export_background_panel = new System.Windows.Forms.Panel();
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
             this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
+            this.tabImageList = new System.Windows.Forms.ImageList(this.components);
             this.run_game_button = new System.Windows.Forms.Button();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
@@ -234,7 +235,7 @@
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // importActiveModsToolStripMenuItem
@@ -262,6 +263,7 @@
             this.main_tabcontrol.Controls.Add(this.modlist_tab);
             this.main_tabcontrol.Controls.Add(this.conflicts_tab);
             this.main_tabcontrol.Controls.Add(this.export_tab);
+            this.main_tabcontrol.ImageList = this.tabImageList;
             this.main_tabcontrol.Location = new System.Drawing.Point(0, 27);
             this.main_tabcontrol.Name = "main_tabcontrol";
             this.main_tabcontrol.SelectedIndex = 0;
@@ -271,10 +273,10 @@
             // modlist_tab
             // 
             this.modlist_tab.Controls.Add(this.horizontal_splitcontainer);
-            this.modlist_tab.Location = new System.Drawing.Point(4, 22);
+            this.modlist_tab.Location = new System.Drawing.Point(4, 23);
             this.modlist_tab.Name = "modlist_tab";
             this.modlist_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modlist_tab.Size = new System.Drawing.Size(892, 474);
+            this.modlist_tab.Size = new System.Drawing.Size(892, 473);
             this.modlist_tab.TabIndex = 0;
             this.modlist_tab.Text = "Mods";
             this.modlist_tab.UseVisualStyleBackColor = true;
@@ -290,8 +292,8 @@
             // horizontal_splitcontainer.Panel2
             // 
             this.horizontal_splitcontainer.Panel2.Controls.Add(this.modinfo_groupbox);
-            this.horizontal_splitcontainer.Size = new System.Drawing.Size(886, 468);
-            this.horizontal_splitcontainer.SplitterDistance = 222;
+            this.horizontal_splitcontainer.Size = new System.Drawing.Size(886, 467);
+            this.horizontal_splitcontainer.SplitterDistance = 221;
             this.horizontal_splitcontainer.TabIndex = 5;
             // 
             // modinfo_groupbox
@@ -544,19 +546,18 @@
             this.conflicts_tab.Controls.Add(this.conflicts_log_label);
             this.conflicts_tab.Controls.Add(this.conflicts_textbox);
             this.conflicts_tab.Controls.Add(this.conflicts_datagrid);
-            this.conflicts_tab.Location = new System.Drawing.Point(4, 22);
+            this.conflicts_tab.Location = new System.Drawing.Point(4, 23);
             this.conflicts_tab.Name = "conflicts_tab";
             this.conflicts_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.conflicts_tab.Size = new System.Drawing.Size(892, 474);
+            this.conflicts_tab.Size = new System.Drawing.Size(892, 473);
             this.conflicts_tab.TabIndex = 1;
             this.conflicts_tab.Text = "Class Overrides";
             this.conflicts_tab.UseVisualStyleBackColor = true;
             // 
             // conflicts_log_label
             // 
-            this.conflicts_log_label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.conflicts_log_label.AutoSize = true;
-            this.conflicts_log_label.Location = new System.Drawing.Point(594, 6);
+            this.conflicts_log_label.Location = new System.Drawing.Point(6, 3);
             this.conflicts_log_label.Name = "conflicts_log_label";
             this.conflicts_log_label.Size = new System.Drawing.Size(28, 13);
             this.conflicts_log_label.TabIndex = 8;
@@ -565,11 +566,11 @@
             // conflicts_textbox
             // 
             this.conflicts_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.conflicts_textbox.Location = new System.Drawing.Point(594, 23);
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.conflicts_textbox.Location = new System.Drawing.Point(6, 20);
             this.conflicts_textbox.Multiline = true;
             this.conflicts_textbox.Name = "conflicts_textbox";
-            this.conflicts_textbox.Size = new System.Drawing.Size(285, 513);
+            this.conflicts_textbox.Size = new System.Drawing.Size(285, 450);
             this.conflicts_textbox.TabIndex = 7;
             // 
             // conflicts_datagrid
@@ -585,10 +586,10 @@
             this.ColumnModName,
             this.ColumnInternalClass,
             this.ColumnModClass});
-            this.conflicts_datagrid.Location = new System.Drawing.Point(3, 6);
+            this.conflicts_datagrid.Location = new System.Drawing.Point(304, 3);
             this.conflicts_datagrid.Name = "conflicts_datagrid";
             this.conflicts_datagrid.ReadOnly = true;
-            this.conflicts_datagrid.Size = new System.Drawing.Size(585, 530);
+            this.conflicts_datagrid.Size = new System.Drawing.Size(585, 467);
             this.conflicts_datagrid.TabIndex = 6;
             // 
             // ColumnModName
@@ -622,10 +623,10 @@
             this.export_tab.Controls.Add(this.export_group_checkbox);
             this.export_tab.Controls.Add(this.export_background_panel);
             this.export_tab.Controls.Add(this.export_workshop_link_checkbox);
-            this.export_tab.Location = new System.Drawing.Point(4, 22);
+            this.export_tab.Location = new System.Drawing.Point(4, 23);
             this.export_tab.Name = "export_tab";
             this.export_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.export_tab.Size = new System.Drawing.Size(892, 474);
+            this.export_tab.Size = new System.Drawing.Size(892, 473);
             this.export_tab.TabIndex = 2;
             this.export_tab.Text = "Profiles";
             this.export_tab.UseVisualStyleBackColor = true;
@@ -698,6 +699,12 @@
             this.export_workshop_link_checkbox.TabIndex = 0;
             this.export_workshop_link_checkbox.Text = "Include Workshop Link";
             this.export_workshop_link_checkbox.UseVisualStyleBackColor = true;
+            // 
+            // tabImageList
+            // 
+            this.tabImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.tabImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.tabImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // run_game_button
             // 
@@ -813,6 +820,7 @@
         private System.Windows.Forms.TabPage modinfo_changelog_tab;
         private System.Windows.Forms.RichTextBox modinfo_changelog_richtextbox;
         private System.Windows.Forms.ToolStripMenuItem updateEntriesToolStripMenuItem;
+        private System.Windows.Forms.ImageList tabImageList;
         private System.Windows.Forms.Button export_save_button;
         private System.Windows.Forms.Button export_load_button;
     }

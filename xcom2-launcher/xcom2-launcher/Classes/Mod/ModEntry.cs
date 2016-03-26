@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using FilePath = System.IO.Path;
 
@@ -56,7 +58,10 @@ namespace XCOM2Launcher.Mod
             get { return _image ?? FilePath.Combine(Path ?? "", "ModPreview.jpg"); }
             set { _image = value; }
         }
-        
+
+        [JsonIgnore]
+        private IEnumerable<ModClassOverride> _overrides;
+
         public string GetDescription()
         {
             var info = new ModInfo(GetModInfoFile());
@@ -64,34 +69,75 @@ namespace XCOM2Launcher.Mod
             return info.Description;
         }
 
-        public ModClassOverride[] GetClassOverrides()
+        public IEnumerable<ModClassOverride> GetOverrides(bool forceUpdate = false)
         {
-            // string 
+            if (_overrides == null || forceUpdate)
+            {
+                _overrides = GetUIScreenListenerOverrides().Union(GetClassOverrides()).ToList();
+            }
+            return _overrides;
+        }
+
+        private IEnumerable<ModClassOverride> GetUIScreenListenerOverrides()
+        {
+            string sourceDirectory = FilePath.Combine(Path, "Src");
+            List<ModClassOverride> overrides = new List<ModClassOverride>();
+
+            if (!Directory.Exists(sourceDirectory))
+            {
+                return overrides;
+            }
+
+            var sourceFiles = Directory.GetFiles(sourceDirectory, "*.uc", SearchOption.AllDirectories);
+
+            Parallel.ForEach(sourceFiles, sourceFile =>
+            {
+                //The XComGame directory usually contains ALL the source files for the game.  Leaving it in is a common mistake.
+                if (sourceFile.Contains(@"Src\XComGame"))
+                {
+                    return;
+                }
+
+                var screenClassRegex = new Regex(@"(?i)^\s*ScreenClass\s*=\s*(?:class')?([a-z_]+)");
+
+                foreach (string line in File.ReadLines(sourceFile))
+                {
+                    var match = screenClassRegex.Match(line);
+                    if (match.Success)
+                    {
+                        string oldClass = match.Groups[1].Value;
+                        if (oldClass.ToLower() == "none")
+                        {
+                            //'ScreenClass = none' means it runs against every UI screen
+                            continue;
+                        }
+
+                        string newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
+                        lock (overrides)
+                        {
+                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener));
+                        }
+                    }
+                }
+            });
+
+            return overrides;
+        }
+
+        private IEnumerable<ModClassOverride> GetClassOverrides()
+        {
             var file = FilePath.Combine(Path, "Config", "XComEngine.ini");
 
-            if (!File.Exists(file))
+            if(!File.Exists(file))
                 return new ModClassOverride[0];
-
-
-            var list = new List<ModClassOverride>();
 
             var r = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)");
 
-            foreach (var line in File.ReadLines(file))
-            {
-                var m = r.Match(line.Replace(" ", ""));
-
-                if (m.Success)
-                {
-                    list.Add(new ModClassOverride
-                    {
-                        OldClass = m.Groups[1].Value,
-                        NewClass = m.Groups[2].Value
-                    });
-                }
-            }
-
-            return list.ToArray();
+            return from line in File.ReadLines(file)
+                select r.Match(line.Replace(" ", ""))
+                into m
+                where m.Success
+                select new ModClassOverride(this, m.Groups[2].Value, m.Groups[1].Value, ModClassOverrideType.Class);
         }
 
         public void ShowOnSteam()
