@@ -212,7 +212,7 @@ namespace XCOM2Launcher.Forms
 
             foreach (var m in Mods.Active)
             {
-                foreach (var classOverride in m.GetOverrides())
+                foreach (var classOverride in m.GetOverrides(true))
                 {
                     string oldClass = classOverride.OldClass;
                     if (classOverride.OverrideType == ModClassOverrideType.UIScreenListener)

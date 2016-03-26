@@ -93,7 +93,7 @@ namespace XCOM2Launcher.Mod
             Parallel.ForEach(sourceFiles, sourceFile =>
             {
                 //The XComGame directory usually contains ALL the source files for the game.  Leaving it in is a common mistake.
-                if (sourceFile.Contains("Src/XComGame"))
+                if (sourceFile.Contains(@"Src\XComGame"))
                 {
                     return;
                 }
