@@ -88,7 +88,9 @@ namespace XCOM2Launcher.Forms
             _updateWorker.RunWorkerCompleted += Updater_RunWorkerCompleted;
 
             // Steam Events
+#if DEBUG
             Workshop.OnItemDownloaded += SteamWorkshop_OnItemDownloaded;
+#endif
 
             // Main Tabs
             // Export
@@ -138,7 +140,7 @@ namespace XCOM2Launcher.Forms
         }
 #endif
 
-        #region Form
+#region Form
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
@@ -167,9 +169,9 @@ namespace XCOM2Launcher.Forms
             modinfo_inspect_propertygrid.SetLabelColumnWidth(100);
         }
 
-        #endregion
+#endregion
 
-        #region Mod Updater
+#region Mod Updater
 
         private readonly BackgroundWorker _updateWorker = new BackgroundWorker
         {
@@ -228,9 +230,9 @@ namespace XCOM2Launcher.Forms
             RefreshModList();
         }
 
-        #endregion
+#endregion
 
-        #region Event Handlers
+#region Event Handlers
         private void MainTabSelected(object sender, TabControlEventArgs e)
         {
             if (e.TabPage == export_tab)
@@ -393,6 +395,6 @@ namespace XCOM2Launcher.Forms
         {
             Process.Start(e.LinkText);
         }
-        #endregion
+#endregion
     }
 }
