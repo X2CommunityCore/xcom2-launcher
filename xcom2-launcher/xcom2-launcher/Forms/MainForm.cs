@@ -224,6 +224,8 @@ namespace XCOM2Launcher.Forms
             Mods.MarkDuplicates();
 
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
+
+            modlist_objectlistview.UpdateObjects(Mods.All.ToList());
             UpdateLabels();
         }
 

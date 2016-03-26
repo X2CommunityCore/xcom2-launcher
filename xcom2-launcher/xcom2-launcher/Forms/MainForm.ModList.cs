@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Timers;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
@@ -86,7 +87,7 @@ namespace XCOM2Launcher.Forms
             var columns = new[]
             {
                 // first column is marked as primary column
-                new OLVColumn 
+                new OLVColumn
                 {
                     Text = "Name",
                     AspectName = "Name",
@@ -436,10 +437,23 @@ namespace XCOM2Launcher.Forms
             CreateModListContextMenu(e.Model as ModEntry).Show(e.ListView, e.Location);
         }
 
+        private System.Timers.Timer _updateTimer;
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            UpdateLabels();
-            UpdateConflicts();
+            // put on a slight delay
+            // so it will only update once
+            if (_updateTimer != null && _updateTimer.Enabled)
+                return;
+
+            _updateTimer = new System.Timers.Timer(100)
+            {
+                SynchronizingObject = this,
+                AutoReset = false,
+            };
+
+            _updateTimer.Elapsed += delegate { UpdateConflicts(); };
+
+            _updateTimer.Start();
         }
 
         private void ModListSelectionChanged(object sender, EventArgs e)
