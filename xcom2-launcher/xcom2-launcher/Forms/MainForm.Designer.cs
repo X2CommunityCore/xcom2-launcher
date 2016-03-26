@@ -38,6 +38,7 @@
             this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.searchForModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateEntriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -87,7 +88,7 @@
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
             this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
             this.run_game_button = new System.Windows.Forms.Button();
-            this.updateEntriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tabImageList = new System.Windows.Forms.ImageList(this.components);
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -180,6 +181,12 @@
             this.searchForModsToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.searchForModsToolStripMenuItem.Text = "Search for mods";
             // 
+            // updateEntriesToolStripMenuItem
+            // 
+            this.updateEntriesToolStripMenuItem.Name = "updateEntriesToolStripMenuItem";
+            this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.updateEntriesToolStripMenuItem.Text = "Update entries";
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -226,7 +233,7 @@
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // importActiveModsToolStripMenuItem
@@ -254,6 +261,7 @@
             this.main_tabcontrol.Controls.Add(this.modlist_tab);
             this.main_tabcontrol.Controls.Add(this.conflicts_tab);
             this.main_tabcontrol.Controls.Add(this.export_tab);
+            this.main_tabcontrol.ImageList = this.tabImageList;
             this.main_tabcontrol.Location = new System.Drawing.Point(0, 27);
             this.main_tabcontrol.Name = "main_tabcontrol";
             this.main_tabcontrol.SelectedIndex = 0;
@@ -679,11 +687,11 @@
             this.run_game_button.Text = "Run XCOM 2";
             this.run_game_button.UseVisualStyleBackColor = true;
             // 
-            // updateEntriesToolStripMenuItem
+            // tabImageList
             // 
-            this.updateEntriesToolStripMenuItem.Name = "updateEntriesToolStripMenuItem";
-            this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.updateEntriesToolStripMenuItem.Text = "Update entries";
+            this.tabImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.tabImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.tabImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // MainForm
             // 
@@ -789,6 +797,7 @@
         private System.Windows.Forms.TabPage modinfo_changelog_tab;
         private System.Windows.Forms.RichTextBox modinfo_changelog_richtextbox;
         private System.Windows.Forms.ToolStripMenuItem updateEntriesToolStripMenuItem;
+        private System.Windows.Forms.ImageList tabImageList;
     }
 }
 

@@ -4,5 +4,12 @@
     {
         public string NewClass;
         public string OldClass;
+        public ModClassOverrideType OverrideType;
+    }
+
+    public enum ModClassOverrideType
+    {
+        Class,
+        UIScreenListener
     }
 }

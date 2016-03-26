@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace XCOM2Launcher.Forms
     public partial class MainForm
     {
         private const string StatusBarIdleString = "Ready.";
+        private const string ExclamationIconKey = "Exclamation";
 
         public MainForm(Settings settings)
         {
@@ -37,6 +39,9 @@ namespace XCOM2Launcher.Forms
             UpdateInterface();
             RegisterEvents();
 
+            //Other intialization
+            InitializeTabImages();
+
             // Check for Updates
             CheckSteamForUpdates();
 
@@ -52,6 +57,11 @@ namespace XCOM2Launcher.Forms
                 t.Start();
             }
 #endif
+        }
+
+        private void InitializeTabImages()
+        {
+            tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
         }
 
         public Settings Settings { get; set; }
@@ -184,10 +194,10 @@ namespace XCOM2Launcher.Forms
             UpdateExport();
 
             //
+            bool hasConflicts = (NumConflicts > 0);
             modlist_tab.Text = $"Mods ({Mods.Active.Count()} / {Mods.All.Count()})";
-            conflicts_tab.Text = "Conflicts";
-            if (NumConflicts > 0)
-                conflicts_tab.Text += $" ({NumConflicts})";
+            conflicts_tab.Text = "Overrides" + (hasConflicts ? $" ({NumConflicts} Conflicts)" : "");
+            conflicts_tab.ImageKey = (hasConflicts ? ExclamationIconKey : null);
         }
 
 
@@ -202,9 +212,14 @@ namespace XCOM2Launcher.Forms
 
             foreach (var m in Mods.Active)
             {
-                foreach (var classOverride in m.GetClassOverrides())
+                foreach (var classOverride in m.GetOverrides())
                 {
-                    conflicts_datagrid.Rows.Add(m.Name, classOverride.OldClass, classOverride.NewClass);
+                    string oldClass = classOverride.OldClass;
+                    if (classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
+                    {
+                        oldClass += " (UIScreenListener)";
+                    }
+                    conflicts_datagrid.Rows.Add(m.Name, oldClass, classOverride.NewClass);
                 }
             }
 

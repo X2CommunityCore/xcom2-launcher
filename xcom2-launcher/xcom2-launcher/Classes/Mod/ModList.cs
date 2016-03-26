@@ -50,14 +50,16 @@ namespace XCOM2Launcher.Mod
             var overrides = new Dictionary<string, List<ModEntry>>();
 
             foreach (var mod in mods)
-                foreach (var overwrite in mod.GetClassOverrides())
+            {
+                foreach (var overwrite in mod.GetOverrides())
                 {
                     if (overrides.ContainsKey(overwrite.OldClass))
                         overrides[overwrite.OldClass].Add(mod);
 
                     else
-                        overrides[overwrite.OldClass] = new List<ModEntry> { mod };
+                        overrides[overwrite.OldClass] = new List<ModEntry> {mod};
                 }
+            }
 
             return overrides;
         }
