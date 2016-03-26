@@ -83,6 +83,8 @@
             this.ColumnInternalClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnModClass = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.export_tab = new System.Windows.Forms.TabPage();
+            this.export_load_button = new System.Windows.Forms.Button();
+            this.export_save_button = new System.Windows.Forms.Button();
             this.export_group_checkbox = new System.Windows.Forms.CheckBox();
             this.export_background_panel = new System.Windows.Forms.Panel();
             this.export_richtextbox = new System.Windows.Forms.RichTextBox();
@@ -615,6 +617,8 @@
             // 
             // export_tab
             // 
+            this.export_tab.Controls.Add(this.export_load_button);
+            this.export_tab.Controls.Add(this.export_save_button);
             this.export_tab.Controls.Add(this.export_group_checkbox);
             this.export_tab.Controls.Add(this.export_background_panel);
             this.export_tab.Controls.Add(this.export_workshop_link_checkbox);
@@ -623,8 +627,28 @@
             this.export_tab.Padding = new System.Windows.Forms.Padding(3);
             this.export_tab.Size = new System.Drawing.Size(892, 474);
             this.export_tab.TabIndex = 2;
-            this.export_tab.Text = "Export";
+            this.export_tab.Text = "Profiles";
             this.export_tab.UseVisualStyleBackColor = true;
+            // 
+            // export_load_button
+            // 
+            this.export_load_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.export_load_button.Location = new System.Drawing.Point(686, 445);
+            this.export_load_button.Name = "export_load_button";
+            this.export_load_button.Size = new System.Drawing.Size(75, 23);
+            this.export_load_button.TabIndex = 4;
+            this.export_load_button.Text = "Load";
+            this.export_load_button.UseVisualStyleBackColor = true;
+            // 
+            // export_save_button
+            // 
+            this.export_save_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.export_save_button.Location = new System.Drawing.Point(814, 445);
+            this.export_save_button.Name = "export_save_button";
+            this.export_save_button.Size = new System.Drawing.Size(75, 23);
+            this.export_save_button.TabIndex = 3;
+            this.export_save_button.Text = "Save";
+            this.export_save_button.UseVisualStyleBackColor = true;
             // 
             // export_group_checkbox
             // 
@@ -647,7 +671,7 @@
             this.export_background_panel.Controls.Add(this.export_richtextbox);
             this.export_background_panel.Location = new System.Drawing.Point(8, 29);
             this.export_background_panel.Name = "export_background_panel";
-            this.export_background_panel.Size = new System.Drawing.Size(876, 439);
+            this.export_background_panel.Size = new System.Drawing.Size(878, 410);
             this.export_background_panel.TabIndex = 1;
             // 
             // export_richtextbox
@@ -655,11 +679,13 @@
             this.export_richtextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.export_richtextbox.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.export_richtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.export_richtextbox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.export_richtextbox.Location = new System.Drawing.Point(1, 1);
             this.export_richtextbox.Name = "export_richtextbox";
-            this.export_richtextbox.Size = new System.Drawing.Size(874, 437);
+            this.export_richtextbox.ReadOnly = true;
+            this.export_richtextbox.Size = new System.Drawing.Size(876, 408);
             this.export_richtextbox.TabIndex = 2;
             this.export_richtextbox.Text = "";
             // 
@@ -787,6 +813,8 @@
         private System.Windows.Forms.TabPage modinfo_changelog_tab;
         private System.Windows.Forms.RichTextBox modinfo_changelog_richtextbox;
         private System.Windows.Forms.ToolStripMenuItem updateEntriesToolStripMenuItem;
+        private System.Windows.Forms.Button export_save_button;
+        private System.Windows.Forms.Button export_load_button;
     }
 }
 
