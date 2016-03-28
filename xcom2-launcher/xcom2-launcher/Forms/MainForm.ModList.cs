@@ -142,7 +142,7 @@ namespace XCOM2Launcher.Forms
                     Width = 50,
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
-                    IsEditable = false,
+                    IsEditable = true,
                 },
 
                 new OLVColumn

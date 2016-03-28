@@ -66,6 +66,8 @@ namespace XCOM2Launcher
         {
             foreach (string dir in ModPaths)
                 Mods.ImportMods(dir);
+
+            Mods.MarkDuplicates();
         }
 
         public string GetWorkshopPath()

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -30,7 +29,7 @@ namespace XCOM2Launcher.Forms
             showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
 
 #if !DEBUG
-            // hide config tab
+    // hide config tab
             modinfo_config_tab.Parent.Controls.Remove(modinfo_config_tab);
 #endif
 
@@ -59,12 +58,12 @@ namespace XCOM2Launcher.Forms
 #endif
         }
 
+        public Settings Settings { get; set; }
+
         private void InitializeTabImages()
         {
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
         }
-
-        public Settings Settings { get; set; }
 
         private void CheckSteamForNewMods()
         {
@@ -134,6 +133,60 @@ namespace XCOM2Launcher.Forms
             _updateWorker.RunWorkerAsync();
         }
 
+        #region Export
+
+        private void UpdateExport()
+        {
+            var str = new StringBuilder();
+
+            if (!Mods.Active.Any())
+            {
+                export_richtextbox.Text = "No active mods.";
+                return;
+            }
+
+            var nameLength = Mods.Active.Max(m => m.Name.Length);
+            var idLength = Mods.Active.Max(m => m.ID.Length);
+            var showCategories = export_group_checkbox.Checked;
+
+            foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
+            {
+                var mods = entry.Value.Entries.Where(m => m.isActive).ToList();
+
+                if (showCategories)
+                    str.AppendLine($"{entry.Key} ({mods.Count()}):");
+
+                foreach (var mod in mods)
+                {
+                    if (showCategories)
+                        str.Append("\t");
+
+                    str.Append(string.Format("{0,-" + nameLength + "} ", mod.Name));
+                    str.Append("\t");
+                    str.Append(string.Format("{0,-" + idLength + "} ", mod.ID));
+                    str.Append("\t");
+
+                    if (mod.WorkshopID == -1)
+                        str.Append("Unknown");
+
+                    else if (export_workshop_link_checkbox.Checked)
+                        str.Append(mod.GetWorkshopLink());
+
+                    else
+                        str.Append(mod.WorkshopID.ToString());
+
+                    str.AppendLine();
+                }
+
+                if (export_group_checkbox.Checked)
+                    str.AppendLine();
+            }
+
+            export_richtextbox.Text = str.ToString();
+        }
+
+        #endregion
+
         #region Basic
 
         private void Reset()
@@ -191,10 +244,10 @@ namespace XCOM2Launcher.Forms
         private void UpdateLabels()
         {
             //
-            bool hasConflicts = (NumConflicts > 0);
+            var hasConflicts = NumConflicts > 0;
             modlist_tab.Text = $"Mods ({Mods.Active.Count()} / {Mods.All.Count()})";
             conflicts_tab.Text = "Overrides" + (hasConflicts ? $" ({NumConflicts} Conflicts)" : "");
-            conflicts_tab.ImageKey = (hasConflicts ? ExclamationIconKey : null);
+            conflicts_tab.ImageKey = hasConflicts ? ExclamationIconKey : null;
         }
 
 
@@ -204,28 +257,27 @@ namespace XCOM2Launcher.Forms
         {
             NumConflicts = 0;
 
-            // Datagrid
+            // Fill ClassOverride DataGrid 
             conflicts_datagrid.Rows.Clear();
 
             foreach (var m in Mods.Active)
             {
                 foreach (var classOverride in m.GetOverrides(true))
                 {
-                    string oldClass = classOverride.OldClass;
+                    var oldClass = classOverride.OldClass;
+
                     if (classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
-                    {
                         oldClass += " (UIScreenListener)";
-                    }
+
                     conflicts_datagrid.Rows.Add(m.Name, oldClass, classOverride.NewClass);
                 }
             }
 
             // Conflict log
-            Mods.MarkDuplicates();
-
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
 
-            modlist_objectlistview.UpdateObjects(Mods.All.ToList());
+            // Update Interface
+            modlist_objectlistview.UpdateObjects(ModList.Objects.ToList());
             UpdateLabels();
         }
 
@@ -260,47 +312,47 @@ namespace XCOM2Launcher.Forms
 
         private string GetOverridesString()
         {
-            StringBuilder str = new StringBuilder();
-
-            bool showUIScreenListenerMessage = false;
-
             var conflicts = Mods.GetActiveConflicts().ToList();
-            if(conflicts.Any())
+            if (!conflicts.Any())
+                return "";
+
+            var showUIScreenListenerMessage = false;
+
+            var str = new StringBuilder();
+
+            str.AppendLine("Mods with colliding overrides found!");
+            str.AppendLine("These mods will not (fully) work when run together.");
+            str.AppendLine();
+
+            foreach (var conflict in conflicts)
             {
-                str.AppendLine("Mods with colliding overrides found!");
-                str.AppendLine("These mods will not (fully) work when run together.");
+                str.AppendLine($"Conflict found for '{conflict.ClassName}':");
+                var hasMultipleUIScreenListeners = conflict.Overrides.Count(o => o.OverrideType == ModClassOverrideType.UIScreenListener) > 1;
+
+                foreach (var classOverride in conflict.Overrides.OrderBy(o => o.OverrideType).ThenBy(o => o.Mod.Name))
+                {
+                    if (hasMultipleUIScreenListeners && classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
+                    {
+                        showUIScreenListenerMessage = true;
+                        str.AppendLine($"\t* {classOverride.Mod.Name}");
+                    }
+                    else
+                    {
+                        str.AppendLine($"\t{classOverride.Mod.Name}");
+                    }
+                }
+
                 str.AppendLine();
 
-                foreach(var conflict in conflicts)
-                {
-                    str.AppendLine($"Conflict found for '{conflict.ClassName}':");
-                    bool hasMultipleUIScreenListeners = (conflict.Overrides.Count(o => o.OverrideType == ModClassOverrideType.UIScreenListener) > 1);
+                NumConflicts++;
+            }
 
-                    foreach (var classOverride in conflict.Overrides.OrderBy(o => o.OverrideType).ThenBy(o => o.Mod.Name))
-                    {
-                        if (hasMultipleUIScreenListeners && classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
-                        {
-                            showUIScreenListenerMessage = true;
-                            str.AppendLine($"\t* {classOverride.Mod.Name}");
-                        }
-                        else
-                        {
-                            str.AppendLine($"\t{classOverride.Mod.Name}");
-                        }
-                    }
+            error_provider.SetError(conflicts_log_label, "Found " + NumConflicts + " conflicts");
 
-                    str.AppendLine();
-
-                    NumConflicts++;
-                }
-
-                error_provider.SetError(conflicts_log_label, "Found " + NumConflicts + " conflicts");
-
-                if(showUIScreenListenerMessage)
-                {
-                    str.AppendLine("* (These mods use UIScreenListeners, meaning they do not conflict with each other)");
-                    str.AppendLine();
-                }
+            if (showUIScreenListenerMessage)
+            {
+                str.AppendLine("* (These mods use UIScreenListeners, meaning they do not conflict with each other)");
+                str.AppendLine();
             }
 
             return str.ToString();
@@ -366,60 +418,6 @@ namespace XCOM2Launcher.Forms
             //}
 
             #endregion
-        }
-
-        #endregion
-
-        #region Export
-
-        private void UpdateExport()
-        {
-            var str = new StringBuilder();
-
-            if (!Mods.Active.Any())
-            {
-                export_richtextbox.Text = "No active mods.";
-                return;
-            }
-
-            var nameLength = Mods.Active.Max(m => m.Name.Length);
-            var idLength = Mods.Active.Max(m => m.ID.Length);
-            var showCategories = export_group_checkbox.Checked;
-
-            foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
-            {
-                var mods = entry.Value.Entries.Where(m => m.isActive).ToList();
-
-                if (showCategories)
-                    str.AppendLine($"{entry.Key} ({mods.Count()}):");
-
-                foreach (var mod in mods)
-                {
-                    if (showCategories)
-                        str.Append("\t");
-
-                    str.Append(string.Format(("{0,-" + nameLength + "} "), mod.Name));
-                    str.Append("\t");
-                    str.Append(string.Format(("{0,-" + idLength + "} "), mod.ID));
-                    str.Append("\t");
-
-                    if (mod.WorkshopID == -1)
-                        str.Append("Unknown");
-
-                    else if (export_workshop_link_checkbox.Checked)
-                        str.Append(mod.GetWorkshopLink());
-
-                    else
-                        str.Append(mod.WorkshopID.ToString());
-
-                    str.AppendLine();
-                }
-
-                if (export_group_checkbox.Checked)
-                    str.AppendLine();
-            }
-
-            export_richtextbox.Text = str.ToString();
         }
 
         #endregion
