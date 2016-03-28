@@ -148,9 +148,13 @@ namespace XCOM2Launcher.XCOM
             Entries.Remove(section);
         }
 
-        private void Remove(string section, string key)
+        public bool Remove(string section, string key)
         {
-            Entries[section].Remove(key);
+            if (!Entries.ContainsKey(section) || !Entries[section].ContainsKey(key))
+                return false;
+
+            Entries[section][key].Clear();
+            return true;
         }
 
         public void UpdateTimestamp()

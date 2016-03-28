@@ -39,12 +39,11 @@ namespace XCOM2Launcher.XCOM
 
             // try modding dirs
             var dirs = DetectModDirs();
-            foreach (var dir in dirs)
-                if (dir.ToLower().Contains("\\steamapps\\"))
-                {
-                    _gameDir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
-                    return _gameDir;
-                }
+            foreach (var dir in dirs.Where(dir => dir.ToLower().Contains("\\steamapps\\")))
+            {
+                _gameDir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
+                return _gameDir;
+            }
 
             // abandon hope
             return "";
@@ -105,7 +104,7 @@ namespace XCOM2Launcher.XCOM
             return File.ReadLines(Path.Combine(UserConfigDir, "XComModOptions.ini")).Where(line => line.StartsWith("ActiveMods=")).Select(line => line.Substring(11)).ToArray();
         }
 
-        public static void SetActiveMods(List<ModEntry> mods)
+        public static void SaveChanges(Settings settings)
         {
             // XComModOptions
             var file = Path.Combine(UserConfigDir, "XComModOptions.ini");
@@ -116,36 +115,29 @@ namespace XCOM2Launcher.XCOM
 
             var modOptions = new ConfigFile("ModOptions", false);
 
-            foreach (var m in mods.OrderBy(m => m.Index))
+            foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
                 modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
 
             modOptions.UpdateTimestamp();
             modOptions.Save();
 
-            //// XComEngine
+            // XComEngine
+            var engine = new ConfigFile("Engine");
             file = Path.Combine(UserConfigDir, "XComEngine.ini");
 
             // Create back up
-            var backup = file + ".bak";
-            File.Copy(file, backup, true);
+            File.Copy(file, file + ".bak", true);
 
-            // Write
-            using (var inStream = new FileStream(backup, FileMode.Open))
-            using (var outStream = new FileStream(file, FileMode.Truncate))
-            using (var reader = new StreamReader(inStream))
-            using (var writer = new StreamWriter(outStream))
-            {
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine();
+            // Remove old ModClassOverrides
+            engine.Remove("Engine.Engine", "ModClassOverrides");
 
-                    if (line == null || line.StartsWith("+ModClassOverrides=") || line.StartsWith("ModClassOverrides="))
-                        // Skip old mod entries
-                        continue;
+            // Set Mod Paths
+            engine.Remove("Engine.DownloadableContentEnumerator", "ModRootDirs");
+            foreach (var modPath in settings.ModPaths)
+                engine.Add("Engine.DownloadableContentEnumerator", "ModRootDirs", modPath);
 
-                    writer.WriteLine(line);
-                }
-            }
+            // Save
+            engine.Save();
         }
     }
 }

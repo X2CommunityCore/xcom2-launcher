@@ -153,7 +153,7 @@ namespace XCOM2Launcher.Forms
 
         private void Save()
         {
-            XCOM2.SetActiveMods(Mods.Active.ToList());
+            XCOM2.SaveChanges(Settings);
             Settings.SaveFile("settings.json");
         }
 
