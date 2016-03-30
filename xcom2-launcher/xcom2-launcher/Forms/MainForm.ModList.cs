@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Timers;
@@ -70,18 +71,8 @@ namespace XCOM2Launcher.Forms
                 // Restore collapsed state
                 group.Collapsed = Mods.Entries[groupName].Collapsed;
 
-                // Move Unsorted to the top
-                if (groupName == "Unsorted")
-                    parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) =>
-                    {
-                        if (a.Key as string == "Unsorted")
-                            return -1;
-
-                        if (b.Key as string == "Unsorted")
-                            return 1;
-
-                        return string.CompareOrdinal(a.ToString(), b.ToString());
-                    });
+                // Sort Categories
+                parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string)a.Key].Index.CompareTo(Mods.Entries[(string)b.Key].Index));
             });
 
             var columns = new[]
@@ -110,13 +101,11 @@ namespace XCOM2Launcher.Forms
                 new OLVColumn
                 {
                     Text = "State",
-                    //Groupable = false,
-                    //Sortable = false,
                     IsEditable = false,
                     Width = 40,
                     AspectGetter = o =>
                     {
-                        var mod = o as ModEntry;
+                        var mod = (ModEntry) o;
 
                         if (mod.State.HasFlag(ModState.ModConflict))
                             return "Conflict";
@@ -160,6 +149,7 @@ namespace XCOM2Launcher.Forms
                 {
                     Text = "Last Update",
                     AspectName = "DateUpdated",
+                    AspectToStringConverter = d => ((DateTime) d).ToLocalTime().ToString(CultureInfo.CurrentCulture),
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     IsEditable = false
@@ -168,6 +158,7 @@ namespace XCOM2Launcher.Forms
                 {
                     Text = "Date Added",
                     AspectName = "DateAdded",
+                    AspectToStringConverter = d => ((DateTime) d).ToLocalTime().ToString(CultureInfo.CurrentCulture),
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     IsEditable = false,
@@ -177,6 +168,7 @@ namespace XCOM2Launcher.Forms
                 {
                     Text = "Date Created",
                     AspectName = "DateCreated",
+                    AspectToStringConverter = d => ((DateTime) d).ToLocalTime().ToString(CultureInfo.CurrentCulture),
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     IsEditable = false,
