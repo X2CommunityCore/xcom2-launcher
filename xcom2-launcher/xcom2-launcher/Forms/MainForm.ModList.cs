@@ -139,10 +139,12 @@ namespace XCOM2Launcher.Forms
                     AspectName = "Index",
                     TextAlign = HorizontalAlignment.Right,
                     HeaderTextAlign = HorizontalAlignment.Center,
-                    Width = 50,
+                    Width = 60,
+                    MinimumWidth = 40,
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
                     IsEditable = true,
+                    CellEditUseWholeCell = true
                 },
 
                 new OLVColumn
@@ -440,12 +442,23 @@ namespace XCOM2Launcher.Forms
         private System.Timers.Timer _updateTimer;
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
+            // If there is a duplicate id conflict 
+            // check all at the same time
+            var modChecked = ModList.GetModelObject(e.Item.Index);
+            if (modChecked.State.HasFlag(ModState.DuplicateID))
+            {
+                foreach (var mod in Mods.All.Where(@mod => mod.ID == modChecked.ID))
+                {
+                    mod.isActive = modChecked.isActive;
+                    UpdateMod(mod);
+                }
+            }
             // put on a slight delay
             // so it will only update once
             if (_updateTimer != null && _updateTimer.Enabled)
                 return;
 
-            _updateTimer = new System.Timers.Timer(100)
+            _updateTimer = new System.Timers.Timer(10)
             {
                 SynchronizingObject = this,
                 AutoReset = false,

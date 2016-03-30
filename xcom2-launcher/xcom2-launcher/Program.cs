@@ -131,7 +131,6 @@ namespace XCOM2Launcher
                     settings.Mods.RemoveMod(m);
             }
 
-
             // import mods
             settings.ImportMods();
 
