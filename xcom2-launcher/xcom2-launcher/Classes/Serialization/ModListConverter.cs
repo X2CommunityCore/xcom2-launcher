@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using XCOM2Launcher.Mod;
+using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Serialization
 {
@@ -22,10 +23,17 @@ namespace XCOM2Launcher.Serialization
         {
             // Load JObject from stream
             var jObject = JObject.Load(reader);
+
+            if (jObject["Arguments"].Type == JTokenType.Object)
+            {
+                // Transform Arguments object to string
+                var args = jObject["Arguments"].ToObject<Arguments>();
+                jObject["Arguments"] = new JValue(args.ToString());
+            }
+
             var settings = jObject.ToObject<Settings>();
 
             // repair old formats
-
             var modToken = jObject["Mods"];
             if (modToken == null)
                 return settings;

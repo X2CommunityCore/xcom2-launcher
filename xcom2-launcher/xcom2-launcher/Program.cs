@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
-using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher
@@ -13,7 +13,7 @@ namespace XCOM2Launcher
     internal static class Program
     {
         /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
+        ///     Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
         [STAThread]
         private static void Main()
@@ -38,7 +38,7 @@ namespace XCOM2Launcher
                 return;
 
 #if !DEBUG
-            // Check for update
+    // Check for update
             if (settings.CheckForUpdates)
             {
                 try
@@ -85,17 +85,18 @@ namespace XCOM2Launcher
 
         public static Settings InitializeSettings()
         {
-            bool firstRun = !File.Exists("settings.json");
+            var firstRun = !File.Exists("settings.json");
 
             Settings settings;
             if (firstRun)
                 settings = new Settings();
 
-            else try
+            else
+                try
                 {
                     settings = Settings.FromFile("settings.json");
                 }
-                catch (Newtonsoft.Json.JsonSerializationException)
+                catch (JsonSerializationException)
                 {
                     MessageBox.Show("settings.json could not be read.\r\nPlease delete or rename that file and try again.");
                     return null;
@@ -110,10 +111,10 @@ namespace XCOM2Launcher
 
             // Verify Mod Paths
             var oldPaths = settings.ModPaths.Where(modPath => !Directory.Exists(modPath)).ToList();
-            foreach (string modPath in oldPaths)
+            foreach (var modPath in oldPaths)
                 settings.ModPaths.Remove(modPath);
 
-            foreach (string modPath in XCOM2.DetectModDirs())
+            foreach (var modPath in XCOM2.DetectModDirs())
                 if (!settings.ModPaths.Contains(modPath))
                     settings.ModPaths.Add(modPath);
 
@@ -121,13 +122,18 @@ namespace XCOM2Launcher
             if (settings.ModPaths.Count == 0)
                 MessageBox.Show("Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
 
+            // Verify categories
+            var index = settings.Mods.Entries.Values.Max(c => c.Index);
+            foreach (var cat in settings.Mods.Entries.Values.Where(c => c.Index == -1))
+                cat.Index = ++index;
+
             // Verify Mods 
             var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
             if (brokenMods.Count > 0)
             {
                 MessageBox.Show($"{brokenMods.Count} mods no longer exists and have been removed:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
 
-                foreach (ModEntry m in brokenMods)
+                foreach (var m in brokenMods)
                     settings.Mods.RemoveMod(m);
             }
 

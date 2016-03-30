@@ -18,7 +18,7 @@ namespace XCOM2Launcher.Mod
         public IEnumerable<ModEntry> All => Entries.SelectMany(c => c.Value.Entries);
 
         [JsonIgnore]
-        public IEnumerable<string> Categories => Entries.Select(c => c.Key);
+        public IEnumerable<string> Categories => Entries.OrderBy(c => c.Value.Index).ThenBy(c => c.Key).Select(c => c.Key);
 
         [JsonIgnore]
         public IEnumerable<ModEntry> Active => All.Where(m => m.isActive);
@@ -55,16 +55,17 @@ namespace XCOM2Launcher.Mod
         private IEnumerable<ModConflict> GetActiveConflictsImplementation()
         {
             IEnumerable<ModClassOverride> allOverrides = Active.SelectMany(o => o.GetOverrides()).ToList();
-            IEnumerable<string> classesOverriden = allOverrides
+            var classesOverriden = allOverrides
                 .Select(o => o.OldClass)
                 .Distinct(StringComparer.InvariantCultureIgnoreCase);
 
             return from className in classesOverriden
-                   let overridesForThisClass = allOverrides.Where(o =>
-                        o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
-                   where overridesForThisClass.Count > 1
-                        && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class) //If every mod uses a UIScreenListener, there is no conflict
-                   select new ModConflict(className, overridesForThisClass);
+                let overridesForThisClass = allOverrides.Where(o =>
+                    o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
+                where overridesForThisClass.Count > 1
+                      && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
+                //If every mod uses a UIScreenListener, there is no conflict
+                select new ModConflict(className, overridesForThisClass);
         }
 
         private void UpdateModsConflictState(IEnumerable<ModConflict> activeConflicts)
@@ -202,7 +203,7 @@ namespace XCOM2Launcher.Mod
                     m.Source = ModSource.SteamWorkshop;
 
                 else
-                    // in workshop path but not loaded via steam
+                // in workshop path but not loaded via steam
                     m.Source = ModSource.Manual;
             }
 
@@ -228,7 +229,7 @@ namespace XCOM2Launcher.Mod
             // Check Workshop for infos
             if (m.WorkshopID != -1)
             {
-                var publishedID = (ulong)m.WorkshopID;
+                var publishedID = (ulong) m.WorkshopID;
 
                 var value = Workshop.GetDetails(publishedID);
 
@@ -250,7 +251,7 @@ namespace XCOM2Launcher.Mod
                 // Check Workshop for updates
                 if (m.Source == ModSource.SteamWorkshop)
                     if (
-                        Workshop.GetDownloadStatus((ulong)m.WorkshopID)
+                        Workshop.GetDownloadStatus((ulong) m.WorkshopID)
                             .HasFlag(EItemState.k_EItemStateNeedsUpdate))
                         m.State |= ModState.UpdateAvailable;
             }
