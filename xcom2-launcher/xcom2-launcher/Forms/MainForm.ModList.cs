@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Timers;
+using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
@@ -14,6 +13,7 @@ using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
+using Timer = System.Timers.Timer;
 
 namespace XCOM2Launcher.Forms
 {
@@ -135,7 +135,6 @@ namespace XCOM2Launcher.Forms
                     IsEditable = true,
                     CellEditUseWholeCell = true
                 },
-
                 new OLVColumn
                 {
                     Text = "Size",
@@ -149,7 +148,7 @@ namespace XCOM2Launcher.Forms
                 {
                     Text = "Last Update",
                     AspectName = "DateUpdated",
-                    AspectToStringConverter = d => ((DateTime) d).ToLocalTime().ToString(CultureInfo.CurrentCulture),
+                    DataType = typeof (DateTime?),
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     IsEditable = false
@@ -158,21 +157,21 @@ namespace XCOM2Launcher.Forms
                 {
                     Text = "Date Added",
                     AspectName = "DateAdded",
-                    AspectToStringConverter = d => ((DateTime) d).ToLocalTime().ToString(CultureInfo.CurrentCulture),
+                    DataType = typeof (DateTime?),
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     IsEditable = false,
-                    IsVisible = false,
+                    IsVisible = false
                 },
                 new OLVColumn
                 {
                     Text = "Date Created",
                     AspectName = "DateCreated",
-                    AspectToStringConverter = d => ((DateTime) d).ToLocalTime().ToString(CultureInfo.CurrentCulture),
+                    DataType = typeof (DateTime?),
                     Width = 120,
                     TextAlign = HorizontalAlignment.Right,
                     IsEditable = false,
-                    IsVisible = false,
+                    IsVisible = false
                 },
                 new OLVColumn
                 {
@@ -182,7 +181,7 @@ namespace XCOM2Launcher.Forms
                     IsEditable = false,
                     IsVisible = false,
                     GroupKeyGetter = o => Path.GetDirectoryName((o as ModEntry)?.Path)
-                },
+                }
             };
 
             // size groupies
@@ -191,15 +190,22 @@ namespace XCOM2Launcher.Forms
                 new[] { "< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB" }
                 );
 
-            // date updated groupies
-            columns.Single(c => c.AspectName == "DateUpdated").MakeGroupies(
-                new[]
+            // Init DateTime columns
+            foreach (var column in columns.Where(c => c.DataType == typeof(DateTime?)))
+            {
+                column.AspectToStringConverter = d => (d as DateTime?)?.ToLocalTime().ToString(CultureInfo.CurrentCulture);
+                column.MakeGroupies(
+                    new[] { DateTime.Now.Subtract(TimeSpan.FromHours(24 * 30)), DateTime.Now.Subtract(TimeSpan.FromHours(24 * 7)), DateTime.Now.Date },
+                    new[] { "Older than one month", "Last Month", "This Week", "Today" }
+                    );
+
+                // Sord Desc
+                column.GroupFormatter = (g, param) =>
                 {
-                    DateTime.Now.Subtract(TimeSpan.FromHours(24*30)), DateTime.Now.Subtract(TimeSpan.FromHours(24*7)),
-                    DateTime.Now.Date
-                },
-                new[] { "Older than one month", "Last Month", "This Week", "Today" }
-                );
+                    param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1)*a.Id.CompareTo(b.Id));
+                };
+            }
+
 
             // Wrapper
             ModList = new TypedObjectListView<ModEntry>(modlist_objectlistview);
@@ -431,7 +437,8 @@ namespace XCOM2Launcher.Forms
             CreateModListContextMenu(e.Model as ModEntry).Show(e.ListView, e.Location);
         }
 
-        private System.Timers.Timer _updateTimer;
+        private Timer _updateTimer;
+
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
             // If there is a duplicate id conflict 
@@ -450,10 +457,10 @@ namespace XCOM2Launcher.Forms
             if (_updateTimer != null && _updateTimer.Enabled)
                 return;
 
-            _updateTimer = new System.Timers.Timer(10)
+            _updateTimer = new Timer(10)
             {
                 SynchronizingObject = this,
-                AutoReset = false,
+                AutoReset = false
             };
 
             _updateTimer.Elapsed += delegate { UpdateConflicts(); };
