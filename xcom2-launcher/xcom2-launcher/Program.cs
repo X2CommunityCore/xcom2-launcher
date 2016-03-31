@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
+using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher
@@ -122,19 +123,25 @@ namespace XCOM2Launcher
             if (settings.ModPaths.Count == 0)
                 MessageBox.Show("Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
 
-            // Verify categories
-            var index = settings.Mods.Entries.Values.Max(c => c.Index);
-            foreach (var cat in settings.Mods.Entries.Values.Where(c => c.Index == -1))
-                cat.Index = ++index;
-
-            // Verify Mods 
-            var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
-            if (brokenMods.Count > 0)
+            if (settings.Mods.Entries.Count > 0)
             {
-                MessageBox.Show($"{brokenMods.Count} mods no longer exists and have been removed:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
+                // Verify categories
+                var index = settings.Mods.Entries.Values.Max(c => c.Index);
+                foreach (var cat in settings.Mods.Entries.Values.Where(c => c.Index == -1))
+                    cat.Index = ++index;
 
-                foreach (var m in brokenMods)
-                    settings.Mods.RemoveMod(m);
+                // Verify Mods 
+                foreach (var mod in settings.Mods.All.Where(mod => !settings.ModPaths.Any(mod.IsInModPath)))
+                    mod.State |= ModState.NotLoaded;
+                
+                var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
+                if (brokenMods.Count > 0)
+                {
+                    MessageBox.Show($"{brokenMods.Count} mods no longer exists and have been removed:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
+
+                    foreach (var m in brokenMods)
+                        settings.Mods.RemoveMod(m);
+                }
             }
 
             // import mods

@@ -44,6 +44,7 @@ namespace XCOM2Launcher.Forms
                 FullRowSelect = true,
                 CellEditActivation = ObjectListView.CellEditActivateMode.DoubleClick,
                 AllowColumnReorder = true,
+                //ShowItemToolTips = true,
 
                 // Sorting
                 ShowSortIndicators = true,
@@ -89,12 +90,13 @@ namespace XCOM2Launcher.Forms
                 },
                 new OLVColumn
                 {
+                    Name = "ID",
                     Text = "ID",
                     AspectName = "ID",
                     Width = 200,
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
-                    IsEditable = false
+                    IsEditable = false,
                 },
 
                 // State
@@ -106,6 +108,9 @@ namespace XCOM2Launcher.Forms
                     AspectGetter = o =>
                     {
                         var mod = (ModEntry) o;
+
+                        if (mod.State.HasFlag(ModState.NotLoaded))
+                            return "Not Loaded";
 
                         if (mod.State.HasFlag(ModState.ModConflict))
                             return "Conflict";
@@ -202,7 +207,7 @@ namespace XCOM2Launcher.Forms
                 // Sord Desc
                 column.GroupFormatter = (g, param) =>
                 {
-                    param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1)*a.Id.CompareTo(b.Id));
+                    param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1) * a.Id.CompareTo(b.Id));
                 };
             }
 
@@ -215,6 +220,7 @@ namespace XCOM2Launcher.Forms
             modlist_objectlistview.ItemChecked += ModListItemChecked;
             modlist_objectlistview.CellRightClick += ModListCellRightClick;
             modlist_objectlistview.CellEditFinished += ModListEditFinished;
+            modlist_objectlistview.CellToolTipShowing += ModListCellToolTipShowing;
             modlist_objectlistview.FormatRow += ModListFormatRow;
             modlist_objectlistview.GroupExpandingCollapsing += ModListGroupExpandingCollapsing;
             modlist_objectlistview.KeyUp += ModListKeyUp;
@@ -233,6 +239,7 @@ namespace XCOM2Launcher.Forms
 
             RefreshModList();
         }
+
 
         private void ModListKeyDown(object sender, KeyEventArgs e)
         {
@@ -272,17 +279,55 @@ namespace XCOM2Launcher.Forms
 
             var item = e.Item;
 
-            if (mod.State.HasFlag(ModState.ModConflict) || mod.State.HasFlag(ModState.DuplicateID))
+
+            if (mod.State.HasFlag(ModState.NotLoaded))
+            {
+                item.BackColor = SystemColors.GradientInactiveCaption;
+                item.ForeColor = SystemColors.InactiveCaptionText;
+            }
+
+            else if (mod.State.HasFlag(ModState.ModConflict))
             {
                 item.BackColor = Color.PaleVioletRed;
                 item.ForeColor = Color.Black;
             }
+
+
+            else if (mod.State.HasFlag(ModState.DuplicateID))
+            {
+                item.BackColor = Color.PaleVioletRed;
+                item.ForeColor = Color.Black;
+            }
+
 
             else if (mod.isHidden)
                 item.BackColor = SystemColors.InactiveBorder;
 
             else if (mod.State.HasFlag(ModState.New))
                 item.BackColor = SystemColors.Info;
+
+        }
+        private void ModListCellToolTipShowing(object sender, ToolTipShowingEventArgs e)
+        {
+            var mod = (ModEntry)e.Model;
+            if (e.Column.Text != "State")
+                return;
+
+            string tooltip = null;
+
+            if (mod.State.HasFlag(ModState.NotLoaded))
+                tooltip = "This mod is not being loaded. Check your Mod Path settings.";
+
+
+            else if (mod.State.HasFlag(ModState.ModConflict))
+                tooltip = "This mod makes changes that conflict with another mod.";
+
+
+
+            else if (mod.State.HasFlag(ModState.DuplicateID))
+                tooltip = "This mods id is not unique. Mods with same id can only be (de-)activated together.";
+
+            e.Text = tooltip;
         }
 
         private void UpdateMod(ModEntry m)
@@ -497,7 +542,7 @@ namespace XCOM2Launcher.Forms
 
                     if (!mod.ManualName)
                         // Restore name
-                        Mods.UpdateMod(mod);
+                        Mods.UpdateMod(mod, Settings);
 
                     break;
 

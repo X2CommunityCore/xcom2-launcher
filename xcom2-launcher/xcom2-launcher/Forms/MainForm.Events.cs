@@ -191,7 +191,7 @@ namespace XCOM2Launcher.Forms
                     return;
                 }
 
-                Mods.UpdateMod(mod);
+                Mods.UpdateMod(mod, Settings);
 
                 lock (_updateWorker)
                 {

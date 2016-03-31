@@ -42,7 +42,7 @@ namespace XCOM2Launcher.Mod
 
         public ModEntry FindByPath(string path)
         {
-            return All.SingleOrDefault(m => m.Path == path);
+            return All.SingleOrDefault(m => string.Compare(m.Path, path, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
         public IEnumerable<ModConflict> GetActiveConflicts()
@@ -120,41 +120,8 @@ namespace XCOM2Launcher.Mod
                 return null;
 
             var modID = Path.GetFileNameWithoutExtension(infoFile);
-            var isDupe = All.Any(m => m.ID == modID && m.Path != modDir);
-
-            // Check if mod with package name alreay exists
-            // todo: move rename ID somewhere?
-
-            //// Parse .XComMod file
-            //modinfo = new ModInfo(infoFile);
-
-            //string msg =
-            //    $"'{modinfo.Title}' could not be imported:\r\n" +
-            //    $"ID '{modID}' is already used by '{existingMod.Name}'\r\n\r\n" +
-            //    $"Do you want to change the package name for '{modinfo.Title}'?\r\nWarning: This might break the mod\r\n\r\n" +
-            //    $"Additional informations:\r\n{modinfo.Title}: {modDir}\r\n{existingMod.Name}: {existingMod.Path}";
-
-            //var result = MessageBox.Show(msg, "Error", MessageBoxButtons.YesNo);
-            //if (result == DialogResult.No)
-            //    return null;
-
-            //string oldModID = modID;
-            //do
-            //{
-            //    modID = Microsoft.VisualBasic.Interaction.InputBox($"Package name {modID} already exists!\r\nPlease enter the new package name for '{modinfo.Title}'.\r\nLeave empty to cancel.", "Rename package");
-
-            //    if (modID == "")
-            //        return null;
-            //}
-            //while (FindByID(modID) != null);
-
-            //// Rename
-            //var files = Directory.GetFiles(modDir, $"*{oldModID}*.*", SearchOption.AllDirectories);
-            //foreach (string file in files)
-            //{
-            //    File.Move(file, file.Replace(oldModID, modID));
-            //}
-
+            var isDupe = All.Any(m => m.ID == modID && string.Compare(m.Path , modDir, StringComparison.OrdinalIgnoreCase) == 0);
+            
             // Parse .XComMod file
             var modinfo = new ModInfo(infoFile);
 
@@ -192,9 +159,11 @@ namespace XCOM2Launcher.Mod
             this[category].Entries.Remove(mod);
         }
 
-        internal void UpdateMod(ModEntry m)
+        internal void UpdateMod(ModEntry m, Settings settings)
         {
-            // load ModInfo ?
+            // Check if in ModPaths
+            if (!settings.ModPaths.Any(modPath => m.IsInModPath(modPath)))
+                m.State |= ModState.NotLoaded;
 
             // Update Source
             if (m.Source == ModSource.Unknown)

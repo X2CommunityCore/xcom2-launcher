@@ -9,15 +9,9 @@ namespace XCOM2Launcher.Serialization
 {
     internal class ModListConverter : JsonConverter
     {
-        public override bool CanRead
-        {
-            get { return true; }
-        }
+        public override bool CanRead => true;
 
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof (Settings);
-        }
+        public override bool CanConvert(Type objectType) => objectType == typeof (Settings);
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
@@ -64,11 +58,6 @@ namespace XCOM2Launcher.Serialization
             return settings;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            var t = JToken.FromObject(value);
-
-            t.WriteTo(writer);
-        }
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => JToken.FromObject(value).WriteTo(writer);
     }
 }

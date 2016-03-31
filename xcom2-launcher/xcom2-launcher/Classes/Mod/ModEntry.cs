@@ -13,6 +13,10 @@ namespace XCOM2Launcher.Mod
 {
     public class ModEntry
     {
+        [JsonIgnore] private string _image;
+
+        [JsonIgnore] private IEnumerable<ModClassOverride> _overrides;
+
         /// <summary>
         ///     Index to determine mod load order
         /// </summary>
@@ -51,16 +55,11 @@ namespace XCOM2Launcher.Mod
         public string Note { get; set; } = null;
 
         [JsonIgnore]
-        private string _image;
-        [JsonIgnore]
         public string Image
         {
             get { return _image ?? FilePath.Combine(Path ?? "", "ModPreview.jpg"); }
             set { _image = value; }
         }
-
-        [JsonIgnore]
-        private IEnumerable<ModClassOverride> _overrides;
 
         public string GetDescription()
         {
@@ -80,8 +79,8 @@ namespace XCOM2Launcher.Mod
 
         private IEnumerable<ModClassOverride> GetUIScreenListenerOverrides()
         {
-            string sourceDirectory = FilePath.Combine(Path, "Src");
-            List<ModClassOverride> overrides = new List<ModClassOverride>();
+            var sourceDirectory = FilePath.Combine(Path, "Src");
+            var overrides = new List<ModClassOverride>();
 
             if (!Directory.Exists(sourceDirectory))
             {
@@ -100,19 +99,19 @@ namespace XCOM2Launcher.Mod
 
                 var screenClassRegex = new Regex(@"(?i)^\s*ScreenClass\s*=\s*(?:class')?([a-z_]+)");
 
-                foreach (string line in File.ReadLines(sourceFile))
+                foreach (var line in File.ReadLines(sourceFile))
                 {
                     var match = screenClassRegex.Match(line);
                     if (match.Success)
                     {
-                        string oldClass = match.Groups[1].Value;
+                        var oldClass = match.Groups[1].Value;
                         if (oldClass.ToLower() == "none")
                         {
                             //'ScreenClass = none' means it runs against every UI screen
                             continue;
                         }
 
-                        string newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
+                        var newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
                         lock (overrides)
                         {
                             overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener));
@@ -128,7 +127,7 @@ namespace XCOM2Launcher.Mod
         {
             var file = FilePath.Combine(Path, "Config", "XComEngine.ini");
 
-            if(!File.Exists(file))
+            if (!File.Exists(file))
                 return new ModClassOverride[0];
 
             var r = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)");
@@ -158,6 +157,11 @@ namespace XCOM2Launcher.Mod
         public override string ToString()
         {
             return ID;
+        }
+
+        public bool IsInModPath(string modPath)
+        {
+            return 0 == string.Compare(modPath.TrimEnd('/', '\\'), FilePath.GetDirectoryName(Path), StringComparison.OrdinalIgnoreCase);
         }
 
         #region Files
