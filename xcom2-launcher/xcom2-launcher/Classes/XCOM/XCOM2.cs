@@ -115,7 +115,7 @@ namespace XCOM2Launcher.XCOM
 
             var modOptions = new ConfigFile("ModOptions", false);
 
-            foreach (var m in settings.Mods.Active.Where(m => m.State < ModState.ModConflict).OrderBy(m => m.Index))
+            foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
                 modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
 
             modOptions.UpdateTimestamp();
