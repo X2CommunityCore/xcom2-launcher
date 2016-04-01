@@ -36,6 +36,8 @@ namespace XCOM2Launcher.Steam
 
         public static ulong[] GetSubscribedItems()
         {
+            SteamAPIWrapper.Init();
+
             var num = SteamUGC.GetNumSubscribedItems();
             var ids = new PublishedFileId_t[num];
             SteamUGC.GetSubscribedItems(ids, num);
@@ -62,6 +64,8 @@ namespace XCOM2Launcher.Steam
 
         public static InstallInfo GetInstallInfo(ulong id)
         {
+            SteamAPIWrapper.Init();
+
             ulong punSizeOnDisk;
             string pchFolder;
             uint punTimeStamp;
@@ -79,6 +83,8 @@ namespace XCOM2Launcher.Steam
 
         public static UpdateInfo GetDownloadInfo(ulong id)
         {
+            SteamAPIWrapper.Init();
+
             ulong punBytesProcessed;
             ulong punBytesTotal;
 

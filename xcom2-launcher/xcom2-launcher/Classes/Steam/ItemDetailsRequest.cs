@@ -27,6 +27,8 @@ namespace XCOM2Launcher.Steam
 
         public ItemDetailsRequest Send()
         {
+            SteamAPIWrapper.Init();
+
             _onQueryCompleted = CallResult<SteamUGCQueryCompleted_t>.Create(QueryCompleted);
             _queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(new[] {ID.ToPublishedFileID()}, 1);
 
