@@ -1,169 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace XCOM2Launcher.XCOM
 {
-    public class ConfigFile
+    public class ConfigFile : IniFile
     {
-        public string FileName { get; }
-
-        public string Path => $"{XCOM2.UserConfigDir}/XCom{FileName}.ini";
-
-        /// <summary>
-        /// Default{FileName}.ini from which this one is build
-        /// </summary>
-        public string DefaultFile { get; set; }
-
-
-        public Dictionary<string, Dictionary<string, List<string>>> Entries { get; set; } = new Dictionary<string, Dictionary<string, List<string>>>();
-
-
-        public ConfigFile(string filename, bool loadData = true)
+        public ConfigFile(string filename, bool load = true) : base($"{XCOM2.UserConfigDir}/XCom{filename}.ini", false)
         {
             FileName = filename;
             DefaultFile = $"{XCOM2.DefaultConfigDir}/Default{FileName}.ini";
 
-            if (loadData)
+            if (load)
+                Load();
+        }
+
+        public string FileName { get; }
+
+        /// <summary>
+        ///     Default{FileName}.ini from which this one is build
+        /// </summary>
+        public string DefaultFile { get; set; }
+
+        public void UpdateTimestamp(string baseFile)
+        {
+            var numTimestamps = 0;
+            if (Entries.ContainsKey("IniVersion"))
+                numTimestamps = Entries["IniVersion"].Count;
+
+            var newTimestamp = new DateTimeOffset(File.GetLastWriteTimeUtc(baseFile)).ToUnixTimeSeconds() + ".000000";
+
+            Add("IniVersion", numTimestamps.ToString(), newTimestamp);
+        }
+
+
+        public new void Load()
+        {
+            if (File.Exists(Path))
+            {
                 Load(Path);
-        }
-
-        public void Load(string file)
-        {
-            using (var stream = new FileStream(file, FileMode.Open))
-            using (var reader = new StreamReader(stream))
-            {
-                var currentSection = "";
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine()?.Trim();
-
-                    if (string.IsNullOrEmpty(line))
-                        continue;
-
-                    if (line.StartsWith("[") && line.EndsWith("]"))
-                        currentSection = line.Substring(1, line.Length - 2);
-
-                    else
-                    {
-                        var pos = line.IndexOf('=');
-
-                        if (pos == -1)
-                            // invalid syntax, previous line possibly missing \
-                            // -> skip
-                            continue;
-
-                        var currentKey = line.Substring(0, pos);
-                        var currentValue = line.Substring(pos + 1);
-
-                        // multi line
-                        while (currentValue.Length > 2 && currentValue.Substring(currentValue.Length - 2) == "\\\\")
-                            currentValue = currentValue.Substring(0, currentValue.Length - 2) + "\n" + reader.ReadLine();
-
-                        Add(currentSection, currentKey, currentValue);
-                    }
-                }
             }
-        }
-
-
-
-        public void Save()
-        {
-            using (FileStream stream = new FileStream(Path, FileMode.Create))
-            using (StreamWriter writer = new StreamWriter(stream))
-            {
-
-                foreach (KeyValuePair<string, Dictionary<string, List<string>>> section in Entries)
-                {
-                    //if (sectionEntry.Value.Count == 0)
-                    //    continue;
-
-                    writer.WriteLine($"[{section.Key}]");
-
-                    foreach (KeyValuePair<string, List<string>> entry in section.Value)
-                    {
-                        foreach (string val in entry.Value)
-                        {
-                            writer.Write(entry.Key);
-                            writer.Write("=");
-                            writer.Write(val.Replace("\n", "\\\\\n"));
-                            writer.WriteLine();
-                        }
-                    }
-
-                    writer.WriteLine();
-                }
-            }
-        }
-
-        public void Set(string section, string key, List<string> value)
-        {
-            if (Entries.ContainsKey(section))
-                // section exists
-                if (Entries[section].ContainsKey(key))
-                    Entries[section][key] = value;
-
-                else
-                    Entries[section].Add(key, value);
-
             else
             {
-                var newSection = new Dictionary<string, List<string>> {{key, value}};
-                Entries.Add(section, newSection);
+                CreateFromDefault(Path);
+                Save();
             }
         }
 
-        public void Add(string section, string key, string value)
+        public new void Load(string path)
         {
-            if (Entries.ContainsKey(section))
-                // section exists
-                if (Entries[section].ContainsKey(key))
-                    Entries[section][key].Add(value);
+            base.Load(path);
 
-                else
-                    Entries[section].Add(key, new List<string> { value });
-
-            else
-            {
-                var newSection = new Dictionary<string, List<string>> {{key, new List<string> {value}}};
-                Entries.Add(section, newSection);
-            }
+            if (Entries.ContainsKey("IniVersion") && Entries["IniVersion"].Count > 0)
+                Entries["IniVersion"].Remove(Entries["IniVersion"].Last().Key);
         }
 
-        public List<string> Get(string section, string key)
+        public new void Save()
         {
-            try
-            {
-                return Entries[section][key];
-            }
-            catch
-            {
-                return null;
-            }
+            UpdateTimestamp(DefaultFile);
+            base.Save();
         }
 
-        private void Remove(string section)
+        public void CreateFromDefault(string name)
         {
-            Entries.Remove(section);
+            Load(DefaultFile);
+
+            if (!Has("Configuration", "BasedOn"))
+                return;
+
+
+            var baseFile = Get("Configuration", "BasedOn").First();
+            Remove("Configuration", "BasedOn");
+
+            var file = System.IO.Path.GetFullPath(System.IO.Path.Combine(XCOM2.GameDir, "XComGame", baseFile));
+
+            // Create config from base baseFile
+            var baseConfig = new IniFile(file, true);
+
+            // Overwrite values
+            foreach (var section in Entries)
+                foreach (var entries in section.Value)
+                {
+                    var op = entries.Key[0];
+
+                    switch (op)
+                    {
+                        case '+':
+                        case '.':
+                            foreach (var value in entries.Value)
+                                baseConfig.Add(section.Key, entries.Key.Substring(1), value.Replace("%GAME%", "XCom"));
+                            break;
+
+                        case '-':
+                            foreach (var value in entries.Value)
+                                baseConfig.Remove(section.Key, entries.Key.Substring(1), value.Replace("%GAME%", "XCom"));
+                            break;
+
+                        case '!':
+                            // !key=ClearArray
+                            baseConfig.Remove(section.Key, entries.Key.Substring(1));
+                            break;
+
+                        case ';':
+                            break;
+
+                        default:
+                            foreach (var value in entries.Value)
+                                baseConfig.Set(section.Key, entries.Key, new List<string> { value });
+                            break;
+                    }
+                }
+
+            Entries.Clear();
+            Entries = baseConfig.Entries;
+            UpdateTimestamp(file);
         }
-
-        public bool Remove(string section, string key)
-        {
-            if (!Entries.ContainsKey(section) || !Entries[section].ContainsKey(key))
-                return false;
-
-            Entries[section][key].Clear();
-            return true;
-        }
-
-        public void UpdateTimestamp()
-        {
-            var timestamp = (new DateTimeOffset(File.GetLastWriteTimeUtc(DefaultFile))).ToUnixTimeSeconds();
-
-            Remove("IniVersion");
-            Add("IniVersion", "0", timestamp + ".000000");
-        }
-
     }
 }

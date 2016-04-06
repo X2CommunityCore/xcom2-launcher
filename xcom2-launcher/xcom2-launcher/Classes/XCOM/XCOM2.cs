@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
-using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.XCOM
 {
@@ -80,53 +78,36 @@ namespace XCOM2Launcher.XCOM
 
         public static string[] DetectModDirs()
         {
-            var dirs = new List<string>();
 
-            foreach (var line in File.ReadLines(Path.Combine(UserConfigDir, "XComEngine.ini")))
-            {
-                if (!line.StartsWith("ModRootDirs="))
-                    continue;
-
-                var dir = line.Substring(12);
-
-                if (!Path.IsPathRooted(dir))
-                    dir = Path.GetFullPath(Path.Combine(GameDir, "bin", "Win64", dir));
-
-                if (Directory.Exists(dir))
-                    dirs.Add(dir);
-            }
-
-            return dirs.ToArray();
+            return
+                new ConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs")?
+                    .Select(
+                        path => Path.IsPathRooted(path)
+                            ? path
+                            : Path.GetFullPath(Path.Combine(GameDir, "bin", "Win64", path))
+                    )
+                    .Where(Directory.Exists)
+                    .ToArray()
+                ?? new string[0];
         }
 
         public static string[] GetActiveMods()
         {
-            return File.ReadLines(Path.Combine(UserConfigDir, "XComModOptions.ini")).Where(line => line.StartsWith("ActiveMods=")).Select(line => line.Substring(11)).ToArray();
+            return new ConfigFile("ModOptions").Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
         }
 
         public static void SaveChanges(Settings settings)
         {
             // XComModOptions
-            var file = Path.Combine(UserConfigDir, "XComModOptions.ini");
-
-            if (!File.Exists(file + ".bak"))
-                // create backup
-                File.Copy(file, file + ".bak");
-
             var modOptions = new ConfigFile("ModOptions", false);
 
             foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
                 modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
 
-            modOptions.UpdateTimestamp();
             modOptions.Save();
 
             // XComEngine
             var engine = new ConfigFile("Engine");
-            file = Path.Combine(UserConfigDir, "XComEngine.ini");
-
-            // Create back up
-            File.Copy(file, file + ".bak", true);
 
             // Remove old ModClassOverrides
             engine.Remove("Engine.Engine", "ModClassOverrides");
