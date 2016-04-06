@@ -233,7 +233,7 @@ namespace XCOM2Launcher.Forms
             UpdateConflicts();
 
             // ModEntry list
-            RefreshModList();
+            // RefreshModList();
 
             // ModEntry details
             UpdateModInfo(modlist_objectlistview.SelectedObject as ModEntry);

@@ -1,4 +1,5 @@
 ﻿using Steamworks;
+using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher.Steam
 {
@@ -16,6 +17,7 @@ namespace XCOM2Launcher.Steam
 
         public void Send()
         {
+            SteamAPIWrapper.Init();
             SteamUGC.DownloadItem(new PublishedFileId_t(_id), true);
         }
     }

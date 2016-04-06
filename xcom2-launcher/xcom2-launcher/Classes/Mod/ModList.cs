@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
-using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Mod
@@ -120,8 +119,8 @@ namespace XCOM2Launcher.Mod
                 return null;
 
             var modID = Path.GetFileNameWithoutExtension(infoFile);
-            var isDupe = All.Any(m => m.ID == modID && string.Compare(m.Path , modDir, StringComparison.OrdinalIgnoreCase) == 0);
-            
+            var isDupe = All.Any(m => m.ID == modID && string.Compare(m.Path, modDir, StringComparison.OrdinalIgnoreCase) == 0);
+
             // Parse .XComMod file
             var modinfo = new ModInfo(infoFile);
 

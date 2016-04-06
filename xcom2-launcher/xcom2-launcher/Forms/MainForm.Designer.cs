@@ -447,8 +447,10 @@
             // 
             // modinfo_readme_richtextbox
             // 
+            this.modinfo_readme_richtextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.modinfo_readme_richtextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.modinfo_readme_richtextbox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.modinfo_readme_richtextbox.Location = new System.Drawing.Point(3, 3);
             this.modinfo_readme_richtextbox.Name = "modinfo_readme_richtextbox";
             this.modinfo_readme_richtextbox.ReadOnly = true;

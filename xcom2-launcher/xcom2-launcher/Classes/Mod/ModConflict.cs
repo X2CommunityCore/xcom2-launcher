@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XCOM2Launcher.Mod;
+﻿using System.Collections.Generic;
 
-namespace XCOM2Launcher.Classes.Mod
+namespace XCOM2Launcher.Mod
 {
     public class ModConflict
     {
