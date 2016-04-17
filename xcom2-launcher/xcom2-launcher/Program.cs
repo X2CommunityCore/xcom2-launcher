@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,10 @@ namespace XCOM2Launcher
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            if (!CheckDotNet4_6())
+                return;
+
 #if !DEBUG
             try
             {
@@ -84,6 +89,28 @@ namespace XCOM2Launcher
 #endif
         }
 
+        /// <summary>
+        /// Check whether .net runtime v4.6 is installed
+        /// </summary>
+        /// <returns>bool</returns>
+        private static bool CheckDotNet4_6()
+        {
+            try
+            {
+                DateTimeOffset.FromUnixTimeSeconds(101010);
+                return true;
+            }
+            catch
+            {
+                var result = MessageBox.Show("This program requires .NET v4.6.\r\nDo you want to install it now?", "Error", MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                    Process.Start(@"https://www.microsoft.com/de-de/download/details.aspx?id=49981");
+
+                return false;
+            }
+        }
+
         public static Settings InitializeSettings()
         {
             var firstRun = !File.Exists("settings.json");
@@ -133,7 +160,7 @@ namespace XCOM2Launcher
                 // Verify Mods 
                 foreach (var mod in settings.Mods.All.Where(mod => !settings.ModPaths.Any(mod.IsInModPath)))
                     mod.State |= ModState.NotLoaded;
-                
+
                 var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
                 if (brokenMods.Count > 0)
                 {
