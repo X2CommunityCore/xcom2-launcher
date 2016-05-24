@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
@@ -73,7 +72,7 @@ namespace XCOM2Launcher.Forms
                 group.Collapsed = Mods.Entries[groupName].Collapsed;
 
                 // Sort Categories
-                parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string)a.Key].Index.CompareTo(Mods.Entries[(string)b.Key].Index));
+                parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string) a.Key].Index.CompareTo(Mods.Entries[(string) b.Key].Index));
             });
 
             var columns = new[]
@@ -96,7 +95,7 @@ namespace XCOM2Launcher.Forms
                     Width = 200,
                     GroupKeyGetter = categoryGroupingDelegate,
                     GroupFormatter = categoryFormatterDelegate,
-                    IsEditable = false,
+                    IsEditable = false
                 },
 
                 // State
@@ -191,24 +190,22 @@ namespace XCOM2Launcher.Forms
 
             // size groupies
             columns.Single(c => c.AspectName == "Size").MakeGroupies(
-                new[] { 1024, 1024 * 1024, (long)50 * 1024 * 1024, (long)100 * 1024 * 1024 },
-                new[] { "< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB" }
+                new[] {1024, 1024*1024, (long) 50*1024*1024, (long) 100*1024*1024},
+                new[] {"< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB"}
                 );
 
             // Init DateTime columns
-            foreach (var column in columns.Where(c => c.DataType == typeof(DateTime?)))
+            foreach (var column in columns.Where(c => c.DataType == typeof (DateTime?)))
             {
                 column.AspectToStringConverter = d => (d as DateTime?)?.ToLocalTime().ToString(CultureInfo.CurrentCulture);
                 column.MakeGroupies(
-                    new[] { DateTime.Now.Subtract(TimeSpan.FromHours(24 * 30)), DateTime.Now.Subtract(TimeSpan.FromHours(24 * 7)), DateTime.Now.Date },
-                    new[] { "Older than one month", "Last Month", "This Week", "Today" }
+                    new[] {DateTime.Now.Subtract(TimeSpan.FromHours(24*30)), DateTime.Now.Subtract(TimeSpan.FromHours(24*7)), DateTime.Now.Date},
+                    new[] {"Older than one month", "Last Month", "This Week", "Today"}
                     );
 
                 // Sord Desc
-                column.GroupFormatter = (g, param) =>
-                {
-                    param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1) * a.Id.CompareTo(b.Id));
-                };
+                column.GroupFormatter =
+                    (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1)*a.Id.CompareTo(b.Id)); };
             }
 
 
@@ -305,11 +302,11 @@ namespace XCOM2Launcher.Forms
 
             else if (mod.State.HasFlag(ModState.New))
                 item.BackColor = SystemColors.Info;
-
         }
+
         private void ModListCellToolTipShowing(object sender, ToolTipShowingEventArgs e)
         {
-            var mod = (ModEntry)e.Model;
+            var mod = (ModEntry) e.Model;
             if (e.Column.Text != "State")
                 return;
 
@@ -321,7 +318,6 @@ namespace XCOM2Launcher.Forms
 
             else if (mod.State.HasFlag(ModState.ModConflict))
                 tooltip = "This mod makes changes that conflict with another mod.";
-
 
 
             else if (mod.State.HasFlag(ModState.DuplicateID))
@@ -342,11 +338,9 @@ namespace XCOM2Launcher.Forms
 
         private void DeleteMods()
         {
-            SteamAPIWrapper.InitSafe();
-
             // Confirmation dialog
             var text = modlist_objectlistview.SelectedObjects.Count == 1
-                ? $"Are you sure you want to delete '{(modlist_objectlistview.SelectedObjects[0] as ModEntry)?.Name}'?"
+                ? $"Are you sure you want to delete '{ModList.SelectedObjects[0]?.Name}'?"
                 : $"Are you sure you want to delete {modlist_objectlistview.SelectedObjects.Count} mods?";
 
             text += "\r\nThis can not be undone.";
@@ -359,13 +353,16 @@ namespace XCOM2Launcher.Forms
             var mods = ModList.SelectedObjects.ToList();
             foreach (var mod in mods)
             {
+                // unsubscribe
+                if (mod.Source == ModSource.SteamWorkshop)
+                    Steam.Workshop.Unsubscribe((ulong) mod.WorkshopID);
+
+                // delete model
                 modlist_objectlistview.RemoveObject(mod);
                 Mods.RemoveMod(mod);
 
+                // delete files
                 Directory.Delete(mod.Path, true);
-                // unsubscribe
-                if (mod.Source == ModSource.SteamWorkshop)
-                    SteamUGC.UnsubscribeItem(new PublishedFileId_t((ulong)mod.WorkshopID));
             }
         }
 
@@ -401,12 +398,7 @@ namespace XCOM2Launcher.Forms
             modlist_objectlistview.SelectionChanged += ModListSelectionChanged;
             modlist_objectlistview.ItemChecked += ModListItemChecked;
         }
-
-        private void UpdateModListItem(ListViewItem item)
-        {
-            UpdateMod(ModList.GetModelObject(item.Index));
-        }
-
+        
         private ContextMenu CreateModListContextMenu(ModEntry m)
         {
             var menu = new ContextMenu();
@@ -442,7 +434,7 @@ namespace XCOM2Launcher.Forms
             menu.MenuItems.Add(moveToCategory);
 
 
-            var toggleVisibility = new MenuItem { Text = m.isHidden ? "Unhide" : "Hide" };
+            var toggleVisibility = new MenuItem {Text = m.isHidden ? "Unhide" : "Hide"};
             toggleVisibility.Click += delegate
             {
                 // save as new list so we can remove mods if they are being hidden
