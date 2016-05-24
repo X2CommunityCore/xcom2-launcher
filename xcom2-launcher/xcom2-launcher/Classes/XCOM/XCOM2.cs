@@ -93,7 +93,14 @@ namespace XCOM2Launcher.XCOM
 
         public static string[] GetActiveMods()
         {
-            return new ConfigFile("ModOptions").Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
+            try
+            {
+                return new ConfigFile("ModOptions").Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
+            }
+            catch (IOException)
+            {
+                return new string[0];
+            }
         }
 
         public static void SaveChanges(Settings settings)

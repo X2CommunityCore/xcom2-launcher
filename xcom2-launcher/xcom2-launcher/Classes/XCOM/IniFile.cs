@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -71,15 +72,13 @@ namespace XCOM2Launcher.XCOM
 
         public void Save()
         {
-            //// Apply filters
-            //if (Entries.ContainsKey("ConfigCoalesceFilter"))
-            //{
-            //    foreach (var section in Get("ConfigCoalesceFilter", "FilterSection"))
-            //        Remove(section);
+            // Create Dir
+            var dir = System.IO.Path.GetDirectoryName(Path);
+            Debug.Assert(dir != null, "dir != null");
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
 
-            //    Remove("ConfigCoalesceFilter", "FilterSection");
-            //}
-
+            // Write File
             using (var stream = new FileStream(Path, FileMode.Create))
             using (var writer = new StreamWriter(stream))
             {
