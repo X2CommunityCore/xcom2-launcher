@@ -78,6 +78,26 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\xcom.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -126,8 +146,10 @@
     <Compile Include="Classes\Steam\ItemDetailsRequest.cs" />
     <Compile Include="Classes\Steam\SteamAPIWrapper.cs" />
     <Compile Include="Classes\Steam\SteamManager.cs" />
+    <Compile Include="Classes\Steam\Workshop.cs" />
     <Compile Include="Classes\WindowSetting.cs" />
     <Compile Include="Classes\XCOM\Arguments.cs" />
+    <Compile Include="Classes\XCOM\IniFile.cs" />
     <Compile Include="Classes\XCOM\XCOM2.cs" />
     <Compile Include="Classes\XCOM\ConfigFile.cs" />
     <Compile Include="Forms\CleanModsForm.cs">

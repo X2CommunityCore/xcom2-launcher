@@ -8,6 +8,9 @@ using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
+using BrightIdeasSoftware;
+using System.Diagnostics;
+using System.Collections;
 
 namespace XCOM2Launcher.Forms
 {
@@ -420,6 +423,50 @@ namespace XCOM2Launcher.Forms
             #endregion
         }
 
-        #endregion
-    }
+		#endregion
+
+		private void filterMods_textbox_TextChanged(object sender, EventArgs e)
+		{
+			TextMatchFilter filter = null;
+			int matchKind = 0;
+			string txt = filterMods_textbox.Text;
+			if (!String.IsNullOrEmpty(txt))
+			{
+				switch (matchKind)
+				{
+					case 0:
+					default:
+						filter = TextMatchFilter.Contains(modlist_objectlistview, txt);
+						break;
+					case 1:
+						filter = TextMatchFilter.Prefix(modlist_objectlistview, txt);
+						break;
+					case 2:
+						filter = TextMatchFilter.Regex(modlist_objectlistview, txt);
+						break;
+				}
+			}
+
+			// Text highlighting requires at least a default renderer
+			if (modlist_objectlistview.DefaultRenderer == null)
+				modlist_objectlistview.DefaultRenderer = new HighlightTextRenderer(filter);
+
+			//Stopwatch stopWatch = new Stopwatch();
+			//stopWatch.Start();
+			modlist_objectlistview.AdditionalFilter = filter;
+			//olv.Invalidate();
+			//stopWatch.Stop();
+
+			//IList objects = olv.Objects as IList;
+			//if (objects == null)
+			//	this.ToolStripStatus1 = prefixForNextSelectionMessage =
+			//		String.Format("Filtered in {0}ms", stopWatch.ElapsedMilliseconds);
+			//else
+			//	this.ToolStripStatus1 = prefixForNextSelectionMessage =
+			//		String.Format("Filtered {0} items down to {1} items in {2}ms",
+			//					  objects.Count,
+			//					  modlist_objectlistview.Items.Count,
+			//					  stopWatch.ElapsedMilliseconds);
+		}
+	}
 }

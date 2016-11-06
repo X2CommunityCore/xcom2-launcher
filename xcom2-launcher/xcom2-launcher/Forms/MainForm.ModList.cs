@@ -30,27 +30,28 @@ namespace XCOM2Launcher.Forms
         {
             modlist_objectlistview?.Dispose();
 
-            modlist_objectlistview = new ObjectListView
-            {
-                // General
-                Name = "modlist_objectlistview",
-                Size = new Size(886, 222),
-                Location = new Point(0, 0),
-                Dock = DockStyle.Fill,
-                TabIndex = 0,
+			modlist_objectlistview = new ObjectListView
+			{
+				// General
+				Name = "modlist_objectlistview",
+				Size = new Size(886, 222),
+				Location = new Point(0, 0),
+				Dock = DockStyle.Fill,
+				TabIndex = 0,
 
-                // Behavior
-                FullRowSelect = true,
-                CellEditActivation = ObjectListView.CellEditActivateMode.DoubleClick,
-                AllowColumnReorder = true,
-                //ShowItemToolTips = true,
+				// Behavior
+				FullRowSelect = true,
+				CellEditActivation = ObjectListView.CellEditActivateMode.DoubleClick,
+				AllowColumnReorder = true,
+				//ShowItemToolTips = true,
 
-                // Sorting
-                ShowSortIndicators = true,
-                TintSortColumn = true,
-                IsSearchOnSortColumn = false,
-                SortGroupItemsByPrimaryColumn = false,
-                AlwaysGroupBySortOrder = SortOrder.None,
+				// Sorting
+				ShowSortIndicators = true,
+				TintSortColumn = true,
+				IsSearchOnSortColumn = false,
+				SortGroupItemsByPrimaryColumn = false,
+				AlwaysGroupBySortOrder = SortOrder.None,
+				UseFiltering = true,
 
                 // Checkbox
                 CheckBoxes = true,
