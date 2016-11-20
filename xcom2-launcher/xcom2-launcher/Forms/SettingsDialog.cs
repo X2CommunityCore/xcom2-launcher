@@ -25,17 +25,6 @@ namespace XCOM2Launcher.Forms
                 modPathsListbox.Items.Add(modPath);
 
             argumentsTextBox.Text = settings.Arguments;
-            argumentsTextBox.Values = new[]
-            {
-                "-Review",
-                "-NoRedScreens",
-                "-Log",
-                "-CrashDumpWatcher",
-                "-NoStartupMovies",
-                "-Language=",
-                "-AllowConsole",
-                "-AutoDebug"
-            };
 
             foreach (var cat in settings.Mods.Categories)
                 categoriesListBox.Items.Add(cat);

@@ -37,6 +37,11 @@ namespace XCOM2Launcher
 
         public ModList Mods { get; set; } = new ModList();
 
+		/// <summary>
+		/// Mod ID, File Name, File Contents
+		/// </summary>
+		public Dictionary<string, Dictionary<string, string>> ModSettings { get; set; } = new Dictionary<string, Dictionary<string, string>>();
+
         public Dictionary<string, WindowSettings> Windows { get; set; } = new Dictionary<string, WindowSettings>();
 
         internal void ImportMods()

@@ -169,7 +169,9 @@ namespace XCOM2Launcher.Mod
 
         public string[] GetConfigFiles()
         {
-            return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini");
+			if (Directory.Exists(FilePath.Combine(Path,"Config")))
+				return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini", SearchOption.AllDirectories);
+	        return new string[0];
         }
 
         internal string GetModInfoFile()
