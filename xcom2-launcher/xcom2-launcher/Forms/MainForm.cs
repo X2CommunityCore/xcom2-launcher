@@ -379,7 +379,7 @@ namespace XCOM2Launcher.Forms
 
             modinfo_inspect_propertygrid.SelectedObject = m;
 
-#region Config
+			#region Config
 
 			// config files
 			string[] configFiles = m.GetConfigFiles();
@@ -388,16 +388,17 @@ namespace XCOM2Launcher.Forms
 			modinfo_config_FileSelectCueComboBox.Items.Clear();
 	        modinfo_ConfigFCTB.Text = "";
 	        modinfo_config_LoadButton.Enabled = false;
+			modinfo_config_RemoveButton.Enabled = false;
 
 			if (configFiles.Length > 0)
 			{
 				foreach (var configFile in configFiles)
 				{
-					if (configFile != null) modinfo_config_FileSelectCueComboBox.Items.Add(Path.GetFileName(configFile));
+					if (configFile != null) modinfo_config_FileSelectCueComboBox.Items.Add(CurrentMod.GetPathRelative(configFile));
 				}
 			}
 
-#endregion
+			#endregion
 		}
 
 

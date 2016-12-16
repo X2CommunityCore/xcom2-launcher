@@ -19,7 +19,7 @@ namespace XCOM2Launcher.XCOM
         public string FileName { get; }
 
         /// <summary>
-        ///     Default{FileName}.ini from which this one is build
+        /// Default{FileName}.ini from which this one is build
         /// </summary>
         public string DefaultFile { get; set; }
 

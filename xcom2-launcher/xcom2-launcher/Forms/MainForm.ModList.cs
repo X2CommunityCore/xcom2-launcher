@@ -22,6 +22,9 @@ namespace XCOM2Launcher.Forms
 
 		public List<ModEntry> Downloads { get; } = new List<ModEntry>();
 
+		public ModEntry CurrentMod;
+
+
 		public void InitObjectListView()
         {
             //modlist_objectlistview?.Dispose();
@@ -87,6 +90,12 @@ namespace XCOM2Launcher.Forms
                 new[] {1024, 1024*1024, (long) 50*1024*1024, (long) 100*1024*1024},
                 new[] {"< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB"}
                 );
+
+			// Sort by Order column removes groups
+			modlist_ListObjectListView.BeforeSorting += (sender, args) =>
+			{
+				modlist_ListObjectListView.ShowGroups = !args.ColumnToSort.Equals(olvcOrder);
+			};
 
             // Init DateTime columns
             foreach (var column in columns.Where(c => c.DataType == typeof (DateTime?)))
@@ -397,25 +406,28 @@ namespace XCOM2Launcher.Forms
 
         private void ModListSelectionChanged(object sender, EventArgs e)
         {
-            if (modlist_ListObjectListView.SelectedObjects.Count > 1)
-                return;
+	        if (modlist_ListObjectListView.SelectedObjects.Count > 1)
+	        {
+		        CurrentMod = null;
+				return;
+	        }
 
-            var m = modlist_ListObjectListView.SelectedObject as ModEntry;
+            CurrentMod = modlist_ListObjectListView.SelectedObject as ModEntry;
 
-            UpdateModInfo(m);
-            CheckAndUpdateChangeLog(modinfo_tabcontrol.SelectedTab, m);
+            UpdateModInfo(CurrentMod);
+            CheckAndUpdateChangeLog(modinfo_tabcontrol.SelectedTab, CurrentMod);
 
-            if (m != null)
+            if (CurrentMod != null)
             {
-                m.State &= ~ModState.New;
-                modlist_ListObjectListView.EnsureModelVisible(m);
+                CurrentMod.State &= ~ModState.New;
+                modlist_ListObjectListView.EnsureModelVisible(CurrentMod);
             }
         }
 
         private void ModListEditFinished(object sender, CellEditEventArgs e)
         {
             var mod = e.RowObject as ModEntry;
-            Contract.Assume(mod != null);
+            if (mod == null) return;
 
             switch (e.Column.AspectName)
             {
@@ -429,11 +441,38 @@ namespace XCOM2Launcher.Forms
                     break;
 
                 case "Index":
-                    // todo reorder
+		            if (Settings.AutoNumberIndexes == false) break;
+					if ((int)e.NewValue == (int)e.Value) break;
+					ReorderIndexes(mod, (int)e.Value);
+					modlist_ListObjectListView.Sort();
+					modlist_ListObjectListView.Refresh();
                     break;
             }
         }
 
         #endregion
-    }
+
+		/// <summary>
+		/// Reorders mod indexes if a mod has its index changed.
+		/// </summary>
+		/// <param name="mod">The mod object that was updated</param>
+		/// <param name="oldIndex">The old index the mod had</param>
+		private void ReorderIndexes(ModEntry mod, int oldIndex)
+		{
+			var currentIndex = mod.Index;
+
+			var modList = Mods.All.ToList();
+			int startPos = (currentIndex > oldIndex) ? oldIndex : currentIndex;
+			var range = Math.Abs(currentIndex - oldIndex) + 1;
+				
+			for (int i = startPos; i < range; i++)
+			{
+				var modEntry = modList[i];
+				if (modEntry != mod)
+					modEntry.Index += ((currentIndex - oldIndex) > 0) ? -1 : 1;
+			}
+
+		}
+
+	}
 }

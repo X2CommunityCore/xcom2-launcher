@@ -20,6 +20,7 @@ namespace XCOM2Launcher.Forms
             closeAfterLaunchCheckBox.Checked = settings.CloseAfterLaunch;
             searchForUpdatesCheckBox.Checked = settings.CheckForUpdates;
             showHiddenEntriesCheckBox.Checked = settings.ShowHiddenElements;
+	        autoNumberModIndexesCheckBox.Checked = settings.AutoNumberIndexes;
 
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
@@ -184,6 +185,7 @@ namespace XCOM2Launcher.Forms
             Settings.CloseAfterLaunch = closeAfterLaunchCheckBox.Checked;
             Settings.CheckForUpdates = searchForUpdatesCheckBox.Checked;
             Settings.ShowHiddenElements = showHiddenEntriesCheckBox.Checked;
+	        Settings.AutoNumberIndexes = autoNumberModIndexesCheckBox.Checked;
 
             Settings.Arguments = argumentsTextBox.Text;
 

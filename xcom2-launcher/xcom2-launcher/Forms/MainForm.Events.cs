@@ -21,11 +21,6 @@ namespace XCOM2Launcher.Forms
 {
     partial class MainForm
     {
-
-		readonly Style CommentStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
-		readonly Style SectionStyle = new TextStyle(Brushes.DeepSkyBlue, null, FontStyle.Bold);
-		readonly Style SeparatorStyle = new TextStyle(Brushes.Chocolate, null, FontStyle.Bold);
-
 		internal void RegisterEvents()
         {
             // Register Events
@@ -268,29 +263,41 @@ namespace XCOM2Launcher.Forms
 
             // parse file
 
-            var regex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)$", RegexOptions.Compiled | RegexOptions.Multiline);
+			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
+            var modEntryRegex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)$", RegexOptions.Compiled | RegexOptions.Multiline);
 
             var mods = Mods.All.ToList();
             var activeMods = new List<ModEntry>();
             var missingMods = new List<Match>();
+	        var categoryName = "";
 
             foreach (var line in File.ReadAllLines(dialog.FileName))
             {
-                var match = regex.Match(line);
-                if (!match.Success)
+	            var categoryMatch = categoryRegex.Match(line);
+	            if (categoryMatch.Success)
+		            categoryName = categoryMatch.Groups["category"].Value;
+
+                var modMatch = modEntryRegex.Match(line);
+                if (!modMatch.Success)
                     continue;
 
-                var entries = mods.Where(mod => mod.ID == match.Groups["id"].Value).ToList();
+                var entries = mods.Where(mod => mod.ID == modMatch.Groups["id"].Value).ToList();
 
                 if (entries.Count == 0)
                 {
                     // Mod missing
                     // -> add to list
-                    missingMods.Add(match);
+                    missingMods.Add(modMatch);
                     continue;
                 }
 
                 activeMods.AddRange(entries);
+
+	            foreach (var modEntry in entries)
+	            {
+		            Mods.RemoveMod(modEntry);
+					Mods.AddMod(categoryName, modEntry);
+	            }
 
                 if (entries.Count > 1)
                 {
@@ -435,22 +442,25 @@ namespace XCOM2Launcher.Forms
 
 		}
 
-		private void modConfigListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		private void checkBox1_CheckedChanged(object sender, EventArgs e)
 		{
-			var comboBox = (ComboBox)sender;
-			ModEntry mod = modlist_ListObjectListView.SelectedObject as ModEntry;
+			//var duplicates = Mods.All.GroupBy(m => m.Index).Where(g => g.Count() > 1).ToList();
+			//modlist_ListObjectListView.ModelFilter = new ModelFilter(delegate (object x)
+			//{
+			//	ModEntry mod = x as ModEntry;
+			//	return duplicates.Contains();
+			//});
+		}
+
+
+		private void modinfo_config_FileSelectCueComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (CurrentMod == null) return;
 
 			// Invalid selection, somehow
-			if (comboBox.SelectedIndex <= -1) return;
+			if (modinfo_config_FileSelectCueComboBox.SelectedIndex <= -1) return;
 
-			// Get the selected file name and try to get the list of config files for the mod.
-			// Then try to get the file path that matches the currently selected name and load that file
-			string fileName = comboBox.Text;
-			string[] configFiles = mod?.GetConfigFiles();
-
-			if (configFiles == null) return;
-			string filePath = Array.Find(configFiles, element => element.Contains(fileName));
-			if (filePath == null) return;
+			string filePath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
 
 			using (var sr = new StreamReader(filePath))
 			{
@@ -458,36 +468,57 @@ namespace XCOM2Launcher.Forms
 			}
 
 			// Check if this file has values saved, and enable/disable load button
-			modinfo_config_LoadButton.Enabled = ModSettingExists(mod.ID, fileName);
+			bool exists = CurrentMod.GetSetting(filePath) != null;
+			modinfo_config_LoadButton.Enabled = exists;
+			modinfo_config_RemoveButton.Enabled = exists;
 		}
 
 		private void modinfo_config_SaveButton_Click(object sender, EventArgs e)
 		{
 			// Get necessary data
-			ModEntry mod = modlist_ListObjectListView.SelectedObject as ModEntry;
-			string filename = modinfo_config_FileSelectCueComboBox.Text;
-			string text = modinfo_ConfigFCTB.Text;
+			if (CurrentMod == null) return;
+
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+			string contents = modinfo_ConfigFCTB.Text;
 
 			// If the data is invalid, just do nothing
-			if (mod == null || String.IsNullOrEmpty(text)) return;
-
-			// If the current file exists already, save to it, otherwise create a new one
-			if (ModSettingExists(mod.ID, filename))
-				Settings.ModSettings[mod.ID][filename] = text;
-			else
-				Settings.ModSettings.Add(mod.ID, new Dictionary<string, string> { { filename, text } });
+			if (string.IsNullOrEmpty(contents)) return;
+			
+			if (CurrentMod.AddSetting(filepath, contents))
+			{
+				// For consistency enable the button
+				modinfo_config_LoadButton.Enabled = true;
+				modinfo_config_RemoveButton.Enabled = true;
+			}
 		}
 
 		private void modinfo_config_LoadButton_Click(object sender, EventArgs e)
 		{
 			// Get necessary data
-			ModEntry mod = modlist_ListObjectListView.SelectedObject as ModEntry;
-			string filename = modinfo_config_FileSelectCueComboBox.Text;
+			if (CurrentMod == null) return;
+
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
 
 			// If data is not valid
-			if (mod == null || ModSettingExists(mod.ID, filename)) return;
+			var setting = CurrentMod.GetSetting(filepath);
+			if (setting == null) return;
 
-			modinfo_ConfigFCTB.Text = Settings.ModSettings[mod.ID][filename];
+			modinfo_ConfigFCTB.Text = setting.Contents;
+		}
+
+		private void modinfo_config_RemoveButton_Click(object sender, EventArgs e)
+		{
+			// Get necessary data
+			if (CurrentMod == null) return;
+
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+
+			if (CurrentMod.RemoveSetting(filepath))
+			{
+				// For consistency enable the button
+				modinfo_config_LoadButton.Enabled = false;
+				modinfo_config_RemoveButton.Enabled = false;
+			}
 		}
 
 		private void modinfo_config_ExpandButton_Click(object sender, EventArgs e)
@@ -515,15 +546,9 @@ namespace XCOM2Launcher.Forms
 			}
 		}
 
-		private void modinfo_ConfigFCTB_TextChanged(object sender, FastColoredTextBoxNS.TextChangedEventArgs e)
+		private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			e.ChangedRange.ClearStyle(CommentStyle);
-			e.ChangedRange.ClearStyle(SectionStyle);
-			e.ChangedRange.ClearStyle(SeparatorStyle);
-
-			e.ChangedRange.SetStyle(CommentStyle, @";.*$", RegexOptions.Multiline);
-			e.ChangedRange.SetStyle(SectionStyle, @"^\[.*\]", RegexOptions.Multiline);
-			e.ChangedRange.SetStyle(SeparatorStyle, @"^.*?(?<range>=)", RegexOptions.Multiline);
+			IniLanguage.Process(e);
 		}
 
 		private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
@@ -553,6 +578,16 @@ namespace XCOM2Launcher.Forms
 			senderComboBox.DropDownWidth = width;
 		}
 
+		private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
+		{
+			string filename = modinfo_config_FileSelectCueComboBox.Text;
+			//if (!ModSettingExists(CurrentMod.ID, filename)) return;
+			//ConfigDiff.Instance.CompareStrings(Settings.ModSettings[CurrentMod.ID][filename], modinfo_ConfigFCTB.Text);
+			// todo
+			ConfigDiff.Instance.Show();
+		}
+
+
 		private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
 		{
 			var numGroups = modlist_ListObjectListView.OLVGroups.Count;
@@ -574,16 +609,7 @@ namespace XCOM2Launcher.Forms
 		{
 			modlist_FilterCueTextBox.Text = "";
 		}
+
 		#endregion
-
-		private bool ModSettingExists(string modId, string filename)
-		{
-			if (!Settings.ModSettings.ContainsKey(modId)) return false;
-			if (!Settings.ModSettings[modId].ContainsKey(filename)) return false;
-			return true;
-		}
-
-
-
 	}
 }

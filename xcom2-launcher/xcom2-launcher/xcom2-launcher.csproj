@@ -155,6 +155,7 @@
     <Compile Include="Classes\WindowSetting.cs" />
     <Compile Include="Classes\XCOM\Arguments.cs" />
     <Compile Include="Classes\XCOM\IniFile.cs" />
+    <Compile Include="Classes\XCOM\IniLanguage.cs" />
     <Compile Include="Classes\XCOM\XCOM2.cs" />
     <Compile Include="Classes\XCOM\DefaultConfigFile.cs" />
     <Compile Include="Forms\CleanModsForm.cs">
@@ -162,6 +163,12 @@
     </Compile>
     <Compile Include="Forms\CleanModsForm.Designer.cs">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ConfigDiff.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ConfigDiff.Designer.cs">
+      <DependentUpon>ConfigDiff.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
@@ -209,6 +216,9 @@
     </Compile>
     <EmbeddedResource Include="Forms\CleanModsForm.resx">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ConfigDiff.resx">
+      <DependentUpon>ConfigDiff.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

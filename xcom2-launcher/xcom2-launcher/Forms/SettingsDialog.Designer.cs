@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+			this.components = new System.ComponentModel.Container();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.label1 = new System.Windows.Forms.Label();
@@ -39,6 +40,7 @@
 			this.addModPathButton = new System.Windows.Forms.Button();
 			this.removeModPathButton = new System.Windows.Forms.Button();
 			this.browseGamePathButton = new System.Windows.Forms.Button();
+			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.searchForUpdatesCheckBox = new System.Windows.Forms.CheckBox();
@@ -52,7 +54,8 @@
 			this.renameCategoryButton = new System.Windows.Forms.Button();
 			this.removeCategoryButton = new System.Windows.Forms.Button();
 			this.categoriesListBox = new System.Windows.Forms.ListBox();
-			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
+			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
+			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBox1.SuspendLayout();
 			this.tableLayoutPanel2.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
@@ -179,6 +182,23 @@
 			this.browseGamePathButton.Text = "Browse";
 			this.browseGamePathButton.UseVisualStyleBackColor = true;
 			// 
+			// argumentsTextBox
+			// 
+			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.argumentsTextBox.Location = new System.Drawing.Point(103, 129);
+			this.argumentsTextBox.Name = "argumentsTextBox";
+			this.argumentsTextBox.Size = new System.Drawing.Size(470, 20);
+			this.argumentsTextBox.TabIndex = 15;
+			this.argumentsTextBox.Values = new string[] {
+        "-Review",
+        "-NoRedScreens",
+        "-Log",
+        "-CrashDumpWatcher",
+        "-NoStartupMovies",
+        "-Language=",
+        "-AllowConsole",
+        "-AutoDebug"};
+			// 
 			// groupBox2
 			// 
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -194,17 +214,19 @@
 			// 
 			// tableLayoutPanel3
 			// 
-			this.tableLayoutPanel3.ColumnCount = 3;
+			this.tableLayoutPanel3.ColumnCount = 4;
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
 			this.tableLayoutPanel3.Controls.Add(this.searchForUpdatesCheckBox, 1, 2);
 			this.tableLayoutPanel3.Controls.Add(this.showHiddenEntriesCheckBox, 1, 0);
 			this.tableLayoutPanel3.Controls.Add(this.label6, 0, 1);
 			this.tableLayoutPanel3.Controls.Add(this.closeAfterLaunchCheckBox, 1, 1);
 			this.tableLayoutPanel3.Controls.Add(this.label5, 0, 3);
-			this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel2, 2, 3);
 			this.tableLayoutPanel3.Controls.Add(this.categoriesListBox, 1, 3);
+			this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel2, 3, 3);
+			this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 2, 0);
 			this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -224,6 +246,7 @@
 			this.searchForUpdatesCheckBox.Size = new System.Drawing.Size(116, 16);
 			this.searchForUpdatesCheckBox.TabIndex = 10;
 			this.searchForUpdatesCheckBox.Text = "Search for updates";
+			this.toolTip.SetToolTip(this.searchForUpdatesCheckBox, "Search for updates to the launcher when starting");
 			this.searchForUpdatesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// showHiddenEntriesCheckBox
@@ -234,6 +257,7 @@
 			this.showHiddenEntriesCheckBox.Size = new System.Drawing.Size(122, 16);
 			this.showHiddenEntriesCheckBox.TabIndex = 9;
 			this.showHiddenEntriesCheckBox.Text = "Show hidden entries";
+			this.toolTip.SetToolTip(this.showHiddenEntriesCheckBox, "Toggle showing hidden mod entries");
 			this.showHiddenEntriesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// label6
@@ -252,6 +276,7 @@
 			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(111, 16);
 			this.closeAfterLaunchCheckBox.TabIndex = 7;
 			this.closeAfterLaunchCheckBox.Text = "Close after launch";
+			this.toolTip.SetToolTip(this.closeAfterLaunchCheckBox, "Close the launcher after launching the game");
 			this.closeAfterLaunchCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// label5
@@ -317,28 +342,23 @@
 			this.categoriesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanel3.SetColumnSpan(this.categoriesListBox, 2);
 			this.categoriesListBox.FormattingEnabled = true;
 			this.categoriesListBox.Location = new System.Drawing.Point(103, 69);
 			this.categoriesListBox.Name = "categoriesListBox";
 			this.categoriesListBox.Size = new System.Drawing.Size(470, 173);
 			this.categoriesListBox.TabIndex = 11;
 			// 
-			// argumentsTextBox
+			// autoNumberModIndexesCheckBox
 			// 
-			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.argumentsTextBox.Location = new System.Drawing.Point(103, 129);
-			this.argumentsTextBox.Name = "argumentsTextBox";
-			this.argumentsTextBox.Size = new System.Drawing.Size(470, 20);
-			this.argumentsTextBox.TabIndex = 15;
-			this.argumentsTextBox.Values = new string[] {
-        "-Review",
-        "-NoRedScreens",
-        "-Log",
-        "-CrashDumpWatcher",
-        "-NoStartupMovies",
-        "-Language=",
-        "-AllowConsole",
-        "-AutoDebug"};
+			this.autoNumberModIndexesCheckBox.AutoSize = true;
+			this.autoNumberModIndexesCheckBox.Location = new System.Drawing.Point(341, 3);
+			this.autoNumberModIndexesCheckBox.Name = "autoNumberModIndexesCheckBox";
+			this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(152, 16);
+			this.autoNumberModIndexesCheckBox.TabIndex = 14;
+			this.autoNumberModIndexesCheckBox.Text = "Auto-Number Mod Indexes";
+			this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-Renumber mod indexes when changing (turn off to set manuall)");
+			this.autoNumberModIndexesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// SettingsDialog
 			// 
@@ -395,5 +415,7 @@
         private System.Windows.Forms.Button addModPathButton;
         private System.Windows.Forms.Button removeModPathButton;
 		private UserElements.AutoCompleteTextBox argumentsTextBox;
+		private System.Windows.Forms.ToolTip toolTip;
+		private System.Windows.Forms.CheckBox autoNumberModIndexesCheckBox;
 	}
 }
