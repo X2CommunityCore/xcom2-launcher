@@ -37,10 +37,10 @@ namespace XCOM2Launcher.Forms
             //Other intialization
             InitializeTabImages();
 
-#if !DEBUG
+//#if !DEBUG
 			// Check for Updates
 			CheckSteamForUpdates();
-#endif
+//#endif
 
             // Check for running downloads
 #if DEBUG
@@ -403,6 +403,5 @@ namespace XCOM2Launcher.Forms
 
 
 		#endregion
-
 	}
 }

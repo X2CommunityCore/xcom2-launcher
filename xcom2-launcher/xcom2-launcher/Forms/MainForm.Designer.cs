@@ -65,16 +65,16 @@
 			this.olvcDateAdded = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcDateCreated = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcPath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-			this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+			this.olvcHasBackup = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
 			this.panel3 = new System.Windows.Forms.Panel();
 			this.modlist_filterClearButton = new System.Windows.Forms.Button();
+			this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
 			this.button1 = new System.Windows.Forms.Button();
 			this.modinfo_groupbox = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-			this.modinfo_image_picturebox = new System.Windows.Forms.PictureBox();
 			this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
 			this.modinfo_details_tab = new System.Windows.Forms.TabPage();
 			this.modinfo_info_CreatedLabel = new System.Windows.Forms.Label();
@@ -93,13 +93,17 @@
 			this.modinfo_inspect_propertygrid = new System.Windows.Forms.PropertyGrid();
 			this.modinfo_config_tab = new System.Windows.Forms.TabPage();
 			this.modinfo_config_TableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-			this.modinfo_config_CompareButton = new System.Windows.Forms.Button();
-			this.modinfo_config_LoadButton = new System.Windows.Forms.Button();
 			this.modinfo_ConfigFCTB = new FastColoredTextBoxNS.FastColoredTextBox();
-			this.modinfo_config_SaveButton = new System.Windows.Forms.Button();
+			this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
+			this.modinfo_config_buttonsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_config_ExpandButton = new System.Windows.Forms.Button();
+			this.modinfo_config_CompareButton = new System.Windows.Forms.Button();
+			this.modinfo_config_SaveButton = new System.Windows.Forms.Button();
+			this.modinfo_config_LoadButton = new System.Windows.Forms.Button();
+			this.modinfo_config_RemoveButton = new System.Windows.Forms.Button();
 			this.modinfo_changelog_tab = new System.Windows.Forms.TabPage();
 			this.modinfo_changelog_richtextbox = new System.Windows.Forms.RichTextBox();
+			this.modinfo_image_picturebox = new System.Windows.Forms.PictureBox();
 			this.conflicts_tab = new System.Windows.Forms.TabPage();
 			this.conflicts_tab_tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.conflicts_log_label = new System.Windows.Forms.Label();
@@ -117,12 +121,9 @@
 			this.export_load_button = new System.Windows.Forms.Button();
 			this.export_save_button = new System.Windows.Forms.Button();
 			this.tabImageList = new System.Windows.Forms.ImageList(this.components);
+			this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.fillPanel = new System.Windows.Forms.Panel();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
-			this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
-			this.modinfo_config_buttonsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-			this.modinfo_config_RemoveButton = new System.Windows.Forms.Button();
 			this.main_statusstrip.SuspendLayout();
 			this.main_menustrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -138,7 +139,6 @@
 			this.panel3.SuspendLayout();
 			this.modinfo_groupbox.SuspendLayout();
 			this.tableLayoutPanel3.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).BeginInit();
 			this.modinfo_tabcontrol.SuspendLayout();
 			this.modinfo_details_tab.SuspendLayout();
 			this.modinfo_readme_tab.SuspendLayout();
@@ -146,14 +146,15 @@
 			this.modinfo_config_tab.SuspendLayout();
 			this.modinfo_config_TableLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.modinfo_ConfigFCTB)).BeginInit();
+			this.modinfo_config_buttonsTableLayoutPanel.SuspendLayout();
 			this.modinfo_changelog_tab.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).BeginInit();
 			this.conflicts_tab.SuspendLayout();
 			this.conflicts_tab_tableLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.conflicts_datagrid)).BeginInit();
 			this.export_tab.SuspendLayout();
 			this.tableLayoutPanel2.SuspendLayout();
 			this.panel1.SuspendLayout();
-			this.modinfo_config_buttonsTableLayoutPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// main_statusstrip
@@ -383,6 +384,7 @@
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcDateAdded);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcDateCreated);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcPath);
+			this.modlist_ListObjectListView.AllColumns.Add(this.olvcHasBackup);
 			this.modlist_ListObjectListView.AllowColumnReorder = true;
 			this.modlist_ListObjectListView.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.DoubleClick;
 			this.modlist_ListObjectListView.CellEditUseWholeCell = false;
@@ -395,7 +397,7 @@
             this.olvcOrder,
             this.olvcSize,
             this.olvcLastUpdated,
-            this.olvcSavedIni});
+            this.olvcHasBackup});
 			this.tableLayoutPanel1.SetColumnSpan(this.modlist_ListObjectListView, 3);
 			this.modlist_ListObjectListView.Cursor = System.Windows.Forms.Cursors.Default;
 			this.modlist_ListObjectListView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -496,9 +498,10 @@
 			this.olvcPath.Text = "Path";
 			this.olvcPath.Width = 160;
 			// 
-			// olvcSavedIni
+			// olvcHasBackup
 			// 
-			this.olvcSavedIni.Text = "Saved INI";
+			this.olvcHasBackup.AspectName = "HasBackedUpSettings";
+			this.olvcHasBackup.Text = "Has Backups";
 			// 
 			// panel2
 			// 
@@ -560,6 +563,16 @@
 			this.modlist_filterClearButton.UseVisualStyleBackColor = true;
 			this.modlist_filterClearButton.Click += new System.EventHandler(this.modlist_filterClearButton_Click);
 			// 
+			// modlist_FilterCueTextBox
+			// 
+			this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+			this.modlist_FilterCueTextBox.CueText = "Filter Mods";
+			this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
+			this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
+			this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
+			this.modlist_FilterCueTextBox.TabIndex = 1;
+			this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
+			// 
 			// button1
 			// 
 			this.button1.Location = new System.Drawing.Point(318, 45);
@@ -597,19 +610,6 @@
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel3.Size = new System.Drawing.Size(970, 225);
 			this.tableLayoutPanel3.TabIndex = 10;
-			// 
-			// modinfo_image_picturebox
-			// 
-			this.modinfo_image_picturebox.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.modinfo_image_picturebox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-			this.modinfo_image_picturebox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-			this.modinfo_image_picturebox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.modinfo_image_picturebox.Location = new System.Drawing.Point(4, 16);
-			this.modinfo_image_picturebox.Name = "modinfo_image_picturebox";
-			this.modinfo_image_picturebox.Size = new System.Drawing.Size(192, 192);
-			this.modinfo_image_picturebox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.modinfo_image_picturebox.TabIndex = 8;
-			this.modinfo_image_picturebox.TabStop = false;
 			// 
 			// modinfo_tabcontrol
 			// 
@@ -731,14 +731,13 @@
 			this.modinfo_info_DescriptionRichTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.modinfo_info_DescriptionRichTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.modinfo_info_DescriptionRichTextBox.Location = new System.Drawing.Point(96, 58);
 			this.modinfo_info_DescriptionRichTextBox.Name = "modinfo_info_DescriptionRichTextBox";
-			this.modinfo_info_DescriptionRichTextBox.ReadOnly = true;
 			this.modinfo_info_DescriptionRichTextBox.Size = new System.Drawing.Size(661, 136);
 			this.modinfo_info_DescriptionRichTextBox.TabIndex = 8;
 			this.modinfo_info_DescriptionRichTextBox.Text = "";
 			this.modinfo_info_DescriptionRichTextBox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
+			this.modinfo_info_DescriptionRichTextBox.TextChanged += new System.EventHandler(this.modinfo_info_DescriptionRichTextBox_TextChanged);
 			// 
 			// modinfo_readme_tab
 			// 
@@ -818,30 +817,6 @@
 			this.modinfo_config_TableLayoutPanel.Size = new System.Drawing.Size(754, 191);
 			this.modinfo_config_TableLayoutPanel.TabIndex = 13;
 			// 
-			// modinfo_config_CompareButton
-			// 
-			this.modinfo_config_CompareButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.modinfo_config_CompareButton.Location = new System.Drawing.Point(323, 4);
-			this.modinfo_config_CompareButton.Name = "modinfo_config_CompareButton";
-			this.modinfo_config_CompareButton.Size = new System.Drawing.Size(74, 21);
-			this.modinfo_config_CompareButton.TabIndex = 14;
-			this.modinfo_config_CompareButton.Text = "Compare";
-			this.toolTip.SetToolTip(this.modinfo_config_CompareButton, "Compare the current file on disk to the stored backup");
-			this.modinfo_config_CompareButton.UseVisualStyleBackColor = true;
-			this.modinfo_config_CompareButton.Click += new System.EventHandler(this.modinfo_config_CompareButton_Click);
-			// 
-			// modinfo_config_LoadButton
-			// 
-			this.modinfo_config_LoadButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.modinfo_config_LoadButton.Enabled = false;
-			this.modinfo_config_LoadButton.Location = new System.Drawing.Point(163, 4);
-			this.modinfo_config_LoadButton.Name = "modinfo_config_LoadButton";
-			this.modinfo_config_LoadButton.Size = new System.Drawing.Size(74, 21);
-			this.modinfo_config_LoadButton.TabIndex = 10;
-			this.modinfo_config_LoadButton.Text = "Load";
-			this.modinfo_config_LoadButton.UseVisualStyleBackColor = true;
-			this.modinfo_config_LoadButton.Click += new System.EventHandler(this.modinfo_config_LoadButton_Click);
-			// 
 			// modinfo_ConfigFCTB
 			// 
 			this.modinfo_ConfigFCTB.AllowSeveralTextStyleDrawing = true;
@@ -880,16 +855,40 @@
 			this.modinfo_ConfigFCTB.Zoom = 100;
 			this.modinfo_ConfigFCTB.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.modinfo_ConfigFCTB_TextChanged);
 			// 
-			// modinfo_config_SaveButton
+			// modinfo_config_FileSelectCueComboBox
 			// 
-			this.modinfo_config_SaveButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.modinfo_config_SaveButton.Location = new System.Drawing.Point(83, 4);
-			this.modinfo_config_SaveButton.Name = "modinfo_config_SaveButton";
-			this.modinfo_config_SaveButton.Size = new System.Drawing.Size(74, 21);
-			this.modinfo_config_SaveButton.TabIndex = 3;
-			this.modinfo_config_SaveButton.Text = "Save";
-			this.modinfo_config_SaveButton.UseVisualStyleBackColor = true;
-			this.modinfo_config_SaveButton.Click += new System.EventHandler(this.modinfo_config_SaveButton_Click);
+			this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
+			this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
+			this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
+			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
+			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
+			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
+			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit.");
+			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
+			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
+			// 
+			// modinfo_config_buttonsTableLayoutPanel
+			// 
+			this.modinfo_config_buttonsTableLayoutPanel.ColumnCount = 5;
+			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_ExpandButton, 0, 0);
+			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_CompareButton, 4, 0);
+			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_SaveButton, 1, 0);
+			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_LoadButton, 2, 0);
+			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_RemoveButton, 3, 0);
+			this.modinfo_config_buttonsTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Right;
+			this.modinfo_config_buttonsTableLayoutPanel.Location = new System.Drawing.Point(353, 0);
+			this.modinfo_config_buttonsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+			this.modinfo_config_buttonsTableLayoutPanel.Name = "modinfo_config_buttonsTableLayoutPanel";
+			this.modinfo_config_buttonsTableLayoutPanel.RowCount = 1;
+			this.modinfo_config_buttonsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this.modinfo_config_buttonsTableLayoutPanel.Size = new System.Drawing.Size(401, 30);
+			this.modinfo_config_buttonsTableLayoutPanel.TabIndex = 13;
 			// 
 			// modinfo_config_ExpandButton
 			// 
@@ -901,6 +900,55 @@
 			this.modinfo_config_ExpandButton.Text = "Expand";
 			this.modinfo_config_ExpandButton.UseVisualStyleBackColor = true;
 			this.modinfo_config_ExpandButton.Click += new System.EventHandler(this.modinfo_config_ExpandButton_Click);
+			// 
+			// modinfo_config_CompareButton
+			// 
+			this.modinfo_config_CompareButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.modinfo_config_CompareButton.Enabled = false;
+			this.modinfo_config_CompareButton.Location = new System.Drawing.Point(323, 4);
+			this.modinfo_config_CompareButton.Name = "modinfo_config_CompareButton";
+			this.modinfo_config_CompareButton.Size = new System.Drawing.Size(74, 21);
+			this.modinfo_config_CompareButton.TabIndex = 14;
+			this.modinfo_config_CompareButton.Text = "Compare";
+			this.toolTip.SetToolTip(this.modinfo_config_CompareButton, "Compare the current file on disk to the stored backup");
+			this.modinfo_config_CompareButton.UseVisualStyleBackColor = true;
+			this.modinfo_config_CompareButton.Click += new System.EventHandler(this.modinfo_config_CompareButton_Click);
+			// 
+			// modinfo_config_SaveButton
+			// 
+			this.modinfo_config_SaveButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.modinfo_config_SaveButton.Location = new System.Drawing.Point(83, 4);
+			this.modinfo_config_SaveButton.Name = "modinfo_config_SaveButton";
+			this.modinfo_config_SaveButton.Size = new System.Drawing.Size(74, 21);
+			this.modinfo_config_SaveButton.TabIndex = 3;
+			this.modinfo_config_SaveButton.Text = "Save";
+			this.modinfo_config_SaveButton.UseVisualStyleBackColor = true;
+			this.modinfo_config_SaveButton.Click += new System.EventHandler(this.modinfo_config_SaveButton_Click);
+			// 
+			// modinfo_config_LoadButton
+			// 
+			this.modinfo_config_LoadButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.modinfo_config_LoadButton.Enabled = false;
+			this.modinfo_config_LoadButton.Location = new System.Drawing.Point(163, 4);
+			this.modinfo_config_LoadButton.Name = "modinfo_config_LoadButton";
+			this.modinfo_config_LoadButton.Size = new System.Drawing.Size(74, 21);
+			this.modinfo_config_LoadButton.TabIndex = 10;
+			this.modinfo_config_LoadButton.Text = "Load";
+			this.modinfo_config_LoadButton.UseVisualStyleBackColor = true;
+			this.modinfo_config_LoadButton.Click += new System.EventHandler(this.modinfo_config_LoadButton_Click);
+			// 
+			// modinfo_config_RemoveButton
+			// 
+			this.modinfo_config_RemoveButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.modinfo_config_RemoveButton.Enabled = false;
+			this.modinfo_config_RemoveButton.Location = new System.Drawing.Point(243, 4);
+			this.modinfo_config_RemoveButton.Name = "modinfo_config_RemoveButton";
+			this.modinfo_config_RemoveButton.Size = new System.Drawing.Size(74, 21);
+			this.modinfo_config_RemoveButton.TabIndex = 15;
+			this.modinfo_config_RemoveButton.Text = "Remove";
+			this.toolTip.SetToolTip(this.modinfo_config_RemoveButton, "Compare the current file on disk to the stored backup");
+			this.modinfo_config_RemoveButton.UseVisualStyleBackColor = true;
+			this.modinfo_config_RemoveButton.Click += new System.EventHandler(this.modinfo_config_RemoveButton_Click);
 			// 
 			// modinfo_changelog_tab
 			// 
@@ -924,6 +972,19 @@
 			this.modinfo_changelog_richtextbox.TabIndex = 0;
 			this.modinfo_changelog_richtextbox.Text = "";
 			this.modinfo_changelog_richtextbox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
+			// 
+			// modinfo_image_picturebox
+			// 
+			this.modinfo_image_picturebox.Anchor = System.Windows.Forms.AnchorStyles.None;
+			this.modinfo_image_picturebox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+			this.modinfo_image_picturebox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+			this.modinfo_image_picturebox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.modinfo_image_picturebox.Location = new System.Drawing.Point(4, 16);
+			this.modinfo_image_picturebox.Name = "modinfo_image_picturebox";
+			this.modinfo_image_picturebox.Size = new System.Drawing.Size(192, 192);
+			this.modinfo_image_picturebox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.modinfo_image_picturebox.TabIndex = 8;
+			this.modinfo_image_picturebox.TabStop = false;
 			// 
 			// conflicts_tab
 			// 
@@ -1118,6 +1179,11 @@
 			this.tabImageList.ImageSize = new System.Drawing.Size(16, 16);
 			this.tabImageList.TransparentColor = System.Drawing.Color.Transparent;
 			// 
+			// olvcSavedIni
+			// 
+			this.olvcSavedIni.DisplayIndex = 6;
+			this.olvcSavedIni.Text = "Saved INI";
+			// 
 			// fillPanel
 			// 
 			this.fillPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1128,64 +1194,6 @@
 			this.fillPanel.Size = new System.Drawing.Size(984, 710);
 			this.fillPanel.TabIndex = 6;
 			this.fillPanel.Visible = false;
-			// 
-			// modlist_FilterCueTextBox
-			// 
-			this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.modlist_FilterCueTextBox.CueText = "Filter Mods";
-			this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
-			this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
-			this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
-			this.modlist_FilterCueTextBox.TabIndex = 1;
-			this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
-			// 
-			// modinfo_config_FileSelectCueComboBox
-			// 
-			this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
-			this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
-			this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
-			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
-			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
-			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
-			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit.");
-			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
-			// 
-			// modinfo_config_buttonsTableLayoutPanel
-			// 
-			this.modinfo_config_buttonsTableLayoutPanel.ColumnCount = 5;
-			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			this.modinfo_config_buttonsTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_ExpandButton, 0, 0);
-			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_CompareButton, 4, 0);
-			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_SaveButton, 1, 0);
-			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_LoadButton, 2, 0);
-			this.modinfo_config_buttonsTableLayoutPanel.Controls.Add(this.modinfo_config_RemoveButton, 3, 0);
-			this.modinfo_config_buttonsTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.modinfo_config_buttonsTableLayoutPanel.Location = new System.Drawing.Point(353, 0);
-			this.modinfo_config_buttonsTableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
-			this.modinfo_config_buttonsTableLayoutPanel.Name = "modinfo_config_buttonsTableLayoutPanel";
-			this.modinfo_config_buttonsTableLayoutPanel.RowCount = 1;
-			this.modinfo_config_buttonsTableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.modinfo_config_buttonsTableLayoutPanel.Size = new System.Drawing.Size(401, 30);
-			this.modinfo_config_buttonsTableLayoutPanel.TabIndex = 13;
-			// 
-			// modinfo_config_RemoveButton
-			// 
-			this.modinfo_config_RemoveButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-			this.modinfo_config_RemoveButton.Enabled = false;
-			this.modinfo_config_RemoveButton.Location = new System.Drawing.Point(243, 4);
-			this.modinfo_config_RemoveButton.Name = "modinfo_config_RemoveButton";
-			this.modinfo_config_RemoveButton.Size = new System.Drawing.Size(74, 21);
-			this.modinfo_config_RemoveButton.TabIndex = 15;
-			this.modinfo_config_RemoveButton.Text = "Remove";
-			this.toolTip.SetToolTip(this.modinfo_config_RemoveButton, "Compare the current file on disk to the stored backup");
-			this.modinfo_config_RemoveButton.UseVisualStyleBackColor = true;
-			this.modinfo_config_RemoveButton.Click += new System.EventHandler(this.modinfo_config_RemoveButton_Click);
 			// 
 			// MainForm
 			// 
@@ -1222,7 +1230,6 @@
 			this.panel3.PerformLayout();
 			this.modinfo_groupbox.ResumeLayout(false);
 			this.tableLayoutPanel3.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).EndInit();
 			this.modinfo_tabcontrol.ResumeLayout(false);
 			this.modinfo_details_tab.ResumeLayout(false);
 			this.modinfo_details_tab.PerformLayout();
@@ -1231,7 +1238,9 @@
 			this.modinfo_config_tab.ResumeLayout(false);
 			this.modinfo_config_TableLayoutPanel.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.modinfo_ConfigFCTB)).EndInit();
+			this.modinfo_config_buttonsTableLayoutPanel.ResumeLayout(false);
 			this.modinfo_changelog_tab.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.modinfo_image_picturebox)).EndInit();
 			this.conflicts_tab.ResumeLayout(false);
 			this.conflicts_tab_tableLayoutPanel.ResumeLayout(false);
 			this.conflicts_tab_tableLayoutPanel.PerformLayout();
@@ -1240,7 +1249,6 @@
 			this.tableLayoutPanel2.ResumeLayout(false);
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();
-			this.modinfo_config_buttonsTableLayoutPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1341,6 +1349,7 @@
 		private BrightIdeasSoftware.OLVColumn olvcSavedIni;
 		private System.Windows.Forms.TableLayoutPanel modinfo_config_buttonsTableLayoutPanel;
 		private System.Windows.Forms.Button modinfo_config_RemoveButton;
+		private BrightIdeasSoftware.OLVColumn olvcHasBackup;
 	}
 }
 

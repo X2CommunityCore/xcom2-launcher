@@ -38,10 +38,10 @@
 			this.fctb1 = new FastColoredTextBoxNS.FastColoredTextBox();
 			this.fctb2 = new FastColoredTextBoxNS.FastColoredTextBox();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.label1 = new System.Windows.Forms.Label();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this.label2 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.fctb1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.fctb2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -94,7 +94,8 @@
 			// 
 			// btCompare
 			// 
-			this.btCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btCompare.Enabled = false;
 			this.btCompare.Location = new System.Drawing.Point(515, 410);
 			this.btCompare.Name = "btCompare";
 			this.btCompare.Size = new System.Drawing.Size(75, 23);
@@ -192,24 +193,6 @@
 			this.splitContainer1.SplitterDistance = 355;
 			this.splitContainer1.TabIndex = 28;
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(3, 0);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(90, 13);
-			this.label1.TabIndex = 29;
-			this.label1.Text = "Saved Config File";
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(3, 0);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(73, 13);
-			this.label2.TabIndex = 30;
-			this.label2.Text = "File From Disk";
-			// 
 			// tableLayoutPanel1
 			// 
 			this.tableLayoutPanel1.ColumnCount = 1;
@@ -225,6 +208,15 @@
 			this.tableLayoutPanel1.Size = new System.Drawing.Size(355, 392);
 			this.tableLayoutPanel1.TabIndex = 30;
 			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(3, 0);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(90, 13);
+			this.label1.TabIndex = 29;
+			this.label1.Text = "Saved Config File";
+			// 
 			// tableLayoutPanel2
 			// 
 			this.tableLayoutPanel2.ColumnCount = 1;
@@ -239,6 +231,15 @@
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel2.Size = new System.Drawing.Size(351, 392);
 			this.tableLayoutPanel2.TabIndex = 31;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(3, 0);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(73, 13);
+			this.label2.TabIndex = 30;
+			this.label2.Text = "File From Disk";
 			// 
 			// ConfigDiff
 			// 

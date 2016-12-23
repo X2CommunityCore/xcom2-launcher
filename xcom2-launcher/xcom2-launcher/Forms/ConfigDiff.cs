@@ -471,14 +471,18 @@ namespace XCOM2Launcher.Forms
 			public static Lines Load(string s)
 			{
 				Lines lines = new Lines();
-				using (StringReader reader = new StringReader(s))
+				try
 				{
-					string line;
-					while ((line = reader.ReadLine()) != null)
-						lines.Add(new Line(line));
+					using (StringReader reader = new StringReader(s))
+					{
+						string line;
+						while ((line = reader.ReadLine()) != null)
+							lines.Add(new Line(line));
+					}
 				}
-
+				catch (Exception e) {}
 				return lines;
+
 			}
 
 			/// <summary>

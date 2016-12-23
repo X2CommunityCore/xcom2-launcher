@@ -412,9 +412,14 @@ namespace XCOM2Launcher.Forms
 				return;
 	        }
 
-            CurrentMod = modlist_ListObjectListView.SelectedObject as ModEntry;
+			var selected = modlist_ListObjectListView.SelectedObject as ModEntry;
 
-            UpdateModInfo(CurrentMod);
+			if (CurrentMod == selected) return;
+
+		    CurrentMod = selected;
+
+
+			UpdateModInfo(CurrentMod);
             CheckAndUpdateChangeLog(modinfo_tabcontrol.SelectedTab, CurrentMod);
 
             if (CurrentMod != null)

@@ -32,6 +32,7 @@ namespace XCOM2Launcher.Mod
         public bool ManualName { get; set; } = false;
 
         public string Author { get; set; } = "Unknown";
+	    public string Description { get; set; } = "";
 
         public string Path { get; set; }
 
@@ -71,10 +72,11 @@ namespace XCOM2Launcher.Mod
 		#region Mod
 
 		public string GetDescription()
-        {
-            var info = new ModInfo(GetModInfoFile());
-
-            return info.Description;
+		{
+			if (!string.IsNullOrEmpty(Description))
+				return Description;
+			
+            return new ModInfo(GetModInfoFile()).Description;
         }
 
         public IEnumerable<ModClassOverride> GetOverrides(bool forceUpdate = false)
@@ -218,7 +220,7 @@ namespace XCOM2Launcher.Mod
 			int i = relativePath.IndexOf("Config", StringComparison.Ordinal);
 			relativePath = relativePath.Substring(i);
 
-			return relativePath;
+			return Uri.UnescapeDataString(relativePath);
 		}
 
 		/// <summary>
@@ -245,11 +247,16 @@ namespace XCOM2Launcher.Mod
 			    var setting = GetSetting(path);
 			    if (setting == null)
 			    {
-				    setting = new ModSettingsEntry(path, FilePath.GetFileNameWithoutExtension(path), contents);
+				    setting = new ModSettingsEntry(path, FilePath.GetFileName(path), contents);
 				    Settings.Add(setting);
 			    }
 			    else
 				    setting.Contents = contents;
+
+			    using (var stream = new StreamWriter(path) )
+			    {
+				    stream.Write(contents);
+			    }
 			    return true;
 		    }
 
@@ -269,7 +276,7 @@ namespace XCOM2Launcher.Mod
 		/// <summary>
 		/// Returns a setting given a fully qualified path to a file
 		/// </summary>
-		/// <param name="path"></param>
+		/// <param name="path">Path to the setting to retreive</param>
 		/// <returns></returns>
 	    public ModSettingsEntry GetSetting(string path)
 		{

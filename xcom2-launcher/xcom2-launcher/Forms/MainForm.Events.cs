@@ -471,6 +471,7 @@ namespace XCOM2Launcher.Forms
 			bool exists = CurrentMod.GetSetting(filePath) != null;
 			modinfo_config_LoadButton.Enabled = exists;
 			modinfo_config_RemoveButton.Enabled = exists;
+			modinfo_config_CompareButton.Enabled = exists;
 		}
 
 		private void modinfo_config_SaveButton_Click(object sender, EventArgs e)
@@ -489,6 +490,7 @@ namespace XCOM2Launcher.Forms
 				// For consistency enable the button
 				modinfo_config_LoadButton.Enabled = true;
 				modinfo_config_RemoveButton.Enabled = true;
+				modinfo_config_CompareButton.Enabled = true;
 			}
 		}
 
@@ -518,6 +520,7 @@ namespace XCOM2Launcher.Forms
 				// For consistency enable the button
 				modinfo_config_LoadButton.Enabled = false;
 				modinfo_config_RemoveButton.Enabled = false;
+				modinfo_config_CompareButton.Enabled = false;
 			}
 		}
 
@@ -580,13 +583,17 @@ namespace XCOM2Launcher.Forms
 
 		private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
 		{
-			string filename = modinfo_config_FileSelectCueComboBox.Text;
-			//if (!ModSettingExists(CurrentMod.ID, filename)) return;
-			//ConfigDiff.Instance.CompareStrings(Settings.ModSettings[CurrentMod.ID][filename], modinfo_ConfigFCTB.Text);
-			// todo
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+			ConfigDiff.Instance.CompareStrings(CurrentMod.GetSetting(filepath).Contents, modinfo_ConfigFCTB.Text);
 			ConfigDiff.Instance.Show();
 		}
 
+		private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
+		{
+			var contents = modinfo_info_DescriptionRichTextBox.Text;
+			if (!CurrentMod.Description.Equals(contents))
+				CurrentMod.Description = contents;
+		}
 
 		private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
 		{
