@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace XCOM2Launcher.XCOM
 {
-    public class ConfigFile : IniFile
+    public class DefaultConfigFile : IniFile
     {
-        public ConfigFile(string filename, bool load = true) : base($"{XCOM2.UserConfigDir}/XCom{filename}.ini", false)
+        public DefaultConfigFile(string filename, bool load = true) : base($"{XCOM2.UserConfigDir}/XCom{filename}.ini", false)
         {
             FileName = filename;
             DefaultFile = $"{XCOM2.DefaultConfigDir}/Default{FileName}.ini";
@@ -19,7 +19,7 @@ namespace XCOM2Launcher.XCOM
         public string FileName { get; }
 
         /// <summary>
-        ///     Default{FileName}.ini from which this one is build
+        /// Default{FileName}.ini from which this one is build
         /// </summary>
         public string DefaultFile { get; set; }
 

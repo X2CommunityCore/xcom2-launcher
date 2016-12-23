@@ -35,7 +35,14 @@ namespace XCOM2Launcher
 
         public bool CloseAfterLaunch { get; set; } = false;
 
+	    public bool AutoNumberIndexes { get; set; } = true;
+
         public ModList Mods { get; set; } = new ModList();
+
+		/// <summary>
+		/// Mod ID
+		/// </summary>
+		//public Dictionary<string, ModSettingsList> ModSettings { get; set; } = new Dictionary<string, ModSettingsList>();
 
         public Dictionary<string, WindowSettings> Windows { get; set; } = new Dictionary<string, WindowSettings>();
 

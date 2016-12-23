@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
+using FastColoredTextBoxNS;
 using Steamworks;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.PropertyGrid;
@@ -17,15 +21,15 @@ namespace XCOM2Launcher.Forms
 {
     partial class MainForm
     {
-        internal void RegisterEvents()
+		internal void RegisterEvents()
         {
             // Register Events
             // run button
-            run_game_button.Click += (a, b) => { RunGame(); };
+            runXCOM2ToolStripMenuItem.Click += (a, b) => { RunGame(); };
 
             // save on close
-            Shown += MainForm_Shown;
-            FormClosing += MainForm_FormClosing;
+            //Shown += MainForm_Shown;
+            //FormClosing += MainForm_FormClosing;
 
             // Menu
             // -> File
@@ -73,14 +77,14 @@ namespace XCOM2Launcher.Forms
             };
 
             // RichTextBox clickable links
-            modinfo_readme_richtextbox.LinkClicked += ControlLinkClicked;
-            modinfo_description_richtextbox.LinkClicked += ControlLinkClicked;
-            export_richtextbox.LinkClicked += ControlLinkClicked;
-            modinfo_changelog_richtextbox.LinkClicked += ControlLinkClicked;
+            //modinfo_readme_RichTextBox.LinkClicked += ControlLinkClicked;
+            //modinfo_info_DescriptionRichTextBox.LinkClicked += ControlLinkClicked;
+            //export_richtextbox.LinkClicked += ControlLinkClicked;
+            //modinfo_changelog_richtextbox.LinkClicked += ControlLinkClicked;
 
             // Tab Controls
-            main_tabcontrol.Selected += MainTabSelected;
-            modinfo_tabcontrol.Selected += ModInfoTabSelected;
+            //main_tabcontrol.Selected += MainTabSelected;
+            //modinfo_tabcontrol.Selected += ModInfoTabSelected;
 
             // Mod Updater
             _updateWorker.DoWork += Updater_DoWork;
@@ -158,7 +162,7 @@ namespace XCOM2Launcher.Forms
             _updateWorker.CancelAsync();
 
             // Save dimensions
-            Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_objectlistview.SaveState() };
+            Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_ListObjectListView.SaveState() };
 
             Save();
         }
@@ -259,29 +263,41 @@ namespace XCOM2Launcher.Forms
 
             // parse file
 
-            var regex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)$", RegexOptions.Compiled | RegexOptions.Multiline);
+			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
+            var modEntryRegex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)$", RegexOptions.Compiled | RegexOptions.Multiline);
 
             var mods = Mods.All.ToList();
             var activeMods = new List<ModEntry>();
             var missingMods = new List<Match>();
+	        var categoryName = "";
 
             foreach (var line in File.ReadAllLines(dialog.FileName))
             {
-                var match = regex.Match(line);
-                if (!match.Success)
+	            var categoryMatch = categoryRegex.Match(line);
+	            if (categoryMatch.Success)
+		            categoryName = categoryMatch.Groups["category"].Value;
+
+                var modMatch = modEntryRegex.Match(line);
+                if (!modMatch.Success)
                     continue;
 
-                var entries = mods.Where(mod => mod.ID == match.Groups["id"].Value).ToList();
+                var entries = mods.Where(mod => mod.ID == modMatch.Groups["id"].Value).ToList();
 
                 if (entries.Count == 0)
                 {
                     // Mod missing
                     // -> add to list
-                    missingMods.Add(match);
+                    missingMods.Add(modMatch);
                     continue;
                 }
 
                 activeMods.AddRange(entries);
+
+	            foreach (var modEntry in entries)
+	            {
+		            Mods.RemoveMod(modEntry);
+					Mods.AddMod(categoryName, modEntry);
+	            }
 
                 if (entries.Count > 1)
                 {
@@ -355,7 +371,7 @@ namespace XCOM2Launcher.Forms
             foreach (var mod in activeMods)
                 mod.isActive = true;
 
-            modlist_objectlistview.UpdateObjects(mods);
+            modlist_ListObjectListView.UpdateObjects(mods);
 
             UpdateExport();
             UpdateLabels();
@@ -379,7 +395,7 @@ namespace XCOM2Launcher.Forms
 
         private void ModInfoTabSelected(object sender, TabControlEventArgs e)
         {
-            CheckAndUpdateChangeLog(e.TabPage, modlist_objectlistview.SelectedObject as ModEntry);
+            CheckAndUpdateChangeLog(e.TabPage, modlist_ListObjectListView.SelectedObject as ModEntry);
         }
 
         private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
@@ -395,6 +411,212 @@ namespace XCOM2Launcher.Forms
         {
             Process.Start(e.LinkText);
         }
-        #endregion
-    }
+
+		private void filterMods_TextChanged(object sender, EventArgs e)
+		{
+			TextMatchFilter filter = null;
+			int matchKind = 0;
+			string txt = ((TextBox) sender).Text;
+			if (!String.IsNullOrEmpty(txt))
+			{
+				switch (matchKind)
+				{
+					case 0:
+					default:
+						filter = TextMatchFilter.Contains(modlist_ListObjectListView, txt);
+						break;
+					case 1:
+						filter = TextMatchFilter.Prefix(modlist_ListObjectListView, txt);
+						break;
+					case 2:
+						filter = TextMatchFilter.Regex(modlist_ListObjectListView, txt);
+						break;
+				}
+			}
+
+			// Text highlighting requires at least a default renderer
+			if (modlist_ListObjectListView.DefaultRenderer == null)
+				modlist_ListObjectListView.DefaultRenderer = new HighlightTextRenderer(filter);
+
+			modlist_ListObjectListView.AdditionalFilter = filter;
+
+		}
+
+		private void checkBox1_CheckedChanged(object sender, EventArgs e)
+		{
+			//var duplicates = Mods.All.GroupBy(m => m.Index).Where(g => g.Count() > 1).ToList();
+			//modlist_ListObjectListView.ModelFilter = new ModelFilter(delegate (object x)
+			//{
+			//	ModEntry mod = x as ModEntry;
+			//	return duplicates.Contains();
+			//});
+		}
+
+
+		private void modinfo_config_FileSelectCueComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (CurrentMod == null) return;
+
+			// Invalid selection, somehow
+			if (modinfo_config_FileSelectCueComboBox.SelectedIndex <= -1) return;
+
+			string filePath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+
+			using (var sr = new StreamReader(filePath))
+			{
+				modinfo_ConfigFCTB.Text = sr.ReadToEnd();
+			}
+
+			// Check if this file has values saved, and enable/disable load button
+			bool exists = CurrentMod.GetSetting(filePath) != null;
+			modinfo_config_LoadButton.Enabled = exists;
+			modinfo_config_RemoveButton.Enabled = exists;
+			modinfo_config_CompareButton.Enabled = exists;
+		}
+
+		private void modinfo_config_SaveButton_Click(object sender, EventArgs e)
+		{
+			// Get necessary data
+			if (CurrentMod == null) return;
+
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+			string contents = modinfo_ConfigFCTB.Text;
+
+			// If the data is invalid, just do nothing
+			if (string.IsNullOrEmpty(contents)) return;
+			
+			if (CurrentMod.AddSetting(filepath, contents))
+			{
+				// For consistency enable the button
+				modinfo_config_LoadButton.Enabled = true;
+				modinfo_config_RemoveButton.Enabled = true;
+				modinfo_config_CompareButton.Enabled = true;
+			}
+		}
+
+		private void modinfo_config_LoadButton_Click(object sender, EventArgs e)
+		{
+			// Get necessary data
+			if (CurrentMod == null) return;
+
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+
+			// If data is not valid
+			var setting = CurrentMod.GetSetting(filepath);
+			if (setting == null) return;
+
+			modinfo_ConfigFCTB.Text = setting.Contents;
+		}
+
+		private void modinfo_config_RemoveButton_Click(object sender, EventArgs e)
+		{
+			// Get necessary data
+			if (CurrentMod == null) return;
+
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+
+			if (CurrentMod.RemoveSetting(filepath))
+			{
+				// For consistency enable the button
+				modinfo_config_LoadButton.Enabled = false;
+				modinfo_config_RemoveButton.Enabled = false;
+				modinfo_config_CompareButton.Enabled = false;
+			}
+		}
+
+		private void modinfo_config_ExpandButton_Click(object sender, EventArgs e)
+		{
+			var layout = modinfo_config_TableLayoutPanel;
+			if (layout.Parent == modinfo_config_tab)
+			{
+				layout.Parent = fillPanel;
+				fillPanel.Visible = true;
+				fillPanel.BringToFront();
+				layout.Dock = DockStyle.Fill;
+				modinfo_config_ExpandButton.Text = "Collapse";
+				toolTip.SetToolTip(modinfo_config_ExpandButton, "Collapse the INI editor to normal size.");
+			}
+			else
+			{
+				layout.Parent = modinfo_config_tab;
+				layout.Dock = DockStyle.Fill;
+				layout.BringToFront();
+				fillPanel.Visible = false;
+				fillPanel.SendToBack();
+				modinfo_config_ExpandButton.Text = "Expand";
+				toolTip.SetToolTip(modinfo_config_ExpandButton, "Expand the INI editor to fill the window.");
+
+			}
+		}
+
+		private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			IniLanguage.Process(e);
+		}
+
+		private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
+		{
+			var senderComboBox = (ComboBox)sender;
+			int width = senderComboBox.DropDownWidth;
+			Graphics g = senderComboBox.CreateGraphics();
+			Font font = senderComboBox.Font;
+
+			int vertScrollBarWidth = (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
+					? SystemInformation.VerticalScrollBarWidth : 0;
+
+			var itemsList = senderComboBox.Items.Cast<object>().Select(item => item.ToString());
+
+			foreach (string s in itemsList)
+			{
+				int newWidth;
+				using (g = senderComboBox.CreateGraphics())
+				{
+					newWidth = (int)g.MeasureString(s, font).Width + vertScrollBarWidth;
+				}
+
+				if (width >= newWidth) continue;
+				width = newWidth;
+			}
+
+			senderComboBox.DropDownWidth = width;
+		}
+
+		private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
+		{
+			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
+			ConfigDiff.Instance.CompareStrings(CurrentMod.GetSetting(filepath).Contents, modinfo_ConfigFCTB.Text);
+			ConfigDiff.Instance.Show();
+		}
+
+		private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
+		{
+			var contents = modinfo_info_DescriptionRichTextBox.Text;
+			if (!CurrentMod.Description.Equals(contents))
+				CurrentMod.Description = contents;
+		}
+
+		private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
+		{
+			var numGroups = modlist_ListObjectListView.OLVGroups.Count;
+			var collapsedGroups = modlist_ListObjectListView.OLVGroups.Count(@group => @group.Collapsed);
+
+			if (collapsedGroups < (numGroups / 2))
+			{
+				foreach (var group in modlist_ListObjectListView.OLVGroups)
+					group.Collapsed = true;
+			}
+			else
+			{
+				foreach (var group in modlist_ListObjectListView.OLVGroups)
+					group.Collapsed = false;
+			}
+		}
+
+		private void modlist_filterClearButton_Click(object sender, EventArgs e)
+		{
+			modlist_FilterCueTextBox.Text = "";
+		}
+
+		#endregion
+	}
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
@@ -11,12 +12,12 @@ using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
 {
-    public partial class MainForm
+	public partial class MainForm
     {
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 
-        public MainForm(Settings settings)
+		public MainForm(Settings settings)
         {
             //
             InitializeComponent();
@@ -28,11 +29,6 @@ namespace XCOM2Launcher.Forms
             // Restore states 
             showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
 
-#if !DEBUG
-    // hide config tab
-            modinfo_config_tab.Parent.Controls.Remove(modinfo_config_tab);
-#endif
-
             // Init interface
             InitObjectListView();
             UpdateInterface();
@@ -41,8 +37,10 @@ namespace XCOM2Launcher.Forms
             //Other intialization
             InitializeTabImages();
 
-            // Check for Updates
-            CheckSteamForUpdates();
+//#if !DEBUG
+			// Check for Updates
+			CheckSteamForUpdates();
+//#endif
 
             // Check for running downloads
 #if DEBUG
@@ -58,7 +56,7 @@ namespace XCOM2Launcher.Forms
 #endif
         }
 
-        public Settings Settings { get; set; }
+		public Settings Settings { get; set; }
 
         private void InitializeTabImages()
         {
@@ -133,7 +131,7 @@ namespace XCOM2Launcher.Forms
             _updateWorker.RunWorkerAsync();
         }
 
-        #region Export
+#region Export
 
         private void UpdateExport()
         {
@@ -185,16 +183,16 @@ namespace XCOM2Launcher.Forms
             export_richtextbox.Text = str.ToString();
         }
 
-        #endregion
+#endregion
 
-        #region Basic
+#region Basic
 
         private void Reset()
         {
             _updateWorker.CancelAsync();
             // let's hope it cancels fast enough...
 
-            modlist_objectlistview.Clear();
+            modlist_ListObjectListView.Clear();
 
             Settings = Program.InitializeSettings();
 
@@ -221,9 +219,9 @@ namespace XCOM2Launcher.Forms
                 Close();
         }
 
-        #endregion
+#endregion
 
-        #region Interface updates
+#region Interface updates
 
         private void UpdateInterface()
         {
@@ -236,7 +234,7 @@ namespace XCOM2Launcher.Forms
             // RefreshModList();
 
             // ModEntry details
-            UpdateModInfo(modlist_objectlistview.SelectedObject as ModEntry);
+            UpdateModInfo(modlist_ListObjectListView.SelectedObject as ModEntry);
 
             UpdateLabels();
         }
@@ -277,7 +275,7 @@ namespace XCOM2Launcher.Forms
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
 
             // Update Interface
-            modlist_objectlistview.UpdateObjects(ModList.Objects.ToList());
+            modlist_ListObjectListView.UpdateObjects(ModList.Objects.ToList());
             UpdateLabels();
         }
 
@@ -363,7 +361,7 @@ namespace XCOM2Launcher.Forms
             if (m == null)
             {
                 // hide panel
-                horizontal_splitcontainer.Panel2Collapsed = true;
+                //horizontal_splitcontainer.Panel2Collapsed = true;
                 return;
             }
 
@@ -371,55 +369,39 @@ namespace XCOM2Launcher.Forms
             horizontal_splitcontainer.Panel2Collapsed = false;
 
             // Update data
-            modinfo_title_textbox.Text = m.Name;
-            modinfo_author_textbox.Text = m.Author;
-            modinfo_date_created_textbox.Text = m.DateCreated?.ToString() ?? "";
-            modinfo_date_added_textbox.Text = m.DateAdded?.ToString() ?? "";
-            modinfo_description_richtextbox.Text = m.GetDescription();
-            modinfo_readme_richtextbox.Text = m.GetReadMe();
+            modinfo_info_TitleTextBox.Text = m.Name;
+            modinfo_info_AuthorTextBox.Text = m.Author;
+            modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
+            modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
+            modinfo_info_DescriptionRichTextBox.Text = m.GetDescription();
+            modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
 
             modinfo_inspect_propertygrid.SelectedObject = m;
 
-            #region Config
+			#region Config
 
-            // config files
-            //string[] configFiles = m.getConfigFiles();
+			// config files
+			string[] configFiles = m.GetConfigFiles();
 
-            //// clear
-            //modinfo_config_propertygrid.SelectedObjects = new object[] { };
+			// clear
+			modinfo_config_FileSelectCueComboBox.Items.Clear();
+	        modinfo_ConfigFCTB.Text = "";
+	        modinfo_config_LoadButton.Enabled = false;
+			modinfo_config_RemoveButton.Enabled = false;
 
-            //if (configFiles.Length > 0)
-            //{
-            //    List<ConfigFile> configs = new List<ConfigFile>();
+			if (configFiles.Length > 0)
+			{
+				foreach (var configFile in configFiles)
+				{
+					if (configFile != null) modinfo_config_FileSelectCueComboBox.Items.Add(CurrentMod.GetPathRelative(configFile));
+				}
+			}
 
-            //    foreach (string configFile in configFiles)
-            //    {
+			#endregion
+		}
 
-            //        ConfigFile config = new ConfigFile
-            //        {
-            //            Name = Path.GetFileName(configFile)
-            //        };
 
-            //        var setting = new ConfigSetting
-            //        {
-            //            Name = "Unknown",
-            //            Category = "Unknown",
-            //            Value = 100,
-            //            DefaultValue = 10,
-            //            Desc = "123"
-            //        };
-
-            //        config.Settings.Add(setting);
-            //        configs.Add(config);
-            //    }
-
-            //    modinfo_config_propertygrid.SelectedObjects = configs.ToArray
-            //}
-
-            #endregion
-        }
-
-        #endregion
-    }
+		#endregion
+	}
 }
