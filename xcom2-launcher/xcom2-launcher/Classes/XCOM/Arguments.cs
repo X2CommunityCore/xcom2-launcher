@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XCOM2Launcher.PropertyGrid;
+﻿using System.ComponentModel;
 
 namespace XCOM2Launcher.XCOM
 {

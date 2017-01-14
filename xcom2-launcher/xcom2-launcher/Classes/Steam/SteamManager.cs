@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Collections;
-using Steamworks;
+﻿using Steamworks;
 using System.Diagnostics;
 using XCOM2Launcher.Classes.Steam;
 

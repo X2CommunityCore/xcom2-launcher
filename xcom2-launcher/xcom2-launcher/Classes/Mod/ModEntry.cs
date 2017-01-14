@@ -6,7 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Newtonsoft.Json;
+using XCOM2Launcher.Forms;
 using FilePath = System.IO.Path;
 
 namespace XCOM2Launcher.Mod
@@ -31,10 +33,32 @@ namespace XCOM2Launcher.Mod
         public bool ManualName { get; set; } = false;
 
         public string Author { get; set; } = "Unknown";
+	    public string Description { get; set; } = "";
 
-        public string Path { get; set; }
+	    public string Path
+	    {
+		    get
+			{
+				string path = "";
+				if (Source == ModSource.SteamWorkshop)
+				{
+					foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
+					{
+						if (modPath.Contains("workshop"))
+							path = modPath;
+					}
+					return FilePath.Combine(path, WorkshopID.ToString());
+				}
+				foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
+				{
+					if (modPath.Contains("XcomGame"))
+						path = modPath;
+				}
+				return FilePath.Combine(path, ID);
+			}
+	    }
 
-        /// <summary>
+	    /// <summary>
         ///     Size in bytes
         /// </summary>
         [DefaultValue(-1)]
@@ -54,6 +78,11 @@ namespace XCOM2Launcher.Mod
 
         public string Note { get; set; } = null;
 
+		[JsonIgnore]
+	    public bool HasBackedUpSettings => Settings.Count > 0;
+
+	    public List<ModSettingsEntry> Settings { get; set; } = new List<ModSettingsEntry>();
+
         [JsonIgnore]
         public string Image
         {
@@ -61,11 +90,15 @@ namespace XCOM2Launcher.Mod
             set { _image = value; }
         }
 
-        public string GetDescription()
-        {
-            var info = new ModInfo(GetModInfoFile());
 
-            return info.Description;
+		#region Mod
+
+		public string GetDescription()
+		{
+			if (!string.IsNullOrEmpty(Description))
+				return Description;
+			
+            return new ModInfo(GetModInfoFile()).Description;
         }
 
         public IEnumerable<ModClassOverride> GetOverrides(bool forceUpdate = false)
@@ -141,7 +174,8 @@ namespace XCOM2Launcher.Mod
 
         public void ShowOnSteam()
         {
-            Process.Start("explorer", "steam://url/CommunityFilePage/" + WorkshopID);
+			//Process.Start("explorer", "steam://url/CommunityFilePage/" + WorkshopID);
+			Process.Start(GetWorkshopLink());
         }
 
         public void ShowInExplorer()
@@ -164,11 +198,16 @@ namespace XCOM2Launcher.Mod
             return 0 == string.Compare(modPath.TrimEnd('/', '\\'), FilePath.GetDirectoryName(Path), StringComparison.OrdinalIgnoreCase);
         }
 
-        #region Files
+		#endregion Mod
 
-        public string[] GetConfigFiles()
+
+		#region Files
+
+		public string[] GetConfigFiles()
         {
-            return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini");
+			if (Directory.Exists(FilePath.Combine(Path,"Config")))
+				return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini", SearchOption.AllDirectories);
+	        return new string[0];
         }
 
         internal string GetModInfoFile()
@@ -188,6 +227,87 @@ namespace XCOM2Launcher.Mod
             }
         }
 
-        #endregion
-    }
+		/// <summary>
+		/// Returns a relative path to this mod's folder.
+		/// </summary>
+		/// <param name="relativeTo"></param>
+		/// <returns></returns>
+		public string GetPathRelative(string relativeTo)
+		{
+			Uri modPath = new Uri(relativeTo);
+			Uri filePath = new Uri(Path);
+			var relativePath = filePath.MakeRelativeUri(modPath).ToString();
+
+			// Trim off the mod ID number, it's not useful here
+			int i = relativePath.IndexOf("Config", StringComparison.Ordinal);
+			relativePath = relativePath.Substring(i);
+
+			return Uri.UnescapeDataString(relativePath);
+		}
+
+		/// <summary>
+		/// Returns the full path to the provided relative path.
+		/// </summary>
+		/// <param name="relativePath"></param>
+		/// <returns></returns>
+	    public string GetPathFull(string relativePath)
+	    {
+		    return FilePath.Combine(Path, relativePath);
+	    }
+
+		#endregion Files
+
+
+		#region Settings
+
+		public bool AddSetting(string path, string contents)
+	    {
+			if (Settings == null) Settings = new List<ModSettingsEntry>();
+			// Check if this belongs to this mod
+			var fullpath = GetPathFull(path);
+			if (!File.Exists(fullpath))
+			{
+				MessageBox.Show(@"Error!\nThe file " + path + @" does not belong to mod " + Name + @".\nNothing was saved.", @"Error", MessageBoxButtons.OK);
+				return false;
+			}
+
+			var setting = GetSetting(path);
+			if (setting == null)
+			{
+				setting = new ModSettingsEntry(path, FilePath.GetFileName(path), contents);
+				Settings.Add(setting);
+			}
+			else
+				setting.Contents = contents;
+
+			using (var stream = new StreamWriter(fullpath) )
+			{
+				stream.Write(contents);
+			}
+			return true;
+
+	    }
+
+	    public bool RemoveSetting(string path)
+	    {
+		    ModSettingsEntry toRemove = Settings.FirstOrDefault(setting => setting.FilePath.Equals(path));
+
+		    if (toRemove == null) return false;
+		    Settings.Remove(toRemove);
+		    return true;
+	    }
+
+		/// <summary>
+		/// Returns a setting given a fully qualified path to a file
+		/// </summary>
+		/// <param name="path">Path to the setting to retreive</param>
+		/// <returns></returns>
+	    public ModSettingsEntry GetSetting(string path)
+		{
+			if (Settings == null) Settings = new List<ModSettingsEntry>();
+			return Settings.FirstOrDefault(setting => setting.FilePath.Equals(path));
+		}
+
+		#endregion Settings
+	}
 }

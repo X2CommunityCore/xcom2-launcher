@@ -25,6 +25,10 @@ namespace XCOM2Launcher.XCOM
 
         public static string DefaultConfigDir => Path.Combine(GameDir, @"XComGame\Config");
 
+		/// <summary>
+		/// Tries to find the directory of the game and the mod folders, both workshop and default
+		/// </summary>
+		/// <returns></returns>
         public static string DetectGameDir()
         {
             // try steam
@@ -47,6 +51,11 @@ namespace XCOM2Launcher.XCOM
             return "";
         }
 
+		/// <summary>
+		/// Runs the game with the selected arguments
+		/// </summary>
+		/// <param name="gameDir"></param>
+		/// <param name="args"></param>
         public static void RunGame(string gameDir, string args)
         {
             if (!SteamAPIWrapper.Init())
@@ -80,7 +89,7 @@ namespace XCOM2Launcher.XCOM
         {
 
             return
-                new ConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs")?
+                new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs")?
                     .Select(
                         path => Path.IsPathRooted(path)
                             ? path
@@ -95,7 +104,7 @@ namespace XCOM2Launcher.XCOM
         {
             try
             {
-                return new ConfigFile("ModOptions").Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
+                return new DefaultConfigFile("ModOptions").Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
             }
             catch (IOException)
             {
@@ -106,7 +115,7 @@ namespace XCOM2Launcher.XCOM
         public static void SaveChanges(Settings settings)
         {
             // XComModOptions
-            var modOptions = new ConfigFile("ModOptions", false);
+            var modOptions = new DefaultConfigFile("ModOptions", false);
 
             foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
                 modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
@@ -114,7 +123,7 @@ namespace XCOM2Launcher.XCOM
             modOptions.Save();
 
             // XComEngine
-            var engine = new ConfigFile("Engine");
+            var engine = new DefaultConfigFile("Engine");
 
             // Remove old ModClassOverrides
             engine.Remove("Engine.Engine", "ModClassOverrides");
