@@ -1,5 +1,4 @@
 ﻿using Steamworks;
-using System.Collections.Generic;
 using System;
 
 namespace XCOM2Launcher.Steam

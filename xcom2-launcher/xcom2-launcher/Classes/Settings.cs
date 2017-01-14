@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Serialization;
@@ -11,7 +12,32 @@ namespace XCOM2Launcher
 {
     public class Settings
     {
-        private string _gamePath;
+		[JsonIgnore]
+	    private static Settings _instance;
+
+	    public static Settings Instance
+	    {
+		    get
+			{
+				if (_instance != null) return _instance;
+				try
+				{
+					_instance = Settings.FromFile("settings.json");
+				}
+				catch (FileNotFoundException e)
+				{
+					MessageBox.Show("Could not find file " + e.FileName);
+				}
+				catch (JsonSerializationException)
+				{
+					MessageBox.Show(@"settings.json could not be read.\r\nPlease delete or rename that file and try again.");
+					return null;
+				}
+				return _instance;
+		    }
+	    }
+
+	    private string _gamePath;
 
         public string GamePath
         {
@@ -31,6 +57,8 @@ namespace XCOM2Launcher
 
         public bool CheckForUpdates { get; set; } = true;
 
+	    public bool ShowUpgradeWarning { get; set; } = true;
+
         public bool ShowHiddenElements { get; set; } = false;
 
         public bool CloseAfterLaunch { get; set; } = false;
@@ -45,6 +73,13 @@ namespace XCOM2Launcher
 		//public Dictionary<string, ModSettingsList> ModSettings { get; set; } = new Dictionary<string, ModSettingsList>();
 
         public Dictionary<string, WindowSettings> Windows { get; set; } = new Dictionary<string, WindowSettings>();
+
+
+	    public Settings()
+	    {
+		    _instance = this;
+	    }
+
 
         internal void ImportMods()
         {

@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
@@ -13,7 +13,7 @@ using XCOM2Launcher.XCOM;
 namespace XCOM2Launcher.Forms
 {
 	public partial class MainForm
-    {
+	{
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 
@@ -37,10 +37,10 @@ namespace XCOM2Launcher.Forms
             //Other intialization
             InitializeTabImages();
 
-//#if !DEBUG
+#if !DEBUG
 			// Check for Updates
 			CheckSteamForUpdates();
-//#endif
+#endif
 
             // Check for running downloads
 #if DEBUG
@@ -103,7 +103,7 @@ namespace XCOM2Launcher.Forms
                     Name = details.m_rgchTitle,
                     DateCreated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeCreated).DateTime,
                     DateUpdated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeUpdated).DateTime,
-                    Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
+                    //Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
                     Image = link,
                     Source = ModSource.SteamWorkshop,
                     WorkshopID = (int) id,
@@ -142,14 +142,22 @@ namespace XCOM2Launcher.Forms
                 export_richtextbox.Text = "No active mods.";
                 return;
             }
+			
+			var showCategories = export_group_checkbox.Checked;
+			var showLink = export_workshop_link_checkbox.Checked;
+			var showAllMods = export_all_mods_checkbox.Checked;
 
-            var nameLength = Mods.Active.Max(m => m.Name.Length);
-            var idLength = Mods.Active.Max(m => m.ID.Length);
-            var showCategories = export_group_checkbox.Checked;
+			var nameLength = showAllMods ? Mods.All.Max(m => m.Name.Length) : Mods.Active.Max(m => m.Name.Length);
+			var idLength = showAllMods ? Mods.All.Max(m => m.ID.Length) : Mods.Active.Max(m => m.ID.Length);
+			
 
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
             {
-                var mods = entry.Value.Entries.Where(m => m.isActive).ToList();
+                List<ModEntry> mods;
+	   //         if (showAllMods)
+		  //          mods = entry.Value.Entries.ToList();
+				//else
+					mods = entry.Value.Entries.Where(m => m.isActive).ToList();
 
                 if (showCategories)
                     str.AppendLine($"{entry.Key} ({mods.Count()}):");
@@ -164,14 +172,18 @@ namespace XCOM2Launcher.Forms
                     str.Append(string.Format("{0,-" + idLength + "} ", mod.ID));
                     str.Append("\t");
 
+					// add workshop ID or link
                     if (mod.WorkshopID == -1)
                         str.Append("Unknown");
 
-                    else if (export_workshop_link_checkbox.Checked)
+                    else if (showLink)
                         str.Append(mod.GetWorkshopLink());
 
                     else
                         str.Append(mod.WorkshopID.ToString());
+	                //str.Append("\t");
+
+	                //str.Append(mod.isActive);
 
                     str.AppendLine();
                 }

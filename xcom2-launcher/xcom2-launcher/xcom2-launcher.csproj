@@ -132,6 +132,7 @@
     <Compile Include="Classes\GitHub\Release.cs" />
     <Compile Include="Classes\GitHub\User.cs" />
     <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
+    <Compile Include="Classes\Helper\MessageBoxManager.cs" />
     <Compile Include="Classes\Mod\ModChangelogCache.cs" />
     <Compile Include="Classes\Mod\ModConflict.cs" />
     <Compile Include="Classes\Mod\ModEntry.cs" />
@@ -139,7 +140,7 @@
     <Compile Include="Classes\Mod\ModInfo.cs" />
     <Compile Include="Classes\Mod\ModList.cs" />
     <Compile Include="Classes\Mod\ModClassOverride.cs" />
-    <Compile Include="Classes\Mod\ModSettingsList.cs" />
+    <Compile Include="Classes\Mod\ModSettingsEntry.cs" />
     <Compile Include="Classes\Mod\ModState.cs" />
     <Compile Include="Classes\Mod\ModSource.cs" />
     <Compile Include="Classes\PropertyGrid\DictionaryPropertyGridAdapter.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="UserElements\CueTextBox.Designer.cs">
       <DependentUpon>CueTextBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserElements\FlexibleMessageBox.cs" />
     <EmbeddedResource Include="Forms\CleanModsForm.resx">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -128,12 +128,17 @@ namespace XCOM2Launcher.Mod
             {
                 ID = modID,
                 Name = modinfo.Title ?? "Unnamed Mod",
-                Path = modDir,
+                //Path = modDir,
                 Source = source,
                 isActive = false,
                 DateAdded = DateTime.Now,
                 State = ModState.New
             };
+	        if (source == ModSource.SteamWorkshop)
+	        {
+		        var s = modDir.Split(Path.DirectorySeparatorChar).Last();
+				mod.WorkshopID = Convert.ToInt64(s);
+			}
 
             AddMod(modinfo.Category, mod);
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using JR.Utils.GUI.Forms;
 using Newtonsoft.Json;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
@@ -14,10 +15,10 @@ namespace XCOM2Launcher
 {
     internal static class Program
     {
-        /// <summary>
-        ///     Der Haupteinstiegspunkt für die Anwendung.
-        /// </summary>
-        [STAThread]
+		/// <summary>
+		/// The main entry point for the application.
+		/// </summary>
+		[STAThread]
         private static void Main()
         {
 #if !DEBUG
@@ -37,7 +38,6 @@ namespace XCOM2Launcher
             }
             // SteamWorkshop.StartCallbackService();
 
-
             // Load settings
             var settings = InitializeSettings();
             if (settings == null)
@@ -52,7 +52,7 @@ namespace XCOM2Launcher
                     using (var client = new System.Net.WebClient())
                     {
                         client.Headers.Add("User-Agent: Other");
-                        var json = client.DownloadString("https://api.github.com/repos/aEnigmatic/xcom2-launcher/releases/latest");
+                        var json = client.DownloadString("https://api.github.com/repos/Gribbleshnibit8/xcom2-launcher/releases/latest");
                         var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
                         var currentVersion = GetCurrentVersion();
 
@@ -110,27 +110,28 @@ namespace XCOM2Launcher
         {
             var firstRun = !File.Exists("settings.json");
 
-            Settings settings;
-            if (firstRun)
-                settings = new Settings();
+	        var settings = firstRun ? new Settings() : Settings.Instance;
 
-            else
-                try
-                {
-                    settings = Settings.FromFile("settings.json");
-                }
-                catch (JsonSerializationException)
-                {
-                    MessageBox.Show("settings.json could not be read.\r\nPlease delete or rename that file and try again.");
-                    return null;
-                }
+	        if (settings.ShowUpgradeWarning && !firstRun)
+	        {
+		        MessageBoxManager.Cancel = "Exit";
+		        MessageBoxManager.OK = "Continue";
+				MessageBoxManager.Register();
+				var choice = MessageBox.Show(
+					"WARNING!!\n\nThis launcher is NOT COMPATIBLE with the old 'settings.json' file.\nStop NOW and launch the old version to export a profile of your mods WITH GROUPS!\nOnce that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\nAfter loading, import the profile you saved to recover groups.\n\nIf you are not ready to do this, click 'Exit' to leave with no changes.",
+					"WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button2);
+				if (choice == DialogResult.Cancel) Environment.Exit(0);
+				MessageBoxManager.Unregister();
+			}
+			settings.ShowUpgradeWarning = false;
 
-            // Verify Game Path
-            if (!Directory.Exists(settings.GamePath))
+
+			// Verify Game Path
+			if (!Directory.Exists(settings.GamePath))
                 settings.GamePath = XCOM2.DetectGameDir();
 
             if (settings.GamePath == "")
-                MessageBox.Show("Could not find XCOM 2 installation path. Please fill it manually in the settings.");
+                MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.");
 
             // Verify Mod Paths
             var oldPaths = settings.ModPaths.Where(modPath => !Directory.Exists(modPath)).ToList();
@@ -143,7 +144,7 @@ namespace XCOM2Launcher
 
 
             if (settings.ModPaths.Count == 0)
-                MessageBox.Show("Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
+                MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
 
             if (settings.Mods.Entries.Count > 0)
             {
@@ -153,17 +154,23 @@ namespace XCOM2Launcher
                     cat.Index = ++index;
 
                 // Verify Mods 
-                foreach (var mod in settings.Mods.All.Where(mod => !settings.ModPaths.Any(mod.IsInModPath)))
-                    mod.State |= ModState.NotLoaded;
+	            foreach (var mod in settings.Mods.All)
+	            {
+		            if (!settings.ModPaths.Any(mod.IsInModPath))
+						mod.State |= ModState.NotLoaded;
+					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
+						mod.State |= ModState.NotInstalled;
+	            }
 
-                var brokenMods = settings.Mods.All.Where(m => !Directory.Exists(m.Path) || !File.Exists(m.GetModInfoFile())).ToList();
+	            var brokenMods = settings.Mods.All.Where(m => m.State == ModState.NotLoaded || m.State == ModState.NotInstalled).ToList();
                 if (brokenMods.Count > 0)
                 {
-                    MessageBox.Show($"{brokenMods.Count} mods no longer exists and have been removed:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
+					FlexibleMessageBox.Show($"{brokenMods.Count} mods no longer exists and have been hidden:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
 
-                    foreach (var m in brokenMods)
-                        settings.Mods.RemoveMod(m);
-                }
+	                foreach (var m in brokenMods)
+		                m.isHidden = true;
+						//settings.Mods.RemoveMod(m);
+				}
             }
 
             // import mods

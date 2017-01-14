@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-
-namespace XCOM2Launcher.Mod
+﻿namespace XCOM2Launcher.Mod
 {
 	public class ModSettingsEntry
 	{

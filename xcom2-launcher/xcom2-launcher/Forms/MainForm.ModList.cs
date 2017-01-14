@@ -60,6 +60,9 @@ namespace XCOM2Launcher.Forms
 				if (mod.State.HasFlag(ModState.NotLoaded))
 					return "Not Loaded";
 
+				if (mod.State.HasFlag(ModState.NotInstalled))
+					return "Not Installed";
+
 				if (mod.State.HasFlag(ModState.ModConflict))
 					return "Conflict";
 
@@ -90,11 +93,15 @@ namespace XCOM2Launcher.Forms
                 new[] {1024, 1024*1024, (long) 50*1024*1024, (long) 100*1024*1024},
                 new[] {"< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB"}
                 );
+			columns.Single(c => c.AspectName == "isHidden").MakeGroupies(
+				new [] {false, true},
+				new [] { "wut?", "Not Hidden", "Hidden"});
 
-			// Sort by Order column removes groups
+			// Sort by Order or WorkshopID column removes groups
 			modlist_ListObjectListView.BeforeSorting += (sender, args) =>
 			{
-				modlist_ListObjectListView.ShowGroups = !args.ColumnToSort.Equals(olvcOrder);
+				modlist_ListObjectListView.ShowGroups = 
+				!(args.ColumnToSort.Equals(olvcOrder) || args.ColumnToSort.Equals(olvcWorkshopID));
 			};
 
             // Init DateTime columns

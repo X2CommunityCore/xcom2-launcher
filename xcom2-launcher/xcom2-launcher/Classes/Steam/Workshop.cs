@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 

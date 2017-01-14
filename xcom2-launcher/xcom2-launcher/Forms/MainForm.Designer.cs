@@ -66,6 +66,8 @@
 			this.olvcDateCreated = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcPath = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcHasBackup = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+			this.olvcWorkshopID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+			this.olvcHidden = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
@@ -116,6 +118,7 @@
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.export_richtextbox = new System.Windows.Forms.RichTextBox();
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.export_all_mods_checkbox = new System.Windows.Forms.CheckBox();
 			this.export_workshop_link_checkbox = new System.Windows.Forms.CheckBox();
 			this.export_group_checkbox = new System.Windows.Forms.CheckBox();
 			this.export_load_button = new System.Windows.Forms.Button();
@@ -385,6 +388,8 @@
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcDateCreated);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcPath);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcHasBackup);
+			this.modlist_ListObjectListView.AllColumns.Add(this.olvcWorkshopID);
+			this.modlist_ListObjectListView.AllColumns.Add(this.olvcHidden);
 			this.modlist_ListObjectListView.AllowColumnReorder = true;
 			this.modlist_ListObjectListView.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.DoubleClick;
 			this.modlist_ListObjectListView.CellEditUseWholeCell = false;
@@ -397,7 +402,8 @@
             this.olvcOrder,
             this.olvcSize,
             this.olvcLastUpdated,
-            this.olvcHasBackup});
+            this.olvcHasBackup,
+            this.olvcHidden});
 			this.tableLayoutPanel1.SetColumnSpan(this.modlist_ListObjectListView, 3);
 			this.modlist_ListObjectListView.Cursor = System.Windows.Forms.Cursors.Default;
 			this.modlist_ListObjectListView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -502,6 +508,18 @@
 			// 
 			this.olvcHasBackup.AspectName = "HasBackedUpSettings";
 			this.olvcHasBackup.Text = "Has Backups";
+			// 
+			// olvcWorkshopID
+			// 
+			this.olvcWorkshopID.AspectName = "WorkshopID";
+			this.olvcWorkshopID.IsEditable = false;
+			this.olvcWorkshopID.IsVisible = false;
+			this.olvcWorkshopID.Text = "Workshop ID";
+			// 
+			// olvcHidden
+			// 
+			this.olvcHidden.AspectName = "isHidden";
+			this.olvcHidden.Text = "Hidden";
 			// 
 			// panel2
 			// 
@@ -1071,6 +1089,7 @@
 			this.conflicts_textbox.Location = new System.Drawing.Point(3, 23);
 			this.conflicts_textbox.Multiline = true;
 			this.conflicts_textbox.Name = "conflicts_textbox";
+			this.conflicts_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.conflicts_textbox.Size = new System.Drawing.Size(294, 651);
 			this.conflicts_textbox.TabIndex = 7;
 			// 
@@ -1124,12 +1143,25 @@
 			// 
 			// panel1
 			// 
+			this.panel1.Controls.Add(this.export_all_mods_checkbox);
 			this.panel1.Controls.Add(this.export_workshop_link_checkbox);
 			this.panel1.Controls.Add(this.export_group_checkbox);
 			this.panel1.Location = new System.Drawing.Point(3, 3);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(258, 29);
+			this.panel1.Size = new System.Drawing.Size(513, 29);
 			this.panel1.TabIndex = 5;
+			// 
+			// export_all_mods_checkbox
+			// 
+			this.export_all_mods_checkbox.AutoSize = true;
+			this.export_all_mods_checkbox.Location = new System.Drawing.Point(262, 6);
+			this.export_all_mods_checkbox.Name = "export_all_mods_checkbox";
+			this.export_all_mods_checkbox.Size = new System.Drawing.Size(104, 17);
+			this.export_all_mods_checkbox.TabIndex = 3;
+			this.export_all_mods_checkbox.Text = "Include All Mods";
+			this.export_all_mods_checkbox.UseVisualStyleBackColor = true;
+			this.export_all_mods_checkbox.Visible = false;
+			this.export_all_mods_checkbox.CheckedChanged += new System.EventHandler(this.ExportCheckboxCheckedChanged);
 			// 
 			// export_workshop_link_checkbox
 			// 
@@ -1350,6 +1382,9 @@
 		private System.Windows.Forms.TableLayoutPanel modinfo_config_buttonsTableLayoutPanel;
 		private System.Windows.Forms.Button modinfo_config_RemoveButton;
 		private BrightIdeasSoftware.OLVColumn olvcHasBackup;
+		private System.Windows.Forms.CheckBox export_all_mods_checkbox;
+		private BrightIdeasSoftware.OLVColumn olvcWorkshopID;
+		private BrightIdeasSoftware.OLVColumn olvcHidden;
 	}
 }
 

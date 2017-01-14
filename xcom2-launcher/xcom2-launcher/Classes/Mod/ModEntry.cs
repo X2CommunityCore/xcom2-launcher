@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using XCOM2Launcher.Forms;
 using FilePath = System.IO.Path;
 
 namespace XCOM2Launcher.Mod
@@ -34,9 +35,30 @@ namespace XCOM2Launcher.Mod
         public string Author { get; set; } = "Unknown";
 	    public string Description { get; set; } = "";
 
-        public string Path { get; set; }
+	    public string Path
+	    {
+		    get
+			{
+				string path = "";
+				if (Source == ModSource.SteamWorkshop)
+				{
+					foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
+					{
+						if (modPath.Contains("workshop"))
+							path = modPath;
+					}
+					return FilePath.Combine(path, WorkshopID.ToString());
+				}
+				foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
+				{
+					if (modPath.Contains("XcomGame"))
+						path = modPath;
+				}
+				return FilePath.Combine(path, ID);
+			}
+	    }
 
-        /// <summary>
+	    /// <summary>
         ///     Size in bytes
         /// </summary>
         [DefaultValue(-1)]
@@ -242,26 +264,28 @@ namespace XCOM2Launcher.Mod
 	    {
 			if (Settings == null) Settings = new List<ModSettingsEntry>();
 			// Check if this belongs to this mod
-		    if (path.Contains(WorkshopID.ToString()))
-		    {
-			    var setting = GetSetting(path);
-			    if (setting == null)
-			    {
-				    setting = new ModSettingsEntry(path, FilePath.GetFileName(path), contents);
-				    Settings.Add(setting);
-			    }
-			    else
-				    setting.Contents = contents;
+			var fullpath = GetPathFull(path);
+			if (!File.Exists(fullpath))
+			{
+				MessageBox.Show(@"Error!\nThe file " + path + @" does not belong to mod " + Name + @".\nNothing was saved.", @"Error", MessageBoxButtons.OK);
+				return false;
+			}
 
-			    using (var stream = new StreamWriter(path) )
-			    {
-				    stream.Write(contents);
-			    }
-			    return true;
-		    }
+			var setting = GetSetting(path);
+			if (setting == null)
+			{
+				setting = new ModSettingsEntry(path, FilePath.GetFileName(path), contents);
+				Settings.Add(setting);
+			}
+			else
+				setting.Contents = contents;
 
-			MessageBox.Show("Error!\nThe file " + path + " does not belong to mod " + Name + ".\nNothing was saved.", "Error", MessageBoxButtons.OK);
-			return false;
+			using (var stream = new StreamWriter(fullpath) )
+			{
+				stream.Write(contents);
+			}
+			return true;
+
 	    }
 
 	    public bool RemoveSetting(string path)
