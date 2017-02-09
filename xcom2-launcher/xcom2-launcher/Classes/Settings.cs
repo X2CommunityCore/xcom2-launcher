@@ -53,7 +53,7 @@ namespace XCOM2Launcher
 
         public List<string> ModPaths { get; set; } = new List<string>();
 
-        public string Arguments { get; set; } = "-Review -NoRedscreens";
+        public string Arguments { get; set; } = "-review -noRedscreens";
 
         public bool CheckForUpdates { get; set; } = true;
 

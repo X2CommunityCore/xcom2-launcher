@@ -174,9 +174,13 @@ namespace XCOM2Launcher.Mod
 
         public void ShowOnSteam()
         {
-			//Process.Start("explorer", "steam://url/CommunityFilePage/" + WorkshopID);
-			Process.Start(GetWorkshopLink());
+			Process.Start("explorer", "steam://url/CommunityFilePage/" + WorkshopID);
         }
+
+	    public void ShowInBrowser()
+		{
+			Process.Start(GetWorkshopLink());
+		}
 
         public void ShowInExplorer()
         {
