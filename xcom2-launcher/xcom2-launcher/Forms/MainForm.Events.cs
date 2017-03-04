@@ -593,9 +593,17 @@ namespace XCOM2Launcher.Forms
 
 		private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
 		{
-			string filepath = CurrentMod.GetPathFull(modinfo_config_FileSelectCueComboBox.Text);
-			ConfigDiff.Instance.CompareStrings(CurrentMod.GetSetting(filepath).Contents, modinfo_ConfigFCTB.Text);
-			ConfigDiff.Instance.Show();
+			string filepath = modinfo_config_FileSelectCueComboBox.Text;
+			try
+			{
+				ConfigDiff.Instance.CompareStrings(CurrentMod.GetSetting(filepath).Contents, modinfo_ConfigFCTB.Text);
+				ConfigDiff.Instance.Show();
+			}
+			catch (Exception configerror)
+			{
+				FlexibleMessageBox.Show("An exception occured. See error.log for additional details.");
+				File.WriteAllText("error.log", configerror.Message + "\r\nStack:\r\n" + configerror.StackTrace);
+			}
 		}
 
 		private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
@@ -627,6 +635,6 @@ namespace XCOM2Launcher.Forms
 			modlist_FilterCueTextBox.Text = "";
 		}
 
-		#endregion
+#endregion
 	}
 }
