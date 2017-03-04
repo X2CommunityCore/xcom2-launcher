@@ -49,7 +49,7 @@ namespace XCOM2Launcher.Forms
                 if (_updateWorker.IsBusy)
                     return;
 
-                _updateWorker.RunWorkerAsync();
+                CheckSteamForUpdates();
             };
             // -> Settings
             // show hidden
