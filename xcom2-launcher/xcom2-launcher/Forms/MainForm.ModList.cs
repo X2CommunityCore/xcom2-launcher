@@ -278,6 +278,7 @@ namespace XCOM2Launcher.Forms
                 }
 
                 RefreshModList();
+                UpdateLabels();
             }
         }
 
