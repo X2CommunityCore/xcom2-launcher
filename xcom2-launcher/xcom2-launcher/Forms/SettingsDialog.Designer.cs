@@ -48,12 +48,12 @@
 			this.label6 = new System.Windows.Forms.Label();
 			this.closeAfterLaunchCheckBox = new System.Windows.Forms.CheckBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.categoriesListBox = new System.Windows.Forms.ListBox();
 			this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
 			this.moveCategoryUpButton = new System.Windows.Forms.Button();
 			this.moveCategoryDownButton = new System.Windows.Forms.Button();
 			this.renameCategoryButton = new System.Windows.Forms.Button();
 			this.removeCategoryButton = new System.Windows.Forms.Button();
-			this.categoriesListBox = new System.Windows.Forms.ListBox();
 			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.groupBox1.SuspendLayout();
@@ -163,6 +163,7 @@
 			this.addModPathButton.TabIndex = 6;
 			this.addModPathButton.Text = "Add";
 			this.addModPathButton.UseVisualStyleBackColor = true;
+			this.addModPathButton.Click += new System.EventHandler(this.AddModPathButtonOnClick);
 			// 
 			// removeModPathButton
 			// 
@@ -172,6 +173,7 @@
 			this.removeModPathButton.TabIndex = 8;
 			this.removeModPathButton.Text = "Remove";
 			this.removeModPathButton.UseVisualStyleBackColor = true;
+			this.removeModPathButton.Click += new System.EventHandler(this.RemoveModPathButtonOnClick);
 			// 
 			// browseGamePathButton
 			// 
@@ -181,6 +183,7 @@
 			this.browseGamePathButton.TabIndex = 14;
 			this.browseGamePathButton.Text = "Browse";
 			this.browseGamePathButton.UseVisualStyleBackColor = true;
+			this.browseGamePathButton.Click += new System.EventHandler(this.BrowseGamePathButtonOnClick);
 			// 
 			// argumentsTextBox
 			// 
@@ -189,15 +192,7 @@
 			this.argumentsTextBox.Name = "argumentsTextBox";
 			this.argumentsTextBox.Size = new System.Drawing.Size(470, 20);
 			this.argumentsTextBox.TabIndex = 15;
-			this.argumentsTextBox.Values = new string[] {
-        "-Review",
-        "-NoRedScreens",
-        "-Log",
-        "-CrashDumpWatcher",
-        "-NoStartupMovies",
-        "-Language=",
-        "-AllowConsole",
-        "-AutoDebug"};
+			this.argumentsTextBox.Values = new string[0];
 			// 
 			// groupBox2
 			// 
@@ -288,6 +283,18 @@
 			this.label5.TabIndex = 0;
 			this.label5.Text = "Categories";
 			// 
+			// categoriesListBox
+			// 
+			this.categoriesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanel3.SetColumnSpan(this.categoriesListBox, 2);
+			this.categoriesListBox.FormattingEnabled = true;
+			this.categoriesListBox.Location = new System.Drawing.Point(103, 69);
+			this.categoriesListBox.Name = "categoriesListBox";
+			this.categoriesListBox.Size = new System.Drawing.Size(470, 173);
+			this.categoriesListBox.TabIndex = 11;
+			// 
 			// flowLayoutPanel2
 			// 
 			this.flowLayoutPanel2.Controls.Add(this.moveCategoryUpButton);
@@ -309,6 +316,7 @@
 			this.moveCategoryUpButton.TabIndex = 10;
 			this.moveCategoryUpButton.Text = "Up";
 			this.moveCategoryUpButton.UseVisualStyleBackColor = true;
+			this.moveCategoryUpButton.Click += new System.EventHandler(this.MoveCategoryUpButtonOnClick);
 			// 
 			// moveCategoryDownButton
 			// 
@@ -318,6 +326,7 @@
 			this.moveCategoryDownButton.TabIndex = 11;
 			this.moveCategoryDownButton.Text = "Down";
 			this.moveCategoryDownButton.UseVisualStyleBackColor = true;
+			this.moveCategoryDownButton.Click += new System.EventHandler(this.MoveCategoryDownButtonOnClick);
 			// 
 			// renameCategoryButton
 			// 
@@ -327,6 +336,7 @@
 			this.renameCategoryButton.TabIndex = 12;
 			this.renameCategoryButton.Text = "Rename";
 			this.renameCategoryButton.UseVisualStyleBackColor = true;
+			this.renameCategoryButton.Click += new System.EventHandler(this.RenameCategoryButtonOnClick);
 			// 
 			// removeCategoryButton
 			// 
@@ -336,18 +346,7 @@
 			this.removeCategoryButton.TabIndex = 13;
 			this.removeCategoryButton.Text = "Remove";
 			this.removeCategoryButton.UseVisualStyleBackColor = true;
-			// 
-			// categoriesListBox
-			// 
-			this.categoriesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tableLayoutPanel3.SetColumnSpan(this.categoriesListBox, 2);
-			this.categoriesListBox.FormattingEnabled = true;
-			this.categoriesListBox.Location = new System.Drawing.Point(103, 69);
-			this.categoriesListBox.Name = "categoriesListBox";
-			this.categoriesListBox.Size = new System.Drawing.Size(470, 173);
-			this.categoriesListBox.TabIndex = 11;
+			this.removeCategoryButton.Click += new System.EventHandler(this.RemoveCategoryButtonOnClick);
 			// 
 			// autoNumberModIndexesCheckBox
 			// 
@@ -372,6 +371,8 @@
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Settings";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsDialog_FormClosing);
+			this.Shown += new System.EventHandler(this.SettingsDialog_Shown);
 			this.groupBox1.ResumeLayout(false);
 			this.tableLayoutPanel2.ResumeLayout(false);
 			this.tableLayoutPanel2.PerformLayout();

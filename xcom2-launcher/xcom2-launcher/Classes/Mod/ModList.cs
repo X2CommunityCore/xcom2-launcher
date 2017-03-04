@@ -137,7 +137,16 @@ namespace XCOM2Launcher.Mod
 	        if (source == ModSource.SteamWorkshop)
 	        {
 		        var s = modDir.Split(Path.DirectorySeparatorChar).Last();
-				mod.WorkshopID = Convert.ToInt64(s);
+		        try
+				{
+					mod.WorkshopID = Convert.ToInt64(s);
+				}
+		        catch (Exception)
+		        {
+			        MessageBox.Show(
+				        $"A mod could not be loaded because the workshop ID failed to parse.\r\nPlease check that the following directory conforms to valid workshop numbering.\r\n\r\nPath: {modDir}");
+			        return null;
+		        }
 			}
 
             AddMod(modinfo.Category, mod);

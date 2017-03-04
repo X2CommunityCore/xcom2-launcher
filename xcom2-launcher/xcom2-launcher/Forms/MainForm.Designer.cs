@@ -68,6 +68,8 @@
 			this.olvcHasBackup = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcWorkshopID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcHidden = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+			this.olvSteamLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+			this.olvBrowserLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
@@ -390,6 +392,8 @@
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcHasBackup);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcWorkshopID);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcHidden);
+			this.modlist_ListObjectListView.AllColumns.Add(this.olvSteamLink);
+			this.modlist_ListObjectListView.AllColumns.Add(this.olvBrowserLink);
 			this.modlist_ListObjectListView.AllowColumnReorder = true;
 			this.modlist_ListObjectListView.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.DoubleClick;
 			this.modlist_ListObjectListView.CellEditUseWholeCell = false;
@@ -418,6 +422,7 @@
 			this.modlist_ListObjectListView.TintSortColumn = true;
 			this.modlist_ListObjectListView.UseCompatibleStateImageBehavior = false;
 			this.modlist_ListObjectListView.UseFiltering = true;
+			this.modlist_ListObjectListView.UseHyperlinks = true;
 			this.modlist_ListObjectListView.View = System.Windows.Forms.View.Details;
 			this.modlist_ListObjectListView.CellEditFinished += new BrightIdeasSoftware.CellEditEventHandler(this.ModListEditFinished);
 			this.modlist_ListObjectListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ModListCellRightClick);
@@ -469,7 +474,7 @@
 			// 
 			// olvcLastUpdated
 			// 
-			this.olvcLastUpdated.AspectName = "LastUpdated";
+			this.olvcLastUpdated.AspectName = "DateUpdated";
 			this.olvcLastUpdated.IsEditable = false;
 			this.olvcLastUpdated.Searchable = false;
 			this.olvcLastUpdated.Text = "Last Update";
@@ -520,6 +525,26 @@
 			// 
 			this.olvcHidden.AspectName = "isHidden";
 			this.olvcHidden.Text = "Hidden";
+			// 
+			// olvSteamLink
+			// 
+			this.olvSteamLink.AspectName = "GetSteamLink";
+			this.olvSteamLink.DisplayIndex = 8;
+			this.olvSteamLink.Hyperlink = true;
+			this.olvSteamLink.IsEditable = false;
+			this.olvSteamLink.IsVisible = false;
+			this.olvSteamLink.Searchable = false;
+			this.olvSteamLink.Text = "Steam Link";
+			// 
+			// olvBrowserLink
+			// 
+			this.olvBrowserLink.AspectName = "BrowserLink";
+			this.olvBrowserLink.DisplayIndex = 9;
+			this.olvBrowserLink.Hyperlink = true;
+			this.olvBrowserLink.IsEditable = false;
+			this.olvBrowserLink.IsVisible = false;
+			this.olvBrowserLink.Searchable = false;
+			this.olvBrowserLink.Text = "Browser Link";
 			// 
 			// panel2
 			// 
@@ -1385,6 +1410,8 @@
 		private System.Windows.Forms.CheckBox export_all_mods_checkbox;
 		private BrightIdeasSoftware.OLVColumn olvcWorkshopID;
 		private BrightIdeasSoftware.OLVColumn olvcHidden;
+		private BrightIdeasSoftware.OLVColumn olvSteamLink;
+		private BrightIdeasSoftware.OLVColumn olvBrowserLink;
 	}
 }
 

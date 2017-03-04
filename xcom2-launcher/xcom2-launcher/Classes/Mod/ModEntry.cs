@@ -90,6 +90,12 @@ namespace XCOM2Launcher.Mod
             set { _image = value; }
         }
 
+	    [JsonIgnore]
+	    public string SteamLink => GetSteamLink();
+
+	    [JsonIgnore]
+	    public string BrowserLink => GetWorkshopLink();
+
 
 		#region Mod
 
@@ -174,7 +180,7 @@ namespace XCOM2Launcher.Mod
 
         public void ShowOnSteam()
         {
-			Process.Start("explorer", "steam://url/CommunityFilePage/" + WorkshopID);
+			Process.Start("explorer", GetSteamLink());
         }
 
 	    public void ShowInBrowser()
@@ -191,6 +197,12 @@ namespace XCOM2Launcher.Mod
         {
             return "https://steamcommunity.com/sharedfiles/filedetails/?id=" + WorkshopID;
         }
+
+	    public string GetSteamLink()
+	    {
+		    return "steam://url/CommunityFilePage/" + WorkshopID;
+
+	    }
 
         public override string ToString()
         {
