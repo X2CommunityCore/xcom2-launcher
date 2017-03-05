@@ -268,7 +268,17 @@ namespace XCOM2Launcher.Forms
                 Mods.RemoveMod(mod);
 
                 // delete files
-                Directory.Delete(mod.Path, true);
+                try
+                {
+                    Directory.Delete(mod.Path, true);
+                }
+                catch (System.IO.DirectoryNotFoundException)
+                {
+                    // the directory was already removed
+                }
+
+                RefreshModList();
+                UpdateLabels();
             }
         }
 
