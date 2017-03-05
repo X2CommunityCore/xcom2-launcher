@@ -369,15 +369,18 @@ namespace XCOM2Launcher.Forms
 
             menu.MenuItems.Add("-");
 
-            menu.MenuItems.Add(new MenuItem("Delete / Unsubscribe", delegate { DeleteMods(); }));
+			menu.MenuItems.Add(new MenuItem("Delete / Unsubscribe", delegate { DeleteMods(); }));
 
 
             menu.MenuItems.Add("-");
 
             menu.MenuItems.Add(new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); }));
 
-            if (m.WorkshopID != -1)
-                menu.MenuItems.Add(new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); }));
+	        if (m.WorkshopID != -1)
+			{
+				menu.MenuItems.Add(new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); }));
+				menu.MenuItems.Add(new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); }));
+			}
 
 
             return menu;
@@ -461,13 +464,14 @@ namespace XCOM2Launcher.Forms
                         Mods.UpdateMod(mod, Settings);
 
                     break;
-
+					
                 case "Index":
 		            if (Settings.AutoNumberIndexes == false) break;
 					if ((int)e.NewValue == (int)e.Value) break;
+					modlist_ListObjectListView.BeginUpdate();
 					ReorderIndexes(mod, (int)e.Value);
 					modlist_ListObjectListView.Sort();
-					modlist_ListObjectListView.Refresh();
+					modlist_ListObjectListView.EndUpdate();
                     break;
             }
         }

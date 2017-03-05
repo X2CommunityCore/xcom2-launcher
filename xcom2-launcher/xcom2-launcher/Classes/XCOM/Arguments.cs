@@ -9,7 +9,7 @@ namespace XCOM2Launcher.XCOM
         [DefaultValue(true)]
         public bool review { get; set; } = true;
 
-        [DisplayName("-noredscreens")]
+        [DisplayName("-noRedScreens")]
         [Description("Hide error popups?\r\nDefault: true")]
         [DefaultValue(true)]
         public bool noRedScreens { get; set; } = true;
@@ -19,31 +19,36 @@ namespace XCOM2Launcher.XCOM
         [DefaultValue(false)]
         public bool log { get; set; } = false;
 
-        [DisplayName("-crashdumpwatcher")]
+        [DisplayName("-crashDumpWatcher")]
         [Description("No idea.\r\nDefault: true")]
         [DefaultValue(true)]
         public bool crashDumpWatcher { get; set; } = true;
 
-        [DisplayName("-nostartupmovies")]
+        [DisplayName("-noStartUpMovies")]
         [Description("Skip intro movies?\r\nDefault: false")]
         [DefaultValue(false)]
         public bool noStartupMovies { get; set; } = false;
 
-        [DisplayName("-language")]
+        [DisplayName("-language=")]
         [Description("Force language\r\nDefault: empty")]
         [DefaultValue("")]
         public string Language { get; set; } = "";
 
 
-        [DisplayName("-allowconsole")]
+        [DisplayName("-allowConsole")]
         [Description("Allow cheat console?\r\nDefault: false")]
         [DefaultValue(false)]
         public bool allowConsole { get; set; } = false;
 
-        [DisplayName("-autodebug")]
+        [DisplayName("-autoDebug")]
         [Description("No idea.\r\nDefault: false")]
         [DefaultValue(false)]
         public bool autoDebug { get; set; } = false;
+
+	    [DisplayName("-noSeekFreeLoading")]
+	    [Description("No idea\r\nDefault: false")]
+	    [DefaultValue(false)]
+	    public bool noSeekFreeLoading { get; set; } = false;
 
         [DisplayName("Additional arguments")]
         [Description("Add something extra")]
@@ -78,8 +83,10 @@ namespace XCOM2Launcher.XCOM
             if (autoDebug)
                 args += " -autoDebug";
 
+	        if (noSeekFreeLoading)
+		        args += "-noseekfreeloading";
 
-            if (!string.IsNullOrEmpty(Custom))
+			if (!string.IsNullOrEmpty(Custom))
                 args += " " + Custom;
 
 

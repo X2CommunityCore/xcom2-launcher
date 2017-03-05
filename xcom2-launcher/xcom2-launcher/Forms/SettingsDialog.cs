@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
+using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
 {
@@ -30,20 +34,21 @@ namespace XCOM2Launcher.Forms
             foreach (var cat in settings.Mods.Categories)
                 categoriesListBox.Items.Add(cat);
 
-            // Register Events
-            Shown += SettingsDialog_Shown;
-            FormClosing += SettingsDialog_FormClosing;
+			// Create autofill values for arguments box
+	        List<string> arguments = new List<string>();
+	        foreach (var propertyInfo in typeof(Arguments).GetProperties())
+	        {
+		        var attrs = propertyInfo.GetCustomAttributes(true);
+		        arguments.AddRange(
+					from attrName in attrs.OfType<DisplayNameAttribute>()
+					where !propertyInfo.Name.Equals("Custom")
+					select attrName.DisplayName);
+	        }
 
-            browseGamePathButton.Click += BrowseGamePathButtonOnClick;
+	        argumentsTextBox.Values = arguments.ToArray();
 
-            addModPathButton.Click += AddModPathButtonOnClick;
-            removeModPathButton.Click += RemoveModPathButtonOnClick;
 
-            moveCategoryDownButton.Click += MoveCategoryDownButtonOnClick;
-            moveCategoryUpButton.Click += MoveCategoryUpButtonOnClick;
 
-            renameCategoryButton.Click += RenameCategoryButtonOnClick;
-            removeCategoryButton.Click += RemoveCategoryButtonOnClick;
         }
 
         protected Settings Settings { get; set; }

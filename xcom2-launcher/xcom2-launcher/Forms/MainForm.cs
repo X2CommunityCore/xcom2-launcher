@@ -131,7 +131,7 @@ namespace XCOM2Launcher.Forms
             _updateWorker.RunWorkerAsync();
         }
 
-#region Export
+		#region Export
 
         private void UpdateExport()
         {
@@ -195,9 +195,10 @@ namespace XCOM2Launcher.Forms
             export_richtextbox.Text = str.ToString();
         }
 
-#endregion
+		#endregion
 
-#region Basic
+
+		#region Basic
 
         private void Reset()
         {
@@ -231,9 +232,10 @@ namespace XCOM2Launcher.Forms
                 Close();
         }
 
-#endregion
+		#endregion
 
-#region Interface updates
+
+		#region Interface updates
 
         private void UpdateInterface()
         {
@@ -259,7 +261,6 @@ namespace XCOM2Launcher.Forms
             conflicts_tab.Text = "Overrides" + (hasConflicts ? $" ({NumConflicts} Conflicts)" : "");
             conflicts_tab.ImageKey = hasConflicts ? ExclamationIconKey : null;
         }
-
 
         public int NumConflicts;
 
@@ -412,7 +413,6 @@ namespace XCOM2Launcher.Forms
 
 			#endregion
 		}
-
 
 		#endregion
 	}
