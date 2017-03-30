@@ -62,8 +62,10 @@ namespace XCOM2Launcher.Mod
                 let overridesForThisClass = allOverrides.Where(o =>
                     o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
                 where overridesForThisClass.Count > 1
-                      && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
-                //If every mod uses a UIScreenListener, there is no conflict
+                    // If every mod uses a UIScreenListener, there is no conflict
+                    && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
+                    // If all overrides are from the same mod, assume there is no conflict
+                    && overridesForThisClass.Any(o => o.Mod != overridesForThisClass[0].Mod)
                 select new ModConflict(className, overridesForThisClass);
         }
 
