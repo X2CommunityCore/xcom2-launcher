@@ -188,7 +188,7 @@ namespace XCOM2Launcher.Mod
                 // in workshop path but not loaded via steam
                     m.Source = ModSource.Manual;
             }
-
+            
             // Ensure source ID exists
             if (m.WorkshopID <= 0)
             {
@@ -202,14 +202,14 @@ namespace XCOM2Launcher.Mod
 
                 m.WorkshopID = sourceID;
             }
-
+            
             // Fill Date Added
             if (!m.DateAdded.HasValue)
                 m.DateAdded = DateTime.Now;
 
 
             // Check Workshop for infos
-            if (m.WorkshopID != -1)
+            if (m.WorkshopID != 0)
             {
                 var publishedID = (ulong) m.WorkshopID;
 
