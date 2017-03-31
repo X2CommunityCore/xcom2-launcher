@@ -393,35 +393,30 @@ namespace XCOM2Launcher.Forms
             CreateModListContextMenu(e.Model as ModEntry).Show(e.ListView, e.Location);
         }
 
-        private Timer _updateTimer;
-
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            // If there is a duplicate id conflict 
-            // check all at the same time
             var modChecked = ModList.GetModelObject(e.Item.Index);
+
+            List<ModEntry> updatedMods = new List<ModEntry>();
+            
+            // If there is a duplicate id conflict check all
+            // at the same time and mark them as updated
             if (modChecked.State.HasFlag(ModState.DuplicateID))
             {
                 foreach (var mod in Mods.All.Where(@mod => mod.ID == modChecked.ID))
                 {
                     mod.isActive = modChecked.isActive;
+                    updatedMods.Add(mod);
                     UpdateMod(mod);
                 }
             }
-            // put on a slight delay
-            // so it will only update once
-            if (_updateTimer != null && _updateTimer.Enabled)
-                return;
-
-            _updateTimer = new Timer(10)
+            // Otherwise just mark the one as updated
+            else
             {
-                SynchronizingObject = this,
-                AutoReset = false
-            };
+                updatedMods.Add(modChecked);
+            }
 
-            _updateTimer.Elapsed += delegate { UpdateConflicts(); };
-
-            _updateTimer.Start();
+            UpdateConflictsForMods(updatedMods);
         }
 
         private void ModListSelectionChanged(object sender, EventArgs e)

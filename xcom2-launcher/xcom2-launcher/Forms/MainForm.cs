@@ -266,9 +266,10 @@ namespace XCOM2Launcher.Forms
 
         private void UpdateConflicts()
         {
+            // Incremented later in GetDuplicatesString() and GetOverridesString()
             NumConflicts = 0;
 
-            // Fill ClassOverride DataGrid 
+            // Clear and refill conflicts_datagrid
             conflicts_datagrid.Rows.Clear();
 
             foreach (var m in Mods.Active)
@@ -287,8 +288,57 @@ namespace XCOM2Launcher.Forms
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
 
-            // Update Interface
+            // Update interface
             modlist_ListObjectListView.UpdateObjects(ModList.Objects.ToList());
+            UpdateLabels();
+        }
+
+        private void UpdateConflictsForMods(List<ModEntry> mods)
+        {
+            // Incremented later in GetDuplicatesString() and GetOverridesString()
+            NumConflicts = 0;
+
+            // Update conflicts_datagrid
+            foreach (var m in mods)
+            {
+                if (m.isActive)
+                {
+                    foreach (var classOverride in m.GetOverrides(true))
+                    {
+                        var oldClass = classOverride.OldClass;
+
+                        if (classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
+                            oldClass += " (UIScreenListener)";
+
+                        conflicts_datagrid.Rows.Add(m.Name, oldClass, classOverride.NewClass);
+                    }
+                }
+                else
+                {
+                    foreach (var classOverride in m.GetOverrides(true))
+                    {
+                        foreach (var row in conflicts_datagrid.Rows.Cast<DataGridViewRow>())
+                        {
+                            var oldClass = classOverride.OldClass;
+
+                            if (classOverride.OverrideType == ModClassOverrideType.UIScreenListener)
+                                oldClass += " (UIScreenListener)";
+
+                            if ((string)row.Cells[0].Value == m.Name && (string)row.Cells[1].Value == oldClass && (string)row.Cells[2].Value == classOverride.NewClass)
+                            {
+                                conflicts_datagrid.Rows.Remove(row);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Conflict log
+            conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
+
+            // Update interface
+            modlist_ListObjectListView.UpdateObjects(mods);
             UpdateLabels();
         }
 
