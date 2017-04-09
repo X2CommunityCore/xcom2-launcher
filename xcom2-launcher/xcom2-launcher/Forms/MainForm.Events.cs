@@ -571,7 +571,7 @@ namespace XCOM2Launcher.Forms
 				fillPanel.BringToFront();
 				layout.Dock = DockStyle.Fill;
 				modinfo_config_ExpandButton.Text = "Collapse";
-				toolTip.SetToolTip(modinfo_config_ExpandButton, "Collapse the INI editor to normal size.");
+				toolTip.SetToolTip(modinfo_config_ExpandButton, "Collapse the INI editor to normal size");
 			}
 			else
 			{
@@ -581,7 +581,7 @@ namespace XCOM2Launcher.Forms
 				fillPanel.Visible = false;
 				fillPanel.SendToBack();
 				modinfo_config_ExpandButton.Text = "Expand";
-				toolTip.SetToolTip(modinfo_config_ExpandButton, "Expand the INI editor to fill the window.");
+				toolTip.SetToolTip(modinfo_config_ExpandButton, "Expand the INI editor to fill the window");
 
 			}
 		}

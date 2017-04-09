@@ -907,7 +907,7 @@
 			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
 			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
 			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
-			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit.");
+			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
 			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
 			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
 			// 
@@ -941,7 +941,8 @@
 			this.modinfo_config_ExpandButton.Size = new System.Drawing.Size(74, 23);
 			this.modinfo_config_ExpandButton.TabIndex = 13;
 			this.modinfo_config_ExpandButton.Text = "Expand";
-			this.modinfo_config_ExpandButton.UseVisualStyleBackColor = true;
+            this.toolTip.SetToolTip(this.modinfo_config_ExpandButton, "Expand the INI editor to fill the window");
+            this.modinfo_config_ExpandButton.UseVisualStyleBackColor = true;
 			this.modinfo_config_ExpandButton.Click += new System.EventHandler(this.modinfo_config_ExpandButton_Click);
 			// 
 			// modinfo_config_CompareButton
@@ -953,7 +954,7 @@
 			this.modinfo_config_CompareButton.Size = new System.Drawing.Size(74, 21);
 			this.modinfo_config_CompareButton.TabIndex = 14;
 			this.modinfo_config_CompareButton.Text = "Compare";
-			this.toolTip.SetToolTip(this.modinfo_config_CompareButton, "Compare the current file on disk to the stored backup");
+			this.toolTip.SetToolTip(this.modinfo_config_CompareButton, "Compare the current file on disk to the backup file");
 			this.modinfo_config_CompareButton.UseVisualStyleBackColor = true;
 			this.modinfo_config_CompareButton.Click += new System.EventHandler(this.modinfo_config_CompareButton_Click);
 			// 
@@ -965,7 +966,8 @@
 			this.modinfo_config_SaveButton.Size = new System.Drawing.Size(74, 21);
 			this.modinfo_config_SaveButton.TabIndex = 3;
 			this.modinfo_config_SaveButton.Text = "Save";
-			this.modinfo_config_SaveButton.UseVisualStyleBackColor = true;
+            this.toolTip.SetToolTip(this.modinfo_config_SaveButton, "Save current settings to the file on disk and the backup file");
+            this.modinfo_config_SaveButton.UseVisualStyleBackColor = true;
 			this.modinfo_config_SaveButton.Click += new System.EventHandler(this.modinfo_config_SaveButton_Click);
 			// 
 			// modinfo_config_LoadButton
@@ -977,7 +979,8 @@
 			this.modinfo_config_LoadButton.Size = new System.Drawing.Size(74, 21);
 			this.modinfo_config_LoadButton.TabIndex = 10;
 			this.modinfo_config_LoadButton.Text = "Load";
-			this.modinfo_config_LoadButton.UseVisualStyleBackColor = true;
+            this.toolTip.SetToolTip(this.modinfo_config_LoadButton, "Load settings from the backup file");
+            this.modinfo_config_LoadButton.UseVisualStyleBackColor = true;
 			this.modinfo_config_LoadButton.Click += new System.EventHandler(this.modinfo_config_LoadButton_Click);
 			// 
 			// modinfo_config_RemoveButton
@@ -989,7 +992,7 @@
 			this.modinfo_config_RemoveButton.Size = new System.Drawing.Size(74, 21);
 			this.modinfo_config_RemoveButton.TabIndex = 15;
 			this.modinfo_config_RemoveButton.Text = "Remove";
-			this.toolTip.SetToolTip(this.modinfo_config_RemoveButton, "Compare the current file on disk to the stored backup");
+			this.toolTip.SetToolTip(this.modinfo_config_RemoveButton, "Remove settings from the backup file");
 			this.modinfo_config_RemoveButton.UseVisualStyleBackColor = true;
 			this.modinfo_config_RemoveButton.Click += new System.EventHandler(this.modinfo_config_RemoveButton_Click);
 			// 
