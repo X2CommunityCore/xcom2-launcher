@@ -480,14 +480,24 @@ namespace XCOM2Launcher.Forms
         /// <param name="oldIndex">The old index the mod had</param>
         private void ReorderIndexes(ModEntry mod, int oldIndex)
         {
+            // Fix values outside of the valid range
+            if (mod.Index < 0)
+                mod.Index = 0;
+            else if (mod.Index >= Mods.All.ToArray().Length)
+                mod.Index = Mods.All.ToArray().Length - 1;
+
             var currentIndex = mod.Index;
 
             var modList = Mods.All.ToList();
             int startPos = (currentIndex > oldIndex) ? oldIndex : currentIndex;
             var range = Math.Abs(currentIndex - oldIndex) + 1;
-
+            
             for (int i = startPos; i < range; i++)
             {
+                if (i >= modList.ToArray().Length)
+                    break;
+                else if (i < 0)
+                    continue;
                 var modEntry = modList[i];
                 if (modEntry != mod)
                     modEntry.Index += ((currentIndex - oldIndex) > 0) ? -1 : 1;
