@@ -79,8 +79,8 @@ namespace XCOM2Launcher.Mod
                 }
             }
 
-
-            Title = values["title"];
+            if (values.ContainsKey("title"))
+                Title = values["title"];
 
             if (values.ContainsKey("category") && values["category"].Length > 0)
                 Category = values["category"];
