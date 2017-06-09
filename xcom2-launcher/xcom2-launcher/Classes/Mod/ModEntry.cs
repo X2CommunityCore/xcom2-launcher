@@ -51,7 +51,7 @@ namespace XCOM2Launcher.Mod
 				}
 				foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
 				{
-					if (modPath.Contains("XcomGame"))
+					if (modPath.ToLower().Contains("xcomgame"))
 						path = modPath;
 				}
 				return FilePath.Combine(path, ID);
