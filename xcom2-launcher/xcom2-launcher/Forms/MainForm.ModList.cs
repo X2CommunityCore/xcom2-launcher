@@ -44,6 +44,9 @@ namespace XCOM2Launcher.Forms
                 parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string) a.Key].Index.CompareTo(Mods.Entries[(string) b.Key].Index));
             });
 
+            olvcActive.GroupKeyGetter = categoryGroupingDelegate;
+            olvcActive.GroupFormatter = categoryFormatterDelegate;
+
             olvcName.GroupKeyGetter = categoryGroupingDelegate;
             olvcName.GroupFormatter = categoryFormatterDelegate;
 
@@ -96,7 +99,13 @@ namespace XCOM2Launcher.Forms
             columns.Single(c => c.AspectName == "isHidden").MakeGroupies(
                 new [] {false, true},
                 new [] { "wut?", "Not Hidden", "Hidden"});
+            columns.Single(c => c.AspectName == "isActive").MakeGroupies(
+                new[] { false, true },
+                new[] { "wut?", "Disabled", "Enabled" });
 
+            olvcActive.AspectToStringConverter = active => "";
+            olvcActive.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1) * a.Header.CompareTo(b.Header)); };
+            
             // Sort by Order or WorkshopID column removes groups
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
@@ -141,6 +150,9 @@ namespace XCOM2Launcher.Forms
                 modlist_ListObjectListView.RestoreState(Settings.Windows["main"].Data);
 
             RefreshModList();
+
+            // Start out sorted by name
+            modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
         }
 
 

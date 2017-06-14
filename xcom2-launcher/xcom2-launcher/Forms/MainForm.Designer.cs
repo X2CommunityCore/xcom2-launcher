@@ -56,6 +56,7 @@
             this.horizontal_splitcontainer = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.modlist_ListObjectListView = new BrightIdeasSoftware.ObjectListView();
+            this.olvcActive = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcState = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -380,6 +381,7 @@
             // 
             // modlist_ListObjectListView
             // 
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvcActive);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcName);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcState);
@@ -400,6 +402,7 @@
             this.modlist_ListObjectListView.CheckBoxes = true;
             this.modlist_ListObjectListView.CheckedAspectName = "isActive";
             this.modlist_ListObjectListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.olvcActive,
             this.olvcName,
             this.olvcID,
             this.olvcState,
@@ -433,6 +436,13 @@
             this.modlist_ListObjectListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ModListItemChecked);
             this.modlist_ListObjectListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ModListKeyDown);
             this.modlist_ListObjectListView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ModListKeyUp);
+            // 
+            // olvcActive
+            // 
+            this.olvcActive.AspectName = "isActive";
+            this.olvcActive.Hideable = false;
+            this.olvcActive.Text = "";
+            this.olvcActive.Width = 20;
             // 
             // olvcName
             // 
@@ -1377,6 +1387,7 @@
         private System.Windows.Forms.Button export_load_button;
         private System.Windows.Forms.ToolStripMenuItem runXCOM2ToolStripMenuItem;
         private BrightIdeasSoftware.ObjectListView modlist_ListObjectListView;
+        private BrightIdeasSoftware.OLVColumn olvcActive;
         private BrightIdeasSoftware.OLVColumn olvcName;
         private BrightIdeasSoftware.OLVColumn olvcID;
         private BrightIdeasSoftware.OLVColumn olvcState;
