@@ -118,13 +118,11 @@ namespace XCOM2Launcher.Forms
             {
                 column.AspectToStringConverter = d => (d as DateTime?)?.ToLocalTime().ToString(CultureInfo.CurrentCulture);
                 column.MakeGroupies(
-                    new[] {DateTime.Now.Subtract(TimeSpan.FromHours(24*30)), DateTime.Now.Subtract(TimeSpan.FromHours(24*7)), DateTime.Now.Date},
-                    new[] {"Older than one month", "Last Month", "This Week", "Today"}
-                    );
+                    new[] { DateTime.Now.Subtract(TimeSpan.FromHours(24 * 30)), DateTime.Now.Subtract(TimeSpan.FromHours(24 * 7)), DateTime.Now.Date },
+                    new[] { "Older Than One Month", "This Month", "This Week", "Today" });
 
                 // Sord Desc
-                column.GroupFormatter =
-                    (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1)*a.Id.CompareTo(b.Id)); };
+                column.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1)*a.Header.CompareTo(b.Header)); };
             }
 
 
