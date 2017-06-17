@@ -231,6 +231,8 @@ namespace XCOM2Launcher.Mod
 
                 // Update directory size
                 m.Size = value.m_nFileSize;
+                if (m.Size < 0)
+                    m.Size = Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length);
 
                 // Check Workshop for updates
                 if (m.Source == ModSource.SteamWorkshop)
