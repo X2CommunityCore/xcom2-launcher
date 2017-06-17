@@ -286,10 +286,10 @@ namespace XCOM2Launcher.Forms
                 {
                     // the directory was already removed
                 }
-
-                RefreshModList();
-                UpdateLabels();
             }
+
+            RefreshModList();
+            UpdateConflicts();
         }
 
         private void MoveMods(string category)
