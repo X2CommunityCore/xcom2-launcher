@@ -162,13 +162,16 @@ namespace XCOM2Launcher
 						mod.State |= ModState.NotInstalled;
 	            }
 
-	            var brokenMods = settings.Mods.All.Where(m => m.State == ModState.NotLoaded || m.State == ModState.NotInstalled).ToList();
-                if (brokenMods.Count > 0)
+                var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();
+                if (newlyBrokenMods.Count > 0)
                 {
-					FlexibleMessageBox.Show($"{brokenMods.Count} mods no longer exists and have been hidden:\r\n\r\n" + string.Join("\r\n", brokenMods.Select(m => m.Name)));
+                    if (newlyBrokenMods.Count == 1)
+                        FlexibleMessageBox.Show($"The mod '{newlyBrokenMods[0].Name}' no longer exists and has been hidden.");
+                    else
+                        FlexibleMessageBox.Show($"{newlyBrokenMods.Count} mods no longer exist and have been hidden:\r\n\r\n" + string.Join("\r\n", newlyBrokenMods.Select(m => m.Name)));
 
-	                foreach (var m in brokenMods)
-		                m.isHidden = true;
+                    foreach (var m in newlyBrokenMods)
+                        m.isHidden = true;
 						//settings.Mods.RemoveMod(m);
 				}
             }
