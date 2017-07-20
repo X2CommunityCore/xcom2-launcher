@@ -140,9 +140,6 @@ namespace XCOM2Launcher.Forms
             //modlist_objectlistview.KeyUp += ModListKeyUp;
             //modlist_objectlistview.KeyDown += ModListKeyDown;
 
-            // move state to the beginning
-            columns.Single(c => c.Text == "State").DisplayIndex = 0;
-
             // Restore State
             if (Settings.Windows.ContainsKey("main") && Settings.Windows["main"].Data != null)
                 modlist_ListObjectListView.RestoreState(Settings.Windows["main"].Data);
