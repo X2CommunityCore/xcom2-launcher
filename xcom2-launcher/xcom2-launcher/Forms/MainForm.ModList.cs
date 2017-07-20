@@ -490,30 +490,29 @@ namespace XCOM2Launcher.Forms
         /// <param name="oldIndex">The old index the mod had</param>
         private void ReorderIndexes(ModEntry mod, int oldIndex)
         {
-            // Fix values outside of the valid range
-            if (mod.Index < 0)
-                mod.Index = 0;
-            else if (mod.Index >= Mods.All.ToArray().Length)
-                mod.Index = Mods.All.ToArray().Length - 1;
-
             var currentIndex = mod.Index;
-
             var modList = Mods.All.ToList();
             int startPos = (currentIndex > oldIndex) ? oldIndex : currentIndex;
-            var range = Math.Abs(currentIndex - oldIndex) + 1;
+            int endPos = (currentIndex < oldIndex) ? oldIndex : currentIndex;
+            int i = 0;
             
-            for (int i = startPos; i < range; i++)
-            {
-                if (i >= modList.ToArray().Length)
-                    break;
-                else if (i < 0)
-                    continue;
-                var modEntry = modList[i];
-                if (modEntry != mod)
-                    modEntry.Index += ((currentIndex - oldIndex) > 0) ? -1 : 1;
-            }
-
+            // Make sure the old indexes go from 0 to Length - 1
+            mod.Index = oldIndex;
+            foreach (var modEntry in modList.OrderBy(m => m.Index))
+                modEntry.Index = i++;
+            
+            // Fix new indexes outside of the valid range
+            if (currentIndex < 0)
+                currentIndex = 0;
+            else if (currentIndex >= Mods.All.ToArray().Length)
+                currentIndex = Mods.All.ToArray().Length - 1;
+            
+            // Set the new indexes
+            mod.Index = currentIndex;
+            foreach (var modEntry in modList.Where(m => m.Index >= startPos && m.Index <= endPos && m != mod))
+                modEntry.Index += (currentIndex - oldIndex > 0) ? -1 : 1;
+            
+            RefreshModList();
         }
-
     }
 }
