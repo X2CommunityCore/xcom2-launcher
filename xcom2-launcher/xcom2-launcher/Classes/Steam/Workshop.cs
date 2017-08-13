@@ -19,12 +19,18 @@ namespace XCOM2Launcher.Steam
             return ids.Select(t => t.m_PublishedFileId).ToArray();
         }
 
+        public static void Subscribe(ulong id)
+        {
+            SteamAPIWrapper.Init();
+
+            SteamUGC.SubscribeItem(id.ToPublishedFileID());
+        }
+
         public static void Unsubscribe(ulong id)
         {
             SteamAPIWrapper.Init();
 
             SteamUGC.UnsubscribeItem(id.ToPublishedFileID());
-            SteamAPIWrapper.RunCallbacks();
         }
 
         public static SteamUGCDetails_t GetDetails(ulong id)

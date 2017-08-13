@@ -77,6 +77,29 @@ namespace XCOM2Launcher.Forms
                 RefreshModList();
             };
 
+            resubscribeToModsToolStripMenuItem.Click += delegate
+            {
+                var modsToDownload = Mods.All.Where(m => m.State.HasFlag(ModState.NotInstalled) && m.Source == ModSource.SteamWorkshop).ToList();
+                var choice = false;
+
+                if (modsToDownload.Count == 0)
+                    MessageBox.Show("No uninstalled workshop mods were found.");
+                else if (modsToDownload.Count == 1)
+                    choice = MessageBox.Show($"Are you sure you want to download the mod {modsToDownload[0].Name}?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
+                else
+                    choice = MessageBox.Show($"Are you sure you want to download {modsToDownload.Count} mods?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
+                
+                if (choice)
+                {
+                    foreach (var m in modsToDownload)
+                    {
+                        Workshop.Subscribe((ulong)m.WorkshopID);
+                        Workshop.DownloadItem((ulong)m.WorkshopID);
+                    }
+                    MessageBox.Show("Launch XCOM 2 after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."));
+                }
+            };
+
             // RichTextBox clickable links
             //modinfo_readme_RichTextBox.LinkClicked += ControlLinkClicked;
             //modinfo_info_DescriptionRichTextBox.LinkClicked += ControlLinkClicked;
@@ -93,6 +116,8 @@ namespace XCOM2Launcher.Forms
             _updateWorker.RunWorkerCompleted += Updater_RunWorkerCompleted;
 
             // Steam Events
+            Workshop.OnItemDownloaded += Resubscribe_OnItemDownloaded;
+
 #if DEBUG
             Workshop.OnItemDownloaded += SteamWorkshop_OnItemDownloaded;
 #endif
@@ -103,6 +128,17 @@ namespace XCOM2Launcher.Forms
             export_group_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
             export_save_button.Click += ExportSaveButtonClick;
             export_load_button.Click += ExportLoadButtonClick;
+        }
+
+        private void Resubscribe_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
+        {
+            var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
+            MessageBox.Show("Resubscribe_OnItemDownloaded");
+            if (mod.State == ModState.NotInstalled && e.Result.m_eResult == EResult.k_EResultOK)
+            {
+                mod.State &= ~ModState.NotInstalled;
+                RefreshModList();
+            }
         }
 
 #if DEBUG

@@ -42,16 +42,22 @@ namespace XCOM2Launcher.Forms
 			CheckSteamForUpdates();
 #endif
 
+            // Run callbacks
+            var t1 = new Timer();
+            t1.Tick += (sender, e) => { SteamAPIWrapper.RunCallbacks(); };
+            t1.Interval = 10;
+            t1.Start();
+
             // Check for running downloads
 #if DEBUG
             if (Settings.GetWorkshopPath() != null)
             {
                 CheckSteamForNewMods();
 
-                var t = new Timer();
-                t.Tick += (sender, e) => { CheckSteamForNewMods(); };
-                t.Interval = 30000;
-                t.Start();
+                var t2 = new Timer();
+                t2.Tick += (sender, e) => { CheckSteamForNewMods(); };
+                t2.Interval = 30000;
+                t2.Start();
             }
 #endif
         }

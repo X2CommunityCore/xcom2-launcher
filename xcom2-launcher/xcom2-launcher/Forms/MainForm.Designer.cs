@@ -130,6 +130,7 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -168,7 +169,7 @@
             this.main_statusstrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.status_toolstrip_label,
             this.progress_toolstrip_progressbar});
-            this.main_statusstrip.Location = new System.Drawing.Point(0, 740);
+            this.main_statusstrip.Location = new System.Drawing.Point(0, 719);
             this.main_statusstrip.Name = "main_statusstrip";
             this.main_statusstrip.Size = new System.Drawing.Size(984, 22);
             this.main_statusstrip.TabIndex = 5;
@@ -284,21 +285,22 @@
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importActiveModsToolStripMenuItem,
-            this.cleanModsToolStripMenuItem});
+            this.cleanModsToolStripMenuItem,
+            this.resubscribeToModsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // importActiveModsToolStripMenuItem
             // 
             this.importActiveModsToolStripMenuItem.Name = "importActiveModsToolStripMenuItem";
-            this.importActiveModsToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.importActiveModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.importActiveModsToolStripMenuItem.Text = "Import active mods";
             // 
             // cleanModsToolStripMenuItem
             // 
             this.cleanModsToolStripMenuItem.Name = "cleanModsToolStripMenuItem";
-            this.cleanModsToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.cleanModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.cleanModsToolStripMenuItem.Text = "Clean mods";
             // 
             // runXCOM2ToolStripMenuItem
@@ -326,7 +328,7 @@
             this.main_tabcontrol.Location = new System.Drawing.Point(0, 27);
             this.main_tabcontrol.Name = "main_tabcontrol";
             this.main_tabcontrol.SelectedIndex = 0;
-            this.main_tabcontrol.Size = new System.Drawing.Size(984, 710);
+            this.main_tabcontrol.Size = new System.Drawing.Size(984, 689);
             this.main_tabcontrol.TabIndex = 6;
             this.main_tabcontrol.Selected += new System.Windows.Forms.TabControlEventHandler(this.MainTabSelected);
             // 
@@ -336,7 +338,7 @@
             this.modlist_tab.Location = new System.Drawing.Point(4, 23);
             this.modlist_tab.Name = "modlist_tab";
             this.modlist_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modlist_tab.Size = new System.Drawing.Size(976, 683);
+            this.modlist_tab.Size = new System.Drawing.Size(976, 662);
             this.modlist_tab.TabIndex = 0;
             this.modlist_tab.Text = "Mods";
             this.modlist_tab.UseVisualStyleBackColor = true;
@@ -357,8 +359,8 @@
             // horizontal_splitcontainer.Panel2
             // 
             this.horizontal_splitcontainer.Panel2.Controls.Add(this.modinfo_groupbox);
-            this.horizontal_splitcontainer.Size = new System.Drawing.Size(970, 677);
-            this.horizontal_splitcontainer.SplitterDistance = 435;
+            this.horizontal_splitcontainer.Size = new System.Drawing.Size(970, 656);
+            this.horizontal_splitcontainer.SplitterDistance = 414;
             this.horizontal_splitcontainer.TabIndex = 5;
             // 
             // tableLayoutPanel1
@@ -376,7 +378,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(970, 435);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(970, 414);
             this.tableLayoutPanel1.TabIndex = 3;
             // 
             // modlist_ListObjectListView
@@ -419,7 +421,7 @@
             this.modlist_ListObjectListView.Location = new System.Drawing.Point(3, 33);
             this.modlist_ListObjectListView.Name = "modlist_ListObjectListView";
             this.modlist_ListObjectListView.ShowItemCountOnGroups = true;
-            this.modlist_ListObjectListView.Size = new System.Drawing.Size(964, 399);
+            this.modlist_ListObjectListView.Size = new System.Drawing.Size(964, 378);
             this.modlist_ListObjectListView.SortGroupItemsByPrimaryColumn = false;
             this.modlist_ListObjectListView.TabIndex = 0;
             this.modlist_ListObjectListView.TintSortColumn = true;
@@ -895,6 +897,7 @@
             this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.modinfo_ConfigFCTB.IsReplaceMode = false;
             this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
             this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1261,15 +1264,21 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.fillPanel.Location = new System.Drawing.Point(0, 27);
             this.fillPanel.Name = "fillPanel";
-            this.fillPanel.Size = new System.Drawing.Size(984, 710);
+            this.fillPanel.Size = new System.Drawing.Size(984, 689);
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
+            // 
+            // resubscribeToModsToolStripMenuItem
+            // 
+            this.resubscribeToModsToolStripMenuItem.Name = "resubscribeToModsToolStripMenuItem";
+            this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to mods";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 762);
+            this.ClientSize = new System.Drawing.Size(984, 741);
             this.Controls.Add(this.main_statusstrip);
             this.Controls.Add(this.main_menustrip);
             this.Controls.Add(this.main_tabcontrol);
@@ -1426,5 +1435,6 @@
         private BrightIdeasSoftware.OLVColumn olvcHidden;
         private BrightIdeasSoftware.OLVColumn olvSteamLink;
         private BrightIdeasSoftware.OLVColumn olvBrowserLink;
+        private System.Windows.Forms.ToolStripMenuItem resubscribeToModsToolStripMenuItem;
     }
 }
