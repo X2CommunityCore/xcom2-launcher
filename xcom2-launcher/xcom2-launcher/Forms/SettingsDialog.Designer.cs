@@ -40,6 +40,22 @@
             this.addModPathButton = new System.Windows.Forms.Button();
             this.removeModPathButton = new System.Windows.Forms.Button();
             this.browseGamePathButton = new System.Windows.Forms.Button();
+            this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.searchForUpdatesCheckBox = new System.Windows.Forms.CheckBox();
+            this.showHiddenEntriesCheckBox = new System.Windows.Forms.CheckBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.closeAfterLaunchCheckBox = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.categoriesListBox = new System.Windows.Forms.ListBox();
+            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.moveCategoryUpButton = new System.Windows.Forms.Button();
+            this.moveCategoryDownButton = new System.Windows.Forms.Button();
+            this.renameCategoryButton = new System.Windows.Forms.Button();
+            this.removeCategoryButton = new System.Windows.Forms.Button();
+            this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -50,7 +66,7 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.tableLayoutPanel2);
             this.groupBox1.Location = new System.Drawing.Point(12, 8);
@@ -169,7 +185,18 @@
             this.browseGamePathButton.UseVisualStyleBackColor = true;
             this.browseGamePathButton.Click += new System.EventHandler(this.BrowseGamePathButtonOnClick);
             // 
+            // argumentsTextBox
             // 
+            this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.argumentsTextBox.Location = new System.Drawing.Point(103, 129);
+            this.argumentsTextBox.Name = "argumentsTextBox";
+            this.argumentsTextBox.Size = new System.Drawing.Size(470, 20);
+            this.argumentsTextBox.TabIndex = 15;
+            this.argumentsTextBox.Values = new string[0];
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.tableLayoutPanel3);
@@ -258,13 +285,8 @@
             // 
             // categoriesListBox
             // 
-            this.categoriesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            // 
-            // 
-            // 
-            // 
-            // 
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.categoriesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel3.SetColumnSpan(this.categoriesListBox, 2);
             this.categoriesListBox.FormattingEnabled = true;
@@ -333,34 +355,9 @@
             this.autoNumberModIndexesCheckBox.Name = "autoNumberModIndexesCheckBox";
             this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(152, 16);
             this.autoNumberModIndexesCheckBox.TabIndex = 14;
-            this.autoNumberModIndexesCheckBox.Text = "Auto-Number Mod Indexes";
-            this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-Renumber mod indexes when changing (turn off to set manuall)");
+            this.autoNumberModIndexesCheckBox.Text = "Auto-number mod indexes";
+            this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-number mod indexes when one is changed (turn off to edit manually)");
             this.autoNumberModIndexesCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // SettingsDialog
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(679, 470);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
-            this.Icon = global::XCOM2Launcher.Properties.Resources.xcom;
-            this.Name = "SettingsDialog";
-            this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Settings";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsDialog_FormClosing);
-            this.Shown += new System.EventHandler(this.SettingsDialog_Shown);
-            this.groupBox1.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
-            this.flowLayoutPanel1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
-            this.flowLayoutPanel2.ResumeLayout(false);
-            this.ResumeLayout(false);
-            // 
             // 
             // SettingsDialog
             // 
