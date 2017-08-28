@@ -65,6 +65,8 @@ namespace XCOM2Launcher
 
 	    public bool AutoNumberIndexes { get; set; } = true;
 
+        public bool UseSpecifiedCategories { get; set; } = true;
+
         public ModList Mods { get; set; } = new ModList();
 
 		/// <summary>

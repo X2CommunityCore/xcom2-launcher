@@ -55,6 +55,7 @@
             this.renameCategoryButton = new System.Windows.Forms.Button();
             this.removeCategoryButton = new System.Windows.Forms.Button();
             this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
+            this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -222,6 +223,7 @@
             this.tableLayoutPanel3.Controls.Add(this.categoriesListBox, 1, 3);
             this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel2, 3, 3);
             this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 2, 1);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -353,11 +355,22 @@
             this.autoNumberModIndexesCheckBox.AutoSize = true;
             this.autoNumberModIndexesCheckBox.Location = new System.Drawing.Point(341, 3);
             this.autoNumberModIndexesCheckBox.Name = "autoNumberModIndexesCheckBox";
-            this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(152, 16);
+            this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(148, 16);
             this.autoNumberModIndexesCheckBox.TabIndex = 14;
             this.autoNumberModIndexesCheckBox.Text = "Auto-number mod indexes";
             this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-number mod indexes when one is changed (turn off to edit manually)");
             this.autoNumberModIndexesCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // useModSpecifiedCategoriesCheckBox
+            // 
+            this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
+            this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(341, 25);
+            this.useModSpecifiedCategoriesCheckBox.Name = "useModSpecifiedCategoriesCheckBox";
+            this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(165, 16);
+            this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
+            this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
+            this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to have all mods appear in Unsorted)");
+            this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
@@ -418,5 +431,6 @@
         private UserElements.AutoCompleteTextBox argumentsTextBox;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox autoNumberModIndexesCheckBox;
+        private System.Windows.Forms.CheckBox useModSpecifiedCategoriesCheckBox;
     }
 }
