@@ -1,5 +1,11 @@
 # Default Categories
 
+Modders can specify a category for their mod to appear in when first installed. To do so, go to your mod's .XComMod file and add the following line:
+
+```
+category=Category Name
+```
+
 To prevent different mod creators from having their mods default to different sets of categories, here is a list of standardized categories to use:
 
 * Bugfixes
