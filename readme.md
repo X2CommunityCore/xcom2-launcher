@@ -2,6 +2,7 @@ This is an alternative launcher / mod manager for the game XCOM 2.
 
 # Links
 [Latest Release](https://github.com/X2CommunityCore/xcom2-launcher/releases/latest)
+
 [Screenshots (Slightly Outdated)](http://imgur.com/a/8EoW9)
 
 # Features
