@@ -67,6 +67,8 @@ namespace XCOM2Launcher
 
         public bool UseSpecifiedCategories { get; set; } = true;
 
+        public bool LastLaunchedWotC { get; set; } = false;
+
         public ModList Mods { get; set; } = new ModList();
 
 		/// <summary>

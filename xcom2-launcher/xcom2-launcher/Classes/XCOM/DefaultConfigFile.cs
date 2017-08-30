@@ -7,10 +7,13 @@ namespace XCOM2Launcher.XCOM
 {
     public class DefaultConfigFile : IniFile
     {
-        public DefaultConfigFile(string filename, bool load = true) : base($"{XCOM2.UserConfigDir}/XCom{filename}.ini", false)
+        public DefaultConfigFile(string filename, bool WotC = false, bool load = true) : base((WotC ? XCOM2.WotCUserConfigDir : XCOM2.UserConfigDir) + $"/XCom{filename}.ini", false)
         {
             FileName = filename;
-            DefaultFile = $"{XCOM2.DefaultConfigDir}/Default{FileName}.ini";
+            if (WotC)
+                DefaultFile = $"{XCOM2.WotCDefaultConfigDir}/Default{FileName}.ini";
+            else
+                DefaultFile = $"{XCOM2.DefaultConfigDir}/Default{FileName}.ini";
 
             if (load)
                 Load();

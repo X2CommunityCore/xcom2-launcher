@@ -23,12 +23,18 @@ namespace XCOM2Launcher.XCOM
         public static string UserConfigDir
             => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM2\XComGame\Config";
 
+        public static string WotCUserConfigDir
+            => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
+            @"\my games\XCOM2 War of the Chosen\XComGame\Config";
+
         public static string DefaultConfigDir => Path.Combine(GameDir, @"XComGame\Config");
 
-		/// <summary>
-		/// Tries to find the directory of the game and the mod folders, both workshop and default
-		/// </summary>
-		/// <returns></returns>
+        public static string WotCDefaultConfigDir => Path.Combine(GameDir, @"XCom2-WarOfTheChosen\XComGame\Config");
+
+        /// <summary>
+        /// Tries to find the directory of the game and the mod folders, both workshop and default
+        /// </summary>
+        /// <returns></returns>
         public static string DetectGameDir()
         {
             // try steam
@@ -77,6 +83,32 @@ namespace XCOM2Launcher.XCOM
             SteamAPIWrapper.Shutdown();
         }
 
+        /// <summary>
+		/// Runs War of the Chosen with the selected arguments
+		/// </summary>
+		/// <param name="gameDir"></param>
+		/// <param name="args"></param>
+        public static void RunWotC(string gameDir, string args)
+        {
+            if (!SteamAPIWrapper.Init())
+                MessageBox.Show("Could not connect to steam.");
+
+
+            var p = new Process
+            {
+                StartInfo =
+                {
+                    Arguments = args,
+                    FileName = gameDir + @"\XCom2-WarOfTheChosen\Binaries\Win64\XCom2.exe",
+                    WorkingDirectory = gameDir + @"\XCom2-WarOfTheChosen"
+                }
+            };
+
+            p.Start();
+
+            SteamAPIWrapper.Shutdown();
+        }
+
         internal static void ImportActiveMods(Settings settings)
         {
             // load active mods
@@ -104,7 +136,7 @@ namespace XCOM2Launcher.XCOM
         {
             try
             {
-                return new DefaultConfigFile("ModOptions").Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
+                return new DefaultConfigFile("ModOptions", Settings.Instance.LastLaunchedWotC).Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
             }
             catch (IOException)
             {
@@ -112,10 +144,10 @@ namespace XCOM2Launcher.XCOM
             }
         }
 
-        public static void SaveChanges(Settings settings)
+        public static void SaveChanges(Settings settings, bool WotC)
         {
             // XComModOptions
-            var modOptions = new DefaultConfigFile("ModOptions", false);
+            var modOptions = new DefaultConfigFile("ModOptions", WotC, false);
 
             foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
                 modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
@@ -123,7 +155,7 @@ namespace XCOM2Launcher.XCOM
             modOptions.Save();
 
             // XComEngine
-            var engine = new DefaultConfigFile("Engine");
+            var engine = new DefaultConfigFile("Engine", WotC);
 
             // Remove old ModClassOverrides
             engine.Remove("Engine.Engine", "ModClassOverrides");

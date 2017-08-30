@@ -221,16 +221,17 @@ namespace XCOM2Launcher.Forms
             //RefreshModList();
         }
 
-        private void Save()
+        private void Save(bool WotC)
         {
-            XCOM2.SaveChanges(Settings);
+            XCOM2.SaveChanges(Settings, WotC);
             Settings.SaveFile("settings.json");
         }
 
         private void RunGame()
         {
             _updateWorker.CancelAsync();
-            Save();
+            Settings.Instance.LastLaunchedWotC = false;
+            Save(false);
 
             XCOM2.RunGame(Settings.GamePath, Settings.Arguments.ToString());
 
@@ -238,10 +239,22 @@ namespace XCOM2Launcher.Forms
                 Close();
         }
 
-		#endregion
+        private void RunWotC()
+        {
+            _updateWorker.CancelAsync();
+            Settings.Instance.LastLaunchedWotC = true;
+            Save(true);
+
+            XCOM2.RunWotC(Settings.GamePath, Settings.Arguments.ToString());
+
+            if (Settings.CloseAfterLaunch)
+                Close();
+        }
+
+        #endregion
 
 
-		#region Interface updates
+        #region Interface updates
 
         private void UpdateInterface()
         {

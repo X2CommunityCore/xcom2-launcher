@@ -49,6 +49,7 @@
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importActiveModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.error_provider = new System.Windows.Forms.ErrorProvider(this.components);
             this.main_tabcontrol = new System.Windows.Forms.TabControl();
@@ -130,7 +131,7 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -191,7 +192,8 @@
             this.runToolStripMenuItem,
             this.settingsToolStripMenuItem,
             this.toolsToolStripMenuItem,
-            this.runXCOM2ToolStripMenuItem});
+            this.runXCOM2ToolStripMenuItem,
+            this.runWarOfTheChosenToolStripMenuItem});
             this.main_menustrip.Location = new System.Drawing.Point(0, 0);
             this.main_menustrip.Name = "main_menustrip";
             this.main_menustrip.Size = new System.Drawing.Size(984, 24);
@@ -302,6 +304,12 @@
             this.cleanModsToolStripMenuItem.Name = "cleanModsToolStripMenuItem";
             this.cleanModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.cleanModsToolStripMenuItem.Text = "Clean mods";
+            // 
+            // resubscribeToModsToolStripMenuItem
+            // 
+            this.resubscribeToModsToolStripMenuItem.Name = "resubscribeToModsToolStripMenuItem";
+            this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to mods";
             // 
             // runXCOM2ToolStripMenuItem
             // 
@@ -834,6 +842,7 @@
             // 
             this.modinfo_inspect_propertygrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.modinfo_inspect_propertygrid.HelpVisible = false;
+            this.modinfo_inspect_propertygrid.LineColor = System.Drawing.SystemColors.ControlDark;
             this.modinfo_inspect_propertygrid.Location = new System.Drawing.Point(3, 3);
             this.modinfo_inspect_propertygrid.Name = "modinfo_inspect_propertygrid";
             this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(754, 191);
@@ -897,7 +906,6 @@
             this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.modinfo_ConfigFCTB.IsReplaceMode = false;
             this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
             this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1051,7 +1059,7 @@
             this.conflicts_tab.Location = new System.Drawing.Point(4, 23);
             this.conflicts_tab.Name = "conflicts_tab";
             this.conflicts_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.conflicts_tab.Size = new System.Drawing.Size(976, 683);
+            this.conflicts_tab.Size = new System.Drawing.Size(976, 662);
             this.conflicts_tab.TabIndex = 1;
             this.conflicts_tab.Text = "Class Overrides";
             this.conflicts_tab.UseVisualStyleBackColor = true;
@@ -1070,7 +1078,7 @@
             this.conflicts_tab_tableLayoutPanel.RowCount = 2;
             this.conflicts_tab_tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.conflicts_tab_tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.conflicts_tab_tableLayoutPanel.Size = new System.Drawing.Size(970, 677);
+            this.conflicts_tab_tableLayoutPanel.Size = new System.Drawing.Size(970, 656);
             this.conflicts_tab_tableLayoutPanel.TabIndex = 9;
             // 
             // conflicts_log_label
@@ -1097,7 +1105,7 @@
             this.conflicts_datagrid.Name = "conflicts_datagrid";
             this.conflicts_datagrid.ReadOnly = true;
             this.conflicts_tab_tableLayoutPanel.SetRowSpan(this.conflicts_datagrid, 2);
-            this.conflicts_datagrid.Size = new System.Drawing.Size(664, 671);
+            this.conflicts_datagrid.Size = new System.Drawing.Size(664, 650);
             this.conflicts_datagrid.TabIndex = 6;
             // 
             // ColumnModName
@@ -1131,7 +1139,7 @@
             this.conflicts_textbox.Multiline = true;
             this.conflicts_textbox.Name = "conflicts_textbox";
             this.conflicts_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.conflicts_textbox.Size = new System.Drawing.Size(294, 651);
+            this.conflicts_textbox.Size = new System.Drawing.Size(294, 630);
             this.conflicts_textbox.TabIndex = 7;
             // 
             // export_tab
@@ -1140,7 +1148,7 @@
             this.export_tab.Location = new System.Drawing.Point(4, 23);
             this.export_tab.Name = "export_tab";
             this.export_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.export_tab.Size = new System.Drawing.Size(976, 683);
+            this.export_tab.Size = new System.Drawing.Size(976, 662);
             this.export_tab.TabIndex = 2;
             this.export_tab.Text = "Profiles";
             this.export_tab.UseVisualStyleBackColor = true;
@@ -1162,7 +1170,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(970, 677);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(970, 656);
             this.tableLayoutPanel2.TabIndex = 5;
             // 
             // export_richtextbox
@@ -1177,7 +1185,7 @@
             this.export_richtextbox.Location = new System.Drawing.Point(3, 38);
             this.export_richtextbox.Name = "export_richtextbox";
             this.export_richtextbox.ReadOnly = true;
-            this.export_richtextbox.Size = new System.Drawing.Size(964, 636);
+            this.export_richtextbox.Size = new System.Drawing.Size(964, 615);
             this.export_richtextbox.TabIndex = 2;
             this.export_richtextbox.Text = "";
             this.export_richtextbox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
@@ -1268,11 +1276,13 @@
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
             // 
-            // resubscribeToModsToolStripMenuItem
+            // runWarOfTheChosenToolStripMenuItem
             // 
-            this.resubscribeToModsToolStripMenuItem.Name = "resubscribeToModsToolStripMenuItem";
-            this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to mods";
+            this.runWarOfTheChosenToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
+            this.runWarOfTheChosenToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runXCOM2ToolStripMenuItem.Image")));
+            this.runWarOfTheChosenToolStripMenuItem.Name = "runWarOfTheChosenToolStripMenuItem";
+            this.runWarOfTheChosenToolStripMenuItem.Size = new System.Drawing.Size(141, 20);
+            this.runWarOfTheChosenToolStripMenuItem.Text = "Run War of the Chosen";
             // 
             // MainForm
             // 
@@ -1436,5 +1446,6 @@
         private BrightIdeasSoftware.OLVColumn olvSteamLink;
         private BrightIdeasSoftware.OLVColumn olvBrowserLink;
         private System.Windows.Forms.ToolStripMenuItem resubscribeToModsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem runWarOfTheChosenToolStripMenuItem;
     }
 }

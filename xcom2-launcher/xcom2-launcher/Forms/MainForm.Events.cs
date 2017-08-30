@@ -24,8 +24,9 @@ namespace XCOM2Launcher.Forms
 		internal void RegisterEvents()
         {
             // Register Events
-            // run button
+            // run buttons
             runXCOM2ToolStripMenuItem.Click += (a, b) => { RunGame(); };
+            runWarOfTheChosenToolStripMenuItem.Click += (a, b) => { RunWotC(); };
 
             // save on close
             //Shown += MainForm_Shown;
@@ -33,7 +34,7 @@ namespace XCOM2Launcher.Forms
 
             // Menu
             // -> File
-            saveToolStripMenuItem.Click += delegate { Save(); };
+            saveToolStripMenuItem.Click += delegate { Save(Settings.Instance.LastLaunchedWotC); };
             reloadToolStripMenuItem.Click += delegate
             {
                 // Confirmation dialog
@@ -201,7 +202,7 @@ namespace XCOM2Launcher.Forms
             // Save dimensions
             Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_ListObjectListView.SaveState() };
 
-            Save();
+            Save(Settings.Instance.LastLaunchedWotC);
         }
 
         // Make sure property grid columns are properly sized
