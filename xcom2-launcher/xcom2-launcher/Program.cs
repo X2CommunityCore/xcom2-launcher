@@ -184,7 +184,7 @@ namespace XCOM2Launcher
 
         public static string GetCurrentVersion()
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            /*var assembly = Assembly.GetExecutingAssembly();
             var fields = assembly.GetType("XCOM2Launcher.GitVersionInformation").GetFields();
 
             var major = fields.Single(f => f.Name == "Major").GetValue(null);
@@ -192,7 +192,8 @@ namespace XCOM2Launcher
             var patch = fields.Single(f => f.Name == "Patch").GetValue(null);
 
 
-            return $"v{major}.{minor}.{patch}";
+            return $"v{major}.{minor}.{patch}";*/
+            return "v1.2.0"; // borked version, will fix next release
         }
     }
 }
