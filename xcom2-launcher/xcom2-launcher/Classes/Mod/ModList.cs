@@ -130,7 +130,7 @@ namespace XCOM2Launcher.Mod
             {
                 ID = modID,
                 Name = modinfo.Title ?? "Unnamed Mod",
-                //Path = modDir,
+                Path = modDir,
                 Source = source,
                 isActive = false,
                 DateAdded = DateTime.Now,

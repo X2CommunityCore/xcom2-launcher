@@ -35,30 +35,9 @@ namespace XCOM2Launcher.Mod
         public string Author { get; set; } = "Unknown";
 	    public string Description { get; set; } = "";
 
-	    public string Path
-	    {
-		    get
-			{
-				string path = "";
-				if (Source == ModSource.SteamWorkshop)
-				{
-					foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
-					{
-						if (modPath.Contains("workshop"))
-							path = modPath;
-					}
-					return FilePath.Combine(path, WorkshopID.ToString());
-				}
-				foreach (var modPath in XCOM2Launcher.Settings.Instance.ModPaths)
-				{
-					if (modPath.ToLower().Contains("xcomgame"))
-						path = modPath;
-				}
-				return FilePath.Combine(path, ID);
-			}
-	    }
+	    public string Path { get; set; } = "";
 
-	    /// <summary>
+        /// <summary>
         ///     Size in bytes
         /// </summary>
         [DefaultValue(-1)]

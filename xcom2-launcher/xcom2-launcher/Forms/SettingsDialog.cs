@@ -173,8 +173,8 @@ namespace XCOM2Launcher.Forms
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            Settings.ModPaths.Add(dialog.SelectedPath);
-            modPathsListbox.Items.Add(dialog.SelectedPath);
+            Settings.ModPaths.Add(dialog.SelectedPath + "\\");
+            modPathsListbox.Items.Add(dialog.SelectedPath + "\\");
         }
 
         private void SettingsDialog_Shown(object sender, EventArgs e)
