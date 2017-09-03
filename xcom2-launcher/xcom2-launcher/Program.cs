@@ -134,6 +134,13 @@ namespace XCOM2Launcher
                 MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.");
 
             // Verify Mod Paths
+            var pathsToEdit = settings.ModPaths.Where(m => !m.EndsWith("\\")).ToList();
+            foreach (var modPath in pathsToEdit)
+            {
+                settings.ModPaths.Add(modPath + "\\");
+                settings.ModPaths.Remove(modPath);
+            }
+
             var oldPaths = settings.ModPaths.Where(modPath => !Directory.Exists(modPath)).ToList();
             foreach (var modPath in oldPaths)
                 settings.ModPaths.Remove(modPath);
@@ -141,10 +148,6 @@ namespace XCOM2Launcher
             foreach (var modPath in XCOM2.DetectModDirs())
                 if (!settings.ModPaths.Contains(modPath))
                     settings.ModPaths.Add(modPath);
-
-            var pathsToEdit = settings.ModPaths.Where(m => !m.EndsWith("\\"));
-            for (int i = 0; i < pathsToEdit.Count(); i++)
-                settings.ModPaths[i] += "\\";
 
             if (settings.ModPaths.Count == 0)
                 MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
