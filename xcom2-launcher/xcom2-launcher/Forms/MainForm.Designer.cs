@@ -60,6 +60,7 @@
             this.olvcActive = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvcCategory = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcState = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcOrder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcSize = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -394,6 +395,7 @@
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcActive);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcName);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvcCategory);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcState);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcOrder);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcSize);
@@ -415,6 +417,7 @@
             this.olvcActive,
             this.olvcName,
             this.olvcID,
+            this.olvcCategory,
             this.olvcState,
             this.olvcOrder,
             this.olvcSize,
@@ -467,6 +470,11 @@
             this.olvcID.IsEditable = false;
             this.olvcID.Text = "ID";
             this.olvcID.Width = 200;
+            // 
+            // olvcCategory
+            // 
+            this.olvcCategory.AspectName = "Category";
+            this.olvcCategory.Text = "Category";
             // 
             // olvcState
             // 
@@ -1447,5 +1455,6 @@
         private BrightIdeasSoftware.OLVColumn olvBrowserLink;
         private System.Windows.Forms.ToolStripMenuItem resubscribeToModsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runWarOfTheChosenToolStripMenuItem;
+        private BrightIdeasSoftware.OLVColumn olvcCategory;
     }
 }

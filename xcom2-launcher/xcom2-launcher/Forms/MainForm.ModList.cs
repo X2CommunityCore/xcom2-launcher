@@ -56,6 +56,7 @@ namespace XCOM2Launcher.Forms
             olvcOrder.GroupKeyGetter = categoryGroupingDelegate;
             olvcOrder.GroupFormatter = categoryFormatterDelegate;
 
+            olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
             olvcState.AspectGetter = o =>
             {
                 var mod = (ModEntry)o;
