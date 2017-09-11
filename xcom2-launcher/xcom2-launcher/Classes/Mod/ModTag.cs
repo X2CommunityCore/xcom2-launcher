@@ -7,23 +7,14 @@ namespace XCOM2Launcher.Mod
     {
         public string Label { get; set; } = "New Tag";
 
-        public Color Color { get; set; } = RandomColor();
+        public Color Color { get; set; } = Color.Black.GetRandom(0.75, 0.9).GetPastelShade();
 
         public ModTag() { }
 
         public ModTag(string label, Color? color = null)
         {
-            Color = color ?? RandomColor();
+            Color = color ?? Color.Black.GetRandom(0.75, 0.9).GetPastelShade();
             Label = label;
-        }
-
-        public static Color RandomColor()
-        {
-            var randomGen = new Random();
-            var names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
-            var randomColorName = names[randomGen.Next(names.Length)];
-
-            return Color.FromKnownColor(randomColorName);
         }
     }
 }
