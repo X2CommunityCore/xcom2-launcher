@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using XCOM2Launcher.Forms;
 using FilePath = System.IO.Path;
 
 namespace XCOM2Launcher.Mod
@@ -74,6 +74,8 @@ namespace XCOM2Launcher.Mod
 
 	    [JsonIgnore]
 	    public string BrowserLink => GetWorkshopLink();
+
+        public IList<string> Tags { get; } = new List<string>();
 
 
 		#region Mod

@@ -145,6 +145,8 @@
     <Compile Include="Classes\Mod\ModSettingsEntry.cs" />
     <Compile Include="Classes\Mod\ModState.cs" />
     <Compile Include="Classes\Mod\ModSource.cs" />
+    <Compile Include="Classes\Mod\ModTag.cs" />
+    <Compile Include="Classes\Mod\TagRenderer.cs" />
     <Compile Include="Classes\PropertyGrid\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Classes\PropertyGrid\PropertyCheckbox.cs" />
     <Compile Include="Classes\PropertyGrid\PropertyGridExtensions.cs" />

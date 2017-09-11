@@ -10,13 +10,13 @@ using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
-using Timer = System.Timers.Timer;
 
 namespace XCOM2Launcher.Forms
 {
     public partial class MainForm : Form
     {
         public ModList Mods => Settings.Mods;
+        public Dictionary<string, ModTag> AvailableTags => Settings.Tags;
 
         public TypedObjectListView<ModEntry> ModList { get; private set; }
 
@@ -57,6 +57,9 @@ namespace XCOM2Launcher.Forms
             olvcOrder.GroupFormatter = categoryFormatterDelegate;
 
             olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
+            
+            olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
+
             olvcState.AspectGetter = o =>
             {
                 var mod = (ModEntry)o;

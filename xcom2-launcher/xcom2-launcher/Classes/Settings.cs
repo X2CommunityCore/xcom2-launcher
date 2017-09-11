@@ -71,6 +71,8 @@ namespace XCOM2Launcher
 
         public ModList Mods { get; set; } = new ModList();
 
+        public Dictionary<string, ModTag> Tags { get; set; } = new Dictionary<string, ModTag>();
+
 		/// <summary>
 		/// Mod ID
 		/// </summary>
