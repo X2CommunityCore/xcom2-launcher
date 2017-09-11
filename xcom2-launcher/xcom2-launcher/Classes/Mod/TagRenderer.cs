@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 
@@ -23,12 +23,14 @@ namespace XCOM2Launcher.Mod
         public TagRenderInfo(Rectangle bounds, Size textSize, Color tagColor)
         {
             var rectWidth = textSize.Width + tX * 2;
-            var rectHeight = Math.Max(textSize.Height + tY * 2, bounds.Height - rY);
-            var tagRectangle = new Rectangle(offset.X + rX, offset.Y + (bounds.Height - rectHeight) / 2 - 1, rectWidth, rectHeight);
+            var rectHeight = Math.Max(textSize.Height + tY * 2, bounds.Height - rY) - 1;
+            var tagRectangle = new Rectangle(offset.X + rX, offset.Y + (bounds.Height - rectHeight) / 2 - 2, rectWidth, rectHeight);
+            var shadowRectangle = new Rectangle(tagRectangle.X + 1, tagRectangle.Y + 1, tagRectangle.Width, tagRectangle.Height);
 
+            TextPosition = new Point(tagRectangle.X + tX, offset.Y + tY - 1);
+            ShadowPath = TagRenderer.RoundedRect(shadowRectangle, rX);
             Path = TagRenderer.RoundedRect(tagRectangle, rX);
             BorderColor = ControlPaint.Dark(tagColor);
-            TextPosition = new Point(tagRectangle.X + tX, offset.Y + tY);
             TextColor = tagColor;
 
             offset.X += rectWidth + rectPadding.Width;
@@ -36,6 +38,7 @@ namespace XCOM2Launcher.Mod
 
         public Point TextPosition { get; }
         public GraphicsPath Path { get; }
+        public GraphicsPath ShadowPath { get; }
         public Color BorderColor { get; }
         public Color TextColor { get; }
     }
@@ -43,7 +46,7 @@ namespace XCOM2Launcher.Mod
     public class TagRenderer : BaseRenderer
     {
         private readonly Dictionary<string, ModTag> _availableTags;
-        private readonly Dictionary<int, TagRenderInfo> _tagRenderInfo = new Dictionary<int, TagRenderInfo>();
+        
         
         public TagRenderer(ObjectListView listView, Dictionary<string, ModTag> availableTags)
         {
@@ -82,12 +85,6 @@ namespace XCOM2Launcher.Mod
             path.CloseFigure();
             return path;
         }
-        /*
-                public override void HitTest(OlvListViewHitTestInfo hti, int x, int y)
-                {
-
-                }
-        */
 
         public override bool RenderSubItem(DrawListViewSubItemEventArgs e, Graphics g, Rectangle r, object rowObject)
         {
@@ -96,56 +93,53 @@ namespace XCOM2Launcher.Mod
             if (mod == null)
                 return false;
 
-            g.Clear(rowObject == ListView.SelectedObject 
-                  ? ListItem?.SelectedBackColor ?? ListView.SelectedBackColorOrDefault 
-                  : ListView.Items[e.ItemIndex].BackColor);
+            var listItem = ListView.Items[e.ItemIndex];
+            var backgroundColor = rowObject == ListView.SelectedObject
+                                ? ListItem?.SelectedBackColor ?? ListView.SelectedBackColorOrDefault
+                                : listItem.BackColor;
+            var tagList = _availableTags.Select(kvp => kvp.Value)
+                                        .Where(t => mod.Tags.Contains(t.Label));
 
-            if (mod.Tags.Count <= 0)
+            return RenderTags(listItem.Font, backgroundColor, g, r, tagList.ToList());
+        }
+
+        public static bool RenderTags(Font font, Color backgroundColor, Graphics graphics, Rectangle bounds, IList<ModTag> tagList)
+        {
+            graphics.Clear(backgroundColor);
+
+            if (tagList.Count <= 0)
                 return true;
 
-            TagRenderInfo.offset = new Point(r.X + TagRenderInfo.rX, 
-                                             r.Y + TagRenderInfo.rY);
+            TagRenderInfo.offset = new Point(bounds.X + TagRenderInfo.rX,
+                                             bounds.Y + TagRenderInfo.rY);
 
-            foreach (var tagName in mod.Tags)
+            foreach (var tag in tagList)
             {
-                TagRenderInfo renderInfo;
-                var tag = _availableTags[tagName];
-                var tagKey = (mod.GetHashCode() * 397) ^ tag.GetHashCode();
-                
-                if (_tagRenderInfo.ContainsKey(tagKey) == false)
-                {
-                    var tagSize = g.MeasureString(tag.Label, GetFont()).ToSize();
+                var tagSize = graphics.MeasureString(tag.Label, font).ToSize();
+                var renderInfo = new TagRenderInfo(bounds, tagSize, tag.Color);
 
-                    _tagRenderInfo[tagKey] = renderInfo = new TagRenderInfo(r, tagSize, tag.Color);
-                }
-                else
+                using (var backgroundBrush = new SolidBrush(Color.FromArgb(255, 32, 32, 32)))
                 {
-                    renderInfo = _tagRenderInfo[tagKey];
+                    graphics.FillPath(backgroundBrush, renderInfo.ShadowPath);
                 }
-
-                using (var backgroundBrush = new SolidBrush(tag.Color))
+                using (var backgroundBrush = new SolidBrush(renderInfo.TextColor))
                 {
-                    g.FillPath(backgroundBrush, renderInfo.Path);
+                    graphics.FillPath(backgroundBrush, renderInfo.Path);
                 }
                 using (var borderPen = new Pen(renderInfo.BorderColor))
                 {
-                    g.DrawPath(borderPen, renderInfo.Path);
+                    graphics.DrawPath(borderPen, renderInfo.Path);
                 }
                 using (var textBrush = new SolidBrush(renderInfo.BorderColor))
                 {
-                    g.DrawString(tag.Label, GetFont(), textBrush, renderInfo.TextPosition);
+                    graphics.DrawString(tag.Label, font, textBrush, renderInfo.TextPosition);
                 }
                 // stop drawing outside of the column bounds
-                if (TagRenderInfo.offset.X > r.Right)
+                if (TagRenderInfo.offset.X > bounds.Right)
                     break;
             }
 
             return true;
-        }
-
-        protected Font GetFont()
-        {
-            return Font ?? ListView.Font;
         }
     }
 }
