@@ -75,7 +75,7 @@ namespace XCOM2Launcher.Mod
 	    [JsonIgnore]
 	    public string BrowserLink => GetWorkshopLink();
 
-        public IList<string> Tags { get; } = new List<string>();
+        public IList<string> Tags { get; set; } = new List<string>();
 
 
 		#region Mod

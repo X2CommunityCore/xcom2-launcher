@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
-using Newtonsoft.Json;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
@@ -166,6 +165,8 @@ namespace XCOM2Launcher
 						mod.State |= ModState.NotLoaded;
 					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
 						mod.State |= ModState.NotInstalled;
+	                // tags clean up
+	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t)).ToList();
 	            }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();
