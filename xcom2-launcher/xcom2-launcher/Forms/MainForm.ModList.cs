@@ -60,9 +60,9 @@ namespace XCOM2Launcher.Forms
             
             olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
             olvcTags.AspectPutter = (rowObject, value) => AddTag((ModEntry) rowObject, (string) value);
+            olvcTags.SearchValueGetter = rowObject => ((ModEntry)rowObject).Tags.ToArray();
             olvcTags.AspectGetter = rowObject => "";
 
-            
 
             olvcState.AspectGetter = o =>
             {
