@@ -381,11 +381,13 @@ namespace XCOM2Launcher.Forms
                                    : $"Rename tag '{tag.Label}' for '{m.Name}' ?";
             var newTag = Interaction.InputBox(prompt, "Rename tag", tag.Label);
 
-            if (MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to {newTag}?",
-                                 @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (string.IsNullOrEmpty(newTag) || (renameAll && MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to {newTag}?",
+                                                                               @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes))
+            { 
                 return;
+            }
 
-            if (string.IsNullOrEmpty(newTag) == false && newTag != tag.Label)
+            if (newTag != tag.Label)
             {
                 if (renameAll)
                 {
@@ -394,7 +396,11 @@ namespace XCOM2Launcher.Forms
                 else
                 {
                     m.Tags.Remove(tag.Label);
-                    AddTag(m, newTag);
+
+                    if (m.Tags.Contains(newTag) == false)
+                    {
+                        AddTag(m, newTag);
+                    }
                 }
             }
         }
