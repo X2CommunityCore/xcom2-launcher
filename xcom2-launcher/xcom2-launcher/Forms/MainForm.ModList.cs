@@ -59,17 +59,10 @@ namespace XCOM2Launcher.Forms
             olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
             
             olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
+            olvcTags.AspectPutter = (rowObject, value) => AddTag((ModEntry) rowObject, (string) value);
+            olvcTags.AspectGetter = rowObject => "";
 
-            modlist_ListObjectListView.CellEditFinished += (sender, e) =>
-            {
-                if (e.Column == olvcTags)
-                {
-                    var newTag = (string)e.NewValue;
-                    var mod = (ModEntry)e.RowObject;
-
-                    AddTag(mod, newTag);
-                }
-            };
+            
 
             olvcState.AspectGetter = o =>
             {
