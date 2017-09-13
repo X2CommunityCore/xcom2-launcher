@@ -31,16 +31,18 @@ namespace XCOM2Launcher.Mod
             ShadowPath = TagRenderer.RoundedRect(shadowRectangle, rX);
             Path = TagRenderer.RoundedRect(tagRectangle, rX);
             BorderColor = ControlPaint.Dark(tagColor);
-            TextColor = tagColor;
+            HitBox = tagRectangle;
+            TagColor = tagColor;
 
             offset.X += rectWidth + rectPadding.Width;
         }
 
         public Point TextPosition { get; }
         public GraphicsPath Path { get; }
+        public Rectangle HitBox { get; }
         public GraphicsPath ShadowPath { get; }
         public Color BorderColor { get; }
-        public Color TextColor { get; }
+        public Color TagColor { get; }
     }
 
     public class TagRenderer : BaseRenderer
@@ -122,7 +124,7 @@ namespace XCOM2Launcher.Mod
                 {
                     graphics.FillPath(backgroundBrush, renderInfo.ShadowPath);
                 }
-                using (var backgroundBrush = new SolidBrush(renderInfo.TextColor))
+                using (var backgroundBrush = new SolidBrush(renderInfo.TagColor))
                 {
                     graphics.FillPath(backgroundBrush, renderInfo.Path);
                 }

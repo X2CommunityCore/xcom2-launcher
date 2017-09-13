@@ -60,6 +60,17 @@ namespace XCOM2Launcher.Forms
             
             olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
 
+            modlist_ListObjectListView.CellEditFinished += (sender, e) =>
+            {
+                if (e.Column == olvcTags)
+                {
+                    var newTag = (string)e.NewValue;
+                    var mod = (ModEntry)e.RowObject;
+
+                    AddTag(mod, newTag);
+                }
+            };
+
             olvcState.AspectGetter = o =>
             {
                 var mod = (ModEntry)o;
@@ -152,6 +163,44 @@ namespace XCOM2Launcher.Forms
 
             // Start out sorted by name
             modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
+        }
+
+        private void RenameTag(ModTag tag, string newTag)
+        {
+            if (tag != null && string.IsNullOrEmpty(newTag) == false)
+            {
+                var oldTag = tag.Label;
+
+                if (AvailableTags.ContainsKey(newTag) == false)
+                {
+                    tag.Label = newTag;
+
+                    AvailableTags.Remove(oldTag);
+                    AvailableTags[newTag] = tag;
+                }
+
+                foreach (var mod in Mods.All)
+                {
+                    if (mod.Tags.Contains(oldTag))
+                    {
+                        mod.Tags.Remove(oldTag);
+                        AddTag(mod, newTag);
+                    }
+                }
+            }
+        }
+
+        private void AddTag(ModEntry mod, string newTag)
+        {
+            if (string.IsNullOrEmpty(newTag) == false && mod.Tags.Contains(newTag) == false)
+            {
+                if (AvailableTags.ContainsKey(newTag) == false)
+                {
+                    AvailableTags[newTag] = new ModTag(newTag);
+                }
+
+                mod.Tags.Add(newTag);
+            }
         }
 
 
@@ -325,8 +374,118 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.SelectionChanged += ModListSelectionChanged;
             modlist_ListObjectListView.ItemChecked += ModListItemChecked;
         }
+
+        private void RenameTagPrompt(ModEntry m, ModTag tag, bool renameAll)
+        {
+            var prompt = renameAll ? $"Rename all instances of tag '{tag.Label}' ?"
+                                   : $"Rename tag '{tag.Label}' for '{m.Name}' ?";
+            var newTag = Interaction.InputBox(prompt, "Rename tag", tag.Label);
+
+            if (MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to {newTag}?",
+                                 @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            if (string.IsNullOrEmpty(newTag) == false && newTag != tag.Label)
+            {
+                if (renameAll)
+                {
+                    RenameTag(tag, newTag);
+                }
+                else
+                {
+                    m.Tags.Remove(tag.Label);
+                    AddTag(m, newTag);
+                }
+            }
+        }
         
-        private ContextMenu CreateModListContextMenu(ModEntry m)
+        private ContextMenu CreateModListContextMenu(ModEntry m, ModTag tag)
+        {
+            var menu = new ContextMenu();
+            if (m?.ID == null || tag == null)
+                return menu;
+            
+            // change color
+            var changeColorItem = new MenuItem("Change color");
+
+            var editColor = new MenuItem("Edit");
+
+            editColor.Click += (sender, e) =>
+            {
+                var colorPicker = new ColorDialog
+                {
+                    AllowFullOpen = true,
+                    Color = tag.Color,
+                    AnyColor = true,
+                    FullOpen = true
+                };
+
+                if (colorPicker.ShowDialog() == DialogResult.OK)
+                    tag.Color = colorPicker.Color;
+            };
+
+            changeColorItem.MenuItems.Add(editColor);
+
+            var makePastelItem = new MenuItem("Make pastel");
+
+            makePastelItem.Click += (sender, e) => tag.Color = tag.Color.GetPastelShade();
+
+            changeColorItem.MenuItems.Add(makePastelItem);
+
+            var changeShadeItem = new MenuItem("Random shade");
+
+            changeShadeItem.Click += (sender, e) => tag.Color = tag.Color.GetRandomShade(0.33, 1.0);
+
+            changeColorItem.MenuItems.Add(changeShadeItem);
+
+            var randomColorItem = new MenuItem("Random color");
+
+            randomColorItem.Click += (sender, e) => tag.Color = ModTag.RandomColor();
+
+            changeColorItem.MenuItems.Add(randomColorItem);
+            menu.MenuItems.Add(changeColorItem);
+
+            menu.MenuItems.Add("-");
+
+            // renaming tags
+            var renameTagItem = new MenuItem($"Rename '{tag.Label}'");
+
+            renameTagItem.Click += (sender, e) => RenameTagPrompt(m, tag, false);
+
+            menu.MenuItems.Add(renameTagItem);
+
+            var renameAllTagItem = new MenuItem($"Rename all '{tag.Label}'");
+
+            renameAllTagItem.Click += (sender, e) => RenameTagPrompt(m, tag, true);
+            menu.MenuItems.Add(renameAllTagItem);
+
+            menu.MenuItems.Add("-");
+
+            // removing tags
+            var removeTagItem = new MenuItem($"Remove '{tag.Label}'");
+
+            removeTagItem.Click += (sender, args) => m.Tags.Remove(tag.Label);
+            menu.MenuItems.Add(removeTagItem);
+            
+            var removeAllTagItem = new MenuItem($"Remove all '{tag.Label}'");
+
+            removeAllTagItem.Click += (sender, args) =>
+            {
+                if (MessageBox.Show($@"Are you sure you want to remove all instances of tag '{tag.Label}'?",
+                        @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+
+                foreach (var mod in Mods.All)
+                {
+                    mod.Tags.Remove(tag.Label);
+                }
+            };
+            menu.MenuItems.Add(removeAllTagItem);
+
+            return menu;
+        }
+        
+        private ContextMenu CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
         {
             var menu = new ContextMenu();
             if (m?.ID == null)
@@ -336,6 +495,13 @@ namespace XCOM2Launcher.Forms
             item.Click += (a, b) => { modlist_ListObjectListView.EditModel(m); };
             menu.MenuItems.Add(item);
 
+            // Add tag
+            if (currentItem != null)
+            {
+                var addTagItem = new MenuItem("Add tag");
+                addTagItem.Click += (a, b) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
+                menu.MenuItems.Add(addTagItem);
+            }
             // Move to ...
             var moveToCategory = new MenuItem("Move to Category...");
             // ... new category
@@ -399,9 +565,39 @@ namespace XCOM2Launcher.Forms
 
         #region Events
 
+        private ModTag HitTest(IList<string> tags, Graphics g, CellEventArgs e)
+        {
+            if (tags == null || e.SubItem == null)
+                return null;
+
+            var bounds = e.SubItem.Bounds;
+            TagRenderInfo.offset = new Point(bounds.X + TagRenderInfo.rX,
+                                             bounds.Y + TagRenderInfo.rY);
+
+            foreach (var tag in tags)
+            {
+                var tagSize = g.MeasureString(tag, e.SubItem.Font).ToSize();
+                var renderInfo = new TagRenderInfo(bounds, tagSize, Color.Black);
+
+                if (renderInfo.HitBox.Contains(e.Location) && AvailableTags.ContainsKey(tag))
+                {
+                    return AvailableTags[tag];
+                }
+            }
+
+            return null;
+        }
+
         private void ModListCellRightClick(object sender, CellRightClickEventArgs e)
         {
-            CreateModListContextMenu(e.Model as ModEntry).Show(e.ListView, e.Location);
+            var mod = e.Model as ModEntry;
+            var graphics = e.ListView.CreateGraphics();
+            var selectedTag = e.SubItem != null ? HitTest(mod?.Tags, graphics, e) : null;
+            var menu = selectedTag == null 
+                ? CreateModListContextMenu(mod, e.Item)
+                : CreateModListContextMenu(mod, selectedTag);
+
+            menu.Show(e.ListView, e.Location);
         }
 
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
@@ -479,6 +675,10 @@ namespace XCOM2Launcher.Forms
                     modlist_ListObjectListView.Sort();
                     modlist_ListObjectListView.EndUpdate();
                     break;
+                case "Category":
+                    MoveMods((string)e.NewValue);
+                    break;
+                    
             }
         }
 
