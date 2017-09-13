@@ -135,6 +135,7 @@
     <Compile Include="Classes\GitHub\User.cs" />
     <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
     <Compile Include="Classes\Helper\MessageBoxManager.cs" />
+    <Compile Include="Classes\Mod\ColorExtensions.cs" />
     <Compile Include="Classes\Mod\ModChangelogCache.cs" />
     <Compile Include="Classes\Mod\ModConflict.cs" />
     <Compile Include="Classes\Mod\ModEntry.cs" />
@@ -275,7 +276,6 @@
     </Content>
     <Content Include="Resources\xcom.ico" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
       <Visible>False</Visible>
