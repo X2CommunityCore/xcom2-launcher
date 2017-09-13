@@ -565,24 +565,31 @@ namespace XCOM2Launcher.Forms
 
         #region Events
 
-        private ModTag HitTest(IList<string> tags, Graphics g, CellEventArgs e)
+        private ModTag HitTest(IEnumerable<string> tags, Graphics g, CellEventArgs e)
         {
             if (tags == null || e.SubItem == null)
                 return null;
 
             var bounds = e.SubItem.Bounds;
-            TagRenderInfo.offset = new Point(bounds.X + TagRenderInfo.rX,
-                                             bounds.Y + TagRenderInfo.rY);
+            var offset = new Point(bounds.X + TagRenderInfo.rX,
+                                   bounds.Y + TagRenderInfo.rY);
+            var tagList = AvailableTags.Select(kvp => kvp.Value)
+                                       .Where(t => tags.Contains(t.Label));
 
-            foreach (var tag in tags)
+            foreach (var tag in tagList)
             {
-                var tagSize = g.MeasureString(tag, e.SubItem.Font).ToSize();
-                var renderInfo = new TagRenderInfo(bounds, tagSize, Color.Black);
+                var tagSize = g.MeasureString(tag.Label, e.SubItem.Font).ToSize();
+                var renderInfo = new TagRenderInfo(offset, bounds, tagSize, Color.Black);
 
-                if (renderInfo.HitBox.Contains(e.Location) && AvailableTags.ContainsKey(tag))
+                if (renderInfo.HitBox.Contains(e.Location))
                 {
-                    return AvailableTags[tag];
+                    return tag;
                 }
+
+                offset.X += renderInfo.HitBox.Width + TagRenderInfo.rX;
+                // stop drawing outside of the column bounds
+                if (offset.X > bounds.Right)
+                    break;
             }
 
             return null;

@@ -17,10 +17,8 @@ namespace XCOM2Launcher.Mod
         public static int rY => rectPadding.Height;
         public static int tX => textPadding.Width;
         public static int tY => textPadding.Height;
-
-        public static Point offset;
-
-        public TagRenderInfo(Rectangle bounds, Size textSize, Color tagColor)
+        
+        public TagRenderInfo(Point offset, Rectangle bounds, Size textSize, Color tagColor)
         {
             var rectWidth = textSize.Width + tX * 2;
             var rectHeight = Math.Max(textSize.Height + tY * 2, bounds.Height - rY) - 1;
@@ -33,8 +31,6 @@ namespace XCOM2Launcher.Mod
             BorderColor = ControlPaint.Dark(tagColor);
             HitBox = tagRectangle;
             TagColor = tagColor;
-
-            offset.X += rectWidth + rectPadding.Width;
         }
 
         public Point TextPosition { get; }
@@ -112,13 +108,13 @@ namespace XCOM2Launcher.Mod
             if (tagList.Count <= 0)
                 return true;
 
-            TagRenderInfo.offset = new Point(bounds.X + TagRenderInfo.rX,
-                                             bounds.Y + TagRenderInfo.rY);
+            var offset = new Point(bounds.X + TagRenderInfo.rX,
+                                   bounds.Y + TagRenderInfo.rY);
 
             foreach (var tag in tagList)
             {
                 var tagSize = graphics.MeasureString(tag.Label, font).ToSize();
-                var renderInfo = new TagRenderInfo(bounds, tagSize, tag.Color);
+                var renderInfo = new TagRenderInfo(offset, bounds, tagSize, tag.Color);
 
                 using (var backgroundBrush = new SolidBrush(Color.FromArgb(255, 32, 32, 32)))
                 {
@@ -136,8 +132,10 @@ namespace XCOM2Launcher.Mod
                 {
                     graphics.DrawString(tag.Label, font, textBrush, renderInfo.TextPosition);
                 }
+
+                offset.X += renderInfo.HitBox.Width + TagRenderInfo.rX;
                 // stop drawing outside of the column bounds
-                if (TagRenderInfo.offset.X > bounds.Right)
+                if (offset.X > bounds.Right)
                     break;
             }
 
