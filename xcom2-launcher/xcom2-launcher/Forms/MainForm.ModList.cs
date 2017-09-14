@@ -24,7 +24,6 @@ namespace XCOM2Launcher.Forms
 
         public ModEntry CurrentMod;
 
-
         public void InitObjectListView()
         {
             //modlist_objectlistview?.Dispose();
@@ -59,7 +58,12 @@ namespace XCOM2Launcher.Forms
             olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
             
             olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
-            olvcTags.AspectPutter = (rowObject, value) => AddTag((ModEntry) rowObject, (string) value);
+            olvcTags.AspectPutter = (rowObject, value) =>
+            {
+                var tags = ((string) value).Split(';');
+
+                tags.All(t => AddTag((ModEntry) rowObject, t.Trim()));
+            };
             olvcTags.SearchValueGetter = rowObject => ((ModEntry)rowObject).Tags.ToArray();
             olvcTags.AspectGetter = rowObject => "";
 
@@ -183,9 +187,9 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void AddTag(ModEntry mod, string newTag)
+        private bool AddTag(ModEntry mod, string newTag)
         {
-            if (string.IsNullOrEmpty(newTag) == false && mod.Tags.Contains(newTag) == false)
+            if (mod != null && string.IsNullOrEmpty(newTag) == false && mod.Tags.Contains(newTag) == false)
             {
                 if (AvailableTags.ContainsKey(newTag) == false)
                 {
@@ -193,7 +197,11 @@ namespace XCOM2Launcher.Forms
                 }
 
                 mod.Tags.Add(newTag);
+
+                return true;
             }
+
+            return false;
         }
 
 
