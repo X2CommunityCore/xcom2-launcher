@@ -634,7 +634,8 @@ namespace XCOM2Launcher.Forms
         {
             var mod = e.Model as ModEntry;
             var graphics = e.ListView.CreateGraphics();
-            var selectedTag = e.SubItem != null ? HitTest(mod?.Tags, graphics, e) : null;
+            var selectedTag = e.SubItem != null && e.Column == olvcTags 
+                            ? HitTest(mod?.Tags, graphics, e) : null;
             var menu = selectedTag == null 
                 ? CreateModListContextMenu(mod, e.Item)
                 : CreateModListContextMenu(mod, selectedTag);
