@@ -505,8 +505,36 @@ namespace XCOM2Launcher.Forms
             // Add tag
             if (currentItem != null)
             {
+                var selectedCount = modlist_ListObjectListView.SelectedItems.Count;
                 var addTagItem = new MenuItem("Add tag");
-                addTagItem.Click += (a, b) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
+
+                if (selectedCount > 1)
+                {
+                    addTagItem.Click += (sender, args) =>
+                    {
+                        var newTag = Interaction.InputBox($"Add a tag to {selectedCount} mods?", "Add tag");
+
+                        if (newTag == "")
+                            return;
+
+                        var tags = newTag.Split(';');
+
+                        foreach (var selectedItem in modlist_ListObjectListView.SelectedItems)
+                        {
+                            var listItem = selectedItem as OLVListItem;
+
+                            if (listItem == null)
+                                continue;
+
+                            tags.All(t => AddTag(listItem.RowObject as ModEntry, t.Trim()));
+                        }
+                    };
+                }
+                else
+                {
+                    addTagItem.Click += (sender, args) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
+                }
+
                 menu.MenuItems.Add(addTagItem);
             }
             // Move to ...
