@@ -388,7 +388,23 @@ namespace XCOM2Launcher.Forms
 		/// </summary>
 		public class Line
 		{
-			/// <summary>
+		    protected bool Equals(Line other)
+		    {
+		        return string.Equals(line, other.line) && Equals(SubLines, other.SubLines) && State == other.State;
+		    }
+
+		    public override int GetHashCode()
+		    {
+		        unchecked
+		        {
+		            var hashCode = (line != null ? line.GetHashCode() : 0);
+		            hashCode = (hashCode * 397) ^ (SubLines != null ? SubLines.GetHashCode() : 0);
+		            hashCode = (hashCode * 397) ^ (int) State;
+		            return hashCode;
+		        }
+		    }
+
+		    /// <summary>
 			/// Source string
 			/// </summary>
 			public readonly string line;
@@ -450,7 +466,7 @@ namespace XCOM2Launcher.Forms
 			{
 			}
 
-			public Line this[int i]
+			public new Line this[int i]
 			{
 				get
 				{
@@ -480,7 +496,7 @@ namespace XCOM2Launcher.Forms
 							lines.Add(new Line(line));
 					}
 				}
-				catch (Exception e) {}
+				catch (Exception) {}
 				return lines;
 
 			}
