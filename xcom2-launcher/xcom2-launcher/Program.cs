@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
 using XCOM2Launcher.Classes.Steam;
@@ -51,13 +52,15 @@ namespace XCOM2Launcher
                     using (var client = new System.Net.WebClient())
                     {
                         client.Headers.Add("User-Agent: Other");
+                        var regex = new Regex("[^0-9.]");
                         var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
                         var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
-                        var currentVersion = GetCurrentVersion();
+                        var currentVersion = new Version(regex.Replace(GetCurrentVersion(), ""));
+                        var newVersion = new Version(regex.Replace(release.tag_name, ""));
 
-                        if (currentVersion != release.tag_name)
+                        if (currentVersion.CompareTo(newVersion) < 0)
                             // New version available
-                            new UpdateAvailableDialog(release, currentVersion).ShowDialog();
+                            new UpdateAvailableDialog(release, currentVersion.ToString()).ShowDialog();
                     }
                 }
                 catch (System.Net.WebException)
