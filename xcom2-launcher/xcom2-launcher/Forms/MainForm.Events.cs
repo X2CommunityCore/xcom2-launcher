@@ -303,7 +303,7 @@ namespace XCOM2Launcher.Forms
             // parse file
 
 			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
-            var modEntryRegex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)([ ]*\t(?<active>.*?))?$", RegexOptions.Compiled | RegexOptions.Multiline);
+            var modEntryRegex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)([ ]*\t(?<tags>.*?))?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
             var mods = Mods.All.ToList();
             var activeMods = new List<ModEntry>();
@@ -344,8 +344,19 @@ namespace XCOM2Launcher.Forms
 
                 activeMods.AddRange(entries);
 
+                var tags = modMatch.Groups["tags"].Value.Split(';');
+
+                foreach (var tag in tags)
+                {
+                    if (AvailableTags.ContainsKey(tag) == false)
+                    {
+                        AvailableTags[tag] = new ModTag(tag);
+                    }
+                }
+
 	            foreach (var modEntry in entries)
 	            {
+	                modEntry.Tags = tags.ToList();
 		            Mods.RemoveMod(modEntry);
 					Mods.AddMod(categoryName, modEntry);
 		            //modEntry.isActive = active;

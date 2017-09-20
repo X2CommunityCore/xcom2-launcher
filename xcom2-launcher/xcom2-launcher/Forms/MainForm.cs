@@ -154,7 +154,8 @@ namespace XCOM2Launcher.Forms
 
 			var nameLength = showAllMods ? Mods.All.Max(m => m.Name.Length) : Mods.Active.Max(m => m.Name.Length);
 			var idLength = showAllMods ? Mods.All.Max(m => m.ID.Length) : Mods.Active.Max(m => m.ID.Length);
-			
+            var workshopIDLength = showAllMods ? Mods.All.Max(m => m.WorkshopID.ToString().Length) : Mods.Active.Max(m => m.WorkshopID.ToString().Length);
+
 
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
             {
@@ -182,13 +183,13 @@ namespace XCOM2Launcher.Forms
                         str.Append("Unknown");
 
                     else if (showLink)
-                        str.Append(mod.GetWorkshopLink());
+                        str.Append(string.Format("{0,-" + workshopIDLength + "} ", mod.GetWorkshopLink()));
 
                     else
-                        str.Append(mod.WorkshopID.ToString());
-	                //str.Append("\t");
+                        str.Append(string.Format("{0,-" + workshopIDLength + "} ", mod.WorkshopID));
+	                str.Append("\t");
 
-	                //str.Append(mod.isActive);
+                    str.Append(string.Join(";", mod.Tags));
 
                     str.AppendLine();
                 }
