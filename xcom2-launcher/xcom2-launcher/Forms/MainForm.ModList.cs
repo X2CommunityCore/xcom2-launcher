@@ -56,6 +56,8 @@ namespace XCOM2Launcher.Forms
             olvcOrder.GroupFormatter = categoryFormatterDelegate;
 
             olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
+
+            olvcRequiresXPack.AspectGetter = o => ((ModEntry)o).Description.Contains("RequiresXPACK=true") ? "Yes" : "No";
             
             olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
             olvcTags.AspectPutter = (rowObject, value) =>
