@@ -10,20 +10,19 @@ using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
-using Timer = System.Timers.Timer;
 
 namespace XCOM2Launcher.Forms
 {
     public partial class MainForm : Form
     {
         public ModList Mods => Settings.Mods;
+        public Dictionary<string, ModTag> AvailableTags => Settings.Tags;
 
         public TypedObjectListView<ModEntry> ModList { get; private set; }
 
         public List<ModEntry> Downloads { get; } = new List<ModEntry>();
 
         public ModEntry CurrentMod;
-
 
         public void InitObjectListView()
         {
@@ -55,6 +54,19 @@ namespace XCOM2Launcher.Forms
 
             olvcOrder.GroupKeyGetter = categoryGroupingDelegate;
             olvcOrder.GroupFormatter = categoryFormatterDelegate;
+
+            olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
+            
+            olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
+            olvcTags.AspectPutter = (rowObject, value) =>
+            {
+                var tags = ((string) value).Split(';');
+
+                tags.All(t => AddTag((ModEntry) rowObject, t.Trim()));
+            };
+            olvcTags.SearchValueGetter = rowObject => ((ModEntry)rowObject).Tags.ToArray();
+            olvcTags.AspectGetter = rowObject => "";
+
 
             olvcState.AspectGetter = o =>
             {
@@ -148,6 +160,48 @@ namespace XCOM2Launcher.Forms
 
             // Start out sorted by name
             modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
+        }
+
+        private void RenameTag(ModTag tag, string newTag)
+        {
+            if (tag != null && string.IsNullOrEmpty(newTag) == false)
+            {
+                var oldTag = tag.Label;
+
+                if (AvailableTags.ContainsKey(newTag) == false)
+                {
+                    tag.Label = newTag;
+
+                    AvailableTags.Remove(oldTag);
+                    AvailableTags[newTag] = tag;
+                }
+
+                foreach (var mod in Mods.All)
+                {
+                    if (mod.Tags.Contains(oldTag))
+                    {
+                        mod.Tags.Remove(oldTag);
+                        AddTag(mod, newTag);
+                    }
+                }
+            }
+        }
+
+        private bool AddTag(ModEntry mod, string newTag)
+        {
+            if (mod != null && string.IsNullOrEmpty(newTag) == false && mod.Tags.Contains(newTag) == false)
+            {
+                if (AvailableTags.ContainsKey(newTag) == false)
+                {
+                    AvailableTags[newTag] = new ModTag(newTag);
+                }
+
+                mod.Tags.Add(newTag);
+
+                return true;
+            }
+
+            return false;
         }
 
 
@@ -321,8 +375,124 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.SelectionChanged += ModListSelectionChanged;
             modlist_ListObjectListView.ItemChecked += ModListItemChecked;
         }
+
+        private void RenameTagPrompt(ModEntry m, ModTag tag, bool renameAll)
+        {
+            var prompt = renameAll ? $"Rename all instances of tag '{tag.Label}' ?"
+                                   : $"Rename tag '{tag.Label}' for '{m.Name}' ?";
+            var newTag = Interaction.InputBox(prompt, "Rename tag", tag.Label);
+
+            if (string.IsNullOrEmpty(newTag) || (renameAll && MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to {newTag}?",
+                                                                               @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes))
+            { 
+                return;
+            }
+
+            if (newTag != tag.Label)
+            {
+                if (renameAll)
+                {
+                    RenameTag(tag, newTag);
+                }
+                else
+                {
+                    m.Tags.Remove(tag.Label);
+
+                    if (m.Tags.Contains(newTag) == false)
+                    {
+                        AddTag(m, newTag);
+                    }
+                }
+            }
+        }
         
-        private ContextMenu CreateModListContextMenu(ModEntry m)
+        private ContextMenu CreateModListContextMenu(ModEntry m, ModTag tag)
+        {
+            var menu = new ContextMenu();
+            if (m?.ID == null || tag == null)
+                return menu;
+            
+            // change color
+            var changeColorItem = new MenuItem("Change color");
+
+            var editColor = new MenuItem("Edit");
+
+            editColor.Click += (sender, e) =>
+            {
+                var colorPicker = new ColorDialog
+                {
+                    AllowFullOpen = true,
+                    Color = tag.Color,
+                    AnyColor = true,
+                    FullOpen = true
+                };
+
+                if (colorPicker.ShowDialog() == DialogResult.OK)
+                    tag.Color = colorPicker.Color;
+            };
+
+            changeColorItem.MenuItems.Add(editColor);
+
+            var makePastelItem = new MenuItem("Make pastel");
+
+            makePastelItem.Click += (sender, e) => tag.Color = tag.Color.GetPastelShade();
+
+            changeColorItem.MenuItems.Add(makePastelItem);
+
+            var changeShadeItem = new MenuItem("Random shade");
+
+            changeShadeItem.Click += (sender, e) => tag.Color = tag.Color.GetRandomShade(0.33, 1.0);
+
+            changeColorItem.MenuItems.Add(changeShadeItem);
+
+            var randomColorItem = new MenuItem("Random color");
+
+            randomColorItem.Click += (sender, e) => tag.Color = ModTag.RandomColor();
+
+            changeColorItem.MenuItems.Add(randomColorItem);
+            menu.MenuItems.Add(changeColorItem);
+
+            menu.MenuItems.Add("-");
+
+            // renaming tags
+            var renameTagItem = new MenuItem($"Rename '{tag.Label}'");
+
+            renameTagItem.Click += (sender, e) => RenameTagPrompt(m, tag, false);
+
+            menu.MenuItems.Add(renameTagItem);
+
+            var renameAllTagItem = new MenuItem($"Rename all '{tag.Label}'");
+
+            renameAllTagItem.Click += (sender, e) => RenameTagPrompt(m, tag, true);
+            menu.MenuItems.Add(renameAllTagItem);
+
+            menu.MenuItems.Add("-");
+
+            // removing tags
+            var removeTagItem = new MenuItem($"Remove '{tag.Label}'");
+
+            removeTagItem.Click += (sender, args) => m.Tags.Remove(tag.Label);
+            menu.MenuItems.Add(removeTagItem);
+            
+            var removeAllTagItem = new MenuItem($"Remove all '{tag.Label}'");
+
+            removeAllTagItem.Click += (sender, args) =>
+            {
+                if (MessageBox.Show($@"Are you sure you want to remove all instances of tag '{tag.Label}'?",
+                        @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+
+                foreach (var mod in Mods.All)
+                {
+                    mod.Tags.Remove(tag.Label);
+                }
+            };
+            menu.MenuItems.Add(removeAllTagItem);
+
+            return menu;
+        }
+        
+        private ContextMenu CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
         {
             var menu = new ContextMenu();
             if (m?.ID == null)
@@ -332,6 +502,41 @@ namespace XCOM2Launcher.Forms
             item.Click += (a, b) => { modlist_ListObjectListView.EditModel(m); };
             menu.MenuItems.Add(item);
 
+            // Add tag
+            if (currentItem != null)
+            {
+                var selectedCount = modlist_ListObjectListView.SelectedItems.Count;
+                var addTagItem = new MenuItem("Add tag");
+
+                if (selectedCount > 1)
+                {
+                    addTagItem.Click += (sender, args) =>
+                    {
+                        var newTag = Interaction.InputBox($"Add a tag to {selectedCount} mods?", "Add tag");
+
+                        if (newTag == "")
+                            return;
+
+                        var tags = newTag.Split(';');
+
+                        foreach (var selectedItem in modlist_ListObjectListView.SelectedItems)
+                        {
+                            var listItem = selectedItem as OLVListItem;
+
+                            if (listItem == null)
+                                continue;
+
+                            tags.All(t => AddTag(listItem.RowObject as ModEntry, t.Trim()));
+                        }
+                    };
+                }
+                else
+                {
+                    addTagItem.Click += (sender, args) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
+                }
+
+                menu.MenuItems.Add(addTagItem);
+            }
             // Move to ...
             var moveToCategory = new MenuItem("Move to Category...");
             // ... new category
@@ -395,9 +600,47 @@ namespace XCOM2Launcher.Forms
 
         #region Events
 
+        private ModTag HitTest(IEnumerable<string> tags, Graphics g, CellEventArgs e)
+        {
+            if (tags == null || e.SubItem == null)
+                return null;
+
+            var bounds = e.SubItem.Bounds;
+            var offset = new Point(bounds.X + TagRenderInfo.rX,
+                                   bounds.Y + TagRenderInfo.rY);
+            var tagList = AvailableTags.Select(kvp => kvp.Value)
+                                       .Where(t => tags.Contains(t.Label));
+
+            foreach (var tag in tagList)
+            {
+                var tagSize = g.MeasureString(tag.Label, e.SubItem.Font).ToSize();
+                var renderInfo = new TagRenderInfo(offset, bounds, tagSize, Color.Black);
+
+                if (renderInfo.HitBox.Contains(e.Location))
+                {
+                    return tag;
+                }
+
+                offset.X += renderInfo.HitBox.Width + TagRenderInfo.rX;
+                // stop drawing outside of the column bounds
+                if (offset.X > bounds.Right)
+                    break;
+            }
+
+            return null;
+        }
+
         private void ModListCellRightClick(object sender, CellRightClickEventArgs e)
         {
-            CreateModListContextMenu(e.Model as ModEntry).Show(e.ListView, e.Location);
+            var mod = e.Model as ModEntry;
+            var graphics = e.ListView.CreateGraphics();
+            var selectedTag = e.SubItem != null && e.Column == olvcTags 
+                            ? HitTest(mod?.Tags, graphics, e) : null;
+            var menu = selectedTag == null 
+                ? CreateModListContextMenu(mod, e.Item)
+                : CreateModListContextMenu(mod, selectedTag);
+
+            menu.Show(e.ListView, e.Location);
         }
 
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
@@ -475,6 +718,10 @@ namespace XCOM2Launcher.Forms
                     modlist_ListObjectListView.Sort();
                     modlist_ListObjectListView.EndUpdate();
                     break;
+                case "Category":
+                    MoveMods((string)e.NewValue);
+                    break;
+                    
             }
         }
 

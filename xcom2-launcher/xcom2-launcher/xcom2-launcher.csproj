@@ -106,13 +106,12 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ObjectListView, Version=2.9.1.1072, Culture=neutral, PublicKeyToken=b1c5bf581481bcd4, processorArchitecture=MSIL">
+    <Reference Include="ObjectListView">
       <HintPath>..\packages\ObjectListView.Official.2.9.1\lib\net20\ObjectListView.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Steamworks.NET, Version=8.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -135,6 +134,7 @@
     <Compile Include="Classes\GitHub\User.cs" />
     <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
     <Compile Include="Classes\Helper\MessageBoxManager.cs" />
+    <Compile Include="Classes\Mod\ColorExtensions.cs" />
     <Compile Include="Classes\Mod\ModChangelogCache.cs" />
     <Compile Include="Classes\Mod\ModConflict.cs" />
     <Compile Include="Classes\Mod\ModEntry.cs" />
@@ -145,6 +145,8 @@
     <Compile Include="Classes\Mod\ModSettingsEntry.cs" />
     <Compile Include="Classes\Mod\ModState.cs" />
     <Compile Include="Classes\Mod\ModSource.cs" />
+    <Compile Include="Classes\Mod\ModTag.cs" />
+    <Compile Include="Classes\Mod\TagRenderer.cs" />
     <Compile Include="Classes\PropertyGrid\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Classes\PropertyGrid\PropertyCheckbox.cs" />
     <Compile Include="Classes\PropertyGrid\PropertyGridExtensions.cs" />
@@ -273,7 +275,6 @@
     </Content>
     <Content Include="Resources\xcom.ico" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
       <Visible>False</Visible>

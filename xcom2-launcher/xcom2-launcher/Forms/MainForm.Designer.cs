@@ -60,6 +60,7 @@
             this.olvcActive = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvcCategory = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcState = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcOrder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcSize = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -70,6 +71,7 @@
             this.olvcHasBackup = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcWorkshopID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcHidden = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvcTags = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvSteamLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvBrowserLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.panel2 = new System.Windows.Forms.Panel();
@@ -394,6 +396,7 @@
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcActive);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcName);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvcCategory);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcState);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcOrder);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcSize);
@@ -404,6 +407,7 @@
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcHasBackup);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcWorkshopID);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcHidden);
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvcTags);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvSteamLink);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvBrowserLink);
             this.modlist_ListObjectListView.AllowColumnReorder = true;
@@ -415,12 +419,14 @@
             this.olvcActive,
             this.olvcName,
             this.olvcID,
+            this.olvcCategory,
             this.olvcState,
             this.olvcOrder,
             this.olvcSize,
             this.olvcLastUpdated,
             this.olvcHasBackup,
-            this.olvcHidden});
+            this.olvcHidden,
+            this.olvcTags});
             this.tableLayoutPanel1.SetColumnSpan(this.modlist_ListObjectListView, 3);
             this.modlist_ListObjectListView.Cursor = System.Windows.Forms.Cursors.Default;
             this.modlist_ListObjectListView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -467,6 +473,11 @@
             this.olvcID.IsEditable = false;
             this.olvcID.Text = "ID";
             this.olvcID.Width = 200;
+            // 
+            // olvcCategory
+            // 
+            this.olvcCategory.AspectName = "Category";
+            this.olvcCategory.Text = "Category";
             // 
             // olvcState
             // 
@@ -545,6 +556,15 @@
             // 
             this.olvcHidden.AspectName = "isHidden";
             this.olvcHidden.Text = "Hidden";
+            // 
+            // olvcTags
+            // 
+            this.olvcTags.AspectName = "";
+            this.olvcTags.AutoCompleteEditor = false;
+            this.olvcTags.AutoCompleteEditorMode = System.Windows.Forms.AutoCompleteMode.None;
+            this.olvcTags.MinimumWidth = 250;
+            this.olvcTags.Text = "Tags";
+            this.olvcTags.Width = 250;
             // 
             // olvSteamLink
             // 
@@ -1447,5 +1467,7 @@
         private BrightIdeasSoftware.OLVColumn olvBrowserLink;
         private System.Windows.Forms.ToolStripMenuItem resubscribeToModsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runWarOfTheChosenToolStripMenuItem;
+        private BrightIdeasSoftware.OLVColumn olvcCategory;
+        private BrightIdeasSoftware.OLVColumn olvcTags;
     }
 }
