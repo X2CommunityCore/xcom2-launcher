@@ -119,6 +119,9 @@ namespace XCOM2Launcher.XCOM
 
         public static string[] DetectModDirs()
         {
+            // Prevent stack overflow (Issue #19)
+            if (_gameDir == null)
+                return new string[0];
 
             return
                 new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs")?
