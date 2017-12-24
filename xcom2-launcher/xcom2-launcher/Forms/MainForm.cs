@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using Steamworks;
@@ -27,6 +28,9 @@ namespace XCOM2Launcher.Forms
 
             // Restore states 
             showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
+
+            // Hide WotC button if necessary
+            runWarOfTheChosenToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
 
             // Init interface
             InitObjectListView();
