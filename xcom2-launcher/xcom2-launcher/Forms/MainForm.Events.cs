@@ -134,7 +134,7 @@ namespace XCOM2Launcher.Forms
         private void Resubscribe_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
         {
             var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
-            MessageBox.Show("Resubscribe_OnItemDownloaded");
+
             if (mod.State == ModState.NotInstalled && e.Result.m_eResult == EResult.k_EResultOK)
             {
                 mod.State &= ~ModState.NotInstalled;
