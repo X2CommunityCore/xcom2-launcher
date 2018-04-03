@@ -29,7 +29,7 @@ namespace XCOM2Launcher
             Application.SetCompatibleTextRenderingDefault(false);
 
             if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                Process.Start(@"https://www.microsoft.com/de-de/download/details.aspx?id=49981");
+                Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
 
             if (!SteamAPIWrapper.Init())
             {
