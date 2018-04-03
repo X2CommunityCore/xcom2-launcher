@@ -27,10 +27,18 @@ namespace XCOM2Launcher
 #endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
-
+            
+            try
+            {
+                if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+            }
+            catch (Exception e)
+            {
+                if (MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+            }
+            
             if (!SteamAPIWrapper.Init())
             {
                 MessageBox.Show("Please start steam first!");
