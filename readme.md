@@ -20,7 +20,7 @@ This is an alternative launcher / mod manager for the game XCOM 2.
 * Editable mod descriptions
 
 # Requirements
-* [.NET 4.6](https://www.microsoft.com/de-de/download/details.aspx?id=49981) (if you're on win 7, you might need to update)
+* [.NET 4.6](https://www.microsoft.com/en-us/download/details.aspx?id=56115) (if you're on win 7, you might need to update)
 * 64-bit Windows
 * Steam running
 
