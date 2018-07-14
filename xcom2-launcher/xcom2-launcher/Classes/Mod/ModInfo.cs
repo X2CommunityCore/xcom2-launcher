@@ -18,6 +18,7 @@ namespace XCOM2Launcher.Mod
         public string Category { get; set; } = "Unsorted";
         public string Description { get; set; } = "";
         public string Tags { get; set; } = "";
+        public bool RequiresXPACK { get; set; }
         public string ContentImage { get; set; } = "ModPreview.jpg";
 
         protected void LoadFile(string filepath)
@@ -25,7 +26,7 @@ namespace XCOM2Launcher.Mod
             if (!File.Exists(filepath))
                 return;
 
-            string[] keys = { "publishedfileid", "title", "category", "description", "tags", "contentimage" };
+            string[] keys = { "publishedfileid", "title", "category", "description", "tags", "contentimage", "requiresxpack" };
             var values = new Dictionary<string, string>();
 
             using (var stream = new FileStream(filepath, FileMode.Open))
@@ -100,6 +101,9 @@ namespace XCOM2Launcher.Mod
 
             if (values.ContainsKey("tags"))
                 Tags = values["tags"];
+
+            if (values.ContainsKey("requiresxpack"))
+                RequiresXPACK = values["requiresxpack"].ToLower() == "true";
 
             if (values.ContainsKey("contentimage"))
             {

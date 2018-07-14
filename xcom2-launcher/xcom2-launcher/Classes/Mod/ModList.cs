@@ -64,8 +64,8 @@ namespace XCOM2Launcher.Mod
                 where overridesForThisClass.Count > 1
                     // If every mod uses a UIScreenListener, there is no conflict
                     && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
-                    // If all overrides are from the same mod, assume there is no conflict
-                    && overridesForThisClass.Any(o => o.Mod != overridesForThisClass[0].Mod)
+                    // If all overrides uses the same mod ID, assume there is no conflict
+                    && overridesForThisClass.Any(o => o.Mod.ID != overridesForThisClass[0].Mod.ID)
                 select new ModConflict(className, overridesForThisClass);
         }
 
@@ -134,6 +134,7 @@ namespace XCOM2Launcher.Mod
                 Source = source,
                 isActive = false,
                 DateAdded = DateTime.Now,
+                BuiltForWOTC = modinfo.RequiresXPACK,
                 State = ModState.New
             };
 	        if (source == ModSource.SteamWorkshop)
@@ -176,6 +177,15 @@ namespace XCOM2Launcher.Mod
 
         internal void UpdateMod(ModEntry m, Settings settings)
         {
+            // Check if mod directory exists
+            if (!Directory.Exists(m.Path))
+            {
+                m.State |= ModState.NotInstalled;
+                m.State |= ModState.NotLoaded;
+                m.isHidden = true;
+                return;
+            }
+
             // Check if in ModPaths
             if (!settings.ModPaths.Any(modPath => m.IsInModPath(modPath)))
                 m.State |= ModState.NotLoaded;
@@ -240,12 +250,45 @@ namespace XCOM2Launcher.Mod
                         Workshop.GetDownloadStatus((ulong) m.WorkshopID)
                             .HasFlag(EItemState.k_EItemStateNeedsUpdate))
                         m.State |= ModState.UpdateAvailable;
+
+                // Check if it is built for WOTC
+                try
+                {
+                    // Parse .XComMod file
+                    var modinfo = new ModInfo(m.GetModInfoFile());
+                    m.BuiltForWOTC = modinfo.RequiresXPACK;
+                }
+                catch (InvalidOperationException)
+                {
+                    return;
+                }
             }
             else
             {
+                m.DateCreated = Directory.GetCreationTime(m.Path);
+                m.DateUpdated = Directory.GetLastWriteTime(m.Path);
+
+
                 // Update directory size
                 // slow, but necessary ?
                 m.Size = Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length);
+
+                // Update Name and Description
+                // look for .XComMod file
+                try
+                {
+                    // Parse .XComMod file
+                    var modinfo = new ModInfo(m.GetModInfoFile());
+                    if (!m.ManualName || m.Name == "")
+                        m.Name = modinfo.Title;
+
+                    m.Description = modinfo.Description;
+                    m.BuiltForWOTC = modinfo.RequiresXPACK;
+                }
+                catch (InvalidOperationException)
+                {
+                    return;
+                }
             }
         }
 

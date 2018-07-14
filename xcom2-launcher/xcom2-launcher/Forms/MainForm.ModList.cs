@@ -594,6 +594,8 @@ namespace XCOM2Launcher.Forms
                 menu.MenuItems.Add(new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); }));
             }
 
+            menu.MenuItems.Add(new MenuItem("Update", delegate { Settings.Mods.UpdateMod(m, Settings); }));
+
 
             return menu;
         }
