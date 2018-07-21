@@ -103,7 +103,7 @@ namespace XCOM2Launcher.Mod
                 Tags = values["tags"];
 
             if (values.ContainsKey("requiresxpack"))
-                RequiresXPACK = values["requiresxpack"].ToLower() == "true";
+                RequiresXPACK = values["requiresxpack"].ToLower().Trim('\r', '\n', '\t', ' ') == "true";
 
             if (values.ContainsKey("contentimage"))
             {
