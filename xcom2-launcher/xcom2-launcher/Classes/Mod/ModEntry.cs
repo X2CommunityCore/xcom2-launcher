@@ -77,6 +77,8 @@ namespace XCOM2Launcher.Mod
 
         public IList<string> Tags { get; set; } = new List<string>();
 
+        public bool BuiltForWOTC { get; set; } = false;
+
 
 		#region Mod
 
@@ -176,13 +178,20 @@ namespace XCOM2Launcher.Mod
 
         public string GetWorkshopLink()
         {
-            return "https://steamcommunity.com/sharedfiles/filedetails/?id=" + WorkshopID;
+            if (WorkshopID > 0)
+            {
+                return "https://steamcommunity.com/sharedfiles/filedetails/?id=" + WorkshopID;
+            }
+            return "";
         }
 
 	    public string GetSteamLink()
 	    {
-		    return "steam://url/CommunityFilePage/" + WorkshopID;
-
+            if (WorkshopID > 0)
+            {
+                return "steam://url/CommunityFilePage/" + WorkshopID;
+            }
+            return "";
 	    }
 
         public override string ToString()

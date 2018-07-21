@@ -51,6 +51,7 @@
             this.cleanModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.error_provider = new System.Windows.Forms.ErrorProvider(this.components);
             this.main_tabcontrol = new System.Windows.Forms.TabControl();
             this.modlist_tab = new System.Windows.Forms.TabPage();
@@ -133,7 +134,7 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.olvForWOTC = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -321,6 +322,14 @@
             this.runXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(103, 20);
             this.runXCOM2ToolStripMenuItem.Text = "Run &XCOM 2";
             // 
+            // runWarOfTheChosenToolStripMenuItem
+            // 
+            this.runWarOfTheChosenToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
+            this.runWarOfTheChosenToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runWarOfTheChosenToolStripMenuItem.Image")));
+            this.runWarOfTheChosenToolStripMenuItem.Name = "runWarOfTheChosenToolStripMenuItem";
+            this.runWarOfTheChosenToolStripMenuItem.Size = new System.Drawing.Size(157, 20);
+            this.runWarOfTheChosenToolStripMenuItem.Text = "Run War of the Chosen";
+            // 
             // error_provider
             // 
             this.error_provider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
@@ -410,6 +419,7 @@
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcTags);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvSteamLink);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvBrowserLink);
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvForWOTC);
             this.modlist_ListObjectListView.AllowColumnReorder = true;
             this.modlist_ListObjectListView.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.DoubleClick;
             this.modlist_ListObjectListView.CellEditUseWholeCell = false;
@@ -426,7 +436,8 @@
             this.olvcLastUpdated,
             this.olvcHasBackup,
             this.olvcHidden,
-            this.olvcTags});
+            this.olvcTags,
+            this.olvForWOTC});
             this.tableLayoutPanel1.SetColumnSpan(this.modlist_ListObjectListView, 3);
             this.modlist_ListObjectListView.Cursor = System.Windows.Forms.Cursors.Default;
             this.modlist_ListObjectListView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -655,7 +666,7 @@
             this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
             this.modlist_FilterCueTextBox.TabIndex = 1;
             this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
-            // 
+            //
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(318, 45);
@@ -926,6 +937,7 @@
             this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.modinfo_ConfigFCTB.IsReplaceMode = false;
             this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
             this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1296,13 +1308,12 @@
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
             // 
-            // runWarOfTheChosenToolStripMenuItem
+            // olvForWOTC
             // 
-            this.runWarOfTheChosenToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
-            this.runWarOfTheChosenToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runXCOM2ToolStripMenuItem.Image")));
-            this.runWarOfTheChosenToolStripMenuItem.Name = "runWarOfTheChosenToolStripMenuItem";
-            this.runWarOfTheChosenToolStripMenuItem.Size = new System.Drawing.Size(141, 20);
-            this.runWarOfTheChosenToolStripMenuItem.Text = "Run War of the Chosen";
+            this.olvForWOTC.AspectName = "BuiltForWOTC";
+            this.olvForWOTC.IsEditable = false;
+            this.olvForWOTC.Searchable = false;
+            this.olvForWOTC.Text = "For WOTC";
             // 
             // MainForm
             // 
@@ -1469,5 +1480,6 @@
         private System.Windows.Forms.ToolStripMenuItem runWarOfTheChosenToolStripMenuItem;
         private BrightIdeasSoftware.OLVColumn olvcCategory;
         private BrightIdeasSoftware.OLVColumn olvcTags;
+        private BrightIdeasSoftware.OLVColumn olvForWOTC;
     }
 }

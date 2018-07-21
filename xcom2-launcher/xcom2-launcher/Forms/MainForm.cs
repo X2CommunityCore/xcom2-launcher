@@ -9,6 +9,7 @@ using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
+using JR.Utils.GUI.Forms;
 
 namespace XCOM2Launcher.Forms
 {
@@ -235,6 +236,24 @@ namespace XCOM2Launcher.Forms
         {
             _updateWorker.CancelAsync();
             Settings.Instance.LastLaunchedWotC = false;
+
+            // Check for WOTC only mods
+            if (Settings.Mods.Active.Count(e => e.BuiltForWOTC) > 0)
+            {
+                if (FlexibleMessageBox.Show(this, 
+                    "Are you sure you want to proceed? Please be warned that this is very likely to crash your game. Offending mods:\r\n" + 
+                    String.Join("\r\n", Settings.Mods.Active.Where(e => e.BuiltForWOTC).Select(e => e.Name)),
+                    "You are trying to launch vanilla game with mods built for WOTC", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    RunVanilla();
+            }
+            else
+            {
+                RunVanilla();
+            }
+        }
+        
+        private void RunVanilla()
+        { 
             Save(false);
 
             XCOM2.RunGame(Settings.GamePath, Settings.Arguments.ToString());
