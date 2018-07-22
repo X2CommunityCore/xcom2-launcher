@@ -10,7 +10,10 @@ namespace XCOM2Launcher.Mod
         private Color _bgColor, _textColor;
         public Color Color
         {
-            get => _bgColor;
+            get
+            {
+                return _bgColor;
+            }
             set
             {
                 _bgColor = value;
