@@ -29,7 +29,7 @@ namespace XCOM2Launcher.Mod
             string[] keys = { "publishedfileid", "title", "category", "description", "tags", "contentimage", "requiresxpack" };
             var values = new Dictionary<string, string>();
 
-            using (var stream = new FileStream(filepath, FileMode.Open))
+            using (var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(stream))
             {
                 string key = null;
@@ -103,7 +103,7 @@ namespace XCOM2Launcher.Mod
                 Tags = values["tags"];
 
             if (values.ContainsKey("requiresxpack"))
-                RequiresXPACK = values["requiresxpack"].ToLower() == "true";
+                RequiresXPACK = values["requiresxpack"].ToLower().ToLower().Trim('\r', '\n', '\t', ' ') == "true";
 
             if (values.ContainsKey("contentimage"))
             {

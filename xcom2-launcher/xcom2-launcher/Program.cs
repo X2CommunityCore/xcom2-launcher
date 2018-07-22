@@ -33,7 +33,7 @@ namespace XCOM2Launcher
                 if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
@@ -182,11 +182,11 @@ namespace XCOM2Launcher
 	            foreach (var mod in settings.Mods.All)
 	            {
 		            if (!settings.ModPaths.Any(mod.IsInModPath))
-						mod.State |= ModState.NotLoaded;
+						mod.AddState(ModState.NotLoaded);
 					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
-						mod.State |= ModState.NotInstalled;
+						mod.AddState(ModState.NotInstalled);
 	                // tags clean up
-	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t)).ToList();
+	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
 	            }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();

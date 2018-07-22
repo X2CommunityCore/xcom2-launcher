@@ -64,7 +64,7 @@ namespace XCOM2Launcher.Forms
 
                 tags.All(t => AddTag((ModEntry) rowObject, t.Trim()));
             };
-            olvcTags.SearchValueGetter = rowObject => ((ModEntry)rowObject).Tags.ToArray();
+            olvcTags.SearchValueGetter = rowObject => ((ModEntry)rowObject).Tags.Select(s => s.ToLower()).ToArray();
             olvcTags.AspectGetter = rowObject => "";
 
 
@@ -168,19 +168,23 @@ namespace XCOM2Launcher.Forms
             {
                 var oldTag = tag.Label;
 
-                if (AvailableTags.ContainsKey(newTag) == false)
+                if (AvailableTags.ContainsKey(newTag.ToLower()) == false)
                 {
                     tag.Label = newTag;
 
-                    AvailableTags.Remove(oldTag);
-                    AvailableTags[newTag] = tag;
+                    AvailableTags.Remove(oldTag.ToLower());
+                    AvailableTags[newTag.ToLower()] = tag;
+                }
+                else if (oldTag.ToLower().Equals(newTag.ToLower()))
+                {
+                    AvailableTags[oldTag.ToLower()].Label = newTag;
                 }
 
                 foreach (var mod in Mods.All)
                 {
-                    if (mod.Tags.Contains(oldTag))
+                    if (mod.Tags.Select(t => t.ToLower()).Contains(oldTag.ToLower()))
                     {
-                        mod.Tags.Remove(oldTag);
+                        mod.Tags.Remove(mod.Tags.First(t => t.ToLower().Equals(oldTag.ToLower())));
                         AddTag(mod, newTag);
                     }
                 }
@@ -191,9 +195,9 @@ namespace XCOM2Launcher.Forms
         {
             if (mod != null && string.IsNullOrEmpty(newTag) == false && mod.Tags.Contains(newTag) == false)
             {
-                if (AvailableTags.ContainsKey(newTag) == false)
+                if (AvailableTags.ContainsKey(newTag.ToLower()) == false)
                 {
-                    AvailableTags[newTag] = new ModTag(newTag);
+                    AvailableTags[newTag.ToLower()] = new ModTag(newTag);
                 }
 
                 mod.Tags.Add(newTag);
@@ -396,7 +400,7 @@ namespace XCOM2Launcher.Forms
                 }
                 else
                 {
-                    m.Tags.Remove(tag.Label);
+                    m.Tags.Remove(m.Tags.First(t => t.ToLower().Equals(tag.Label.ToLower())));
 
                     if (m.Tags.Contains(newTag) == false)
                     {
@@ -484,7 +488,7 @@ namespace XCOM2Launcher.Forms
 
                 foreach (var mod in Mods.All)
                 {
-                    mod.Tags.Remove(tag.Label);
+                    mod.Tags.Remove(mod.Tags.First(t => t.ToLower().Equals(tag.Label.ToLower())));
                 }
             };
             menu.MenuItems.Add(removeAllTagItem);
@@ -501,11 +505,11 @@ namespace XCOM2Launcher.Forms
             var item = new MenuItem("Rename");
             item.Click += (a, b) => { modlist_ListObjectListView.EditModel(m); };
             menu.MenuItems.Add(item);
+            var selectedCount = modlist_ListObjectListView.SelectedItems.Count;
 
             // Add tag
             if (currentItem != null)
             {
-                var selectedCount = modlist_ListObjectListView.SelectedItems.Count;
                 var addTagItem = new MenuItem("Add tag");
 
                 if (selectedCount > 1)
@@ -586,15 +590,75 @@ namespace XCOM2Launcher.Forms
 
             menu.MenuItems.Add("-");
 
-            menu.MenuItems.Add(new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); }));
-
-            if (m.WorkshopID != -1)
+            if (selectedCount == 1)
             {
-                menu.MenuItems.Add(new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); }));
-                menu.MenuItems.Add(new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); }));
+                menu.MenuItems.Add(new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); }));
+
+                if (m.WorkshopID > 0)
+                {
+                    menu.MenuItems.Add(new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); }));
+                    menu.MenuItems.Add(new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); }));
+                }
             }
 
-            menu.MenuItems.Add(new MenuItem("Update", delegate { Settings.Mods.UpdateMod(m, Settings); }));
+            menu.MenuItems.Add(new MenuItem("Update", delegate {
+                System.ComponentModel.BackgroundWorker _singleWorker = new System.ComponentModel.BackgroundWorker
+                {
+                    WorkerReportsProgress = true
+                };
+                _singleWorker.ProgressChanged += Updater_SingleUpdateProgress;
+                List<ModEntry> SelectedMods = new List<ModEntry>(ModList.SelectedObjects);
+                _singleWorker.DoWork += delegate
+                {
+                    System.Threading.Tasks.Parallel.ForEach(SelectedMods, sel_item =>
+                    {
+                        Settings.Mods.UpdateMod(sel_item, Settings);
+
+                        lock (_singleWorker)
+                        {
+                            _singleWorker.ReportProgress(0, sel_item);
+                        }
+                    });
+                };
+                _singleWorker.RunWorkerAsync();
+            }));
+
+            if (m.Source == ModSource.SteamWorkshop || selectedCount > 1)
+            {
+                menu.MenuItems.Add(new MenuItem("Use workshop tags", delegate {
+                    System.ComponentModel.BackgroundWorker _singleWorker = new System.ComponentModel.BackgroundWorker
+                    {
+                        WorkerReportsProgress = true
+                    };
+                    _singleWorker.ProgressChanged += Updater_SingleUpdateProgress;
+                    List<ModEntry> SelectedMods = new List<ModEntry>(ModList.SelectedObjects);
+                    _singleWorker.DoWork += delegate
+                    {
+                        System.Threading.Tasks.Parallel.ForEach(SelectedMods, sel_item =>
+                        {
+                            var tags = sel_item.GetSteamTags();
+                            if (tags.Count() > 0)
+                            {
+                                sel_item.Tags.Clear();
+                                foreach (string tag in tags)
+                                {
+                                    AddTag(sel_item, tag);
+                                }
+
+                                lock (_singleWorker)
+                                {
+                                    _singleWorker.ReportProgress(0, sel_item);
+                                }
+                            }
+                        });
+                    };
+                    if (SelectedMods.Count == 1 || MessageBox.Show($"Are you sure you want to replace the tags of '{SelectedMods.Count}' mods with workshop tags? " +
+                        $"This process will override existing tags of selected mods.", "Using workshop tags", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        _singleWorker.RunWorkerAsync();
+                    }
+                }));
+            }
 
 
             return menu;
@@ -610,8 +674,7 @@ namespace XCOM2Launcher.Forms
             var bounds = e.SubItem.Bounds;
             var offset = new Point(bounds.X + TagRenderInfo.rX,
                                    bounds.Y + TagRenderInfo.rY);
-            var tagList = AvailableTags.Select(kvp => kvp.Value)
-                                       .Where(t => tags.Contains(t.Label));
+            var tagList = AvailableTags.Where(t => tags.Select(s => s.ToLower()).Contains(t.Key)).Select(kvp => kvp.Value);
 
             foreach (var tag in tagList)
             {
@@ -691,7 +754,7 @@ namespace XCOM2Launcher.Forms
 
             if (CurrentMod != null)
             {
-                CurrentMod.State &= ~ModState.New;
+                CurrentMod.RemoveState(ModState.New);
                 modlist_ListObjectListView.EnsureModelVisible(CurrentMod);
             }
         }
