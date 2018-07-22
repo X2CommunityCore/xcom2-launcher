@@ -10,7 +10,7 @@ namespace XCOM2Launcher.Mod
     {
         private static readonly Dictionary<long, string> Cache = new Dictionary<long, string>();
 
-        private static readonly Regex Regexp = new Regex(@"<div class=""detailBox workshopAnnouncement noFooter"">\s*<div class=""headline"">\s*(.*)\s*</div>\s*<p id=""[0-9]+"">(.*)</p>", RegexOptions.Compiled);
+        private static readonly Regex Regexp = new Regex(@"<div class=""detailBox workshopAnnouncement noFooter"">\s*<div class=""changelog headline"">\s*(.*)\s*</div>\s*<p id=""[0-9]+"">(.*)</p>", RegexOptions.Compiled);
 
         public static async Task<string> GetChangeLogAsync(long workshopID)
         {
