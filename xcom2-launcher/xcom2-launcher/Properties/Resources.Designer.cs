@@ -73,6 +73,16 @@ namespace XCOM2Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        internal static System.Drawing.Icon wotc {
+            get {
+                object obj = ResourceManager.GetObject("wotc", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         internal static System.Drawing.Icon xcom {
             get {
                 object obj = ResourceManager.GetObject("xcom", resourceCulture);

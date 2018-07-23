@@ -263,6 +263,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\cross.png" />
+    <None Include="Resources\wotc.ico" />
     <Content Include="Steamworks.NET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
