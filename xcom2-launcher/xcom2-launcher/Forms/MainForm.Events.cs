@@ -334,10 +334,12 @@ namespace XCOM2Launcher.Forms
                 CheckFileExists = true,
                 Multiselect = false,
             };
-
+            
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
+            bool OverrideTags = MessageBox.Show("Do you want to override the tags and categories of your current mods with the tags saved in your profile?\r\n" +
+                "Warning: This action cannot be undone", "Importing profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
             // parse file
 
 			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
@@ -382,28 +384,24 @@ namespace XCOM2Launcher.Forms
 
                 activeMods.AddRange(entries);
 
-                var tags = modMatch.Groups["tags"].Value.Split(';');
-
-                foreach (var tag in tags)
+                if (OverrideTags)
                 {
-                    if (AvailableTags.ContainsKey(tag.ToLower()) == false)
+                    var tags = modMatch.Groups["tags"].Value.Split(';');
+
+                    foreach (var tag in tags)
                     {
-                        AvailableTags[tag.ToLower()] = new ModTag(tag);
+                        if (AvailableTags.ContainsKey(tag.ToLower()) == false)
+                        {
+                            AvailableTags[tag.ToLower()] = new ModTag(tag);
+                        }
                     }
-                }
 
-	            foreach (var modEntry in entries)
-	            {
-	                modEntry.Tags = tags.ToList();
-		            Mods.RemoveMod(modEntry);
-					Mods.AddMod(categoryName, modEntry);
-		            //modEntry.isActive = active;
-	            }
-
-                if (entries.Count > 1)
-                {
-                    // More than 1 mod
-                    // Add warning?
+                    foreach (var modEntry in entries)
+                    {
+                        modEntry.Tags = tags.ToList();
+                        Mods.RemoveMod(modEntry);
+                        Mods.AddMod(categoryName, modEntry);
+                    }
                 }
             }
 

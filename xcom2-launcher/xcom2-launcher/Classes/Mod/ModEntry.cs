@@ -259,7 +259,7 @@ namespace XCOM2Launcher.Mod
             if (WorkshopID > 0)
             {
                 var details = Steam.Workshop.GetDetails((ulong) WorkshopID);
-                return details.m_rgchTags.Split(',').Select(s => s.TrimStart(' ').TrimEnd(' ')).ToArray();
+                return details.m_rgchTags.Split(',').Select(s => s.TrimStart(' ').TrimEnd(' ')).Where(s => !String.IsNullOrWhiteSpace(s)).ToArray();
             }
             return new String[0];
         }
