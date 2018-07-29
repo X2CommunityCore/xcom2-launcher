@@ -236,6 +236,7 @@ namespace XCOM2Launcher.Forms
         {
             _updateWorker.CancelAsync();
             Settings.Instance.LastLaunchedWotC = false;
+            ChallengeMode = false;
 
             // Check for WOTC only mods
             if (Settings.Mods.Active.Count(e => e.BuiltForWOTC) > 0)
@@ -266,6 +267,7 @@ namespace XCOM2Launcher.Forms
         {
             _updateWorker.CancelAsync();
             Settings.Instance.LastLaunchedWotC = true;
+            ChallengeMode = false;
             Save(true);
 
             XCOM2.RunWotC(Settings.GamePath, Settings.Arguments.ToString());
