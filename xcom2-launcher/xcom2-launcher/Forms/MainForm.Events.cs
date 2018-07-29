@@ -27,6 +27,7 @@ namespace XCOM2Launcher.Forms
             // run buttons
             runXCOM2ToolStripMenuItem.Click += (a, b) => { RunGame(); };
             runWarOfTheChosenToolStripMenuItem.Click += (a, b) => { RunWotC(); };
+            runChallengeModeToolStripMenuItem.Click += (a, b) => { RunChallengeMode(); };
 
             // save on close
             //Shown += MainForm_Shown;

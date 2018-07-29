@@ -75,6 +75,7 @@
             this.olvcTags = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvSteamLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvBrowserLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvForWOTC = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.panel2 = new System.Windows.Forms.Panel();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
@@ -134,7 +135,7 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.olvForWOTC = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.runChallengeModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -196,7 +197,8 @@
             this.settingsToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.runXCOM2ToolStripMenuItem,
-            this.runWarOfTheChosenToolStripMenuItem});
+            this.runWarOfTheChosenToolStripMenuItem,
+            this.runChallengeModeToolStripMenuItem});
             this.main_menustrip.Location = new System.Drawing.Point(0, 0);
             this.main_menustrip.Name = "main_menustrip";
             this.main_menustrip.Size = new System.Drawing.Size(984, 24);
@@ -597,6 +599,13 @@
             this.olvBrowserLink.Searchable = false;
             this.olvBrowserLink.Text = "Browser Link";
             // 
+            // olvForWOTC
+            // 
+            this.olvForWOTC.AspectName = "BuiltForWOTC";
+            this.olvForWOTC.IsEditable = false;
+            this.olvForWOTC.Searchable = false;
+            this.olvForWOTC.Text = "For WOTC";
+            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.checkBox1);
@@ -666,7 +675,7 @@
             this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
             this.modlist_FilterCueTextBox.TabIndex = 1;
             this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
-            //
+            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(318, 45);
@@ -937,7 +946,6 @@
             this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.modinfo_ConfigFCTB.IsReplaceMode = false;
             this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
             this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1308,12 +1316,12 @@
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
             // 
-            // olvForWOTC
+            // runChallengeModeToolStripMenuItem
             // 
-            this.olvForWOTC.AspectName = "BuiltForWOTC";
-            this.olvForWOTC.IsEditable = false;
-            this.olvForWOTC.Searchable = false;
-            this.olvForWOTC.Text = "For WOTC";
+            this.runChallengeModeToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runChallengeModeToolStripMenuItem.Image")));
+            this.runChallengeModeToolStripMenuItem.Name = "runChallengeModeToolStripMenuItem";
+            this.runChallengeModeToolStripMenuItem.Size = new System.Drawing.Size(146, 20);
+            this.runChallengeModeToolStripMenuItem.Text = "Run Challenge Mode";
             // 
             // MainForm
             // 
@@ -1481,5 +1489,6 @@
         private BrightIdeasSoftware.OLVColumn olvcCategory;
         private BrightIdeasSoftware.OLVColumn olvcTags;
         private BrightIdeasSoftware.OLVColumn olvForWOTC;
+        private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
     }
 }
