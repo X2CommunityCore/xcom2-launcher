@@ -226,9 +226,9 @@ namespace XCOM2Launcher.Forms
             //RefreshModList();
         }
 
-        private void Save(bool WotC, bool disableMods = false)
+        private void Save(bool WotC)
         {
-            XCOM2.SaveChanges(Settings, WotC, disableMods);
+            XCOM2.SaveChanges(Settings, WotC, ChallengeMode);
             Settings.SaveFile("settings.json");
         }
 
@@ -274,13 +274,16 @@ namespace XCOM2Launcher.Forms
                 Close();
         }
 
+        private bool ChallengeMode = false;
+        
         private void RunChallengeMode()
         {
             _updateWorker.CancelAsync();
             Settings.Instance.LastLaunchedWotC = true;
-            Save(true, true);
+            ChallengeMode = true;
+            Save(true);
 
-            XCOM2.RunWotC(Settings.GamePath, Settings.Arguments.Replace("-allowConsole", ""));
+            XCOM2.RunWotC(Settings.GamePath, Settings.Arguments.ToLower().Replace("-allowconsole", ""));
 
             if (Settings.CloseAfterLaunch)
                 Close();
