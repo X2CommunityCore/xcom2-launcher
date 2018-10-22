@@ -499,7 +499,7 @@ namespace XCOM2Launcher.Forms
                 return menu;
 
             var item = new MenuItem("Rename");
-            item.Click += (a, b) => { modlist_ListObjectListView.EditModel(m); };
+            item.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
             menu.MenuItems.Add(item);
 
             // Add tag
