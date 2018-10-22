@@ -345,19 +345,25 @@ namespace XCOM2Launcher.Forms
 
                 activeMods.AddRange(entries);
 
-                var tags = modMatch.Groups["tags"].Value.Split(';');
+				var tagStr = modMatch.Groups["tags"].Value;
+				List<string> tags = new List<string>();
 
-                foreach (var tag in tags)
-                {
-                    if (AvailableTags.ContainsKey(tag) == false)
-                    {
-                        AvailableTags[tag] = new ModTag(tag);
-                    }
-                }
+				if (!string.IsNullOrEmpty(tagStr))
+				{
+					tags.AddRange(tagStr.Split(';'));
 
-	            foreach (var modEntry in entries)
+					foreach (var tag in tags) {
+						if (AvailableTags.ContainsKey(tag) == false)
+						{
+							AvailableTags[tag] = new ModTag(tag);
+						}
+					}
+				}
+
+
+				foreach (var modEntry in entries)
 	            {
-	                modEntry.Tags = tags.ToList();
+					modEntry.Tags = tags;
 		            Mods.RemoveMod(modEntry);
 					Mods.AddMod(categoryName, modEntry);
 		            //modEntry.isActive = active;
