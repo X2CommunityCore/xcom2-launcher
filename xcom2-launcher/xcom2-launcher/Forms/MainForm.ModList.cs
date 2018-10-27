@@ -117,7 +117,9 @@ namespace XCOM2Launcher.Forms
 
             olvcActive.AspectToStringConverter = active => "";
             olvcActive.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1) * a.Header.CompareTo(b.Header)); };
-            
+
+            olvcName.AutoCompleteEditor = false;
+
             // Sort by Order or WorkshopID column removes groups
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
