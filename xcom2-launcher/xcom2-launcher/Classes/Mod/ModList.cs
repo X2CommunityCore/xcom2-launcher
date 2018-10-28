@@ -105,17 +105,7 @@ namespace XCOM2Launcher.Mod
                 return null;
 
             // look for .XComMod file
-            string infoFile;
-            try
-            {
-                infoFile = Directory.GetFiles(modDir, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
-            }
-            catch (InvalidOperationException)
-            {
-                MessageBox.Show(
-                    $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
-                return null;
-            }
+            string infoFile = FindModInfo(modDir);
 
             if (infoFile == null)
                 return null;
@@ -160,6 +150,23 @@ namespace XCOM2Launcher.Mod
                     m.State |= ModState.DuplicateID;
 
             return mod;
+        }
+
+        public string FindModInfo(string modDir)
+        {
+            string infoFile;
+            try
+            {
+                infoFile = Directory.GetFiles(modDir, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
+            }
+            catch (InvalidOperationException)
+            {
+                MessageBox.Show(
+                    $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
+                return null;
+            }
+
+            return infoFile;
         }
 
         public void AddMod(string category, ModEntry mod)
