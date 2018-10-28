@@ -256,8 +256,6 @@ namespace XCOM2Launcher.Forms
             var m = e.UserState as ModEntry;
             if (m == null)
                 return;
-
-            UpdateMod(m);
         }
 
         private void Updater_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
