@@ -251,11 +251,6 @@ namespace XCOM2Launcher.Forms
 
             progress_toolstrip_progressbar.Value = e.ProgressPercentage;
             status_toolstrip_label.Text = $"Updating Mods... ({e.ProgressPercentage} / {progress_toolstrip_progressbar.Maximum})";
-
-            // Update list item
-            var m = e.UserState as ModEntry;
-            if (m == null)
-                return;
         }
 
         private void Updater_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
