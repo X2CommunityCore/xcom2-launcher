@@ -219,6 +219,9 @@
       <DependentUpon>CueTextBox.cs</DependentUpon>
     </Compile>
     <Compile Include="UserElements\FlexibleMessageBox.cs" />
+    <Compile Include="UserElements\LaunchArgumentCheckbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Forms\CleanModsForm.resx">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
     </EmbeddedResource>

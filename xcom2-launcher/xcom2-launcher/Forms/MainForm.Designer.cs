@@ -52,6 +52,7 @@
             this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runChallengeModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.error_provider = new System.Windows.Forms.ErrorProvider(this.components);
             this.main_tabcontrol = new System.Windows.Forms.TabControl();
             this.modlist_tab = new System.Windows.Forms.TabPage();
@@ -135,7 +136,9 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.runChallengeModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LauchOptionsPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.LogLaunchArgument = new XCOM2Launcher.UserElements.LaunchArgumentCheckbox();
+            this.NoRedscreensLaunchArgument = new XCOM2Launcher.UserElements.LaunchArgumentCheckbox();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -167,6 +170,7 @@
             this.export_tab.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.LauchOptionsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // main_statusstrip
@@ -332,6 +336,13 @@
             this.runWarOfTheChosenToolStripMenuItem.Size = new System.Drawing.Size(157, 20);
             this.runWarOfTheChosenToolStripMenuItem.Text = "Run War of the Chosen";
             // 
+            // runChallengeModeToolStripMenuItem
+            // 
+            this.runChallengeModeToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runChallengeModeToolStripMenuItem.Image")));
+            this.runChallengeModeToolStripMenuItem.Name = "runChallengeModeToolStripMenuItem";
+            this.runChallengeModeToolStripMenuItem.Size = new System.Drawing.Size(146, 20);
+            this.runChallengeModeToolStripMenuItem.Text = "Run Challenge Mode";
+            // 
             // error_provider
             // 
             this.error_provider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
@@ -393,6 +404,7 @@
             this.tableLayoutPanel1.Controls.Add(this.modlist_ListObjectListView, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.panel2, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.panel3, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.LauchOptionsPanel, 2, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -1316,12 +1328,38 @@
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
             // 
-            // runChallengeModeToolStripMenuItem
+            // LauchOptionsPanel
             // 
-            this.runChallengeModeToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runChallengeModeToolStripMenuItem.Image")));
-            this.runChallengeModeToolStripMenuItem.Name = "runChallengeModeToolStripMenuItem";
-            this.runChallengeModeToolStripMenuItem.Size = new System.Drawing.Size(146, 20);
-            this.runChallengeModeToolStripMenuItem.Text = "Run Challenge Mode";
+            this.LauchOptionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LauchOptionsPanel.AutoSize = true;
+            this.LauchOptionsPanel.Controls.Add(this.NoRedscreensLaunchArgument);
+            this.LauchOptionsPanel.Controls.Add(this.LogLaunchArgument);
+            this.LauchOptionsPanel.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
+            this.LauchOptionsPanel.Location = new System.Drawing.Point(814, 3);
+            this.LauchOptionsPanel.Name = "LauchOptionsPanel";
+            this.LauchOptionsPanel.Size = new System.Drawing.Size(153, 24);
+            this.LauchOptionsPanel.TabIndex = 4;
+            // 
+            // LogLaunchArgument
+            // 
+            this.LogLaunchArgument.AutoSize = true;
+            this.LogLaunchArgument.Location = new System.Drawing.Point(3, 3);
+            this.LogLaunchArgument.Name = "LogLaunchArgument";
+            this.LogLaunchArgument.Size = new System.Drawing.Size(43, 17);
+            this.LogLaunchArgument.TabIndex = 2;
+            this.LogLaunchArgument.Text = "-log";
+            this.LogLaunchArgument.UseVisualStyleBackColor = true;
+            // 
+            // NoRedscreensLaunchArgument
+            // 
+            this.NoRedscreensLaunchArgument.AutoSize = true;
+            this.NoRedscreensLaunchArgument.Location = new System.Drawing.Point(52, 3);
+            this.NoRedscreensLaunchArgument.Name = "NoRedscreensLaunchArgument";
+            this.NoRedscreensLaunchArgument.Size = new System.Drawing.Size(98, 17);
+            this.NoRedscreensLaunchArgument.TabIndex = 3;
+            this.NoRedscreensLaunchArgument.Text = "-noRedscreens";
+            this.NoRedscreensLaunchArgument.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -1351,6 +1389,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.horizontal_splitcontainer)).EndInit();
             this.horizontal_splitcontainer.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.modlist_ListObjectListView)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -1377,6 +1416,8 @@
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.LauchOptionsPanel.ResumeLayout(false);
+            this.LauchOptionsPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1490,5 +1531,8 @@
         private BrightIdeasSoftware.OLVColumn olvcTags;
         private BrightIdeasSoftware.OLVColumn olvForWOTC;
         private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
+        private System.Windows.Forms.FlowLayoutPanel LauchOptionsPanel;
+        private UserElements.LaunchArgumentCheckbox NoRedscreensLaunchArgument;
+        private UserElements.LaunchArgumentCheckbox LogLaunchArgument;
     }
 }
