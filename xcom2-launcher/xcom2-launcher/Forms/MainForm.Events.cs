@@ -68,6 +68,7 @@ namespace XCOM2Launcher.Forms
                 new SettingsDialog(Settings).ShowDialog();
 
                 RefreshModList();
+                ShowQuickLaunchArgsBasedOnSettings();
 
                 NoRedscreensLaunchArgument.UpdateFromSettings();
                 LogLaunchArgument.UpdateFromSettings();
@@ -197,6 +198,8 @@ namespace XCOM2Launcher.Forms
                 DesktopBounds = setting.Bounds;
                 WindowState = setting.State;
             }
+
+            ShowQuickLaunchArgsBasedOnSettings();
         }
 
 
