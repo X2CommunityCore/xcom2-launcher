@@ -8,17 +8,15 @@ namespace XCOM2Launcher.UserElements
     class LaunchArgumentCheckbox : CheckBox
     {
         private Settings _settings;
+        private bool _doNotUpdateSettings;
 
         public Settings Settings
         {
             get => _settings;
             set
             {
-                _settings = null; // Prevent updating setting due to event listener
-                if (value == null) return;
-
-                Checked = GetCurrentArguments(value).Contains(Text);
                 _settings = value;
+                UpdateFromSettings();
             }
         }
 
@@ -29,10 +27,11 @@ namespace XCOM2Launcher.UserElements
 
         private void HandleCheckedChanged(object sender, EventArgs e)
         {
+            if (_doNotUpdateSettings) return;
             if (Settings == null) return;
 
             // Unpack the arguments
-            List<string> currentArguments = GetCurrentArguments(Settings);
+            List<string> currentArguments = CurrentArguments;
             bool argumentEnabledOld = currentArguments.Contains(Text);
 
             // If the new value already matches the argument string, do nothing
@@ -48,15 +47,20 @@ namespace XCOM2Launcher.UserElements
             }
 
             // Pack the arguments back together
-            Settings.Arguments = string.Join(" ", currentArguments);
+            CurrentArguments = currentArguments;
         }
 
-        private static List<string> GetCurrentArguments(Settings settings)
+        private void UpdateFromSettings()
         {
-            return settings.Arguments
-                .Split(' ')
-                .Where(s => !string.IsNullOrWhiteSpace(s))
-                .ToList();
+            _doNotUpdateSettings = true;
+            Checked = CurrentArguments.Contains(Text);
+            _doNotUpdateSettings = false;
+        }
+
+        private List<string> CurrentArguments
+        {
+            get => Settings.Arguments.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            set => Settings.Arguments = string.Join(" ", value);
         }
     }
 }
