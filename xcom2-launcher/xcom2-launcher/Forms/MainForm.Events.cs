@@ -66,7 +66,11 @@ namespace XCOM2Launcher.Forms
             editSettingsToolStripMenuItem.Click += delegate
             {
                 new SettingsDialog(Settings).ShowDialog();
+
                 RefreshModList();
+
+                NoRedscreensLaunchArgument.UpdateFromSettings();
+                LogLaunchArgument.UpdateFromSettings();
             };
 
             exitToolStripMenuItem.Click += (sender, e) => { Close(); };

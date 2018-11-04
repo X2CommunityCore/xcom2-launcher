@@ -16,7 +16,8 @@ namespace XCOM2Launcher.UserElements
             set
             {
                 _settings = value;
-                UpdateFromSettings();
+
+                if (value != null) UpdateFromSettings();
             }
         }
 
@@ -32,7 +33,7 @@ namespace XCOM2Launcher.UserElements
 
             // Unpack the arguments
             List<string> currentArguments = CurrentArguments;
-            bool argumentEnabledOld = currentArguments.Contains(Text);
+            bool argumentEnabledOld = IsArgumentEnabled(Text, currentArguments);
 
             // If the new value already matches the argument string, do nothing
             if (argumentEnabledOld == Checked) return;
@@ -43,17 +44,21 @@ namespace XCOM2Launcher.UserElements
             }
             else
             {
-                currentArguments.Remove(Text);
+                // Cannot just do "currentArguments.Remove(Text)" since that does case sensitive check
+
+                GetExistingMatchingArguments(Text, currentArguments)
+                    .ToList() // Break dependency on underlying list
+                    .ForEach(s => currentArguments.Remove(s));
             }
 
             // Pack the arguments back together
             CurrentArguments = currentArguments;
         }
 
-        private void UpdateFromSettings()
+        public void UpdateFromSettings()
         {
             _doNotUpdateSettings = true;
-            Checked = CurrentArguments.Contains(Text);
+            Checked = IsArgumentEnabled(Text, CurrentArguments);
             _doNotUpdateSettings = false;
         }
 
@@ -61,6 +66,16 @@ namespace XCOM2Launcher.UserElements
         {
             get => Settings.Arguments.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             set => Settings.Arguments = string.Join(" ", value);
+        }
+
+        private static IEnumerable<string> GetExistingMatchingArguments(string argument, IEnumerable<string> arguments)
+        {
+            return arguments.Where(s => StringComparer.OrdinalIgnoreCase.Equals(s, argument));
+        }
+
+        private static bool IsArgumentEnabled(string argument, IEnumerable<string> arguments)
+        {
+            return GetExistingMatchingArguments(argument, arguments).Any();
         }
     }
 }

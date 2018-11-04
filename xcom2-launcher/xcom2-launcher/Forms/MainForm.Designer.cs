@@ -1358,7 +1358,7 @@
             this.NoRedscreensLaunchArgument.Name = "NoRedscreensLaunchArgument";
             this.NoRedscreensLaunchArgument.Size = new System.Drawing.Size(98, 17);
             this.NoRedscreensLaunchArgument.TabIndex = 3;
-            this.NoRedscreensLaunchArgument.Text = "-noRedscreens";
+            this.NoRedscreensLaunchArgument.Text = "-noRedScreens";
             this.NoRedscreensLaunchArgument.UseVisualStyleBackColor = true;
             // 
             // MainForm
