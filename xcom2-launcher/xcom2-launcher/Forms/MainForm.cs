@@ -41,6 +41,10 @@ namespace XCOM2Launcher.Forms
             //Other intialization
             InitializeTabImages();
 
+            // Init the argument checkboxes
+            LogLaunchArgument.Settings = settings;
+            NoRedscreensLaunchArgument.Settings = settings;
+
 #if !DEBUG
 			// Check for Updates
 			CheckSteamForUpdates();
@@ -523,6 +527,11 @@ namespace XCOM2Launcher.Forms
 			#endregion
 		}
 
-		#endregion
-	}
+	    private void ShowQuickLaunchArgsBasedOnSettings()
+	    {
+	        LauchOptionsPanel.Visible = Settings.ShowQuickLaunchArguments;
+	    }
+
+        #endregion
+    }
 }

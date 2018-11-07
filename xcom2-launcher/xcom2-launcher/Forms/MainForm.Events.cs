@@ -66,7 +66,12 @@ namespace XCOM2Launcher.Forms
             editSettingsToolStripMenuItem.Click += delegate
             {
                 new SettingsDialog(Settings).ShowDialog();
+
                 RefreshModList();
+                ShowQuickLaunchArgsBasedOnSettings();
+
+                NoRedscreensLaunchArgument.UpdateFromSettings();
+                LogLaunchArgument.UpdateFromSettings();
             };
 
             exitToolStripMenuItem.Click += (sender, e) => { Close(); };
@@ -193,6 +198,8 @@ namespace XCOM2Launcher.Forms
                 DesktopBounds = setting.Bounds;
                 WindowState = setting.State;
             }
+
+            ShowQuickLaunchArgsBasedOnSettings();
         }
 
 

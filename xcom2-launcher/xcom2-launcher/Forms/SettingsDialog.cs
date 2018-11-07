@@ -26,6 +26,7 @@ namespace XCOM2Launcher.Forms
             showHiddenEntriesCheckBox.Checked = settings.ShowHiddenElements;
 	        autoNumberModIndexesCheckBox.Checked = settings.AutoNumberIndexes;
             useModSpecifiedCategoriesCheckBox.Checked = settings.UseSpecifiedCategories;
+            ShowQuickLaunchArgumentsToggle.Checked = settings.ShowQuickLaunchArguments;
 
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
@@ -193,6 +194,7 @@ namespace XCOM2Launcher.Forms
             Settings.ShowHiddenElements = showHiddenEntriesCheckBox.Checked;
 	        Settings.AutoNumberIndexes = autoNumberModIndexesCheckBox.Checked;
             Settings.UseSpecifiedCategories = useModSpecifiedCategoriesCheckBox.Checked;
+            Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
 
             Settings.Arguments = argumentsTextBox.Text;
 
