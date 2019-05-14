@@ -30,8 +30,12 @@ namespace XCOM2Launcher.Forms
             // Restore states 
             showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
 
-            // Hide WotC button if necessary
-            runWarOfTheChosenToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+            // Hide WotC and Challenge Mode buttons if necessary
+            if (settings.GamePath != "")
+            {
+                runWarOfTheChosenToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+                runChallengeModeToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+            }
 
             // Init interface
             InitObjectListView();
