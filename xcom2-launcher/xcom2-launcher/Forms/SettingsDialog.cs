@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using XCOM2Launcher.XCOM;
+using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Forms
 {
@@ -55,7 +56,25 @@ namespace XCOM2Launcher.Forms
 
         protected Settings Settings { get; set; }
 
-        private void RemoveCategoryButtonOnClick(object sender, EventArgs eventArgs)
+		private void addCategoryButton_Click(object sender, EventArgs e)
+		{
+			var newName = Interaction.InputBox($"Please enter the name for new the category.", "New category", "");
+
+			if (string.IsNullOrEmpty(newName))
+				return;
+
+			// If no category with the given name exists add it, otherweise select exiting entry.
+			if (!Settings.Mods.Categories.Contains(newName)) {
+				categoriesListBox.Items.Add(newName);
+				categoriesListBox.SelectedItem = newName;
+
+				Settings.Mods.Entries.Add(newName, new ModCategory());
+			} else {
+				categoriesListBox.SelectedItem = newName;
+			}
+		}
+
+		private void RemoveCategoryButtonOnClick(object sender, EventArgs eventArgs)
         {
             var index = categoriesListBox.SelectedIndex;
             if (index == -1)
@@ -63,12 +82,18 @@ namespace XCOM2Launcher.Forms
 
             var category = (string) categoriesListBox.Items[index];
 
-            if (MessageBox.Show($"Are you sure you want to remove the category '{category}'?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.No)
+			if (category == ModInfo.DEFAULT_CATEGORY_NAME) {
+				MessageBox.Show($"Default category '{ModInfo.DEFAULT_CATEGORY_NAME}' can not be removed.", "Info");
+				return;
+			}
+
+            if (MessageBox.Show($"Are you sure you want to remove the category '{category}'?", "Delete category", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                 return;
 
             var entry = Settings.Mods.Entries[category];
-            foreach (var m in entry.Entries)
-                Settings.Mods.AddMod("Unsorted", m);
+
+			foreach (var m in entry.Entries)
+                Settings.Mods.AddMod(ModInfo.DEFAULT_CATEGORY_NAME, m);
 
             Settings.Mods.Entries.Remove(category);
             categoriesListBox.Items.RemoveAt(index);
@@ -76,20 +101,33 @@ namespace XCOM2Launcher.Forms
 
         private void RenameCategoryButtonOnClick(object sender, EventArgs eventArgs)
         {
-            var index = categoriesListBox.SelectedIndex;
-            if (index == -1)
-                return;
+			RenameSelectedCategory();
+		}
 
-            var oldName = (string) categoriesListBox.Items[index];
-            var newName = Interaction.InputBox($"Enter the new name for the category '{oldName}'");
+		private void categoriesListBox_DoubleClick(object sender, EventArgs e) 
+		{
+			RenameSelectedCategory();
+		}
 
-            categoriesListBox.Items[index] = newName;
-            var entry = Settings.Mods.Entries[oldName];
-            Settings.Mods.Entries.Remove(oldName);
-            Settings.Mods.Entries.Add(newName, entry);
-        }
+		private void RenameSelectedCategory() 
+		{
+			var index = categoriesListBox.SelectedIndex;
+			if (index == -1)
+				return;
 
-        private void MoveCategoryUpButtonOnClick(object sender, EventArgs eventArgs)
+			var oldName = (string)categoriesListBox.Items[index];
+			var newName = Interaction.InputBox($"Enter the new name for the category '{oldName}'.", "Rename category", oldName);
+
+			if (string.IsNullOrEmpty(newName))
+				return;
+
+			categoriesListBox.Items[index] = newName;
+			var entry = Settings.Mods.Entries[oldName];
+			Settings.Mods.Entries.Remove(oldName);
+			Settings.Mods.Entries.Add(newName, entry);
+		}
+
+		private void MoveCategoryUpButtonOnClick(object sender, EventArgs eventArgs)
         {
             var index = categoriesListBox.SelectedIndex;
             if (index == -1 || index == 0)
