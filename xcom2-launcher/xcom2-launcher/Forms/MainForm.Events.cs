@@ -59,20 +59,24 @@ namespace XCOM2Launcher.Forms
             {
                 Settings.ShowHiddenElements = showHiddenModsToolStripMenuItem.Checked;
 				olvcHidden.IsVisible = showHiddenModsToolStripMenuItem.Checked;
-				RefreshModList();
+				RefreshModList(true);
             };
 
             // Edit
-            editSettingsToolStripMenuItem.Click += delegate
+            editOptionsToolStripMenuItem.Click += delegate
             {
-                new SettingsDialog(Settings).ShowDialog();
+                var result = new SettingsDialog(Settings).ShowDialog();
 
-                RefreshModList();
-                ShowQuickLaunchArgsBasedOnSettings();
-
-                NoRedscreensLaunchArgument.UpdateFromSettings();
-                LogLaunchArgument.UpdateFromSettings();
+				if (result == DialogResult.OK) {
+					RefreshModList();
+					ShowQuickLaunchArgsBasedOnSettings();
+					showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
+					NoRedscreensLaunchArgument.UpdateFromSettings();
+					LogLaunchArgument.UpdateFromSettings();
+				}
             };
+
+			manageCategoriesToolStripMenuItem.Click += ManageCategoriesToolStripMenuItem_Click;
 
             exitToolStripMenuItem.Click += (sender, e) => { Close(); };
 
@@ -137,7 +141,16 @@ namespace XCOM2Launcher.Forms
             export_load_button.Click += ExportLoadButtonClick;
         }
 
-        private void Resubscribe_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
+		private void ManageCategoriesToolStripMenuItem_Click(object sender, EventArgs e) {
+			CategoryManager catManager = new CategoryManager(Settings);
+			var result = catManager.ShowDialog();
+
+			if (result == DialogResult.OK) {
+				RefreshModList();
+			}
+		}
+
+		private void Resubscribe_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
         {
             var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 

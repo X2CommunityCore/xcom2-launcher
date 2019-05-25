@@ -162,6 +162,12 @@
     <Compile Include="Classes\XCOM\IniLanguage.cs" />
     <Compile Include="Classes\XCOM\XCOM2.cs" />
     <Compile Include="Classes\XCOM\DefaultConfigFile.cs" />
+    <Compile Include="Forms\CategoryManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CategoryManager.Designer.cs">
+      <DependentUpon>CategoryManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\CleanModsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -222,6 +228,9 @@
     <Compile Include="UserElements\LaunchArgumentCheckbox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <EmbeddedResource Include="Forms\CategoryManager.resx">
+      <DependentUpon>CategoryManager.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\CleanModsForm.resx">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
     </EmbeddedResource>

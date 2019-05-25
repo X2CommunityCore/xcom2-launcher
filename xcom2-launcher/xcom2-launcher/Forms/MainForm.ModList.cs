@@ -357,8 +357,11 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.EndUpdate();
         }
 
-
-        private void RefreshModList()
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="rebuildColumns">Set to true if visibility for some columns was changed for example.</param>
+		private void RefreshModList(bool rebuildColumns = false)
         {
             // Un-register events
             modlist_ListObjectListView.SelectionChanged -= ModListSelectionChanged;
@@ -370,6 +373,10 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.ClearObjects();
 
             modlist_ListObjectListView.Objects = Settings.ShowHiddenElements ? Mods.All : Mods.All.Where(m => !m.isHidden);
+
+			if (rebuildColumns) {
+				modlist_ListObjectListView.RebuildColumns();
+			}
 
             modlist_ListObjectListView.EndUpdate();
 

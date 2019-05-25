@@ -33,7 +33,7 @@ namespace XCOM2Launcher
                 if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
