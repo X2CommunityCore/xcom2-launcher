@@ -30,8 +30,8 @@
 			this.removeCategoryButton = new System.Windows.Forms.Button();
 			this.renameCategoryButton = new System.Windows.Forms.Button();
 			this.pLeft = new System.Windows.Forms.Panel();
-			this.pMain = new System.Windows.Forms.Panel();
 			this.bClose = new System.Windows.Forms.Button();
+			this.pMain = new System.Windows.Forms.Panel();
 			this.label1 = new System.Windows.Forms.Label();
 			this.pLeft.SuspendLayout();
 			this.pMain.SuspendLayout();
@@ -118,16 +118,6 @@
 			this.pLeft.Size = new System.Drawing.Size(93, 278);
 			this.pLeft.TabIndex = 21;
 			// 
-			// pMain
-			// 
-			this.pMain.Controls.Add(this.label1);
-			this.pMain.Controls.Add(this.categoriesListBox);
-			this.pMain.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pMain.Location = new System.Drawing.Point(0, 0);
-			this.pMain.Name = "pMain";
-			this.pMain.Size = new System.Drawing.Size(302, 278);
-			this.pMain.TabIndex = 22;
-			// 
 			// bClose
 			// 
 			this.bClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -138,6 +128,16 @@
 			this.bClose.TabIndex = 0;
 			this.bClose.Text = "Close";
 			this.bClose.UseVisualStyleBackColor = true;
+			// 
+			// pMain
+			// 
+			this.pMain.Controls.Add(this.label1);
+			this.pMain.Controls.Add(this.categoriesListBox);
+			this.pMain.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.pMain.Location = new System.Drawing.Point(0, 0);
+			this.pMain.Name = "pMain";
+			this.pMain.Size = new System.Drawing.Size(302, 278);
+			this.pMain.TabIndex = 22;
 			// 
 			// label1
 			// 
@@ -156,6 +156,7 @@
 			this.Controls.Add(this.pMain);
 			this.Controls.Add(this.pLeft);
 			this.Name = "CategoryManager";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Category manager";
 			this.pLeft.ResumeLayout(false);
 			this.pMain.ResumeLayout(false);
