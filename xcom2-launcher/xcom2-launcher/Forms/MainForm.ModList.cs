@@ -335,10 +335,13 @@ namespace XCOM2Launcher.Forms
                 {
                     Directory.Delete(mod.Path, true);
                 }
-                catch (System.IO.DirectoryNotFoundException)
-                {
+                catch (DirectoryNotFoundException) {
                     // the directory was already removed
-                }
+                } catch (IOException ex) {
+					string message = $"Error while deleting mod folder: {Environment.NewLine}";
+					message += $"'{mod.Path}' {Environment.NewLine} {Environment.NewLine} {ex.Message}";
+					MessageBox.Show(message, "Error");
+				}
             }
 
             RefreshModList();
