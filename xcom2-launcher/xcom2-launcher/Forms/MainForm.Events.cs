@@ -396,7 +396,7 @@ namespace XCOM2Launcher.Forms
 
                 if (OverrideTags)
                 {
-                    var tags = modMatch.Groups["tags"].Value.Split(';');
+                    var tags = modMatch.Groups["tags"].Value.Split(';').Where(t => !string.IsNullOrWhiteSpace(t));
 
                     foreach (var tag in tags)
                     {

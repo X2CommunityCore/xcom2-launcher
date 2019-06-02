@@ -64,6 +64,12 @@ namespace XCOM2Launcher.Forms
 
             var category = (string) categoriesListBox.Items[index];
 
+            if (Settings.Mods.Entries.Count == 1)
+            {
+                MessageBox.Show("You cannot remove all categories.");
+                return;
+            }
+
             if (MessageBox.Show($"Are you sure you want to remove the category '{category}'?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.No)
                 return;
 
@@ -84,10 +90,13 @@ namespace XCOM2Launcher.Forms
             var oldName = (string) categoriesListBox.Items[index];
             var newName = Interaction.InputBox($"Enter the new name for the category '{oldName}'");
 
-            categoriesListBox.Items[index] = newName;
-            var entry = Settings.Mods.Entries[oldName];
-            Settings.Mods.Entries.Remove(oldName);
-            Settings.Mods.Entries.Add(newName, entry);
+            if (!string.IsNullOrWhiteSpace(newName))
+            {
+                categoriesListBox.Items[index] = newName;
+                var entry = Settings.Mods.Entries[oldName];
+                Settings.Mods.Entries.Remove(oldName);
+                Settings.Mods.Entries.Add(newName, entry);
+            }
         }
 
         private void MoveCategoryUpButtonOnClick(object sender, EventArgs eventArgs)
