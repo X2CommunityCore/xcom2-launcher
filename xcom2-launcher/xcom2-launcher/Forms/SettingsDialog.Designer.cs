@@ -57,6 +57,7 @@
             this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
             this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -224,6 +225,7 @@
             this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel2, 3, 3);
             this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 2, 0);
             this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 2, 1);
+            this.tableLayoutPanel3.Controls.Add(this.neverAdoptTagsAndCatFromprofile, 2, 2);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -369,8 +371,21 @@
             this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(165, 16);
             this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
             this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
-            this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to have all mods appear in Unsorted)");
+            this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to h" +
+        "ave all mods appear in Unsorted)");
             this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // neverAdoptTagsAndCatFromprofile
+            // 
+            this.neverAdoptTagsAndCatFromprofile.AutoSize = true;
+            this.neverAdoptTagsAndCatFromprofile.Location = new System.Drawing.Point(341, 47);
+            this.neverAdoptTagsAndCatFromprofile.Name = "neverAdoptTagsAndCatFromprofile";
+            this.neverAdoptTagsAndCatFromprofile.Size = new System.Drawing.Size(182, 16);
+            this.neverAdoptTagsAndCatFromprofile.TabIndex = 16;
+            this.neverAdoptTagsAndCatFromprofile.Text = "Never import tags and categories";
+            this.toolTip.SetToolTip(this.neverAdoptTagsAndCatFromprofile, "Turn on to suppress the confirmation dialog to override tags and categories when " +
+        "importing profiles, always preserving your current tags and profiles.");
+            this.neverAdoptTagsAndCatFromprofile.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
@@ -432,5 +447,6 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox autoNumberModIndexesCheckBox;
         private System.Windows.Forms.CheckBox useModSpecifiedCategoriesCheckBox;
+        private System.Windows.Forms.CheckBox neverAdoptTagsAndCatFromprofile;
     }
 }

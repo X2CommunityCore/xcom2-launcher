@@ -69,6 +69,8 @@ namespace XCOM2Launcher
 
         public bool LastLaunchedWotC { get; set; } = false;
 
+        public bool NeverImportTags { get; set; } = false;
+
         public ModList Mods { get; set; } = new ModList();
 
         public Dictionary<string, ModTag> Tags { get; set; } = new Dictionary<string, ModTag>();

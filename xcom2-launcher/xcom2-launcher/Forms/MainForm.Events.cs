@@ -338,8 +338,17 @@ namespace XCOM2Launcher.Forms
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            bool OverrideTags = MessageBox.Show("Do you want to override the tags and categories of your current mods with the tags saved in your profile?\r\n" +
-                "Warning: This action cannot be undone", "Importing profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+            bool OverrideTags;
+
+            if (!Settings.NeverImportTags)
+            {
+                OverrideTags = MessageBox.Show("Do you want to override the tags and categories of your current mods with the tags saved in your profile?\r\n" +
+                    "Warning: This action cannot be undone", "Importing profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+            }
+            else
+            {
+                OverrideTags = false;
+            }
             // parse file
 
 			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
