@@ -67,6 +67,8 @@ namespace XCOM2Launcher
 
         public bool UseSpecifiedCategories { get; set; } = true;
 
+        public bool ShowQuickLaunchArguments { get; set; }
+
         public bool LastLaunchedWotC { get; set; } = false;
 
         public bool NeverImportTags { get; set; } = false;

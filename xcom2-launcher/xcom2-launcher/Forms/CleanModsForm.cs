@@ -34,7 +34,7 @@ namespace XCOM2Launcher.Forms
             foreach (var m in Mods.All)
             {
                 // Source Files
-                if (hasSourceFiles(m))
+                if (hasSourceFiles(m) && !hasCookedPCConsole(m))
                 {
                     if (source_mode == "src_all_radiobutton")
                         deleteSourceFiles(m);
@@ -95,6 +95,11 @@ namespace XCOM2Launcher.Forms
         internal static void deleteXComGameSourceFiles(ModEntry m)
         {
             Directory.Delete(Path.Combine(m.Path, "src", "XComGame"), true);
+        }
+
+        internal static bool hasCookedPCConsole(ModEntry m)
+        {
+            return Directory.Exists(Path.Combine(m.Path, "CookedPCConsole"));
         }
     }
 }

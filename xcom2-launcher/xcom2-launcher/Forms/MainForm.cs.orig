@@ -535,11 +535,14 @@ namespace XCOM2Launcher.Forms
 			#endregion
 		}
 
+<<<<<<< HEAD
+=======
 	    private void ShowQuickLaunchArgsBasedOnSettings()
 	    {
 	        LauchOptionsPanel.Visible = Settings.ShowQuickLaunchArguments;
 	    }
 
+>>>>>>> upstream/master
         #endregion
     }
 }

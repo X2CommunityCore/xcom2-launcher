@@ -394,6 +394,7 @@ namespace XCOM2Launcher.Forms
 
                 activeMods.AddRange(entries);
 
+<<<<<<< HEAD
                 if (OverrideTags)
                 {
                     var tags = modMatch.Groups["tags"].Value.Split(';');
@@ -405,6 +406,31 @@ namespace XCOM2Launcher.Forms
                             AvailableTags[tag.ToLower()] = new ModTag(tag);
                         }
                     }
+=======
+				var tagStr = modMatch.Groups["tags"].Value;
+				List<string> tags = new List<string>();
+
+				if (!string.IsNullOrEmpty(tagStr))
+				{
+					tags.AddRange(tagStr.Split(';'));
+
+					foreach (var tag in tags) {
+						if (AvailableTags.ContainsKey(tag) == false)
+						{
+							AvailableTags[tag] = new ModTag(tag);
+						}
+					}
+				}
+
+
+				foreach (var modEntry in entries)
+	            {
+					modEntry.Tags = tags;
+		            Mods.RemoveMod(modEntry);
+					Mods.AddMod(categoryName, modEntry);
+		            //modEntry.isActive = active;
+	            }
+>>>>>>> upstream/master
 
                     foreach (var modEntry in entries)
                     {

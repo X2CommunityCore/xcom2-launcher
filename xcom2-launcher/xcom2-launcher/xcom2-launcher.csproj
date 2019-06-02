@@ -220,6 +220,9 @@
       <DependentUpon>CueTextBox.cs</DependentUpon>
     </Compile>
     <Compile Include="UserElements\FlexibleMessageBox.cs" />
+    <Compile Include="UserElements\LaunchArgumentCheckbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Forms\CleanModsForm.resx">
       <DependentUpon>CleanModsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -264,6 +267,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\cross.png" />
+    <None Include="Resources\wotc.ico" />
     <Content Include="Steamworks.NET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

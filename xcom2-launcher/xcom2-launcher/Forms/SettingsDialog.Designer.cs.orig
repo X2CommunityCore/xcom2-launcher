@@ -57,8 +57,11 @@
             this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
             this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+<<<<<<< HEAD
             this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
+=======
             this.ShowQuickLaunchArgumentsToggle = new System.Windows.Forms.CheckBox();
+>>>>>>> upstream/master
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -226,8 +229,11 @@
             this.tableLayoutPanel3.Controls.Add(this.flowLayoutPanel2, 3, 3);
             this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 2, 0);
             this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 2, 1);
+<<<<<<< HEAD
             this.tableLayoutPanel3.Controls.Add(this.neverAdoptTagsAndCatFromprofile, 2, 2);
+=======
             this.tableLayoutPanel3.Controls.Add(this.ShowQuickLaunchArgumentsToggle, 2, 2);
+>>>>>>> upstream/master
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -377,6 +383,7 @@
         "ave all mods appear in Unsorted)");
             this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
             // 
+<<<<<<< HEAD
             // neverAdoptTagsAndCatFromprofile
             // 
             this.neverAdoptTagsAndCatFromprofile.AutoSize = true;
@@ -388,15 +395,17 @@
             this.toolTip.SetToolTip(this.neverAdoptTagsAndCatFromprofile, "Turn on to suppress the confirmation dialog to override tags and categories when " +
         "importing profiles, always preserving your current tags and profiles.");
             this.neverAdoptTagsAndCatFromprofile.UseVisualStyleBackColor = true;
+=======
             // ShowQuickLaunchArgumentsToggle
             // 
             this.ShowQuickLaunchArgumentsToggle.AutoSize = true;
             this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(341, 47);
             this.ShowQuickLaunchArgumentsToggle.Name = "ShowQuickLaunchArgumentsToggle";
             this.ShowQuickLaunchArgumentsToggle.Size = new System.Drawing.Size(169, 16);
-            this.ShowQuickLaunchArgumentsToggle.TabIndex = 17;
+            this.ShowQuickLaunchArgumentsToggle.TabIndex = 16;
             this.ShowQuickLaunchArgumentsToggle.Text = "Show quick launch arguments";
             this.ShowQuickLaunchArgumentsToggle.UseVisualStyleBackColor = true;
+>>>>>>> upstream/master
             // 
             // SettingsDialog
             // 
@@ -458,7 +467,10 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox autoNumberModIndexesCheckBox;
         private System.Windows.Forms.CheckBox useModSpecifiedCategoriesCheckBox;
+<<<<<<< HEAD
         private System.Windows.Forms.CheckBox neverAdoptTagsAndCatFromprofile;
+=======
         private System.Windows.Forms.CheckBox ShowQuickLaunchArgumentsToggle;
+>>>>>>> upstream/master
     }
 }

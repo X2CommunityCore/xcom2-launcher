@@ -137,10 +137,13 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+<<<<<<< HEAD
             this.olvAuthor = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+=======
             this.LauchOptionsPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.LogLaunchArgument = new XCOM2Launcher.UserElements.LaunchArgumentCheckbox();
             this.NoRedscreensLaunchArgument = new XCOM2Launcher.UserElements.LaunchArgumentCheckbox();
+>>>>>>> upstream/master
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -1344,10 +1347,12 @@
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
             // 
+<<<<<<< HEAD
             // olvAuthor
             // 
             this.olvAuthor.AspectName = "Author";
             this.olvAuthor.Text = "Author";
+=======
             // LauchOptionsPanel
             // 
             this.LauchOptionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1380,6 +1385,7 @@
             this.NoRedscreensLaunchArgument.TabIndex = 3;
             this.NoRedscreensLaunchArgument.Text = "-noRedScreens";
             this.NoRedscreensLaunchArgument.UseVisualStyleBackColor = true;
+>>>>>>> upstream/master
             // 
             // MainForm
             // 
@@ -1550,11 +1556,14 @@
         private BrightIdeasSoftware.OLVColumn olvcCategory;
         private BrightIdeasSoftware.OLVColumn olvcTags;
         private BrightIdeasSoftware.OLVColumn olvForWOTC;
+<<<<<<< HEAD
         private System.Windows.Forms.Button btnDescSave;
         private BrightIdeasSoftware.OLVColumn olvAuthor;
+=======
         private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
         private System.Windows.Forms.FlowLayoutPanel LauchOptionsPanel;
         private UserElements.LaunchArgumentCheckbox NoRedscreensLaunchArgument;
         private UserElements.LaunchArgumentCheckbox LogLaunchArgument;
+>>>>>>> upstream/master
     }
 }

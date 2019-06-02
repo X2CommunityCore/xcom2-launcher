@@ -35,4 +35,4 @@ Released under GPL, due to [objectlistview](http://objectlistview.sourceforge.ne
 If you encounter a bug, please leave a bug report [here](https://github.com/X2CommunityCore/xcom2-launcher/issues).
 
 # Credit
-The XCOM 2 icon is property of Firaxis.
+The XCOM 2 and War of the Chosen icons are property of Firaxis.

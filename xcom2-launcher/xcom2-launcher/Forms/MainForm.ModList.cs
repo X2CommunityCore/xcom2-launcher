@@ -117,7 +117,9 @@ namespace XCOM2Launcher.Forms
 
             olvcActive.AspectToStringConverter = active => "";
             olvcActive.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1) * a.Header.CompareTo(b.Header)); };
-            
+
+            olvcName.AutoCompleteEditor = false;
+
             // Sort by Order or WorkshopID column removes groups
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
@@ -134,7 +136,7 @@ namespace XCOM2Launcher.Forms
                     new[] { "Older Than One Month", "This Month", "This Week", "Today" });
 
                 // Sord Desc
-                column.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1)*a.Header.CompareTo(b.Header)); };
+                column.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? -1 : 1)*a.Header.CompareTo(b.Header)); };
             }
 
 
@@ -503,7 +505,7 @@ namespace XCOM2Launcher.Forms
                 return menu;
 
             var item = new MenuItem("Rename");
-            item.Click += (a, b) => { modlist_ListObjectListView.EditModel(m); };
+            item.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
             menu.MenuItems.Add(item);
             var selectedCount = modlist_ListObjectListView.SelectedItems.Count;
 

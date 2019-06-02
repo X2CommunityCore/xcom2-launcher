@@ -147,13 +147,16 @@ namespace XCOM2Launcher.XCOM
             }
         }
 
-        public static void SaveChanges(Settings settings, bool WotC)
+        public static void SaveChanges(Settings settings, bool WotC, bool disableMods)
         {
             // XComModOptions
             var modOptions = new DefaultConfigFile("ModOptions", WotC, false);
 
-            foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
-                modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
+            if (!disableMods)
+            {
+                foreach (var m in settings.Mods.Active.OrderBy(m => m.Index))
+                    modOptions.Add("Engine.XComModOptions", "ActiveMods", m.ID);
+            }
 
             modOptions.Save();
 
