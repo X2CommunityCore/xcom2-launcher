@@ -26,7 +26,7 @@ namespace XCOM2Launcher.Mod
         public int Index { get; set; } = -1;
 
         [JsonIgnore]
-        public ModState State { get; set; } = ModState.None;
+        public ModState State { get; private set; } = ModState.None;
 
         public string ID { get; set; }
         public string Name { get; set; }
@@ -74,20 +74,80 @@ namespace XCOM2Launcher.Mod
 
 	    [JsonIgnore]
 	    public string BrowserLink => GetWorkshopLink();
-
+        
+        [Browsable(false)]
         public IList<string> Tags { get; set; } = new List<string>();
 
         public bool BuiltForWOTC { get; set; } = false;
 
+        public Classes.Mod.ModProperty GetProperty()
+        {
+            return new Classes.Mod.ModProperty(this);
+        }
 
 		#region Mod
 
-		public string GetDescription()
+		public string GetDescription(bool CleanBBCode = false)
 		{
-			if (!string.IsNullOrEmpty(Description))
-				return Description;
-			
-            return new ModInfo(GetModInfoFile()).Description;
+            string dsc;
+            if (!string.IsNullOrEmpty(Description))
+                dsc = Description;
+            else
+                dsc = new ModInfo(GetModInfoFile()).Description;
+
+            if (CleanBBCode)
+            {
+                dsc = dsc.Replace(@"\", @"\\");
+                Regex Regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
+                dsc = Regexp.Replace(dsc, RTFEvaluator);
+                Regex replace_linebreaks = new Regex(@"[\r\n]{1,2}");
+                dsc = replace_linebreaks.Replace(dsc, @"\line ");
+                return @"{\rtf1\ansi " + dsc + "}";
+            }
+            return Description;
+        }
+
+        private string RTFEvaluator(Match match)
+        {
+            String output;
+            if (match.Groups[2].Value.StartsWith("url"))
+            {
+                if (match.Groups[1].Value == "/")
+                {
+                    return @"}}}";
+                }
+                else
+                {
+                    return @"{\field{\*\fldinst{HYPERLINK """ + match.Groups[2].Value.Substring(4) + @"""}}{\fldrslt{\ul ";
+                }
+            }
+            else
+            {
+                switch (match.Groups[2].Value)
+                {
+                    case "h1":
+                        output = @"{\fs20 \b ";
+                        break;
+                    case "strike":
+                        output = @"{\strike ";
+                        break;
+                    case "b":
+                        output = @"{\b ";
+                        break;
+                    case "i":
+                        output = @"{\i ";
+                        break;
+                    case "u":
+                        output = @"{\ul ";
+                        break;
+                    default:
+                        output = "";
+                        break;
+                }
+            }
+            if (output != "" && match.Groups[1].Value == "/")
+                output = "}";
+            return output;
         }
 
         public IEnumerable<ModClassOverride> GetOverrides(bool forceUpdate = false)
@@ -194,6 +254,16 @@ namespace XCOM2Launcher.Mod
             return "";
 	    }
 
+        public String[] GetSteamTags()
+        {
+            if (WorkshopID > 0)
+            {
+                var details = Steam.Workshop.GetDetails((ulong) WorkshopID);
+                return details.m_rgchTags.Split(',').Select(s => s.TrimStart(' ').TrimEnd(' ')).Where(s => !String.IsNullOrWhiteSpace(s)).ToArray();
+            }
+            return new String[0];
+        }
+
         public override string ToString()
         {
             return ID;
@@ -204,12 +274,55 @@ namespace XCOM2Launcher.Mod
             return 0 == string.Compare(modPath.TrimEnd('/', '\\'), FilePath.GetDirectoryName(Path), StringComparison.OrdinalIgnoreCase);
         }
 
-		#endregion Mod
+        #endregion Mod
+
+        #region Public Setters
+        public void SetState(ModState newState)
+        {
+            State = newState;
+        }
+
+        public void AddState(ModState newState)
+        {
+            State |= newState;
+        }
+
+        public void RemoveState(ModState newState)
+        {
+            State &= ~newState;
+        }
+
+        public void SetRequiresWOTC(bool NeedWOTC)
+        {
+            BuiltForWOTC = NeedWOTC;
+        }
+
+        public void RealizeSize(long newSize)
+        {
+            Size = newSize;
+        }
+
+        public void SetSource(ModSource newSource)
+        {
+            Source = newSource;
+        }
+
+        public void RealizeIDAndPath(string ModRoot)
+        {
+            Path = ModRoot;
+
+            var info_file = Directory.GetFiles(Path, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
+            if (info_file != null)
+            {
+				ID = FilePath.GetFileNameWithoutExtension(info_file);
+			}
+        }
+        #endregion
 
 
-		#region Files
+        #region Files
 
-		public string[] GetConfigFiles()
+        public string[] GetConfigFiles()
         {
 			if (Directory.Exists(FilePath.Combine(Path,"Config")))
 				return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini", SearchOption.AllDirectories);

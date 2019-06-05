@@ -31,7 +31,7 @@ namespace XCOM2Launcher.Mod
             string[] keys = { "publishedfileid", "title", "category", "description", "tags", "contentimage", "requiresxpack" };
             var values = new Dictionary<string, string>();
 
-            using (var stream = new FileStream(filepath, FileMode.Open))
+            using (var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(stream))
             {
                 string key = null;

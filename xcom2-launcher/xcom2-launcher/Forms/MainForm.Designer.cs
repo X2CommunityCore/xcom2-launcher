@@ -92,6 +92,7 @@
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
 			this.modinfo_details_tab = new System.Windows.Forms.TabPage();
+            this.btnDescSave = new System.Windows.Forms.Button();
 			this.modinfo_info_CreatedLabel = new System.Windows.Forms.Label();
 			this.modinfo_info_DescriptionLabel = new System.Windows.Forms.Label();
 			this.modinfo_info_InstalledTextBox = new System.Windows.Forms.TextBox();
@@ -140,6 +141,7 @@
 			this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.fillPanel = new System.Windows.Forms.Panel();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.olvAuthor = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.main_statusstrip.SuspendLayout();
 			this.main_menustrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -426,6 +428,7 @@
 			// 
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcActive);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcName);
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvAuthor);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcCategory);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcState);
@@ -450,6 +453,7 @@
 			this.modlist_ListObjectListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvcActive,
             this.olvcName,
+            this.olvAuthor,
             this.olvcID,
             this.olvcCategory,
             this.olvcState,
@@ -789,6 +793,7 @@
 			// 
 			// modinfo_details_tab
 			// 
+            this.modinfo_details_tab.Controls.Add(this.btnDescSave);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_CreatedLabel);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_DescriptionLabel);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_InstalledTextBox);
@@ -807,6 +812,17 @@
 			this.modinfo_details_tab.Text = "Info";
 			this.modinfo_details_tab.UseVisualStyleBackColor = true;
 			// 
+            // btnDescSave
+            // 
+            this.btnDescSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnDescSave.Location = new System.Drawing.Point(7, 75);
+            this.btnDescSave.Name = "btnDescSave";
+            this.btnDescSave.Size = new System.Drawing.Size(83, 23);
+            this.btnDescSave.TabIndex = 11;
+            this.btnDescSave.Text = "Save Description";
+            this.btnDescSave.UseVisualStyleBackColor = true;
+            this.btnDescSave.Click += new System.EventHandler(this.btnDescSave_Click);
+            // 
 			// modinfo_info_CreatedLabel
 			// 
 			this.modinfo_info_CreatedLabel.AutoSize = true;
@@ -1371,6 +1387,11 @@
 			this.fillPanel.TabIndex = 6;
 			this.fillPanel.Visible = false;
 			// 
+            // olvAuthor
+            // 
+            this.olvAuthor.AspectName = "Author";
+            this.olvAuthor.Text = "Author";
+            // 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1540,6 +1561,8 @@
         private BrightIdeasSoftware.OLVColumn olvcCategory;
         private BrightIdeasSoftware.OLVColumn olvcTags;
         private BrightIdeasSoftware.OLVColumn olvForWOTC;
+        private System.Windows.Forms.Button btnDescSave;
+        private BrightIdeasSoftware.OLVColumn olvAuthor;
         private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
         private System.Windows.Forms.FlowLayoutPanel LauchOptionsPanel;
         private UserElements.LaunchArgumentCheckbox NoRedscreensLaunchArgument;

@@ -123,10 +123,10 @@ namespace XCOM2Launcher.Forms
                     DateUpdated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeUpdated).DateTime,
                     //Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
                     Image = link,
-                    Source = ModSource.SteamWorkshop,
-                    WorkshopID = (int) id,
-                    State = ModState.New | ModState.NotInstalled
+                    WorkshopID = (int) id
                 };
+                downloadMod.SetSource(ModSource.SteamWorkshop);
+                downloadMod.AddState(ModState.New | ModState.NotInstalled);
 
                 // Start download
                 Workshop.DownloadItem(id);
@@ -503,11 +503,15 @@ namespace XCOM2Launcher.Forms
             modinfo_info_AuthorTextBox.Text = m.Author;
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
-            modinfo_info_DescriptionRichTextBox.Text = m.GetDescription();
+            modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
+            modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
+            btnDescSave.Enabled = false;
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
 
-            modinfo_inspect_propertygrid.SelectedObject = m;
+            var sel_obj = m.GetProperty();
+            sel_obj.PropertyChanged += (sender, e) => { RefreshModList(); modinfo_inspect_propertygrid.Refresh(); };
+            modinfo_inspect_propertygrid.SelectedObject = sel_obj;
 
 			#region Config
 

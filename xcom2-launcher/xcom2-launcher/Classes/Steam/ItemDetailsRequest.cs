@@ -10,13 +10,15 @@ namespace XCOM2Launcher.Steam
 
         private UGCQueryHandle_t _queryHandle;
 
-        public ItemDetailsRequest(ulong id)
+        public ItemDetailsRequest(ulong id, bool GetDesc = false)
         {
             ID = id;
+            GetFullDescription = GetDesc;
         }
 
 
         public ulong ID { get; }
+        public bool GetFullDescription { get; }
 
         public bool Success { get; private set; }
         public bool Finished { get; private set; }
@@ -31,6 +33,8 @@ namespace XCOM2Launcher.Steam
 
             _onQueryCompleted = CallResult<SteamUGCQueryCompleted_t>.Create(QueryCompleted);
             _queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(new[] {ID.ToPublishedFileID()}, 1);
+
+            SteamUGC.SetReturnLongDescription(_queryHandle, GetFullDescription);
 
             var apiCall = SteamUGC.SendQueryUGCRequest(_queryHandle);
             _onQueryCompleted.Set(apiCall);

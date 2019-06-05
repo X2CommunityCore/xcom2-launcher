@@ -182,19 +182,19 @@ namespace XCOM2Launcher
 	            foreach (var mod in settings.Mods.All)
 	            {
 		            if (!settings.ModPaths.Any(mod.IsInModPath))
-						mod.State |= ModState.NotLoaded;
-					if (!Directory.Exists(mod.Path))
-						mod.State |= ModState.NotInstalled;
+						mod.AddState(ModState.NotLoaded);
+					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
+						mod.AddState(ModState.NotInstalled);
                     else if (!File.Exists(mod.GetModInfoFile()))
                     {
                         string newModInfo = settings.Mods.FindModInfo(mod.Path);
                         if (newModInfo != null)
                             mod.ID = Path.GetFileNameWithoutExtension(newModInfo);
                         else
-                            mod.State |= ModState.NotInstalled;
+						    mod.AddState(ModState.NotInstalled);
                     }
 	                // tags clean up
-	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t)).ToList();
+	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
 	            }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();

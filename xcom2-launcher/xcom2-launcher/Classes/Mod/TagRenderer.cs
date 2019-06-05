@@ -95,8 +95,7 @@ namespace XCOM2Launcher.Mod
             var backgroundColor = rowObject == ListView.SelectedObject
                                 ? ListItem?.SelectedBackColor ?? ListView.SelectedBackColorOrDefault
                                 : listItem.BackColor;
-            var tagList = _availableTags.Select(kvp => kvp.Value)
-                                        .Where(t => mod.Tags.Contains(t.Label));
+            var tagList = _availableTags.Where(t => mod.Tags.Select(s => s.ToLower()).Contains(t.Key)).Select(kvp => kvp.Value);
 
             return RenderTags(listItem.Font, backgroundColor, g, r, tagList.ToList());
         }
@@ -128,7 +127,7 @@ namespace XCOM2Launcher.Mod
                 {
                     graphics.DrawPath(borderPen, renderInfo.Path);
                 }
-                using (var textBrush = new SolidBrush(renderInfo.BorderColor))
+                using (var textBrush = new SolidBrush(tag.TextColor))
                 {
                     graphics.DrawString(tag.Label, font, textBrush, renderInfo.TextPosition);
                 }

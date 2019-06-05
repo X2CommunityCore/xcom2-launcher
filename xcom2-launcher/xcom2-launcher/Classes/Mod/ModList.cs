@@ -73,12 +73,12 @@ namespace XCOM2Launcher.Mod
         {
             foreach (var mod in All)
             {
-                mod.State &= ~ModState.ModConflict;
+                mod.RemoveState(ModState.ModConflict);
             }
 
             foreach (var classOverride in activeConflicts.SelectMany(conflict => conflict.Overrides))
             {
-                classOverride.Mod.State |= ModState.ModConflict;
+                classOverride.Mod.AddState(ModState.ModConflict);
             }
         }
 
@@ -118,16 +118,17 @@ namespace XCOM2Launcher.Mod
 
             var mod = new ModEntry
             {
-                ID = modID,
                 Name = modinfo.Title ?? "Unnamed Mod",
+                ID = modID,
                 Path = modDir,
-                Source = source,
                 isActive = false,
-                DateAdded = DateTime.Now,
-                BuiltForWOTC = modinfo.RequiresXPACK,
-                State = ModState.New
+                DateAdded = DateTime.Now
             };
-	        if (source == ModSource.SteamWorkshop)
+            mod.AddState(ModState.New);
+            mod.SetRequiresWOTC(modinfo.RequiresXPACK);
+            mod.SetSource(source);
+
+            if (source == ModSource.SteamWorkshop)
 	        {
 		        var s = modDir.Split(Path.DirectorySeparatorChar).Last();
 		        try
@@ -147,7 +148,7 @@ namespace XCOM2Launcher.Mod
             // mark dupes
             if (isDupe)
                 foreach (var m in All.Where(m => m.ID == modID))
-                    m.State |= ModState.DuplicateID;
+                    m.AddState(ModState.DuplicateID);
 
             return mod;
         }
@@ -187,25 +188,25 @@ namespace XCOM2Launcher.Mod
             // Check if mod directory exists
             if (!Directory.Exists(m.Path))
             {
-                m.State |= ModState.NotInstalled;
-                m.State |= ModState.NotLoaded;
+                m.AddState(ModState.NotInstalled);
+                m.AddState(ModState.NotLoaded);
                 m.isHidden = true;
                 return;
             }
 
             // Check if in ModPaths
             if (!settings.ModPaths.Any(modPath => m.IsInModPath(modPath)))
-                m.State |= ModState.NotLoaded;
+                m.AddState(ModState.NotLoaded);
 
             // Update Source
             if (m.Source == ModSource.Unknown)
             {
                 if (m.Path.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1)
-                    m.Source = ModSource.SteamWorkshop;
+                    m.SetSource(ModSource.SteamWorkshop);
 
                 else
                 // in workshop path but not loaded via steam
-                    m.Source = ModSource.Manual;
+                    m.SetSource(ModSource.Manual);
             }
             
             // Ensure source ID exists
@@ -214,12 +215,14 @@ namespace XCOM2Launcher.Mod
                 long sourceID;
 
                 if (m.Source == ModSource.SteamWorkshop && long.TryParse(Path.GetFileName(m.Path), out sourceID))
-                    m.Source = ModSource.Manual;
-
+                {
+                    m.WorkshopID = sourceID;
+                }
                 else
-                    sourceID = new ModInfo(m.GetModInfoFile()).PublishedFileID;
+                {
+                    m.WorkshopID = new ModInfo(m.GetModInfoFile()).PublishedFileID;
+                }
 
-                m.WorkshopID = sourceID;
             }
             
             // Fill Date Added
@@ -232,7 +235,7 @@ namespace XCOM2Launcher.Mod
             {
                 var publishedID = (ulong) m.WorkshopID;
 
-                var value = Workshop.GetDetails(publishedID);
+                var value = Workshop.GetDetails(publishedID, string.IsNullOrEmpty(m.Description));
 
                 if (!m.ManualName)
                     m.Name = value.m_rgchTitle;
@@ -247,23 +250,38 @@ namespace XCOM2Launcher.Mod
                 //MessageBox.Show(m.Author);
 
                 // Update directory size
-                m.Size = value.m_nFileSize;
+                m.RealizeSize(value.m_nFileSize);
                 if (m.Size < 0)
-                    m.Size = Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length);
+                    m.RealizeSize(Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length));
+
+                if (string.IsNullOrEmpty(m.Description))
+                {
+                    m.Description = value.m_rgchDescription;
+                }
+
+                if (value.m_ulSteamIDOwner > 0)
+                {
+                    m.Author = Workshop.GetUsername(value.m_ulSteamIDOwner);
+                    if (string.IsNullOrEmpty(m.Author))
+                    {
+                        m.Author = "Unknown";
+                    }
+                }
 
                 // Check Workshop for updates
                 if (m.Source == ModSource.SteamWorkshop)
-                    if (
-                        Workshop.GetDownloadStatus((ulong) m.WorkshopID)
-                            .HasFlag(EItemState.k_EItemStateNeedsUpdate))
-                        m.State |= ModState.UpdateAvailable;
+                if (
+                    Workshop.GetDownloadStatus((ulong) m.WorkshopID)
+                        .HasFlag(EItemState.k_EItemStateNeedsUpdate))
+                    m.AddState(ModState.UpdateAvailable);
 
                 // Check if it is built for WOTC
                 try
                 {
                     // Parse .XComMod file
                     var modinfo = new ModInfo(m.GetModInfoFile());
-                    m.BuiltForWOTC = modinfo.RequiresXPACK;
+                    m.SetRequiresWOTC(modinfo.RequiresXPACK);
+
                 }
                 catch (InvalidOperationException)
                 {
@@ -278,7 +296,7 @@ namespace XCOM2Launcher.Mod
 
                 // Update directory size
                 // slow, but necessary ?
-                m.Size = Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length);
+                m.RealizeSize(Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length));
 
                 // Update Name and Description
                 // look for .XComMod file
@@ -290,7 +308,7 @@ namespace XCOM2Launcher.Mod
                         m.Name = modinfo.Title;
 
                     m.Description = modinfo.Description;
-                    m.BuiltForWOTC = modinfo.RequiresXPACK;
+                    m.SetRequiresWOTC(modinfo.RequiresXPACK);
                 }
                 catch (InvalidOperationException)
                 {
@@ -317,7 +335,7 @@ namespace XCOM2Launcher.Mod
         public void MarkDuplicates()
         {
             foreach (var m in GetDuplicates().SelectMany(@group => @group))
-                m.State |= ModState.DuplicateID;
+                m.AddState(ModState.DuplicateID);
         }
     }
 }
