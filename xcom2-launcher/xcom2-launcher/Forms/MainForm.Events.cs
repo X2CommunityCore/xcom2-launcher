@@ -154,9 +154,9 @@ namespace XCOM2Launcher.Forms
         {
             var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
-            if (mod.State == ModState.NotInstalled && e.Result.m_eResult == EResult.k_EResultOK)
+            if ((mod.State | ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
             {
-                mod.State &= ~ModState.NotInstalled;
+                mod.RemoveState(ModState.NotInstalled);
                 RefreshModList();
             }
         }
@@ -174,14 +174,9 @@ namespace XCOM2Launcher.Forms
 
             if (m != null)
             {
-                // look for .XComMod file
-                var infoFile = Directory.GetFiles(m.Path, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
-                if (infoFile == null)
-                    throw new Exception("Invalid Download");
-
                 // Fill fields
-                m.State &= ~ModState.NotInstalled;
-                m.ID = Path.GetFileNameWithoutExtension(infoFile);
+                m.RemoveState(ModState.NotInstalled);
+                m.RealizeIDAndPath(m.Path);
                 m.Image = null; // Use default image again
 
                 // load info
@@ -242,10 +237,13 @@ namespace XCOM2Launcher.Forms
             WorkerSupportsCancellation = true
         };
 
+        private string last_error;
+
         private void Updater_DoWork(object sender, DoWorkEventArgs e)
         {
             _updateWorker.ReportProgress(0);
             var numCompletedMods = 0;
+            last_error = "";
             Parallel.ForEach(Mods.All.ToList(), mod =>
             {
                 if (_updateWorker.CancellationPending || Disposing || IsDisposed)
@@ -254,7 +252,14 @@ namespace XCOM2Launcher.Forms
                     return;
                 }
 
-                Mods.UpdateMod(mod, Settings);
+                try
+                {
+                    Mods.UpdateMod(mod, Settings);
+                }
+                catch (Exception ex)
+                {
+                    last_error += ex.Message + "\r\n" + ex.StackTrace;
+                }
 
                 lock (_updateWorker)
                 {
@@ -273,6 +278,32 @@ namespace XCOM2Launcher.Forms
             status_toolstrip_label.Text = $"Updating Mods... ({e.ProgressPercentage} / {progress_toolstrip_progressbar.Maximum})";
         }
 
+        private void Updater_SingleUpdateProgress(object sender, ProgressChangedEventArgs e)
+        {
+            if (modlist_ListObjectListView.SelectedObjects.Count == 1)
+            {
+                var selected = modlist_ListObjectListView.SelectedObject as ModEntry;
+
+                if (e.UserState as ModEntry == selected)
+                {
+                    UpdateModInfo(CurrentMod);
+                }
+            }
+        }
+
+        private void Updater_SingleUpdateCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (modlist_ListObjectListView.SelectedObjects.Count == 1)
+            {
+                var selected = modlist_ListObjectListView.SelectedObject as ModEntry;
+
+                if (CurrentMod == selected)
+                {
+                    UpdateModInfo(CurrentMod);
+                }
+            }
+        }
+
         private void Updater_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled)
@@ -283,7 +314,14 @@ namespace XCOM2Launcher.Forms
 
             progress_toolstrip_progressbar.Visible = false;
             status_toolstrip_label.Text = StatusBarIdleString;
+#if DEBUG
+            if (!String.IsNullOrEmpty(last_error))
+            {
+                MessageBox.Show(last_error, "ERROR!");
+            }
+#endif
             RefreshModList();
+            Updater_SingleUpdateCompleted(sender, e);
         }
 
         #endregion
@@ -310,10 +348,21 @@ namespace XCOM2Launcher.Forms
                 CheckFileExists = true,
                 Multiselect = false,
             };
-
+            
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
+            bool OverrideTags;
+
+            if (!Settings.NeverImportTags)
+            {
+                OverrideTags = MessageBox.Show("Do you want to override the tags and categories of your current mods with the tags saved in your profile?\r\n" +
+                    "Warning: This action cannot be undone", "Importing profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+            }
+            else
+            {
+                OverrideTags = false;
+            }
             // parse file
 
 			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
@@ -358,34 +407,24 @@ namespace XCOM2Launcher.Forms
 
                 activeMods.AddRange(entries);
 
-				var tagStr = modMatch.Groups["tags"].Value;
-				List<string> tags = new List<string>();
-
-				if (!string.IsNullOrEmpty(tagStr))
-				{
-					tags.AddRange(tagStr.Split(';'));
-
-					foreach (var tag in tags) {
-						if (AvailableTags.ContainsKey(tag) == false)
-						{
-							AvailableTags[tag] = new ModTag(tag);
-						}
-					}
-				}
-
-
-				foreach (var modEntry in entries)
-	            {
-					modEntry.Tags = tags;
-		            Mods.RemoveMod(modEntry);
-					Mods.AddMod(categoryName, modEntry);
-		            //modEntry.isActive = active;
-	            }
-
-                if (entries.Count > 1)
+                if (OverrideTags)
                 {
-                    // More than 1 mod
-                    // Add warning?
+                    var tags = modMatch.Groups["tags"].Value.Split(';').Where(t => !string.IsNullOrWhiteSpace(t));
+
+                    foreach (var tag in tags)
+                    {
+                        if (AvailableTags.ContainsKey(tag.ToLower()) == false)
+                        {
+                            AvailableTags[tag.ToLower()] = new ModTag(tag);
+                        }
+                    }
+
+                    foreach (var modEntry in entries)
+                    {
+                        modEntry.Tags = tags.ToList();
+                        Mods.RemoveMod(modEntry);
+                        Mods.AddMod(categoryName, modEntry);
+                    }
                 }
             }
 
@@ -676,13 +715,25 @@ namespace XCOM2Launcher.Forms
 
 		private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
 		{
-			var contents = modinfo_info_DescriptionRichTextBox.Text;
-			if (!CurrentMod.Description.Equals(contents))
-				CurrentMod.Description = contents;
+            //var contents = modinfo_info_DescriptionRichTextBox.Text;
+            //if (!CurrentMod.Description.Equals(contents))
+            //    CurrentMod.Description = contents;
+            btnDescSave.Enabled = true;
 		}
 
-		private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
+        private void btnDescSave_Click(object sender, EventArgs e)
+        {
+            var contents = modinfo_info_DescriptionRichTextBox.Text;
+            if (!CurrentMod.Description.Equals(contents))
+                CurrentMod.Description = contents;
+            btnDescSave.Enabled = false;
+        }
+
+        private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
 		{
+            if (modlist_ListObjectListView.OLVGroups == null)
+                return;
+
 			var numGroups = modlist_ListObjectListView.OLVGroups.Count;
 			var collapsedGroups = modlist_ListObjectListView.OLVGroups.Count(@group => @group.Collapsed);
 

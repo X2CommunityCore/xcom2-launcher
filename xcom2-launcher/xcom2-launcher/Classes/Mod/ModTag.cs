@@ -7,7 +7,26 @@ namespace XCOM2Launcher.Mod
     {
         public string Label { get; set; } = "New Tag";
 
-        public Color Color { get; set; } = RandomColor();
+        private Color _bgColor, _textColor;
+        public Color Color
+        {
+            get
+            {
+                return _bgColor;
+            }
+            set
+            {
+                _bgColor = value;
+                double L = (0.299 * value.R + 0.587 * value.G + 0.114 * value.B) / 255;
+
+                if (L > 0.5)
+                    _textColor = Color.Black;
+                else
+                    _textColor = Color.White;
+            }
+        }
+
+        public Color TextColor => _textColor;
 
         public static Color RandomColor()
         {

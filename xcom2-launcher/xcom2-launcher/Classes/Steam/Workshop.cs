@@ -33,9 +33,9 @@ namespace XCOM2Launcher.Steam
             SteamUGC.UnsubscribeItem(id.ToPublishedFileID());
         }
 
-        public static SteamUGCDetails_t GetDetails(ulong id)
+        public static SteamUGCDetails_t GetDetails(ulong id, bool GetDesc = false)
         {
-            var request = new ItemDetailsRequest(id);
+            var request = new ItemDetailsRequest(id, GetDesc);
 
             request.Send().WaitForResult();
 
@@ -115,8 +115,20 @@ namespace XCOM2Launcher.Steam
 
         public static string GetUsername(ulong steamID)
         {
-            // todo
-            return SteamFriends.GetPlayerNickname(new CSteamID(steamID));
+            System.Threading.ManualResetEvent work_done = new System.Threading.ManualResetEvent(false);
+            var _profileCallback = Callback<PersonaStateChange_t>.Create(delegate (PersonaStateChange_t result)
+            {
+                work_done.Set();
+            });
+            bool success = SteamFriends.RequestUserInformation(new CSteamID(steamID), true);
+            
+            if (success)
+            {
+                work_done.WaitOne(5000);
+                work_done.Reset();
+            }
+
+            return SteamFriends.GetFriendPersonaName(new CSteamID(steamID));
         }
     }
 }

@@ -49,9 +49,10 @@
 			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
 			this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowQuickLaunchArgumentsToggle = new System.Windows.Forms.CheckBox();
+			this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.bCancel = new System.Windows.Forms.Button();
 			this.bOK = new System.Windows.Forms.Button();
+			this.bCancel = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			this.tableLayoutPanel2.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
@@ -95,13 +96,13 @@
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(646, 190);
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 186);
 			this.tableLayoutPanel2.TabIndex = 6;
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(4, 164);
+			this.label1.Location = new System.Drawing.Point(4, 160);
 			this.label1.Margin = new System.Windows.Forms.Padding(4, 4, 3, 0);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(57, 13);
@@ -114,7 +115,7 @@
 			this.modPathsListbox.FormattingEnabled = true;
 			this.modPathsListbox.Location = new System.Drawing.Point(103, 53);
 			this.modPathsListbox.Name = "modPathsListbox";
-			this.modPathsListbox.Size = new System.Drawing.Size(467, 104);
+			this.modPathsListbox.Size = new System.Drawing.Size(462, 100);
 			this.modPathsListbox.TabIndex = 4;
 			// 
 			// label3
@@ -142,7 +143,7 @@
 			this.gamePathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.gamePathTextBox.Location = new System.Drawing.Point(103, 3);
 			this.gamePathTextBox.Name = "gamePathTextBox";
-			this.gamePathTextBox.Size = new System.Drawing.Size(467, 20);
+			this.gamePathTextBox.Size = new System.Drawing.Size(462, 20);
 			this.gamePathTextBox.TabIndex = 10;
 			// 
 			// flowLayoutPanel1
@@ -150,10 +151,10 @@
 			this.flowLayoutPanel1.Controls.Add(this.addModPathButton);
 			this.flowLayoutPanel1.Controls.Add(this.removeModPathButton);
 			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(573, 50);
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(568, 50);
 			this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 110);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 106);
 			this.flowLayoutPanel1.TabIndex = 12;
 			// 
 			// addModPathButton
@@ -178,7 +179,7 @@
 			// 
 			// browseGamePathButton
 			// 
-			this.browseGamePathButton.Location = new System.Drawing.Point(576, 3);
+			this.browseGamePathButton.Location = new System.Drawing.Point(571, 3);
 			this.browseGamePathButton.Name = "browseGamePathButton";
 			this.browseGamePathButton.Size = new System.Drawing.Size(67, 24);
 			this.browseGamePathButton.TabIndex = 14;
@@ -189,9 +190,9 @@
 			// argumentsTextBox
 			// 
 			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.argumentsTextBox.Location = new System.Drawing.Point(103, 163);
+			this.argumentsTextBox.Location = new System.Drawing.Point(103, 159);
 			this.argumentsTextBox.Name = "argumentsTextBox";
-			this.argumentsTextBox.Size = new System.Drawing.Size(467, 20);
+			this.argumentsTextBox.Size = new System.Drawing.Size(462, 20);
 			this.argumentsTextBox.TabIndex = 15;
 			this.argumentsTextBox.Values = new string[0];
 			// 
@@ -200,41 +201,45 @@
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.tableLayoutPanel3);
-			this.groupBox2.Location = new System.Drawing.Point(12, 231);
+			this.groupBox2.Location = new System.Drawing.Point(12, 229);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(655, 96);
+			this.groupBox2.Size = new System.Drawing.Size(655, 105);
 			this.groupBox2.TabIndex = 10;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Launcher options";
 			// 
 			// tableLayoutPanel3
 			// 
+			this.tableLayoutPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.tableLayoutPanel3.ColumnCount = 3;
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.Controls.Add(this.searchForUpdatesCheckBox, 0, 2);
 			this.tableLayoutPanel3.Controls.Add(this.showHiddenEntriesCheckBox, 0, 0);
 			this.tableLayoutPanel3.Controls.Add(this.closeAfterLaunchCheckBox, 0, 1);
 			this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 1, 0);
 			this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 1, 1);
 			this.tableLayoutPanel3.Controls.Add(this.ShowQuickLaunchArgumentsToggle, 1, 2);
+			this.tableLayoutPanel3.Controls.Add(this.neverAdoptTagsAndCatFromprofile, 2, 0);
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 20);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
 			this.tableLayoutPanel3.RowCount = 3;
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(443, 66);
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 79);
 			this.tableLayoutPanel3.TabIndex = 6;
 			// 
 			// searchForUpdatesCheckBox
 			// 
 			this.searchForUpdatesCheckBox.AutoSize = true;
-			this.searchForUpdatesCheckBox.Location = new System.Drawing.Point(3, 47);
+			this.searchForUpdatesCheckBox.Location = new System.Drawing.Point(3, 55);
 			this.searchForUpdatesCheckBox.Name = "searchForUpdatesCheckBox";
-			this.searchForUpdatesCheckBox.Size = new System.Drawing.Size(116, 16);
+			this.searchForUpdatesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.searchForUpdatesCheckBox.Size = new System.Drawing.Size(119, 20);
 			this.searchForUpdatesCheckBox.TabIndex = 10;
 			this.searchForUpdatesCheckBox.Text = "Search for updates";
 			this.toolTip.SetToolTip(this.searchForUpdatesCheckBox, "Search for updates to the launcher when starting");
@@ -245,7 +250,8 @@
 			this.showHiddenEntriesCheckBox.AutoSize = true;
 			this.showHiddenEntriesCheckBox.Location = new System.Drawing.Point(3, 3);
 			this.showHiddenEntriesCheckBox.Name = "showHiddenEntriesCheckBox";
-			this.showHiddenEntriesCheckBox.Size = new System.Drawing.Size(116, 16);
+			this.showHiddenEntriesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.showHiddenEntriesCheckBox.Size = new System.Drawing.Size(119, 20);
 			this.showHiddenEntriesCheckBox.TabIndex = 9;
 			this.showHiddenEntriesCheckBox.Text = "Show hidden mods";
 			this.toolTip.SetToolTip(this.showHiddenEntriesCheckBox, "Toggle showing hidden mod entries");
@@ -254,9 +260,10 @@
 			// closeAfterLaunchCheckBox
 			// 
 			this.closeAfterLaunchCheckBox.AutoSize = true;
-			this.closeAfterLaunchCheckBox.Location = new System.Drawing.Point(3, 25);
+			this.closeAfterLaunchCheckBox.Location = new System.Drawing.Point(3, 29);
 			this.closeAfterLaunchCheckBox.Name = "closeAfterLaunchCheckBox";
-			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(111, 16);
+			this.closeAfterLaunchCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(114, 20);
 			this.closeAfterLaunchCheckBox.TabIndex = 7;
 			this.closeAfterLaunchCheckBox.Text = "Close after launch";
 			this.toolTip.SetToolTip(this.closeAfterLaunchCheckBox, "Close the launcher after launching the game");
@@ -265,9 +272,10 @@
 			// autoNumberModIndexesCheckBox
 			// 
 			this.autoNumberModIndexesCheckBox.AutoSize = true;
-			this.autoNumberModIndexesCheckBox.Location = new System.Drawing.Point(224, 3);
+			this.autoNumberModIndexesCheckBox.Location = new System.Drawing.Point(216, 3);
 			this.autoNumberModIndexesCheckBox.Name = "autoNumberModIndexesCheckBox";
-			this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(148, 16);
+			this.autoNumberModIndexesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(151, 20);
 			this.autoNumberModIndexesCheckBox.TabIndex = 14;
 			this.autoNumberModIndexesCheckBox.Text = "Auto-number mod indexes";
 			this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-number mod indexes when one is changed (turn off to edit manually)");
@@ -276,9 +284,10 @@
 			// useModSpecifiedCategoriesCheckBox
 			// 
 			this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
-			this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(224, 25);
+			this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(216, 29);
 			this.useModSpecifiedCategoriesCheckBox.Name = "useModSpecifiedCategoriesCheckBox";
-			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(165, 16);
+			this.useModSpecifiedCategoriesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(168, 20);
 			this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
 			this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
 			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to h" +
@@ -288,28 +297,31 @@
 			// ShowQuickLaunchArgumentsToggle
 			// 
 			this.ShowQuickLaunchArgumentsToggle.AutoSize = true;
-			this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(224, 47);
+			this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(216, 55);
 			this.ShowQuickLaunchArgumentsToggle.Name = "ShowQuickLaunchArgumentsToggle";
-			this.ShowQuickLaunchArgumentsToggle.Size = new System.Drawing.Size(169, 16);
-			this.ShowQuickLaunchArgumentsToggle.TabIndex = 16;
+			this.ShowQuickLaunchArgumentsToggle.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.ShowQuickLaunchArgumentsToggle.Size = new System.Drawing.Size(172, 20);
+			this.ShowQuickLaunchArgumentsToggle.TabIndex = 17;
 			this.ShowQuickLaunchArgumentsToggle.Text = "Show quick launch arguments";
 			this.ShowQuickLaunchArgumentsToggle.UseVisualStyleBackColor = true;
 			// 
-			// bCancel
+			// neverAdoptTagsAndCatFromprofile
 			// 
-			this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.bCancel.Location = new System.Drawing.Point(563, 336);
-			this.bCancel.Name = "bCancel";
-			this.bCancel.Size = new System.Drawing.Size(104, 24);
-			this.bCancel.TabIndex = 11;
-			this.bCancel.Text = "Cancel";
-			this.bCancel.UseVisualStyleBackColor = true;
+			this.neverAdoptTagsAndCatFromprofile.AutoSize = true;
+			this.neverAdoptTagsAndCatFromprofile.Location = new System.Drawing.Point(429, 3);
+			this.neverAdoptTagsAndCatFromprofile.Name = "neverAdoptTagsAndCatFromprofile";
+			this.neverAdoptTagsAndCatFromprofile.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.neverAdoptTagsAndCatFromprofile.Size = new System.Drawing.Size(185, 20);
+			this.neverAdoptTagsAndCatFromprofile.TabIndex = 16;
+			this.neverAdoptTagsAndCatFromprofile.Text = "Never import tags and categories";
+			this.toolTip.SetToolTip(this.neverAdoptTagsAndCatFromprofile, "Turn on to suppress the confirmation dialog to override tags and categories when " +
+        "importing profiles, always preserving your current tags and profiles.");
+			this.neverAdoptTagsAndCatFromprofile.UseVisualStyleBackColor = true;
 			// 
 			// bOK
 			// 
 			this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.bOK.Location = new System.Drawing.Point(453, 336);
+			this.bOK.Location = new System.Drawing.Point(453, 343);
 			this.bOK.Name = "bOK";
 			this.bOK.Size = new System.Drawing.Size(104, 24);
 			this.bOK.TabIndex = 12;
@@ -317,11 +329,22 @@
 			this.bOK.UseVisualStyleBackColor = true;
 			this.bOK.Click += new System.EventHandler(this.bOK_Click);
 			// 
+			// bCancel
+			// 
+			this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.bCancel.Location = new System.Drawing.Point(563, 343);
+			this.bCancel.Name = "bCancel";
+			this.bCancel.Size = new System.Drawing.Size(104, 24);
+			this.bCancel.TabIndex = 11;
+			this.bCancel.Text = "Cancel";
+			this.bCancel.UseVisualStyleBackColor = true;
+			// 
 			// SettingsDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(679, 372);
+			this.ClientSize = new System.Drawing.Size(679, 379);
 			this.Controls.Add(this.bOK);
 			this.Controls.Add(this.bCancel);
 			this.Controls.Add(this.groupBox2);
@@ -369,6 +392,7 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox autoNumberModIndexesCheckBox;
         private System.Windows.Forms.CheckBox useModSpecifiedCategoriesCheckBox;
+        private System.Windows.Forms.CheckBox neverAdoptTagsAndCatFromprofile;
         private System.Windows.Forms.CheckBox ShowQuickLaunchArgumentsToggle;
 		private System.Windows.Forms.Button bCancel;
 		private System.Windows.Forms.Button bOK;
