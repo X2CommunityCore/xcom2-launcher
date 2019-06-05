@@ -13,9 +13,11 @@ namespace XCOM2Launcher.Mod
             LoadFile(filepath);
         }
 
+		public const string DEFAULT_CATEGORY_NAME = "Unsorted";
+
         public int PublishedFileID { get; set; } = -1;
         public string Title { get; set; }
-        public string Category { get; set; } = "Unsorted";
+        public string Category { get; set; } = DEFAULT_CATEGORY_NAME;
         public string Description { get; set; } = "";
         public string Tags { get; set; } = "";
         public bool RequiresXPACK { get; set; }
