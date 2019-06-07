@@ -186,7 +186,7 @@ namespace XCOM2Launcher.Forms
                 {
                     if (mod.Tags.Select(t => t.ToLower()).Contains(oldTag.ToLower()))
                     {
-                        mod.Tags.Remove(mod.Tags.First(t => t.ToLower().Equals(oldTag.ToLower())));
+                        mod.Tags.Remove(mod.Tags.FirstOrDefault(t => t.ToLower().Equals(oldTag.ToLower())));
                         AddTag(mod, newTag);
                     }
                 }
@@ -342,17 +342,17 @@ namespace XCOM2Launcher.Forms
                 catch (DirectoryNotFoundException) {
                     // the directory was already removed
                 } catch (IOException ex) {
-					string message = $"Error while deleting mod folder: {Environment.NewLine}";
-					message += $"'{mod.Path}' {Environment.NewLine} {Environment.NewLine} {ex.Message}";
-					MessageBox.Show(message, "Error");
-				}
+                    string message = $"Error while deleting mod folder: {Environment.NewLine}";
+                    message += $"'{mod.Path}' {Environment.NewLine} {Environment.NewLine} {ex.Message}";
+                    MessageBox.Show(message, "Error");
+                }
             }
 
             RefreshModList();
             UpdateConflicts();
         }
 
-        private void MoveMods(string category)
+        private void MoveSelectedModsToCategory(string category)
         {
             modlist_ListObjectListView.BeginUpdate();
             foreach (var mod in ModList.SelectedObjects)
@@ -364,11 +364,11 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.EndUpdate();
         }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="rebuildColumns">Set to true if visibility for some columns was changed for example.</param>
-		private void RefreshModList(bool rebuildColumns = false)
+        /// <summary>
+        /// Clears the Mod list view and reloads the ModEntry model objects.
+        /// </summary>
+        /// <param name="rebuildColumns">Set to true if visibility for some columns was changed for example.</param>
+        private void RefreshModList(bool rebuildColumns = false)
         {
             // Un-register events
             modlist_ListObjectListView.SelectionChanged -= ModListSelectionChanged;
@@ -381,9 +381,10 @@ namespace XCOM2Launcher.Forms
 
             modlist_ListObjectListView.Objects = Settings.ShowHiddenElements ? Mods.All : Mods.All.Where(m => !m.isHidden);
 
-			if (rebuildColumns) {
-				modlist_ListObjectListView.RebuildColumns();
-			}
+            if (rebuildColumns)
+            {
+                modlist_ListObjectListView.RebuildColumns();
+            }
 
             modlist_ListObjectListView.EndUpdate();
 
@@ -394,30 +395,31 @@ namespace XCOM2Launcher.Forms
 
         private void RenameTagPrompt(ModEntry m, ModTag tag, bool renameAll)
         {
-            var prompt = renameAll ? $"Rename all instances of tag '{tag.Label}' ?"
-                                   : $"Rename tag '{tag.Label}' for '{m.Name}' ?";
+            var prompt = renameAll ? $"Enter new name for all instances of tag '{tag.Label}'."
+                                   : $"Enter new name for tag '{tag.Label}' on mod '{m.Name}'.";
+
             var newTag = Interaction.InputBox(prompt, "Rename tag", tag.Label);
 
-            if (string.IsNullOrEmpty(newTag) || (renameAll && MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to {newTag}?",
+            if (newTag == tag.Label)
+                return;
+
+            if (string.IsNullOrEmpty(newTag) || (renameAll && MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to '{newTag}'?",
                                                                                @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes))
             { 
                 return;
             }
 
-            if (newTag != tag.Label)
+            if (renameAll)
             {
-                if (renameAll)
-                {
-                    RenameTag(tag, newTag);
-                }
-                else
-                {
-                    m.Tags.Remove(m.Tags.First(t => t.ToLower().Equals(tag.Label.ToLower())));
+                RenameTag(tag, newTag);
+            }
+            else
+            {
+                m.Tags.Remove(m.Tags.FirstOrDefault(t => t.ToLower().Equals(tag.Label.ToLower())));
 
-                    if (m.Tags.Contains(newTag) == false)
-                    {
-                        AddTag(m, newTag);
-                    }
+                if (m.Tags.Contains(newTag) == false)
+                {
+                    AddTag(m, newTag);
                 }
             }
         }
@@ -500,72 +502,90 @@ namespace XCOM2Launcher.Forms
 
                 foreach (var mod in Mods.All)
                 {
-                    mod.Tags.Remove(mod.Tags.First(t => t.ToLower().Equals(tag.Label.ToLower())));
+                    mod.Tags.Remove(mod.Tags.FirstOrDefault(t => t.ToLower().Equals(tag.Label.ToLower())));
                 }
             };
             menu.MenuItems.Add(removeAllTagItem);
 
             return menu;
         }
-        
+
         private ContextMenu CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
         {
             var menu = new ContextMenu();
+
             if (m?.ID == null)
                 return menu;
 
-            var item = new MenuItem("Rename");
-            item.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
-            menu.MenuItems.Add(item);
-            var selectedCount = modlist_ListObjectListView.SelectedItems.Count;
+            var selectedMods = ModList.SelectedObjects.ToList();
+            var selectedModCount = ModList.SelectedObjects.Count;
 
-            // Add tag
-            if (currentItem != null)
+            MenuItem renameItem = null;
+            MenuItem addTagItem = null;
+            MenuItem showInExplorerItem = null;
+            MenuItem showOnSteamItem = null;
+            MenuItem showInBrowser = null;
+            MenuItem fetchWorkshopTagsItem = null;
+
+            // create items that appear only when a single mod is selected
+            if (selectedMods.Count == 1)
             {
-                var addTagItem = new MenuItem("Add tag");
+                renameItem = new MenuItem("Rename");
+                renameItem.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
 
-                if (selectedCount > 1)
+                addTagItem = new MenuItem("Add tag");
+                addTagItem.Click += (sender, args) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
+
+                showInExplorerItem = new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); });
+                menu.MenuItems.Add(showInExplorerItem);
+
+                if (m.WorkshopID > 0)
                 {
-                    addTagItem.Click += (sender, args) =>
-                    {
-                        var newTag = Interaction.InputBox($"Add a tag to {selectedCount} mods?", "Add tag");
+                    showOnSteamItem = new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); });
+                    menu.MenuItems.Add(showOnSteamItem);
 
-                        if (newTag == "")
-                            return;
-
-                        var tags = newTag.Split(';');
-
-                        foreach (var selectedItem in modlist_ListObjectListView.SelectedItems)
-                        {
-                            var listItem = selectedItem as OLVListItem;
-
-                            if (listItem == null)
-                                continue;
-
-                            tags.All(t => AddTag(listItem.RowObject as ModEntry, t.Trim()));
-                        }
-                    };
+                    showInBrowser = new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); });
+                    menu.MenuItems.Add(showInBrowser);
                 }
-                else
-                {
-                    addTagItem.Click += (sender, args) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
-                }
-
-                menu.MenuItems.Add(addTagItem);
             }
+
+            // create items that appear only when multiple mods are selected
+            if (selectedMods.Count > 1)
+            {
+                addTagItem = new MenuItem("Add tag(s)...");
+                addTagItem.Click += (sender, args) =>
+                {
+                    var newTag = Interaction.InputBox($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedModCount} selected mods.", "Add tag(s)");
+
+                    if (newTag == "")
+                        return;
+
+                    var tags = newTag.Split(';');
+
+                    foreach (ModEntry mod in modlist_ListObjectListView.SelectedObjects)
+                    {
+                        foreach (string tag in tags)
+                        {
+                            AddTag(mod, tag.Trim());
+                        }
+                    }
+                };
+            }
+
             // Move to ...
-            var moveToCategory = new MenuItem("Move to Category...");
+            var moveToCategoryItem = new MenuItem("Move to category...");
             // ... new category
-            moveToCategory.MenuItems.Add("New category", delegate
+            moveToCategoryItem.MenuItems.Add("New category", delegate
             {
                 var category = Interaction.InputBox("Please enter the name of the new category", "Create category", "New category");
-                if (category == "")
+
+                if (string.IsNullOrEmpty(category))
                     return;
 
-                MoveMods(category);
+                MoveSelectedModsToCategory(category);
             });
 
-            moveToCategory.MenuItems.Add("-");
+            moveToCategoryItem.MenuItems.Add("-");
 
             // ... existing category
             foreach (var category in Settings.Mods.Categories.OrderBy(c => c))
@@ -573,105 +593,134 @@ namespace XCOM2Launcher.Forms
                 if (category == Mods.GetCategory(m))
                     continue;
 
-                moveToCategory.MenuItems.Add(category, delegate { MoveMods(category); });
+                moveToCategoryItem.MenuItems.Add(category, delegate { MoveSelectedModsToCategory(category); });
             }
-            menu.MenuItems.Add(moveToCategory);
 
-
+            // Hide/unhide
             var toggleVisibility = new MenuItem {Text = m.isHidden ? "Unhide" : "Hide"};
             toggleVisibility.Click += delegate
             {
                 // save as new list so we can remove mods if they are being hidden
-                foreach (var mod in ModList.SelectedObjects.ToList())
+                foreach (var mod in selectedMods)
                 {
                     mod.isHidden = !m.isHidden;
 
                     if (!Settings.ShowHiddenElements && mod.isHidden)
                         modlist_ListObjectListView.RemoveObject(mod);
+                    else
+                        modlist_ListObjectListView.UpdateObject(mod);
                 }
-
-                RefreshModList();
             };
 
-            menu.MenuItems.Add(toggleVisibility);
-
-            menu.MenuItems.Add("-");
-
-            menu.MenuItems.Add(new MenuItem("Delete / Unsubscribe", delegate { DeleteMods(); }));
-
-
-            menu.MenuItems.Add("-");
-
-            if (selectedCount == 1)
+            // Update mods
+            var updateItem = new MenuItem("Update", delegate
             {
-                menu.MenuItems.Add(new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); }));
-
-                if (m.WorkshopID > 0)
-                {
-                    menu.MenuItems.Add(new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); }));
-                    menu.MenuItems.Add(new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); }));
-                }
-            }
-
-            menu.MenuItems.Add(new MenuItem("Update", delegate {
-                System.ComponentModel.BackgroundWorker _singleWorker = new System.ComponentModel.BackgroundWorker
+                System.ComponentModel.BackgroundWorker singleWorker = new System.ComponentModel.BackgroundWorker
                 {
                     WorkerReportsProgress = true
                 };
-                _singleWorker.ProgressChanged += Updater_SingleUpdateProgress;
-                List<ModEntry> SelectedMods = new List<ModEntry>(ModList.SelectedObjects);
-                _singleWorker.DoWork += delegate
-                {
-                    System.Threading.Tasks.Parallel.ForEach(SelectedMods, sel_item =>
-                    {
-                        Settings.Mods.UpdateMod(sel_item, Settings);
 
-                        lock (_singleWorker)
+                singleWorker.ProgressChanged += Updater_SingleUpdateProgress;
+                List<ModEntry> modsToUpdate = new List<ModEntry>(ModList.SelectedObjects);
+
+                singleWorker.DoWork += delegate
+                {
+                    System.Threading.Tasks.Parallel.ForEach(modsToUpdate, selItem =>
+                    {
+                        Settings.Mods.UpdateMod(selItem, Settings);
+
+                        lock (singleWorker)
                         {
-                            _singleWorker.ReportProgress(0, sel_item);
+                            singleWorker.ReportProgress(0, selItem);
                         }
                     });
                 };
-                _singleWorker.RunWorkerAsync();
-            }));
+                singleWorker.RunWorkerAsync();
+            });
 
-            if (m.Source == ModSource.SteamWorkshop || selectedCount > 1)
+            if (ModList.SelectedObjects.Any(mod => mod.Source == ModSource.SteamWorkshop))
             {
-                menu.MenuItems.Add(new MenuItem("Use workshop tags", delegate {
-                    System.ComponentModel.BackgroundWorker _singleWorker = new System.ComponentModel.BackgroundWorker
+                List<ModEntry> modsToUpdate = new List<ModEntry>(ModList.SelectedObjects.Where(mod => mod.Source == ModSource.SteamWorkshop));
+
+                fetchWorkshopTagsItem = new MenuItem("Use workshop tags");
+                fetchWorkshopTagsItem.Click += delegate
+                {
+                    if (modsToUpdate.Count > 1)
+                    {
+                        var result = MessageBox.Show(
+                                                     "Are you sure you want to replace the existing tags with tags from the workshop? " +
+                                                     Environment.NewLine + $"This process will override the tags of '{modsToUpdate.Count}' mods.",
+                                                     "Fetch workshop tags", MessageBoxButtons.YesNo);
+
+                        if (result != DialogResult.Yes)
+                            return;
+                    }
+
+                    System.ComponentModel.BackgroundWorker singleWorker = new System.ComponentModel.BackgroundWorker
                     {
                         WorkerReportsProgress = true
                     };
-                    _singleWorker.ProgressChanged += Updater_SingleUpdateProgress;
-                    List<ModEntry> SelectedMods = new List<ModEntry>(ModList.SelectedObjects);
-                    _singleWorker.DoWork += delegate
+
+                    singleWorker.ProgressChanged += Updater_SingleUpdateProgress;
+
+                    singleWorker.DoWork += delegate
                     {
-                        System.Threading.Tasks.Parallel.ForEach(SelectedMods, sel_item =>
+                        System.Threading.Tasks.Parallel.ForEach(modsToUpdate, selItem =>
                         {
-                            var tags = sel_item.GetSteamTags();
-                            if (tags.Count() > 0)
+                            var tags = selItem.GetSteamTags();
+                            if (tags.Any())
                             {
-                                sel_item.Tags.Clear();
+                                selItem.Tags.Clear();
                                 foreach (string tag in tags)
                                 {
-                                    AddTag(sel_item, tag);
+                                    AddTag(selItem, tag);
                                 }
 
-                                lock (_singleWorker)
+                                lock (singleWorker)
                                 {
-                                    _singleWorker.ReportProgress(0, sel_item);
+                                    singleWorker.ReportProgress(0, selItem);
                                 }
                             }
                         });
                     };
-                    if (SelectedMods.Count == 1 || MessageBox.Show($"Are you sure you want to replace the tags of '{SelectedMods.Count}' mods with workshop tags? " +
-                        $"This process will override existing tags of selected mods.", "Using workshop tags", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    {
-                        _singleWorker.RunWorkerAsync();
-                    }
-                }));
+
+                    singleWorker.RunWorkerAsync();
+                };
             }
 
+            var deleteItem = new MenuItem("Delete / Unsubscribe", delegate { DeleteMods(); });
+
+            // create menu structure
+            if (renameItem != null)
+                menu.MenuItems.Add(renameItem);
+
+            menu.MenuItems.Add(updateItem);
+            menu.MenuItems.Add("-");
+
+            if (addTagItem != null)
+                menu.MenuItems.Add(addTagItem);
+
+            if (fetchWorkshopTagsItem != null)
+                menu.MenuItems.Add(fetchWorkshopTagsItem);
+
+            menu.MenuItems.Add(moveToCategoryItem);
+            menu.MenuItems.Add("-");
+
+            if (showInExplorerItem != null)
+                menu.MenuItems.Add(showInExplorerItem);
+
+            if (showOnSteamItem != null)
+                menu.MenuItems.Add(showOnSteamItem);
+
+            if (showInBrowser != null)
+                menu.MenuItems.Add(showInBrowser);
+
+            // prevent double separator
+            if (menu.MenuItems[menu.MenuItems.Count - 1].Text != @"-")
+                menu.MenuItems.Add("-");
+
+            menu.MenuItems.Add(toggleVisibility);
+            menu.MenuItems.Add(deleteItem);
 
             return menu;
         }
@@ -796,7 +845,7 @@ namespace XCOM2Launcher.Forms
                     modlist_ListObjectListView.EndUpdate();
                     break;
                 case "Category":
-                    MoveMods((string)e.NewValue);
+                    MoveSelectedModsToCategory((string)e.NewValue);
                     break;
                     
             }
