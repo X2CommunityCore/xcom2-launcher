@@ -15,7 +15,7 @@ namespace XCOM2Launcher.GitHub
         public string name { get; set; }
         public string draft { get; set; }
         public User author { get; set; }
-        public string prerelease { get; set; }
+        public bool prerelease { get; set; }
         public DateTime created_at { get; set; }
         public DateTime published_at { get; set; }
         public List<Asset> assets { get; set; }

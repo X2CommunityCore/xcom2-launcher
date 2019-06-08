@@ -51,6 +51,7 @@
 			this.importActiveModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.cleanModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runChallengeModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +63,7 @@
 			this.modlist_ListObjectListView = new BrightIdeasSoftware.ObjectListView();
 			this.olvcActive = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+			this.olvAuthor = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcCategory = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvcState = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -92,7 +94,7 @@
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
 			this.modinfo_details_tab = new System.Windows.Forms.TabPage();
-            this.btnDescSave = new System.Windows.Forms.Button();
+			this.btnDescSave = new System.Windows.Forms.Button();
 			this.modinfo_info_CreatedLabel = new System.Windows.Forms.Label();
 			this.modinfo_info_DescriptionLabel = new System.Windows.Forms.Label();
 			this.modinfo_info_InstalledTextBox = new System.Windows.Forms.TextBox();
@@ -141,7 +143,6 @@
 			this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.fillPanel = new System.Windows.Forms.Panel();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.olvAuthor = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.main_statusstrip.SuspendLayout();
 			this.main_menustrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -282,24 +283,24 @@
 			this.showHiddenModsToolStripMenuItem.CheckOnClick = true;
 			this.showHiddenModsToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.showHiddenModsToolStripMenuItem.Name = "showHiddenModsToolStripMenuItem";
-			this.showHiddenModsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.showHiddenModsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.showHiddenModsToolStripMenuItem.Text = "Show hidden mods";
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+			this.toolStripSeparator3.Size = new System.Drawing.Size(173, 6);
 			// 
 			// editOptionsToolStripMenuItem
 			// 
 			this.editOptionsToolStripMenuItem.Name = "editOptionsToolStripMenuItem";
-			this.editOptionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.editOptionsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.editOptionsToolStripMenuItem.Text = "Options...";
 			// 
 			// manageCategoriesToolStripMenuItem
 			// 
 			this.manageCategoriesToolStripMenuItem.Name = "manageCategoriesToolStripMenuItem";
-			this.manageCategoriesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.manageCategoriesToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.manageCategoriesToolStripMenuItem.Text = "Categories...";
 			// 
 			// toolsToolStripMenuItem
@@ -307,7 +308,8 @@
 			this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem,
-            this.resubscribeToModsToolStripMenuItem});
+            this.resubscribeToModsToolStripMenuItem,
+            this.checkForUpdatesToolStripMenuItem});
 			this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
 			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
 			this.toolsToolStripMenuItem.Text = "Tools";
@@ -329,6 +331,12 @@
 			this.resubscribeToModsToolStripMenuItem.Name = "resubscribeToModsToolStripMenuItem";
 			this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
 			this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to mods";
+			// 
+			// checkForUpdatesToolStripMenuItem
+			// 
+			this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+			this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.checkForUpdatesToolStripMenuItem.Text = "Check for updates...";
 			// 
 			// runXCOM2ToolStripMenuItem
 			// 
@@ -428,7 +436,7 @@
 			// 
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcActive);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcName);
-            this.modlist_ListObjectListView.AllColumns.Add(this.olvAuthor);
+			this.modlist_ListObjectListView.AllColumns.Add(this.olvAuthor);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcCategory);
 			this.modlist_ListObjectListView.AllColumns.Add(this.olvcState);
@@ -503,6 +511,11 @@
 			this.olvcName.Hideable = false;
 			this.olvcName.Text = "Name";
 			this.olvcName.Width = 350;
+			// 
+			// olvAuthor
+			// 
+			this.olvAuthor.AspectName = "Author";
+			this.olvAuthor.Text = "Author";
 			// 
 			// olvcID
 			// 
@@ -793,7 +806,7 @@
 			// 
 			// modinfo_details_tab
 			// 
-            this.modinfo_details_tab.Controls.Add(this.btnDescSave);
+			this.modinfo_details_tab.Controls.Add(this.btnDescSave);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_CreatedLabel);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_DescriptionLabel);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_InstalledTextBox);
@@ -812,17 +825,17 @@
 			this.modinfo_details_tab.Text = "Info";
 			this.modinfo_details_tab.UseVisualStyleBackColor = true;
 			// 
-            // btnDescSave
-            // 
-            this.btnDescSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDescSave.Location = new System.Drawing.Point(7, 75);
-            this.btnDescSave.Name = "btnDescSave";
-            this.btnDescSave.Size = new System.Drawing.Size(83, 23);
-            this.btnDescSave.TabIndex = 11;
-            this.btnDescSave.Text = "Save Description";
-            this.btnDescSave.UseVisualStyleBackColor = true;
-            this.btnDescSave.Click += new System.EventHandler(this.btnDescSave_Click);
-            // 
+			// btnDescSave
+			// 
+			this.btnDescSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnDescSave.Location = new System.Drawing.Point(7, 75);
+			this.btnDescSave.Name = "btnDescSave";
+			this.btnDescSave.Size = new System.Drawing.Size(83, 23);
+			this.btnDescSave.TabIndex = 11;
+			this.btnDescSave.Text = "Save Description";
+			this.btnDescSave.UseVisualStyleBackColor = true;
+			this.btnDescSave.Click += new System.EventHandler(this.btnDescSave_Click);
+			// 
 			// modinfo_info_CreatedLabel
 			// 
 			this.modinfo_info_CreatedLabel.AutoSize = true;
@@ -1387,11 +1400,6 @@
 			this.fillPanel.TabIndex = 6;
 			this.fillPanel.Visible = false;
 			// 
-            // olvAuthor
-            // 
-            this.olvAuthor.AspectName = "Author";
-            this.olvAuthor.Text = "Author";
-            // 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1568,5 +1576,6 @@
         private UserElements.LaunchArgumentCheckbox NoRedscreensLaunchArgument;
         private UserElements.LaunchArgumentCheckbox LogLaunchArgument;
 		private System.Windows.Forms.ToolStripMenuItem manageCategoriesToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
 	}
 }
