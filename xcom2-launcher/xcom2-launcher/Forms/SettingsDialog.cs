@@ -35,7 +35,7 @@ namespace XCOM2Launcher.Forms
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
 
-            argumentsTextBox.Text = settings.Arguments;
+            argumentsTextBox.Text = string.Join(" ", settings.ArgumentList);
 
 			// Create autofill values for arguments box
 	        List<string> arguments = new List<string>();
@@ -116,7 +116,8 @@ namespace XCOM2Launcher.Forms
             Settings.NeverImportTags = neverAdoptTagsAndCatFromprofile.Checked;
 			Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
 
-			Settings.Arguments = argumentsTextBox.Text;
+            var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+            Settings.ArgumentList = newArguments.AsReadOnly();
 
 			// Save dimensions
 			Settings.Windows["settings"] = new WindowSettings(this);
