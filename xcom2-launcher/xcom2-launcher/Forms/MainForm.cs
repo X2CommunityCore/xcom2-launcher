@@ -504,6 +504,7 @@ namespace XCOM2Launcher.Forms
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
             modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
+            modinfo_info_DescriptionRichTextBox.Clear();
             modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
             btnDescSave.Enabled = false;
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
