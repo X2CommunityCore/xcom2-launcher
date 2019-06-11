@@ -502,7 +502,13 @@ namespace XCOM2Launcher.Forms
 
                 foreach (var mod in Mods.All)
                 {
-                    mod.Tags.Remove(mod.Tags.FirstOrDefault(t => t.ToLower().Equals(tag.Label.ToLower())));
+                    for (int i = 0; i < mod.Tags.Count; ++i)
+                    {
+                        if (mod.Tags[i].ToLower().Equals(tag.Label.ToLower()))
+                        {
+                            mod.Tags.RemoveAt(i--);
+                        }
+                    }
                 }
             };
             menu.MenuItems.Add(removeAllTagItem);
