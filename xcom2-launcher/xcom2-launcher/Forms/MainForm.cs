@@ -24,7 +24,7 @@ namespace XCOM2Launcher.Forms
             InitializeComponent();
 
             // Settings
-            SteamAPIWrapper.InitSafe();
+            SteamAPIWrapper.Init();
             Settings = settings;
 
             // Restore states 
