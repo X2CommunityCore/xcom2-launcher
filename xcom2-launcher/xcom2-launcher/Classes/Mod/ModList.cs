@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -205,16 +206,14 @@ namespace XCOM2Launcher.Mod
                     m.SetSource(ModSource.SteamWorkshop);
 
                 else
-                // in workshop path but not loaded via steam
+                    // in workshop path but not loaded via steam
                     m.SetSource(ModSource.Manual);
             }
-            
+
             // Ensure source ID exists
             if (m.WorkshopID <= 0)
             {
-                long sourceID;
-
-                if (m.Source == ModSource.SteamWorkshop && long.TryParse(Path.GetFileName(m.Path), out sourceID))
+                if (m.Source == ModSource.SteamWorkshop && long.TryParse(Path.GetFileName(m.Path), out var sourceID))
                 {
                     m.WorkshopID = sourceID;
                 }
@@ -222,49 +221,51 @@ namespace XCOM2Launcher.Mod
                 {
                     m.WorkshopID = new ModInfo(m.GetModInfoFile()).PublishedFileID;
                 }
-
             }
-            
+
             // Fill Date Added
             if (!m.DateAdded.HasValue)
                 m.DateAdded = DateTime.Now;
 
+            SteamUGCDetails_t workshopDetails = new SteamUGCDetails_t();
 
             // Check Workshop for infos
             if (m.WorkshopID != 0)
             {
-                var publishedID = (ulong) m.WorkshopID;
+                workshopDetails = Workshop.GetDetails((ulong) m.WorkshopID, string.IsNullOrEmpty(m.Description));
+            }
 
-                var value = Workshop.GetDetails(publishedID, string.IsNullOrEmpty(m.Description));
-
+            if (workshopDetails.m_eResult == EResult.k_EResultOK)
+            {
                 if (!m.ManualName)
-                    m.Name = value.m_rgchTitle;
+                    m.Name = workshopDetails.m_rgchTitle;
 
-                m.DateCreated = DateTimeOffset.FromUnixTimeSeconds(value.m_rtimeCreated).DateTime;
-                m.DateUpdated = DateTimeOffset.FromUnixTimeSeconds(value.m_rtimeUpdated).DateTime;
+                m.DateCreated = DateTimeOffset.FromUnixTimeSeconds(workshopDetails.m_rtimeCreated).DateTime;
+                m.DateUpdated = DateTimeOffset.FromUnixTimeSeconds(workshopDetails.m_rtimeUpdated).DateTime;
 
-                if (value.m_rtimeAddedToUserList > 0)
-                    m.DateAdded = DateTimeOffset.FromUnixTimeSeconds(value.m_rtimeAddedToUserList).DateTime;
+                if (workshopDetails.m_rtimeAddedToUserList > 0)
+                    m.DateAdded = DateTimeOffset.FromUnixTimeSeconds(workshopDetails.m_rtimeAddedToUserList).DateTime;
 
                 //m.Author = SteamWorkshop.GetUsername(value.m_ulSteamIDOwner);
                 //MessageBox.Show(m.Author);
 
                 // Update directory size
-                m.RealizeSize(value.m_nFileSize);
+                m.RealizeSize(workshopDetails.m_nFileSize);
                 if (m.Size < 0)
                     m.RealizeSize(Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length));
 
                 if (string.IsNullOrEmpty(m.Description))
                 {
-                    m.Description = value.m_rgchDescription;
+                    m.Description = workshopDetails.m_rgchDescription;
                 }
 
-                if (value.m_ulSteamIDOwner > 0)
+                if (workshopDetails.m_ulSteamIDOwner > 0)
                 {
-                    m.Author = Workshop.GetUsername(value.m_ulSteamIDOwner);
-                    if (string.IsNullOrEmpty(m.Author))
+                    string newAuthorName = Workshop.GetUsername(workshopDetails.m_ulSteamIDOwner);
+
+                    if (!string.IsNullOrEmpty(newAuthorName))
                     {
-                        m.Author = "Unknown";
+                        m.Author = newAuthorName;
                     }
                 }
 
@@ -279,13 +280,12 @@ namespace XCOM2Launcher.Mod
                 try
                 {
                     // Parse .XComMod file
-                    var modinfo = new ModInfo(m.GetModInfoFile());
-                    m.SetRequiresWOTC(modinfo.RequiresXPACK);
-
+                    var modInfo = new ModInfo(m.GetModInfoFile());
+                    m.SetRequiresWOTC(modInfo.RequiresXPACK);
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException ex)
                 {
-                    return;
+                    Debug.WriteLine(ex.Message);
                 }
             }
             else
@@ -303,16 +303,17 @@ namespace XCOM2Launcher.Mod
                 try
                 {
                     // Parse .XComMod file
-                    var modinfo = new ModInfo(m.GetModInfoFile());
-                    if (!m.ManualName || m.Name == "")
-                        m.Name = modinfo.Title;
+                    var modInfo = new ModInfo(m.GetModInfoFile());
 
-                    m.Description = modinfo.Description;
-                    m.SetRequiresWOTC(modinfo.RequiresXPACK);
+                    if (!m.ManualName || m.Name == "")
+                        m.Name = modInfo.Title;
+
+                    m.Description = modInfo.Description;
+                    m.SetRequiresWOTC(modInfo.RequiresXPACK);
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException ex)
                 {
-                    return;
+                    Debug.WriteLine(ex.Message);
                 }
             }
         }
