@@ -27,18 +27,16 @@ namespace XCOM2Launcher
 #endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
-            try
-            {
-                if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+
+            if (!CheckDotNet4_6()) {
+                var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.6 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+                if (result == DialogResult.Yes)
+                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+
+                return;
             }
-            catch (Exception)
-            {
-                if (MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
-            }
-            
+
             if (!SteamAPIWrapper.Init())
             {
                 MessageBox.Show("Please start steam first!");
@@ -100,19 +98,16 @@ namespace XCOM2Launcher
         }
 
         /// <summary>
-        /// Check whether .net runtime v4.6 is installed
+        /// Checks if .Net Framework 4.6 or later installed.
+        /// It verifies if the method DateTimeOffset.FromUnixTimeSeconds() (which was added with 4.6) is available.
         /// </summary>
-        /// <returns>bool</returns>
-        private static bool CheckDotNet4_6()
-        {
-            try
-            {
-                DateTimeOffset.FromUnixTimeSeconds(101010);
+        /// <returns>true if at least 4.6</returns>
+        private static bool CheckDotNet4_6() {
+            try {
+                return typeof(DateTimeOffset).GetMethod("FromUnixTimeSeconds") != null;
+            } catch (AmbiguousMatchException) {
+                // ambiguous means there is more than one result
                 return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
