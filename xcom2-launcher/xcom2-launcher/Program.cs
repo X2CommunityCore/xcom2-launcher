@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
+using Sentry;
+using Sentry.Protocol;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
@@ -15,86 +17,187 @@ namespace XCOM2Launcher
 {
     internal static class Program
     {
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
+        public static bool IsDebugBuild;
+
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
         private static void Main()
         {
-#if !DEBUG
+            #if DEBUG
+                IsDebugBuild = true;
+            #else
+                IsDebugBuild = false;
+
+                // Capture all unhandled Exceptions
+                AppDomain.CurrentDomain.UnhandledException += (sender, args) => HandleUnhandledException(args.ExceptionObject as Exception, "UnhandledException");
+                Application.ThreadException += (sender, args) => HandleUnhandledException(args.Exception, "ThreadException");
+            #endif
+
+            IDisposable sentrySdkInstance = null;
+
             try
             {
-#endif
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            if (!CheckDotNet4_6()) {
-                var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.6 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                InitAppSettings();
+                sentrySdkInstance = InitSentry();
 
-                if (result == DialogResult.Yes)
-                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=56115");
-
-                return;
-            }
-
-            if (!SteamAPIWrapper.Init())
-            {
-                MessageBox.Show("Please start steam first!");
-                return;
-            }
-            // SteamWorkshop.StartCallbackService();
-
-            // Load settings
-            var settings = InitializeSettings();
-            if (settings == null)
-                return;
-
-#if !DEBUG
-    // Check for update
-            if (settings.CheckForUpdates)
-            {
-                try
+                if (!CheckDotNet4_6())
                 {
-                    using (var client = new System.Net.WebClient())
-                    {
-                        client.Headers.Add("User-Agent: Other");
-                        var regex = new Regex("[^0-9.]");
-                        var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                        var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
-                        var currentVersion = new Version(regex.Replace(GetCurrentVersion(), ""));
-                        var newVersion = new Version(regex.Replace(release.tag_name, ""));
+                    var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.6 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
-                        if (currentVersion.CompareTo(newVersion) < 0)
-                            // New version available
-                            new UpdateAvailableDialog(release, currentVersion.ToString()).ShowDialog();
+                    if (result == DialogResult.Yes)
+                        Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+
+                }
+
+                if (!SteamAPIWrapper.Init())
+                {
+                    MessageBox.Show("Please start steam first!");
+                    return;
+                }
+                // SteamWorkshop.StartCallbackService();
+
+                // Load settings
+                var settings = InitializeSettings();
+                if (settings == null)
+                    return;
+                
+                // Check for update
+                if (!IsDebugBuild && settings.CheckForUpdates)
+                {
+                    try
+                    {
+                        using (var client = new System.Net.WebClient())
+                        {
+                            client.Headers.Add("User-Agent: Other");
+                            var regex = new Regex("[^0-9.]");
+                            var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
+                            var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
+                            var currentVersion = GetCurrentVersion();
+                            var newVersion = new Version(regex.Replace(release.tag_name, ""));
+
+                            if (currentVersion.CompareTo(newVersion) < 0)
+                                // New version available
+                                new UpdateAvailableDialog(release, currentVersion.ToString()).ShowDialog();
+                        }
+                    }
+                    catch (System.Net.WebException)
+                    {
+                        // No internet?
                     }
                 }
-                catch (System.Net.WebException)
+
+                // clean up old files
+                if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
                 {
-                    // No internet?
+                    // Restore backup
+                    File.Copy(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini", true);
+                    File.Delete(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
                 }
-            }
-#endif
 
-            // clean up old files
-            if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
+                Application.Run(new MainForm(settings));
+                SteamAPIWrapper.Shutdown();
+            }
+            finally
             {
-                // Restore backup
-                File.Copy(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini", true);
-                File.Delete(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
+                sentrySdkInstance?.Dispose();
+                Properties.Settings.Default.Save();
             }
+        }
 
-            Application.Run(new MainForm(settings));
-
-            SteamAPIWrapper.Shutdown();
 #if !DEBUG
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("An exception occured. See error.log for additional details.");
-                File.WriteAllText("error.log", e.Message + "\r\nStack:\r\n" + e.StackTrace);
-            }
+        static void HandleUnhandledException(Exception e, string source)
+        {
+            //SentrySdk.CaptureException(e);
+            File.WriteAllText("error.log", $"Sentry GUID: {Properties.Settings.Default.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
+            MessageBox.Show("An unhandled exception occured. See 'error.log' in application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+        }
 #endif
+
+        /// <summary>
+        /// Initializes the Sentry environment.
+        /// Sentry is an open-source application monitoring platform that help to identify issues.
+        /// </summary>
+        /// <returns></returns>
+        private static IDisposable InitSentry()
+        {
+            if (!Properties.Settings.Default.IsSentryEnabled || IsDebugBuild)
+                return null;
+
+            IDisposable sentrySdkInstance = null;
+
+            try
+            {
+                sentrySdkInstance = SentrySdk.Init(o =>
+                {
+                    o.Dsn = new Dsn("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084");
+                    o.Release = "AML@" + GetCurrentVersionString();     // prefix because releases are global per organization
+                    o.Debug = false;
+                    o.Environment = IsDebugBuild ? "Debug" : "Release"; // Maybe use "Beta" for Pre-Release version (new/separate build configuration)
+                    o.BeforeSend = sentryEvent =>
+                    {
+                        sentryEvent.User.Email = null;
+                        return sentryEvent;
+                    };
+                });
+
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.User = new User
+                    {
+                        Id = Properties.Settings.Default.Guid,
+                        Username = Properties.Settings.Default.Username,
+                        IpAddress = null
+                    };
+                });
+
+                // SentrySdk.CaptureMessage("Sentry test message", SentryLevel.Debug);
+            }
+            catch (Exception ex)
+            {
+                // If Sentry wasn't initialized correctly we at least try to send one message to report this.
+                // (this won't throw another Ex, even if Init() failed)
+                SentrySdk.CaptureException(ex);
+                SentrySdk.Close();
+                Debug.WriteLine(ex.Message);
+            }
+
+            return sentrySdkInstance;
+        }
+
+
+		/// <summary>
+		/// Initializes the Properties.Settings .NET applications settings.
+		/// Used for all settings that we want to persist, even if the user decides to delete the
+		/// json settings file or starts AML from different folders.
+		/// </summary>
+		private static void InitAppSettings()
+        {
+            var appSettings = Properties.Settings.Default;
+
+            // Upgrade settings from previous version if required
+            if (appSettings.IsSettingsUpgradeRequired) {
+                appSettings.Upgrade();
+                appSettings.IsSettingsUpgradeRequired = false;
+            }
+
+            // Initialize GUID (used for error reporting)
+            if (string.IsNullOrEmpty(appSettings.Guid)) {
+                appSettings.Guid = Guid.NewGuid().ToString();
+            }
+
+            // Version information can be used to perform version specific migrations if required.
+            if (appSettings.Version != GetCurrentVersionString()) {
+                // IF required at some point
+                appSettings.Version = GetCurrentVersionString();
+            }
+
+            appSettings.Save();
         }
 
         /// <summary>
@@ -212,17 +315,27 @@ namespace XCOM2Launcher
             return settings;
         }
 
-        public static string GetCurrentVersion()
+        public static Version GetCurrentVersion()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var fields = assembly.GetType("XCOM2Launcher.GitVersionInformation").GetFields();
 
-            var major = fields.Single(f => f.Name == "Major").GetValue(null);
-            var minor = fields.Single(f => f.Name == "Minor").GetValue(null);
-            var patch = fields.Single(f => f.Name == "Patch").GetValue(null);
+            int.TryParse(fields.Single(f => f.Name == "Major").GetValue(null).ToString(), out var major);
+            int.TryParse(fields.Single(f => f.Name == "Minor").GetValue(null).ToString(), out var minor);
+            int.TryParse(fields.Single(f => f.Name == "Patch").GetValue(null).ToString(), out var patch);
 
+            return new Version(major, minor, patch);
+        }
 
-            return $"v{major}.{minor}.{patch}";
+        public static string GetCurrentVersionString(bool includeDebugPostfix = false) {
+            var ver = GetCurrentVersion();
+
+            var result = $"v{ver.Major}.{ver.Minor}.{ver.Build}";
+
+            if (IsDebugBuild && includeDebugPostfix)
+                result += " DEBUG";
+            
+            return result;
         }
     }
 }
