@@ -76,6 +76,14 @@ namespace XCOM2Launcher.Forms
                 }
             };
 
+            checkForUpdatesToolStripMenuItem.Click += delegate
+            {
+                if (!Program.CheckForUpdate())
+                {
+                    MessageBox.Show("No updates available", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            };
+
             manageCategoriesToolStripMenuItem.Click += ManageCategoriesToolStripMenuItem_Click;
 
             exitToolStripMenuItem.Click += (sender, e) => { Close(); };

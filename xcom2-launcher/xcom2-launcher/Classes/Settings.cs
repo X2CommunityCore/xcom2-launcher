@@ -71,7 +71,9 @@ namespace XCOM2Launcher
 
         public bool CheckForUpdates { get; set; } = true;
 
-	    public bool ShowUpgradeWarning { get; set; } = true;
+        public bool CheckForPreReleaseUpdates { get; set; } = false;
+
+        public bool ShowUpgradeWarning { get; set; } = true;
 
         public bool ShowHiddenElements { get; set; } = false;
 
@@ -108,10 +110,7 @@ namespace XCOM2Launcher
 
         internal void ImportMods()
         {
-            foreach (var dir in ModPaths)
-                Mods.ImportMods(dir);
-
-            Mods.MarkDuplicates();
+            Mods.ImportMods(ModPaths);
         }
 
         public string GetWorkshopPath()

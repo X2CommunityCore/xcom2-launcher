@@ -51,6 +51,7 @@
 			this.importActiveModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.cleanModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runChallengeModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -313,9 +314,10 @@
 			this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem,
-            this.resubscribeToModsToolStripMenuItem});
+            this.resubscribeToModsToolStripMenuItem,
+            this.checkForUpdatesToolStripMenuItem});
 			this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
 			this.toolsToolStripMenuItem.Text = "Tools";
 			// 
 			// importActiveModsToolStripMenuItem
@@ -335,6 +337,12 @@
 			this.resubscribeToModsToolStripMenuItem.Name = "resubscribeToModsToolStripMenuItem";
 			this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
 			this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to mods";
+			// 
+			// checkForUpdatesToolStripMenuItem
+			// 
+			this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+			this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.checkForUpdatesToolStripMenuItem.Text = "Check for updates...";
 			// 
 			// runXCOM2ToolStripMenuItem
 			// 
@@ -474,6 +482,7 @@
 			this.modlist_ListObjectListView.Cursor = System.Windows.Forms.Cursors.Default;
 			this.modlist_ListObjectListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.modlist_ListObjectListView.FullRowSelect = true;
+			this.modlist_ListObjectListView.HideSelection = false;
 			this.modlist_ListObjectListView.IsSearchOnSortColumn = false;
 			this.modlist_ListObjectListView.Location = new System.Drawing.Point(3, 33);
 			this.modlist_ListObjectListView.Name = "modlist_ListObjectListView";
@@ -718,9 +727,9 @@
 			this.LauchOptionsPanel.AutoSize = true;
 			this.LauchOptionsPanel.Controls.Add(this.modTabToolStrip);
 			this.LauchOptionsPanel.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-			this.LauchOptionsPanel.Location = new System.Drawing.Point(783, 3);
+			this.LauchOptionsPanel.Location = new System.Drawing.Point(814, 3);
 			this.LauchOptionsPanel.Name = "LauchOptionsPanel";
-			this.LauchOptionsPanel.Size = new System.Drawing.Size(184, 24);
+			this.LauchOptionsPanel.Size = new System.Drawing.Size(153, 24);
 			this.LauchOptionsPanel.TabIndex = 4;
 			// 
 			// modTabToolStrip
@@ -730,7 +739,7 @@
             this.quickLaunchToolstripButton});
 			this.modTabToolStrip.Location = new System.Drawing.Point(0, 0);
 			this.modTabToolStrip.Name = "modTabToolStrip";
-			this.modTabToolStrip.Size = new System.Drawing.Size(184, 24);
+			this.modTabToolStrip.Size = new System.Drawing.Size(153, 24);
 			this.modTabToolStrip.TabIndex = 4;
 			this.modTabToolStrip.Text = "toolStrip1";
 			// 
@@ -1071,7 +1080,6 @@
 			this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
 			this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
 			this.modinfo_ConfigFCTB.IsReplaceMode = false;
 			this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
 			this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1618,6 +1626,7 @@
         private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
         private System.Windows.Forms.FlowLayoutPanel LauchOptionsPanel;
 		private System.Windows.Forms.ToolStripMenuItem manageCategoriesToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
 		private System.Windows.Forms.ToolStrip modTabToolStrip;
 		private System.Windows.Forms.ToolStripDropDownButton quickLaunchToolstripButton;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;

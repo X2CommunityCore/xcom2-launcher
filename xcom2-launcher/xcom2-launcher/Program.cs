@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -27,18 +28,16 @@ namespace XCOM2Launcher
 #endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
-            try
-            {
-                if (!CheckDotNet4_6() && MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+
+            if (!CheckDotNet4_6()) {
+                var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.6 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+                if (result == DialogResult.Yes)
+                    Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+
+                return;
             }
-            catch (Exception)
-            {
-                if (MessageBox.Show(@"This program requires .NET v4.6 or newer.\r\nDo you want to install it now?", @"Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=56115");
-            }
-            
+
             if (!SteamAPIWrapper.Init())
             {
                 MessageBox.Show("Please start steam first!");
@@ -55,26 +54,7 @@ namespace XCOM2Launcher
     // Check for update
             if (settings.CheckForUpdates)
             {
-                try
-                {
-                    using (var client = new System.Net.WebClient())
-                    {
-                        client.Headers.Add("User-Agent: Other");
-                        var regex = new Regex("[^0-9.]");
-                        var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                        var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
-                        var currentVersion = new Version(regex.Replace(GetCurrentVersion(), ""));
-                        var newVersion = new Version(regex.Replace(release.tag_name, ""));
-
-                        if (currentVersion.CompareTo(newVersion) < 0)
-                            // New version available
-                            new UpdateAvailableDialog(release, currentVersion.ToString()).ShowDialog();
-                    }
-                }
-                catch (System.Net.WebException)
-                {
-                    // No internet?
-                }
+                CheckForUpdate();
             }
 #endif
 
@@ -100,19 +80,16 @@ namespace XCOM2Launcher
         }
 
         /// <summary>
-        /// Check whether .net runtime v4.6 is installed
+        /// Checks if .Net Framework 4.6 or later installed.
+        /// It verifies if the method DateTimeOffset.FromUnixTimeSeconds() (which was added with 4.6) is available.
         /// </summary>
-        /// <returns>bool</returns>
-        private static bool CheckDotNet4_6()
-        {
-            try
-            {
-                DateTimeOffset.FromUnixTimeSeconds(101010);
+        /// <returns>true if at least 4.6</returns>
+        private static bool CheckDotNet4_6() {
+            try {
+                return typeof(DateTimeOffset).GetMethod("FromUnixTimeSeconds") != null;
+            } catch (AmbiguousMatchException) {
+                // ambiguous means there is more than one result
                 return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -120,24 +97,24 @@ namespace XCOM2Launcher
         {
             var firstRun = !File.Exists("settings.json");
 
-	        var settings = firstRun ? new Settings() : Settings.Instance;
+            var settings = firstRun ? new Settings() : Settings.Instance;
 
-	        if (settings.ShowUpgradeWarning && !firstRun)
-	        {
-		        MessageBoxManager.Cancel = "Exit";
-		        MessageBoxManager.OK = "Continue";
-				MessageBoxManager.Register();
-				var choice = MessageBox.Show(
-					"WARNING!!\n\nThis launcher is NOT COMPATIBLE with the old 'settings.json' file.\nStop NOW and launch the old version to export a profile of your mods WITH GROUPS!\nOnce that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\nAfter loading, import the profile you saved to recover groups.\n\nIf you are not ready to do this, click 'Exit' to leave with no changes.",
-					"WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button2);
-				if (choice == DialogResult.Cancel) Environment.Exit(0);
-				MessageBoxManager.Unregister();
-			}
-			settings.ShowUpgradeWarning = false;
+            if (settings.ShowUpgradeWarning && !firstRun)
+            {
+                MessageBoxManager.Cancel = "Exit";
+                MessageBoxManager.OK = "Continue";
+                MessageBoxManager.Register();
+                var choice = MessageBox.Show(
+                    "WARNING!!\n\nThis launcher is NOT COMPATIBLE with the old 'settings.json' file.\nStop NOW and launch the old version to export a profile of your mods WITH GROUPS!\nOnce that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\nAfter loading, import the profile you saved to recover groups.\n\nIf you are not ready to do this, click 'Exit' to leave with no changes.",
+                    "WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button2);
+                if (choice == DialogResult.Cancel) Environment.Exit(0);
+                MessageBoxManager.Unregister();
+            }
 
+            settings.ShowUpgradeWarning = false;
 
-			// Verify Game Path
-			if (!Directory.Exists(settings.GamePath))
+            // Verify Game Path
+            if (!Directory.Exists(settings.GamePath))
                 settings.GamePath = XCOM2.DetectGameDir();
 
             if (settings.GamePath == "")
@@ -179,23 +156,27 @@ namespace XCOM2Launcher
                     cat.Index = ++index;
 
                 // Verify Mods 
-	            foreach (var mod in settings.Mods.All)
-	            {
-		            if (!settings.ModPaths.Any(mod.IsInModPath))
-						mod.AddState(ModState.NotLoaded);
-					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
-						mod.AddState(ModState.NotInstalled);
+                foreach (var mod in settings.Mods.All)
+                {
+                    if (!settings.ModPaths.Any(mod.IsInModPath))
+                        mod.AddState(ModState.NotLoaded);
+
+                    if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
+                    {
+                        mod.AddState(ModState.NotInstalled);
+                    }
                     else if (!File.Exists(mod.GetModInfoFile()))
                     {
                         string newModInfo = settings.Mods.FindModInfo(mod.Path);
                         if (newModInfo != null)
                             mod.ID = Path.GetFileNameWithoutExtension(newModInfo);
                         else
-						    mod.AddState(ModState.NotInstalled);
+                            mod.AddState(ModState.NotInstalled);
                     }
-	                // tags clean up
-	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
-	            }
+
+                    // tags clean up
+                    mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
+                }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();
                 if (newlyBrokenMods.Count > 0)
@@ -207,8 +188,7 @@ namespace XCOM2Launcher
 
                     foreach (var m in newlyBrokenMods)
                         m.isHidden = true;
-						//settings.Mods.RemoveMod(m);
-				}
+                }
             }
 
             // import mods
@@ -217,6 +197,66 @@ namespace XCOM2Launcher
             return settings;
         }
 
+        public static bool CheckForUpdate()
+        {
+            try
+            {
+                using (var client = new System.Net.WebClient())
+                {
+                    client.Headers.Add("User-Agent: Other");
+                    GitHub.Release release;
+
+                    if (Settings.Instance.CheckForPreReleaseUpdates)
+                    {
+                        // fetch all releases including pre-releases and select the first/newest 
+                        var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
+                        var allReleases = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
+                        release = allReleases.FirstOrDefault();
+                    }
+                    else
+                    {
+                        // fetch latest non-pre-release
+                        var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
+                        release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
+                    }
+
+                    if (release == null)
+                        return false;
+
+                    var regexVersionNumber = new Regex("[^0-9.]");
+
+                    string currentVersionString = GetCurrentVersion();
+                    string releaseVersionString = release.tag_name;
+                    Version.TryParse(regexVersionNumber.Replace(currentVersionString, ""), out Version currentVersion);
+                    Version.TryParse(regexVersionNumber.Replace(releaseVersionString, ""), out Version newVersion);
+
+                    if (currentVersion != null && newVersion != null)
+                    {
+                        if (currentVersion.CompareTo(newVersion) < 0)
+                        {
+                            // New version available
+                            new UpdateAvailableDialog(release, currentVersion, newVersion).ShowDialog();
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"{nameof(CheckForUpdate)}: Error parsing version information '{currentVersion}'/'{releaseVersionString}'.");
+                    }
+                }
+            }
+            catch (System.Net.WebException ex)
+            {
+                Debug.WriteLine(nameof(CheckForUpdate) + ": " + ex.Message);
+            }
+
+            return false;
+		}
+
+        /// <summary>
+        /// Returns versions information that was generated by GitVersionTask
+        /// </summary>
+        /// <returns></returns>
         public static string GetCurrentVersion()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -225,7 +265,6 @@ namespace XCOM2Launcher
             var major = fields.Single(f => f.Name == "Major").GetValue(null);
             var minor = fields.Single(f => f.Name == "Minor").GetValue(null);
             var patch = fields.Single(f => f.Name == "Patch").GetValue(null);
-
 
             return $"v{major}.{minor}.{patch}";
         }
