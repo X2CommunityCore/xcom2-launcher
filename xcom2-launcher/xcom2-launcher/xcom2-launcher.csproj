@@ -226,9 +226,6 @@
       <DependentUpon>CueTextBox.cs</DependentUpon>
     </Compile>
     <Compile Include="UserElements\FlexibleMessageBox.cs" />
-    <Compile Include="UserElements\LaunchArgumentCheckbox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <EmbeddedResource Include="Forms\CategoryManager.resx">
       <DependentUpon>CategoryManager.cs</DependentUpon>
     </EmbeddedResource>

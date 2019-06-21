@@ -72,8 +72,7 @@ namespace XCOM2Launcher.Forms
                     RefreshModList();
                     ShowQuickLaunchArgsBasedOnSettings();
                     showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
-                    NoRedscreensLaunchArgument.UpdateFromSettings();
-                    LogLaunchArgument.UpdateFromSettings();
+                    UpdateQuickArgumentsMenu();
                 }
             };
 
@@ -148,6 +147,19 @@ namespace XCOM2Launcher.Forms
             export_group_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
             export_save_button.Click += ExportSaveButtonClick;
             export_load_button.Click += ExportLoadButtonClick;
+        }
+
+        private void QuickArgumentItemClick(object sender, EventArgs e) {
+            Debug.Assert(sender is ToolStripMenuItem);
+
+            // Add or remove the respective argument from the argument list, depending on its check-state.
+            if (sender is ToolStripMenuItem item)
+            {
+                if (item.Checked)
+                    Settings.AddArgument(item.Text);
+                else
+                    Settings.RemoveArgument(item.Text);
+            }
         }
 
 		private void ManageCategoriesToolStripMenuItem_Click(object sender, EventArgs e) {

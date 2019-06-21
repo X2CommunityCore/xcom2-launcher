@@ -18,6 +18,8 @@ namespace XCOM2Launcher.Forms
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 
+        public Settings Settings { get; set; }
+
 		public MainForm(Settings settings)
         {
             //
@@ -46,8 +48,7 @@ namespace XCOM2Launcher.Forms
             InitializeTabImages();
 
             // Init the argument checkboxes
-            LogLaunchArgument.Settings = settings;
-            NoRedscreensLaunchArgument.Settings = settings;
+            UpdateQuickArgumentsMenu();
 
 #if !DEBUG
 			// Check for Updates
@@ -73,8 +74,6 @@ namespace XCOM2Launcher.Forms
             }
 #endif
         }
-
-		public Settings Settings { get; set; }
 
         private void InitializeTabImages()
         {
@@ -265,7 +264,7 @@ namespace XCOM2Launcher.Forms
         { 
             Save(false);
 
-            XCOM2.RunGame(Settings.GamePath, Settings.Arguments.ToString());
+            XCOM2.RunGame(Settings.GamePath, Settings.GetArgumentString());
 
             if (Settings.CloseAfterLaunch)
                 Close();
@@ -278,7 +277,7 @@ namespace XCOM2Launcher.Forms
             ChallengeMode = false;
             Save(true);
 
-            XCOM2.RunWotC(Settings.GamePath, Settings.Arguments.ToString());
+            XCOM2.RunWotC(Settings.GamePath, Settings.GetArgumentString());
 
             if (Settings.CloseAfterLaunch)
                 Close();
@@ -293,7 +292,7 @@ namespace XCOM2Launcher.Forms
             ChallengeMode = true;
             Save(true);
 
-            XCOM2.RunWotC(Settings.GamePath, Settings.Arguments.ToLower().Replace("-allowconsole", ""));
+            XCOM2.RunWotC(Settings.GamePath, Settings.GetArgumentString().ToLower().Replace("-allowconsole", ""));
 
             if (Settings.CloseAfterLaunch)
                 Close();
@@ -541,6 +540,16 @@ namespace XCOM2Launcher.Forms
 	        LauchOptionsPanel.Visible = Settings.ShowQuickLaunchArguments;
 	    }
 
-        #endregion
+        /// <summary>
+        /// Updates the quick launch menu items check-states, depending on if the the respective argument is enabled in the settings.
+        /// </summary>
+        private void UpdateQuickArgumentsMenu()
+        {
+            foreach (ToolStripMenuItem item in quickLaunchToolstripButton.DropDownItems) {
+                item.Checked = Settings.ArgumentList.Any(arg => arg.Equals(item.Text, StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+		#endregion
     }
 }
