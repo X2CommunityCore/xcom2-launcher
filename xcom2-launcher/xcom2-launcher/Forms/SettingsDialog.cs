@@ -12,13 +12,12 @@ namespace XCOM2Launcher.Forms
 {
     public partial class SettingsDialog : Form
     {
-		protected Settings Settings { get; set; }
+        protected Settings Settings { get; set; }
 
-		public SettingsDialog(Settings settings)
+        public SettingsDialog(Settings settings)
         {
             InitializeComponent();
 
-            //
             Settings = settings;
 
             // Restore states
@@ -27,28 +26,31 @@ namespace XCOM2Launcher.Forms
             closeAfterLaunchCheckBox.Checked = settings.CloseAfterLaunch;
             searchForUpdatesCheckBox.Checked = settings.CheckForUpdates;
             showHiddenEntriesCheckBox.Checked = settings.ShowHiddenElements;
-	        autoNumberModIndexesCheckBox.Checked = settings.AutoNumberIndexes;
+            autoNumberModIndexesCheckBox.Checked = settings.AutoNumberIndexes;
             useModSpecifiedCategoriesCheckBox.Checked = settings.UseSpecifiedCategories;
             neverAdoptTagsAndCatFromprofile.Checked = settings.NeverImportTags;
             ShowQuickLaunchArgumentsToggle.Checked = settings.ShowQuickLaunchArguments;
+            checkForPreReleaseUpdates.Checked = settings.CheckForPreReleaseUpdates;
+
+            checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
 
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
 
             argumentsTextBox.Text = settings.Arguments;
 
-			// Create autofill values for arguments box
-	        List<string> arguments = new List<string>();
-	        foreach (var propertyInfo in typeof(Arguments).GetProperties())
-	        {
-		        var attrs = propertyInfo.GetCustomAttributes(true);
-		        arguments.AddRange(
-					from attrName in attrs.OfType<DisplayNameAttribute>()
-					where !propertyInfo.Name.Equals("Custom")
-					select attrName.DisplayName);
-	        }
+            // Create autofill values for arguments box
+            List<string> arguments = new List<string>();
+            foreach (var propertyInfo in typeof(Arguments).GetProperties())
+            {
+                var attrs = propertyInfo.GetCustomAttributes(true);
+                arguments.AddRange(
+                                   from attrName in attrs.OfType<DisplayNameAttribute>()
+                                   where !propertyInfo.Name.Equals("Custom")
+                                   select attrName.DisplayName);
+            }
 
-	        argumentsTextBox.Values = arguments.ToArray();
+            argumentsTextBox.Values = arguments.ToArray();
 
 
 
@@ -104,25 +106,32 @@ namespace XCOM2Launcher.Forms
             //     Bounds = Settings.Windows["settings"].Bounds;
         }
 
-		private void bOK_Click(object sender, EventArgs e) {
-			// Save states 
-			Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
+        private void bOK_Click(object sender, EventArgs e)
+        {
+            // Save states 
+            Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
 
-			Settings.CloseAfterLaunch = closeAfterLaunchCheckBox.Checked;
-			Settings.CheckForUpdates = searchForUpdatesCheckBox.Checked;
-			Settings.ShowHiddenElements = showHiddenEntriesCheckBox.Checked;
-			Settings.AutoNumberIndexes = autoNumberModIndexesCheckBox.Checked;
-			Settings.UseSpecifiedCategories = useModSpecifiedCategoriesCheckBox.Checked;
+            Settings.CloseAfterLaunch = closeAfterLaunchCheckBox.Checked;
+            Settings.CheckForUpdates = searchForUpdatesCheckBox.Checked;
+            Settings.ShowHiddenElements = showHiddenEntriesCheckBox.Checked;
+            Settings.AutoNumberIndexes = autoNumberModIndexesCheckBox.Checked;
+            Settings.UseSpecifiedCategories = useModSpecifiedCategoriesCheckBox.Checked;
             Settings.NeverImportTags = neverAdoptTagsAndCatFromprofile.Checked;
-			Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
+            Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
+            Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
 
-			Settings.Arguments = argumentsTextBox.Text;
+            Settings.Arguments = argumentsTextBox.Text;
 
-			// Save dimensions
-			Settings.Windows["settings"] = new WindowSettings(this);
+            // Save dimensions
+            Settings.Windows["settings"] = new WindowSettings(this);
 
-			DialogResult = DialogResult.OK;
-			Close();
-		}
-	}
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void searchForUpdatesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
+        }
+    }
 }

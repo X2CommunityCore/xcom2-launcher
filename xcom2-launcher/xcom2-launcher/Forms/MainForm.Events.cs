@@ -58,8 +58,8 @@ namespace XCOM2Launcher.Forms
             showHiddenModsToolStripMenuItem.Click += delegate
             {
                 Settings.ShowHiddenElements = showHiddenModsToolStripMenuItem.Checked;
-				olvcHidden.IsVisible = showHiddenModsToolStripMenuItem.Checked;
-				RefreshModList(true);
+                olvcHidden.IsVisible = showHiddenModsToolStripMenuItem.Checked;
+                RefreshModList(true);
             };
 
             // Edit
@@ -67,16 +67,25 @@ namespace XCOM2Launcher.Forms
             {
                 var result = new SettingsDialog(Settings).ShowDialog();
 
-				if (result == DialogResult.OK) {
-					RefreshModList();
-					ShowQuickLaunchArgsBasedOnSettings();
-					showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
-					NoRedscreensLaunchArgument.UpdateFromSettings();
-					LogLaunchArgument.UpdateFromSettings();
-				}
+                if (result == DialogResult.OK)
+                {
+                    RefreshModList();
+                    ShowQuickLaunchArgsBasedOnSettings();
+                    showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
+                    NoRedscreensLaunchArgument.UpdateFromSettings();
+                    LogLaunchArgument.UpdateFromSettings();
+                }
             };
 
-			manageCategoriesToolStripMenuItem.Click += ManageCategoriesToolStripMenuItem_Click;
+            checkForUpdatesToolStripMenuItem.Click += delegate
+            {
+                if (!Program.CheckForUpdate())
+                {
+                    MessageBox.Show("No updates available", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            };
+
+            manageCategoriesToolStripMenuItem.Click += ManageCategoriesToolStripMenuItem_Click;
 
             exitToolStripMenuItem.Click += (sender, e) => { Close(); };
 

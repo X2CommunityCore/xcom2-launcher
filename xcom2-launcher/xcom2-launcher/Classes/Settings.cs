@@ -57,7 +57,9 @@ namespace XCOM2Launcher
 
         public bool CheckForUpdates { get; set; } = true;
 
-	    public bool ShowUpgradeWarning { get; set; } = true;
+        public bool CheckForPreReleaseUpdates { get; set; } = false;
+
+        public bool ShowUpgradeWarning { get; set; } = true;
 
         public bool ShowHiddenElements { get; set; } = false;
 
