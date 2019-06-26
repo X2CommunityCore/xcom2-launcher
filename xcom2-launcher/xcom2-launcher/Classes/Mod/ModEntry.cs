@@ -271,7 +271,7 @@ namespace XCOM2Launcher.Mod
 
         public bool IsInModPath(string modPath)
         {
-            return 0 == string.Compare(modPath.TrimEnd('/', '\\'), FilePath.GetDirectoryName(Path), StringComparison.OrdinalIgnoreCase);
+            return string.Equals(modPath.TrimEnd('/', '\\'), FilePath.GetDirectoryName(Path), StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion Mod

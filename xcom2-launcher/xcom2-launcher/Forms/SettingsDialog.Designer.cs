@@ -43,13 +43,14 @@
 			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-			this.searchForUpdatesCheckBox = new System.Windows.Forms.CheckBox();
 			this.showHiddenEntriesCheckBox = new System.Windows.Forms.CheckBox();
-			this.closeAfterLaunchCheckBox = new System.Windows.Forms.CheckBox();
 			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
-			this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowQuickLaunchArgumentsToggle = new System.Windows.Forms.CheckBox();
 			this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
+			this.closeAfterLaunchCheckBox = new System.Windows.Forms.CheckBox();
+			this.searchForUpdatesCheckBox = new System.Windows.Forms.CheckBox();
+			this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
+			this.checkForPreReleaseUpdates = new System.Windows.Forms.CheckBox();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.bOK = new System.Windows.Forms.Button();
 			this.bCancel = new System.Windows.Forms.Button();
@@ -217,13 +218,14 @@
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-			this.tableLayoutPanel3.Controls.Add(this.searchForUpdatesCheckBox, 0, 2);
 			this.tableLayoutPanel3.Controls.Add(this.showHiddenEntriesCheckBox, 0, 0);
-			this.tableLayoutPanel3.Controls.Add(this.closeAfterLaunchCheckBox, 0, 1);
 			this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 1, 0);
-			this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 1, 1);
 			this.tableLayoutPanel3.Controls.Add(this.ShowQuickLaunchArgumentsToggle, 1, 2);
 			this.tableLayoutPanel3.Controls.Add(this.neverAdoptTagsAndCatFromprofile, 2, 0);
+			this.tableLayoutPanel3.Controls.Add(this.closeAfterLaunchCheckBox, 2, 2);
+			this.tableLayoutPanel3.Controls.Add(this.searchForUpdatesCheckBox, 0, 1);
+			this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 0, 2);
+			this.tableLayoutPanel3.Controls.Add(this.checkForPreReleaseUpdates, 1, 1);
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 20);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
 			this.tableLayoutPanel3.RowCount = 3;
@@ -232,18 +234,6 @@
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 79);
 			this.tableLayoutPanel3.TabIndex = 6;
-			// 
-			// searchForUpdatesCheckBox
-			// 
-			this.searchForUpdatesCheckBox.AutoSize = true;
-			this.searchForUpdatesCheckBox.Location = new System.Drawing.Point(3, 55);
-			this.searchForUpdatesCheckBox.Name = "searchForUpdatesCheckBox";
-			this.searchForUpdatesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			this.searchForUpdatesCheckBox.Size = new System.Drawing.Size(119, 20);
-			this.searchForUpdatesCheckBox.TabIndex = 10;
-			this.searchForUpdatesCheckBox.Text = "Search for updates";
-			this.toolTip.SetToolTip(this.searchForUpdatesCheckBox, "Search for updates to the launcher when starting");
-			this.searchForUpdatesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// showHiddenEntriesCheckBox
 			// 
@@ -257,18 +247,6 @@
 			this.toolTip.SetToolTip(this.showHiddenEntriesCheckBox, "Toggle showing hidden mod entries");
 			this.showHiddenEntriesCheckBox.UseVisualStyleBackColor = true;
 			// 
-			// closeAfterLaunchCheckBox
-			// 
-			this.closeAfterLaunchCheckBox.AutoSize = true;
-			this.closeAfterLaunchCheckBox.Location = new System.Drawing.Point(3, 29);
-			this.closeAfterLaunchCheckBox.Name = "closeAfterLaunchCheckBox";
-			this.closeAfterLaunchCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(114, 20);
-			this.closeAfterLaunchCheckBox.TabIndex = 7;
-			this.closeAfterLaunchCheckBox.Text = "Close after launch";
-			this.toolTip.SetToolTip(this.closeAfterLaunchCheckBox, "Close the launcher after launching the game");
-			this.closeAfterLaunchCheckBox.UseVisualStyleBackColor = true;
-			// 
 			// autoNumberModIndexesCheckBox
 			// 
 			this.autoNumberModIndexesCheckBox.AutoSize = true;
@@ -280,19 +258,6 @@
 			this.autoNumberModIndexesCheckBox.Text = "Auto-number mod indexes";
 			this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-number mod indexes when one is changed (turn off to edit manually)");
 			this.autoNumberModIndexesCheckBox.UseVisualStyleBackColor = true;
-			// 
-			// useModSpecifiedCategoriesCheckBox
-			// 
-			this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
-			this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(216, 29);
-			this.useModSpecifiedCategoriesCheckBox.Name = "useModSpecifiedCategoriesCheckBox";
-			this.useModSpecifiedCategoriesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(168, 20);
-			this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
-			this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
-			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to h" +
-        "ave all mods appear in Unsorted)");
-			this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// ShowQuickLaunchArgumentsToggle
 			// 
@@ -317,6 +282,55 @@
 			this.toolTip.SetToolTip(this.neverAdoptTagsAndCatFromprofile, "Turn on to suppress the confirmation dialog to override tags and categories when " +
         "importing profiles, always preserving your current tags and profiles.");
 			this.neverAdoptTagsAndCatFromprofile.UseVisualStyleBackColor = true;
+			// 
+			// closeAfterLaunchCheckBox
+			// 
+			this.closeAfterLaunchCheckBox.AutoSize = true;
+			this.closeAfterLaunchCheckBox.Location = new System.Drawing.Point(429, 55);
+			this.closeAfterLaunchCheckBox.Name = "closeAfterLaunchCheckBox";
+			this.closeAfterLaunchCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(114, 20);
+			this.closeAfterLaunchCheckBox.TabIndex = 7;
+			this.closeAfterLaunchCheckBox.Text = "Close after launch";
+			this.toolTip.SetToolTip(this.closeAfterLaunchCheckBox, "Close the launcher after launching the game");
+			this.closeAfterLaunchCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// searchForUpdatesCheckBox
+			// 
+			this.searchForUpdatesCheckBox.AutoSize = true;
+			this.searchForUpdatesCheckBox.Location = new System.Drawing.Point(3, 29);
+			this.searchForUpdatesCheckBox.Name = "searchForUpdatesCheckBox";
+			this.searchForUpdatesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.searchForUpdatesCheckBox.Size = new System.Drawing.Size(116, 20);
+			this.searchForUpdatesCheckBox.TabIndex = 10;
+			this.searchForUpdatesCheckBox.Text = "Check for updates";
+			this.toolTip.SetToolTip(this.searchForUpdatesCheckBox, "Check if a new Version is available on startup.");
+			this.searchForUpdatesCheckBox.UseVisualStyleBackColor = true;
+			this.searchForUpdatesCheckBox.CheckedChanged += new System.EventHandler(this.searchForUpdatesCheckBox_CheckedChanged);
+			// 
+			// useModSpecifiedCategoriesCheckBox
+			// 
+			this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
+			this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(3, 55);
+			this.useModSpecifiedCategoriesCheckBox.Name = "useModSpecifiedCategoriesCheckBox";
+			this.useModSpecifiedCategoriesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(168, 20);
+			this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
+			this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
+			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to h" +
+        "ave all mods appear in Unsorted)");
+			this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// checkForPreReleaseUpdates
+			// 
+			this.checkForPreReleaseUpdates.AutoSize = true;
+			this.checkForPreReleaseUpdates.Location = new System.Drawing.Point(216, 29);
+			this.checkForPreReleaseUpdates.Name = "checkForPreReleaseUpdates";
+			this.checkForPreReleaseUpdates.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.checkForPreReleaseUpdates.Size = new System.Drawing.Size(193, 20);
+			this.checkForPreReleaseUpdates.TabIndex = 18;
+			this.checkForPreReleaseUpdates.Text = "Include Pre-Release/Beta updates";
+			this.checkForPreReleaseUpdates.UseVisualStyleBackColor = true;
 			// 
 			// bOK
 			// 
@@ -396,5 +410,6 @@
         private System.Windows.Forms.CheckBox ShowQuickLaunchArgumentsToggle;
 		private System.Windows.Forms.Button bCancel;
 		private System.Windows.Forms.Button bOK;
+		private System.Windows.Forms.CheckBox checkForPreReleaseUpdates;
 	}
 }

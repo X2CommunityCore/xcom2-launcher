@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -69,27 +70,8 @@ namespace XCOM2Launcher
                 // Check for update
                 if (!IsDebugBuild && settings.CheckForUpdates)
                 {
-                    try
-                    {
-                        using (var client = new System.Net.WebClient())
-                        {
-                            client.Headers.Add("User-Agent: Other");
-                            var regex = new Regex("[^0-9.]");
-                            var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                            var release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
-                            var currentVersion = GetCurrentVersion();
-                            var newVersion = new Version(regex.Replace(release.tag_name, ""));
-
-                            if (currentVersion.CompareTo(newVersion) < 0)
-                                // New version available
-                                new UpdateAvailableDialog(release, currentVersion.ToString()).ShowDialog();
-                        }
-                    }
-                    catch (System.Net.WebException)
-                    {
-                        // No internet?
-                    }
-                }
+                CheckForUpdate();
+            }
 
                 // clean up old files
                 if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
@@ -231,8 +213,8 @@ namespace XCOM2Launcher
 				if (choice == DialogResult.Cancel) Environment.Exit(0);
 				MessageBoxManager.Unregister();
 			}
-			settings.ShowUpgradeWarning = false;
 
+			settings.ShowUpgradeWarning = false;
 
 			// Verify Game Path
 			if (!Directory.Exists(settings.GamePath))
@@ -281,8 +263,11 @@ namespace XCOM2Launcher
 	            {
 		            if (!settings.ModPaths.Any(mod.IsInModPath))
 						mod.AddState(ModState.NotLoaded);
+
 					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
+                    {
 						mod.AddState(ModState.NotInstalled);
+                    }
                     else if (!File.Exists(mod.GetModInfoFile()))
                     {
                         string newModInfo = settings.Mods.FindModInfo(mod.Path);
@@ -291,6 +276,7 @@ namespace XCOM2Launcher
                         else
 						    mod.AddState(ModState.NotInstalled);
                     }
+
 	                // tags clean up
 	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
 	            }
@@ -305,7 +291,6 @@ namespace XCOM2Launcher
 
                     foreach (var m in newlyBrokenMods)
                         m.isHidden = true;
-						//settings.Mods.RemoveMod(m);
 				}
             }
 
@@ -315,6 +300,65 @@ namespace XCOM2Launcher
             return settings;
         }
 
+        public static bool CheckForUpdate()
+        {
+            try
+            {
+                using (var client = new System.Net.WebClient())
+                {
+                    client.Headers.Add("User-Agent: Other");
+                    GitHub.Release release;
+
+                    if (Settings.Instance.CheckForPreReleaseUpdates)
+                    {
+                        // fetch all releases including pre-releases and select the first/newest 
+                        var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
+                        var allReleases = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
+                        release = allReleases.FirstOrDefault();
+                    }
+                    else
+                    {
+                        // fetch latest non-pre-release
+                        var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
+                        release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
+                    }
+
+                    if (release == null)
+                        return false;
+
+                    var regexVersionNumber = new Regex("[^0-9.]");
+
+                    var currentVersion = GetCurrentVersion();
+                    string releaseVersionString = release.tag_name;
+                    Version.TryParse(regexVersionNumber.Replace(releaseVersionString, ""), out Version newVersion);
+
+                    if (currentVersion != null && newVersion != null)
+                    {
+                        if (currentVersion.CompareTo(newVersion) < 0)
+                        {
+                            // New version available
+                            new UpdateAvailableDialog(release, currentVersion, newVersion).ShowDialog();
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"{nameof(CheckForUpdate)}: Error parsing version information '{currentVersion}'/'{releaseVersionString}'.");
+                    }
+                }
+            }
+            catch (System.Net.WebException ex)
+            {
+                Debug.WriteLine(nameof(CheckForUpdate) + ": " + ex.Message);
+            }
+
+            return false;
+		}
+
+        /// <summary>
+        /// Returns versions information that was generated by GitVersionTask
+        /// </summary>
+        /// <returns></returns>
         public static Version GetCurrentVersion()
         {
             var assembly = Assembly.GetExecutingAssembly();

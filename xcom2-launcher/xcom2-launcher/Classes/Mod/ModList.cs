@@ -27,8 +27,7 @@ namespace XCOM2Launcher.Mod
         {
             get
             {
-                ModCategory cat;
-                Entries.TryGetValue(category, out cat);
+                Entries.TryGetValue(category, out var cat);
 
                 if (cat == null)
                 {
@@ -42,7 +41,7 @@ namespace XCOM2Launcher.Mod
 
         public ModEntry FindByPath(string path)
         {
-            return All.SingleOrDefault(m => string.Compare(m.Path, path, StringComparison.OrdinalIgnoreCase) == 0);
+            return All.SingleOrDefault(m => string.Equals(m.Path, path, StringComparison.OrdinalIgnoreCase));
         }
 
         public IEnumerable<ModConflict> GetActiveConflicts()
@@ -83,26 +82,34 @@ namespace XCOM2Launcher.Mod
             }
         }
 
-        public void ImportMods(string dir)
+        public void ImportMods(List<string> modPaths)
         {
-            if (!Directory.Exists(dir))
-                return;
+            if (modPaths == null)
+                throw new ArgumentNullException(nameof(modPaths));
 
-            // (try to) load mods
-            foreach (var modDir in Directory.GetDirectories(dir))
+            foreach (var dir in modPaths)
             {
-                var source = modDir.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1
-                    ? ModSource.SteamWorkshop
-                    : ModSource.Manual;
+                if (!Directory.Exists(dir))
+                    continue;
 
-                Import(modDir, source);
+                // (try to) load mods
+                foreach (var modDir in Directory.GetDirectories(dir)) 
+                {
+                    var source = modDir.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1
+                        ? ModSource.SteamWorkshop
+                        : ModSource.Manual;
+
+                    Import(modDir, source);
+                }
             }
+
+            MarkDuplicates();
         }
 
         public ModEntry Import(string modDir, ModSource source = ModSource.Unknown)
         {
+            // Check if Mod already loaded
             if (FindByPath(modDir) != null)
-                // Mod already loaded
                 return null;
 
             // look for .XComMod file
@@ -112,7 +119,6 @@ namespace XCOM2Launcher.Mod
                 return null;
 
             var modID = Path.GetFileNameWithoutExtension(infoFile);
-            var isDupe = All.Any(m => m.ID == modID && string.Compare(m.Path, modDir, StringComparison.OrdinalIgnoreCase) == 0);
 
             // Parse .XComMod file
             var modinfo = new ModInfo(infoFile);
@@ -125,31 +131,28 @@ namespace XCOM2Launcher.Mod
                 isActive = false,
                 DateAdded = DateTime.Now
             };
+
             mod.AddState(ModState.New);
             mod.SetRequiresWOTC(modinfo.RequiresXPACK);
             mod.SetSource(source);
 
             if (source == ModSource.SteamWorkshop)
-	        {
-		        var s = modDir.Split(Path.DirectorySeparatorChar).Last();
-		        try
-				{
-					mod.WorkshopID = Convert.ToInt64(s);
-				}
-		        catch (Exception)
-		        {
-			        MessageBox.Show(
-				        $"A mod could not be loaded because the workshop ID failed to parse.\r\nPlease check that the following directory conforms to valid workshop numbering.\r\n\r\nPath: {modDir}");
-			        return null;
-		        }
-			}
+            {
+                var s = modDir.Split(Path.DirectorySeparatorChar).Last();
+
+                if (long.TryParse(s, out var workShopId))
+                {
+                    mod.WorkshopID = workShopId;
+                }
+                else
+                {
+                    MessageBox.Show("A mod could not be loaded because the workshop ID failed to parse." +
+                                    $"\nPlease check that the following directory conforms to valid workshop numbering.\n\nPath: {modDir}");
+                    return null;
+                }
+            }
 
             AddMod(modinfo.Category, mod);
-
-            // mark dupes
-            if (isDupe)
-                foreach (var m in All.Where(m => m.ID == modID))
-                    m.AddState(ModState.DuplicateID);
 
             return mod;
         }
@@ -271,10 +274,10 @@ namespace XCOM2Launcher.Mod
 
                 // Check Workshop for updates
                 if (m.Source == ModSource.SteamWorkshop)
-                if (
-                    Workshop.GetDownloadStatus((ulong) m.WorkshopID)
-                        .HasFlag(EItemState.k_EItemStateNeedsUpdate))
-                    m.AddState(ModState.UpdateAvailable);
+                {
+                    if (Workshop.GetDownloadStatus((ulong) m.WorkshopID).HasFlag(EItemState.k_EItemStateNeedsUpdate))
+                        m.AddState(ModState.UpdateAvailable);
+                }
 
                 // Check if it is built for WOTC
                 try
@@ -330,12 +333,12 @@ namespace XCOM2Launcher.Mod
 
         public IEnumerable<IGrouping<string, ModEntry>> GetDuplicates()
         {
-            return All.GroupBy(m => m.ID).Where(g => g.Count() > 1);
+            return All.GroupBy(m => m.ID, StringComparer.InvariantCultureIgnoreCase).Where(g => g.Count() > 1);
         }
 
         public void MarkDuplicates()
         {
-            foreach (var m in GetDuplicates().SelectMany(@group => @group))
+            foreach (var m in GetDuplicates().SelectMany(group => group))
                 m.AddState(ModState.DuplicateID);
         }
     }

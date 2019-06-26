@@ -33,14 +33,6 @@ namespace XCOM2Launcher.Classes.Steam
             }
         }
 
-        public static bool InitSafe()
-        {
-            lock (Mutex)
-            {
-                return SteamAPI.InitSafe();
-            }
-        }
-
         public static bool RestartAppIfNecessary(AppId_t unOwnAppID)
         {
             lock (Mutex)
