@@ -755,13 +755,9 @@ namespace JR.Utils.GUI.Forms
                     Cursor.Current = Cursors.WaitCursor;
                     Process.Start(e.LinkText);
                 }
-                catch (Exception)
+                finally // Omit catch -> Let the caller of FlexibleMessageBoxForm decide what to do with this exception.
                 {
-                    //Let the caller of FlexibleMessageBoxForm decide what to do with this exception...
-                    throw;
-                }
-                finally
-                {
+                    
                     Cursor.Current = Cursors.Default;
                 }
 

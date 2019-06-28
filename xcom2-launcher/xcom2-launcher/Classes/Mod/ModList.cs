@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Sentry;
 using Steamworks;
 using XCOM2Launcher.Steam;
 
@@ -288,7 +289,8 @@ namespace XCOM2Launcher.Mod
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Debug.WriteLine(ex.Message);
+                    SentrySdk.CaptureException(ex);
+                    Debug.Fail(ex.Message);
                 }
             }
             else
@@ -316,7 +318,8 @@ namespace XCOM2Launcher.Mod
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Debug.WriteLine(ex.Message);
+                    SentrySdk.CaptureException(ex);
+                    Debug.Fail(ex.Message);
                 }
             }
         }

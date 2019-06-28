@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using Sentry;
 
 namespace XCOM2Launcher.Mod
 {
@@ -93,8 +95,9 @@ namespace XCOM2Launcher.Mod
                 if (values.ContainsKey("publishedfileid"))
                     PublishedFileID = int.Parse(values["publishedfileid"]);
             }
-            catch (FormatException)
+            catch (FormatException ex)
             {
+                SentrySdk.CaptureException(ex);
                 PublishedFileID = -1;
             }
 
@@ -119,9 +122,10 @@ namespace XCOM2Launcher.Mod
                     if (val.Length > 0 && File.Exists(Path.Combine(path, val)))
                         ContentImage = values["contentimage"];
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // ignored
+                    SentrySdk.CaptureException(ex);
+                    Debug.Fail(ex.Message);
                 }
             }
         }
