@@ -75,7 +75,9 @@ namespace XCOM2Launcher.Forms
                     showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
                     UpdateQuickArgumentsMenu();
 
-                    if (dialog.IsRestartRequired) {
+                    if (dialog.IsRestartRequired)
+                    {
+                        appRestartPendingLabel.Visible = true;
                         MessageBox.Show("Some changes won't take effect, until after the application has been restarted.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }

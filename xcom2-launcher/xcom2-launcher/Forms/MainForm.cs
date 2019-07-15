@@ -76,6 +76,11 @@ namespace XCOM2Launcher.Forms
 #endif
         }
 
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            Text += " " + Program.GetCurrentVersionString(true);
+        }
+
         private void InitializeTabImages()
         {
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);

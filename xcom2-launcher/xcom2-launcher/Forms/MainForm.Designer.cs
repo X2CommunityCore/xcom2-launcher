@@ -85,7 +85,6 @@
 			this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
 			this.panel3 = new System.Windows.Forms.Panel();
 			this.modlist_filterClearButton = new System.Windows.Forms.Button();
-			this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
 			this.LauchOptionsPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.modTabToolStrip = new System.Windows.Forms.ToolStrip();
 			this.quickLaunchToolstripButton = new System.Windows.Forms.ToolStripDropDownButton();
@@ -117,7 +116,6 @@
 			this.modinfo_config_tab = new System.Windows.Forms.TabPage();
 			this.modinfo_config_TableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_ConfigFCTB = new FastColoredTextBoxNS.FastColoredTextBox();
-			this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
 			this.modinfo_config_buttonsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_config_ExpandButton = new System.Windows.Forms.Button();
 			this.modinfo_config_CompareButton = new System.Windows.Forms.Button();
@@ -148,6 +146,10 @@
 			this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.fillPanel = new System.Windows.Forms.Panel();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+			this.appRestartPendingLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.labelFillsFreeSpace = new System.Windows.Forms.ToolStripStatusLabel();
+			this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
+			this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
 			this.main_statusstrip.SuspendLayout();
 			this.main_menustrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -187,9 +189,12 @@
 			// 
 			this.main_statusstrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.status_toolstrip_label,
-            this.progress_toolstrip_progressbar});
+            this.progress_toolstrip_progressbar,
+            this.labelFillsFreeSpace,
+            this.appRestartPendingLabel});
 			this.main_statusstrip.Location = new System.Drawing.Point(0, 719);
 			this.main_statusstrip.Name = "main_statusstrip";
+			this.main_statusstrip.ShowItemToolTips = true;
 			this.main_statusstrip.Size = new System.Drawing.Size(984, 22);
 			this.main_statusstrip.TabIndex = 5;
 			this.main_statusstrip.Text = "statusStrip1";
@@ -710,16 +715,6 @@
 			this.modlist_filterClearButton.UseVisualStyleBackColor = true;
 			this.modlist_filterClearButton.Click += new System.EventHandler(this.modlist_filterClearButton_Click);
 			// 
-			// modlist_FilterCueTextBox
-			// 
-			this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.modlist_FilterCueTextBox.CueText = "Filter Mods";
-			this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
-			this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
-			this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
-			this.modlist_FilterCueTextBox.TabIndex = 1;
-			this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
-			// 
 			// LauchOptionsPanel
 			// 
 			this.LauchOptionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1093,19 +1088,6 @@
 			this.modinfo_ConfigFCTB.Zoom = 100;
 			this.modinfo_ConfigFCTB.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.modinfo_ConfigFCTB_TextChanged);
 			// 
-			// modinfo_config_FileSelectCueComboBox
-			// 
-			this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
-			this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
-			this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
-			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
-			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
-			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
-			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
-			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
-			// 
 			// modinfo_config_buttonsTableLayoutPanel
 			// 
 			this.modinfo_config_buttonsTableLayoutPanel.ColumnCount = 5;
@@ -1450,6 +1432,46 @@
 			this.fillPanel.TabIndex = 6;
 			this.fillPanel.Visible = false;
 			// 
+			// appRestartPendingLabel
+			// 
+			this.appRestartPendingLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.appRestartPendingLabel.ForeColor = System.Drawing.Color.Red;
+			this.appRestartPendingLabel.Name = "appRestartPendingLabel";
+			this.appRestartPendingLabel.Size = new System.Drawing.Size(158, 17);
+			this.appRestartPendingLabel.Text = "Application restart pending";
+			this.appRestartPendingLabel.ToolTipText = "Some changes to the settings won\'t take effect,\r\nuntil after the application has " +
+    "been restarted.";
+			this.appRestartPendingLabel.Visible = false;
+			// 
+			// labelFillsFreeSpace
+			// 
+			this.labelFillsFreeSpace.Name = "labelFillsFreeSpace";
+			this.labelFillsFreeSpace.Size = new System.Drawing.Size(678, 17);
+			this.labelFillsFreeSpace.Spring = true;
+			// 
+			// modlist_FilterCueTextBox
+			// 
+			this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+			this.modlist_FilterCueTextBox.CueText = "Filter Mods";
+			this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
+			this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
+			this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
+			this.modlist_FilterCueTextBox.TabIndex = 1;
+			this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
+			// 
+			// modinfo_config_FileSelectCueComboBox
+			// 
+			this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
+			this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
+			this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
+			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
+			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
+			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
+			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
+			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
+			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1465,6 +1487,7 @@
 			this.Name = "MainForm";
 			this.Text = "XCOM 2 Mod Launcher";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
 			this.main_statusstrip.ResumeLayout(false);
 			this.main_statusstrip.PerformLayout();
@@ -1634,5 +1657,7 @@
 		private System.Windows.Forms.ToolStripMenuItem noSeekFreeLoadingToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem autoDebugToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem reviewToolStripMenuItem;
+		private System.Windows.Forms.ToolStripStatusLabel labelFillsFreeSpace;
+		private System.Windows.Forms.ToolStripStatusLabel appRestartPendingLabel;
 	}
 }

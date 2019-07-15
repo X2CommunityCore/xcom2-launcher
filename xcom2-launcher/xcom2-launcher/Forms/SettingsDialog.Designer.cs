@@ -40,6 +40,7 @@
 			this.addModPathButton = new System.Windows.Forms.Button();
 			this.removeModPathButton = new System.Windows.Forms.Button();
 			this.browseGamePathButton = new System.Windows.Forms.Button();
+			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.useSentry = new System.Windows.Forms.CheckBox();
@@ -54,7 +55,6 @@
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.bOK = new System.Windows.Forms.Button();
 			this.bCancel = new System.Windows.Forms.Button();
-			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox1.SuspendLayout();
 			this.tableLayoutPanel2.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
@@ -189,6 +189,15 @@
 			this.browseGamePathButton.UseVisualStyleBackColor = true;
 			this.browseGamePathButton.Click += new System.EventHandler(this.BrowseGamePathButtonOnClick);
 			// 
+			// argumentsTextBox
+			// 
+			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.argumentsTextBox.Location = new System.Drawing.Point(103, 159);
+			this.argumentsTextBox.Name = "argumentsTextBox";
+			this.argumentsTextBox.Size = new System.Drawing.Size(462, 20);
+			this.argumentsTextBox.TabIndex = 15;
+			this.argumentsTextBox.Values = new string[0];
+			// 
 			// groupBox2
 			// 
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -238,8 +247,8 @@
 			this.useSentry.Size = new System.Drawing.Size(170, 20);
 			this.useSentry.TabIndex = 17;
 			this.useSentry.Text = "Send anonymous error reports";
-			this.toolTip.SetToolTip(this.useSentry, "If enabled, unhandled exceptions or other \r\npotential issues are automatically re" +
-        "ported to\r\nour X2CommunityCore Sentry.io account.");
+			this.toolTip.SetToolTip(this.useSentry, "If enabled, critical errors or other \r\npotential issues are automatically reporte" +
+        "d to\r\nour X2CommunityCore Sentry.io account.");
 			this.useSentry.UseVisualStyleBackColor = true;
 			// 
 			// showHiddenEntriesCheckBox
@@ -369,15 +378,6 @@
 			this.bCancel.TabIndex = 11;
 			this.bCancel.Text = "Cancel";
 			this.bCancel.UseVisualStyleBackColor = true;
-			// 
-			// argumentsTextBox
-			// 
-			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.argumentsTextBox.Location = new System.Drawing.Point(103, 159);
-			this.argumentsTextBox.Name = "argumentsTextBox";
-			this.argumentsTextBox.Size = new System.Drawing.Size(462, 20);
-			this.argumentsTextBox.TabIndex = 15;
-			this.argumentsTextBox.Values = new string[0];
 			// 
 			// SettingsDialog
 			// 
