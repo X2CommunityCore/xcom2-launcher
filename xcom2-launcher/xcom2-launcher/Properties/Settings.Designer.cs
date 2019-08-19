@@ -61,7 +61,7 @@ namespace XCOM2Launcher.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool IsSentryEnabled {
             get {
                 return ((bool)(this["IsSentryEnabled"]));
@@ -80,6 +80,18 @@ namespace XCOM2Launcher.Properties {
             }
             set {
                 this["Version"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084")]
+        public string SentryDsn {
+            get {
+                return ((string)(this["SentryDsn"]));
+            }
+            set {
+                this["SentryDsn"] = value;
             }
         }
     }

@@ -52,12 +52,12 @@ namespace XCOM2Launcher
                 InitAppSettings();
                 sentrySdkInstance = InitSentry();
 
-                if (!CheckDotNet4_6())
+                if (!CheckDotNet4_7_2())
                 {
-                    var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.6 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.7.2 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
                     if (result == DialogResult.Yes)
-                        Process.Start("https://www.microsoft.com/en-us/download/details.aspx?id=56115");
+                        Process.Start("https://dotnet.microsoft.com/download/dotnet-framework");
 
                     return;
                 }
@@ -122,7 +122,7 @@ namespace XCOM2Launcher
             {
                 sentrySdkInstance = SentrySdk.Init(o =>
                 {
-                    o.Dsn = new Dsn("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084");
+                    o.Dsn = new Dsn(Properties.Settings.Default.SentryDsn);
                     o.Release = "AML@" + GetCurrentVersionString();     // prefix because releases are global per organization
                     o.Debug = false;
                     o.Environment = IsDebugBuild ? "Debug" : "Release"; // Maybe use "Beta" for Pre-Release version (new/separate build configuration)
@@ -171,10 +171,24 @@ namespace XCOM2Launcher
             if (appSettings.IsSettingsUpgradeRequired) {
                 appSettings.Upgrade();
                 appSettings.IsSettingsUpgradeRequired = false;
+
+                // Ask user to opt-in for Sentry error reporting on first run or after updating to new version if it is disabled
+                if (!appSettings.IsSentryEnabled)
+                {
+                    var result = MessageBox.Show("Please help us to improve AML, by enabling anonymous error reporting! \n\n" +
+                                                 "Critical errors or other potential issues are then automatically " +
+                                                 "reported to our X2CommunityCore Sentry.io account. \n" +
+                                                 "You can enable/disable this feature at any time in the Settings dialog. \n\n" +
+                                                 "Do you want to enable anonymous error reporting now?",
+                                                 "Enable/disable AML error reporting", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+
+                    appSettings.IsSentryEnabled = result == DialogResult.Yes;
+                }
             }
 
             // Initialize GUID (used for error reporting)
-            if (string.IsNullOrEmpty(appSettings.Guid)) {
+            if (string.IsNullOrEmpty(appSettings.Guid))
+            {
                 appSettings.Guid = Guid.NewGuid().ToString();
             }
 
@@ -188,14 +202,19 @@ namespace XCOM2Launcher
         }
 
         /// <summary>
-        /// Checks if .Net Framework 4.6 or later installed.
-        /// It verifies if the method DateTimeOffset.FromUnixTimeSeconds() (which was added with 4.6) is available.
+        /// Checks if .Net Framework 4.7.2 or later installed.
+        /// Verifies that the method SortedSet.TryGetValue() (which was added with 4.7.2) is available.
         /// </summary>
-        /// <returns>true if at least 4.6</returns>
-        private static bool CheckDotNet4_6() {
-            try {
-                return typeof(DateTimeOffset).GetMethod("FromUnixTimeSeconds") != null;
-            } catch (AmbiguousMatchException) {
+        /// <returns>true if version 4.7.2 or later is installed</returns>
+        private static bool CheckDotNet4_7_2()
+        {
+            try
+            {
+                return typeof(SortedSet<>).GetMethod("TryGetValue") != null;
+                // return typeof(DateTimeOffset).GetMethod("FromUnixTimeSeconds") != null; // obsolete .NET 4.6 check
+            }
+            catch (AmbiguousMatchException)
+            {
                 // ambiguous means there is more than one result
                 return true;
             }
