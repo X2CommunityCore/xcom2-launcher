@@ -485,6 +485,15 @@ namespace XCOM2Launcher.Forms
             return str.ToString();
         }
 
+        private void UpdateModDescription(ModEntry m)
+        {
+            modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
+            modinfo_info_DescriptionRichTextBox.Clear();
+            modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
+            btnDescSave.Enabled = false;
+            btnDescUndo.Enabled = false;
+        }
+
         private void UpdateModInfo(ModEntry m)
         {
             if (m == null)
@@ -502,10 +511,9 @@ namespace XCOM2Launcher.Forms
             modinfo_info_AuthorTextBox.Text = m.Author;
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
-            modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
-            modinfo_info_DescriptionRichTextBox.Clear();
-            modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
-            btnDescSave.Enabled = false;
+
+            UpdateModDescription(m);
+
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
 

@@ -123,8 +123,8 @@ namespace XCOM2Launcher.Forms
             // Sort by Order or WorkshopID column removes groups
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
-                modlist_ListObjectListView.ShowGroups = 
-                !(args.ColumnToSort.Equals(olvcOrder) || args.ColumnToSort.Equals(olvcWorkshopID));
+                modlist_ListObjectListView.ShowGroups = cEnableGrouping.Checked &&
+                                                        !(args.ColumnToSort.Equals(olvcOrder) || args.ColumnToSort.Equals(olvcWorkshopID));
             };
 
             // Init DateTime columns

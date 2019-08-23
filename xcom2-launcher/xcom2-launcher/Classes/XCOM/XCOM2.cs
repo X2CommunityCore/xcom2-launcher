@@ -109,10 +109,12 @@ namespace XCOM2Launcher.XCOM
             SteamAPIWrapper.Shutdown();
         }
 
-        internal static void ImportActiveMods(Settings settings)
+        internal static void ImportActiveMods(Settings settings, bool wotc)
         {
+            var activeMods = GetActiveMods(wotc);
+
             // load active mods
-            foreach (var internalName in GetActiveMods())
+            foreach (var internalName in activeMods)
                 foreach (var mod in settings.Mods.All.Where(m => m.ID == internalName))
                     mod.isActive = true;
         }
@@ -135,11 +137,15 @@ namespace XCOM2Launcher.XCOM
                 ?? new string[0];
         }
 
-        public static string[] GetActiveMods()
+        /// <summary>
+        /// Returns all mods, that are currently listed as "ActiveMods" from the XComModOptions.ini file.
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetActiveMods(bool wotc)
         {
             try
             {
-                return new DefaultConfigFile("ModOptions", Settings.Instance.LastLaunchedWotC).Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
+                return new DefaultConfigFile("ModOptions", wotc).Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
             }
             catch (IOException)
             {
@@ -147,6 +153,13 @@ namespace XCOM2Launcher.XCOM
             }
         }
 
+        /// <summary>
+        /// Updates the XComModOptions.ini and XComEngine.ini according
+        /// to currently enabled mods and configured mod directories.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="WotC"></param>
+        /// <param name="disableMods"></param>
         public static void SaveChanges(Settings settings, bool WotC, bool disableMods)
         {
             // XComModOptions
