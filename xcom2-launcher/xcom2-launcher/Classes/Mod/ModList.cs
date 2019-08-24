@@ -267,7 +267,9 @@ namespace XCOM2Launcher.Mod
                 {
                     string newAuthorName = Workshop.GetUsername(workshopDetails.m_ulSteamIDOwner);
 
-                    if (!string.IsNullOrEmpty(newAuthorName))
+                    // Getusername() sometimes returns null, an empty string or "[unknown]".
+                    // We do not want to overwrite a potentially already correct author name in that case.
+                    if (!string.IsNullOrEmpty(newAuthorName) && newAuthorName != "[unknown]")
                     {
                         m.Author = newAuthorName;
                     }
