@@ -33,6 +33,8 @@
 			this.main_statusstrip = new System.Windows.Forms.StatusStrip();
 			this.status_toolstrip_label = new System.Windows.Forms.ToolStripStatusLabel();
 			this.progress_toolstrip_progressbar = new System.Windows.Forms.ToolStripProgressBar();
+			this.labelFillsFreeSpace = new System.Windows.Forms.ToolStripStatusLabel();
+			this.appRestartPendingLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.main_menustrip = new System.Windows.Forms.MenuStrip();
 			this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -196,9 +198,12 @@
 			// 
 			this.main_statusstrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.status_toolstrip_label,
-            this.progress_toolstrip_progressbar});
+            this.progress_toolstrip_progressbar,
+            this.labelFillsFreeSpace,
+            this.appRestartPendingLabel});
 			this.main_statusstrip.Location = new System.Drawing.Point(0, 719);
 			this.main_statusstrip.Name = "main_statusstrip";
+			this.main_statusstrip.ShowItemToolTips = true;
 			this.main_statusstrip.Size = new System.Drawing.Size(984, 22);
 			this.main_statusstrip.TabIndex = 5;
 			this.main_statusstrip.Text = "statusStrip1";
@@ -212,6 +217,22 @@
 			// 
 			this.progress_toolstrip_progressbar.Name = "progress_toolstrip_progressbar";
 			this.progress_toolstrip_progressbar.Size = new System.Drawing.Size(100, 16);
+			// 
+			// labelFillsFreeSpace
+			// 
+			this.labelFillsFreeSpace.Name = "labelFillsFreeSpace";
+			this.labelFillsFreeSpace.Size = new System.Drawing.Size(709, 17);
+			this.labelFillsFreeSpace.Spring = true;
+			// 
+			// appRestartPendingLabel
+			// 
+			this.appRestartPendingLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.appRestartPendingLabel.ForeColor = System.Drawing.Color.Red;
+			this.appRestartPendingLabel.Name = "appRestartPendingLabel";
+			this.appRestartPendingLabel.Size = new System.Drawing.Size(158, 17);
+			this.appRestartPendingLabel.Text = "Application restart pending";
+			this.appRestartPendingLabel.ToolTipText = "Some changes to the settings won\'t take effect,\r\nuntil after the application has " +
+    "been restarted.";
 			// 
 			// main_menustrip
 			// 
@@ -308,7 +329,7 @@
 			this.showHiddenModsToolStripMenuItem.CheckOnClick = true;
 			this.showHiddenModsToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
 			this.showHiddenModsToolStripMenuItem.Name = "showHiddenModsToolStripMenuItem";
-			this.showHiddenModsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.showHiddenModsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.showHiddenModsToolStripMenuItem.Text = "Show hidden mods";
 			this.showHiddenModsToolStripMenuItem.ToolTipText = "Show/hide all mods, that are currently set to \"hidden\".";
 			// 
@@ -351,7 +372,7 @@
 			// importFromXCOM2ToolStripMenuItem
 			// 
 			this.importFromXCOM2ToolStripMenuItem.Name = "importFromXCOM2ToolStripMenuItem";
-			this.importFromXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.importFromXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
 			this.importFromXCOM2ToolStripMenuItem.Text = "XCOM 2";
 			this.importFromXCOM2ToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the X" +
     "COM 2 basegame config file.";
@@ -359,7 +380,7 @@
 			// importFromWotCToolStripMenuItem
 			// 
 			this.importFromWotCToolStripMenuItem.Name = "importFromWotCToolStripMenuItem";
-			this.importFromWotCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.importFromWotCToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
 			this.importFromWotCToolStripMenuItem.Text = "WotC";
 			this.importFromWotCToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the W" +
     "otC config file.";
@@ -1179,6 +1200,7 @@
 			this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
 			this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
 			this.modinfo_ConfigFCTB.IsReplaceMode = false;
 			this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
 			this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1564,6 +1586,7 @@
 			this.Name = "MainForm";
 			this.Text = "XCOM 2 Alternative Mod Launcher";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
 			this.main_statusstrip.ResumeLayout(false);
 			this.main_statusstrip.PerformLayout();
@@ -1732,6 +1755,8 @@
 		private System.Windows.Forms.ToolStripMenuItem noSeekFreeLoadingToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem autoDebugToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem reviewToolStripMenuItem;
+		private System.Windows.Forms.ToolStripStatusLabel labelFillsFreeSpace;
+		private System.Windows.Forms.ToolStripStatusLabel appRestartPendingLabel;
 		private System.Windows.Forms.Button btnDescUndo;
 		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;

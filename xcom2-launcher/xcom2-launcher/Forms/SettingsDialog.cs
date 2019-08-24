@@ -4,15 +4,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 using XCOM2Launcher.XCOM;
-using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Forms
 {
     public partial class SettingsDialog : Form
     {
         protected Settings Settings { get; set; }
+
+        public bool IsRestartRequired { get; private set; }
 
         public SettingsDialog(Settings settings)
         {
@@ -31,6 +31,7 @@ namespace XCOM2Launcher.Forms
             neverAdoptTagsAndCatFromprofile.Checked = settings.NeverImportTags;
             ShowQuickLaunchArgumentsToggle.Checked = settings.ShowQuickLaunchArguments;
             checkForPreReleaseUpdates.Checked = settings.CheckForPreReleaseUpdates;
+            useSentry.Checked = Properties.Settings.Default.IsSentryEnabled;
 
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
 
@@ -108,9 +109,11 @@ namespace XCOM2Launcher.Forms
 
         private void bOK_Click(object sender, EventArgs e)
         {
-            // Save states 
-            Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
+            // indicate if some changes require an application restart
+            IsRestartRequired = useSentry.Checked != Properties.Settings.Default.IsSentryEnabled;
 
+            // Apply changes
+            Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
             Settings.CloseAfterLaunch = closeAfterLaunchCheckBox.Checked;
             Settings.CheckForUpdates = searchForUpdatesCheckBox.Checked;
             Settings.ShowHiddenElements = showHiddenEntriesCheckBox.Checked;
@@ -119,6 +122,7 @@ namespace XCOM2Launcher.Forms
             Settings.NeverImportTags = neverAdoptTagsAndCatFromprofile.Checked;
             Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
             Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
+            Properties.Settings.Default.IsSentryEnabled = useSentry.Checked;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
             Settings.ArgumentList = newArguments.AsReadOnly();
@@ -126,6 +130,7 @@ namespace XCOM2Launcher.Forms
             // Save dimensions
             Settings.Windows["settings"] = new WindowSettings(this);
 
+            Properties.Settings.Default.Save();
             DialogResult = DialogResult.OK;
             Close();
         }

@@ -10,6 +10,7 @@ using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
+using Sentry;
 
 namespace XCOM2Launcher.Forms
 {
@@ -24,6 +25,8 @@ namespace XCOM2Launcher.Forms
         {
             //
             InitializeComponent();
+
+            appRestartPendingLabel.Visible = false;
 
             // Settings
             SteamAPIWrapper.Init();
@@ -75,6 +78,11 @@ namespace XCOM2Launcher.Forms
 #endif
         }
 
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            Text += " " + Program.GetCurrentVersionString(true);
+        }
+
         private void InitializeTabImages()
         {
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
@@ -89,10 +97,11 @@ namespace XCOM2Launcher.Forms
             {
                 subscribedIDs = Workshop.GetSubscribedItems();
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
                 // Steamworks not initialized?
                 // Game taking over?
+                SentrySdk.CaptureException(ex);
                 status_toolstrip_label.Text = "Error checking for new mods.";
                 return;
             }
@@ -543,21 +552,18 @@ namespace XCOM2Launcher.Forms
 			#endregion
 		}
 
-	    private void ShowQuickLaunchArgsBasedOnSettings()
-	    {
-	        LauchOptionsPanel.Visible = Settings.ShowQuickLaunchArguments;
-	    }
-
         /// <summary>
         /// Updates the quick launch menu items check-states, depending on if the the respective argument is enabled in the settings.
         /// </summary>
         private void UpdateQuickArgumentsMenu()
         {
+            LauchOptionsPanel.Visible = Settings.ShowQuickLaunchArguments;
+
             foreach (ToolStripMenuItem item in quickLaunchToolstripButton.DropDownItems) {
                 item.Checked = Settings.ArgumentList.Any(arg => arg.Equals(item.Text, StringComparison.OrdinalIgnoreCase));
             }
         }
 
-		#endregion
+        #endregion
     }
 }

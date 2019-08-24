@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -12,6 +11,7 @@ using System.Windows.Forms;
 using BrightIdeasSoftware;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
+using Sentry;
 using Steamworks;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.PropertyGrid;
@@ -67,14 +67,20 @@ namespace XCOM2Launcher.Forms
             // open Settings
             editOptionsToolStripMenuItem.Click += delegate
             {
-                var result = new SettingsDialog(Settings).ShowDialog();
+                var dialog = new SettingsDialog(Settings);
 
-                if (result == DialogResult.OK)
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
+                    // refresh/update settings dependent functions
                     RefreshModList();
-                    ShowQuickLaunchArgsBasedOnSettings();
                     showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
                     UpdateQuickArgumentsMenu();
+
+                    if (dialog.IsRestartRequired)
+                    {
+                        appRestartPendingLabel.Visible = true;
+                        MessageBox.Show("Some changes won't take effect, until after the application has been restarted.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
             };
 
@@ -257,8 +263,6 @@ namespace XCOM2Launcher.Forms
                 DesktopBounds = setting.Bounds;
                 WindowState = setting.State;
             }
-
-            ShowQuickLaunchArgsBasedOnSettings();
         }
 
 
@@ -288,13 +292,11 @@ namespace XCOM2Launcher.Forms
             WorkerSupportsCancellation = true
         };
 
-        private string last_error;
-
         private void Updater_DoWork(object sender, DoWorkEventArgs e)
         {
             _updateWorker.ReportProgress(0);
             var numCompletedMods = 0;
-            last_error = "";
+
             Parallel.ForEach(Mods.All.ToList(), mod =>
             {
                 if (_updateWorker.CancellationPending || Disposing || IsDisposed)
@@ -309,7 +311,8 @@ namespace XCOM2Launcher.Forms
                 }
                 catch (Exception ex)
                 {
-                    last_error += ex.Message + "\r\n" + ex.StackTrace;
+                    SentrySdk.CaptureException(ex);
+                    Debug.Fail(ex.Message + "\r\n" + ex.StackTrace);
                 }
 
                 lock (_updateWorker)
@@ -365,12 +368,6 @@ namespace XCOM2Launcher.Forms
 
             progress_toolstrip_progressbar.Visible = false;
             status_toolstrip_label.Text = StatusBarIdleString;
-#if DEBUG
-            if (!String.IsNullOrEmpty(last_error))
-            {
-                MessageBox.Show(last_error, "ERROR!");
-            }
-#endif
             RefreshModList();
             Updater_SingleUpdateCompleted(sender, e);
         }

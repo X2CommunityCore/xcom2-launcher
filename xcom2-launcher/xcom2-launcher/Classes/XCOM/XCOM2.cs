@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Sentry;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 
@@ -147,8 +148,10 @@ namespace XCOM2Launcher.XCOM
             {
                 return new DefaultConfigFile("ModOptions", wotc).Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
             }
-            catch (IOException)
+            catch (IOException ex)
             {
+                SentrySdk.CaptureException(ex);
+                Debug.Fail(ex.Message);
                 return new string[0];
             }
         }

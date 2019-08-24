@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CategoryManager));
 			this.moveCategoryUpButton = new System.Windows.Forms.Button();
 			this.categoriesListBox = new System.Windows.Forms.ListBox();
 			this.moveCategoryDownButton = new System.Windows.Forms.Button();
@@ -155,6 +156,7 @@
 			this.ClientSize = new System.Drawing.Size(395, 278);
 			this.Controls.Add(this.pMain);
 			this.Controls.Add(this.pLeft);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "CategoryManager";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Category manager";
