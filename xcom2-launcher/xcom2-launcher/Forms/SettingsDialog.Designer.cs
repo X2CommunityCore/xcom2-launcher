@@ -43,6 +43,7 @@
 			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this.useSentry = new System.Windows.Forms.CheckBox();
 			this.showHiddenEntriesCheckBox = new System.Windows.Forms.CheckBox();
 			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowQuickLaunchArgumentsToggle = new System.Windows.Forms.CheckBox();
@@ -207,7 +208,7 @@
 			this.groupBox2.Size = new System.Drawing.Size(655, 105);
 			this.groupBox2.TabIndex = 10;
 			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Launcher options";
+			this.groupBox2.Text = "Miscellaneous";
 			// 
 			// tableLayoutPanel3
 			// 
@@ -218,6 +219,7 @@
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this.tableLayoutPanel3.Controls.Add(this.useSentry, 2, 1);
 			this.tableLayoutPanel3.Controls.Add(this.showHiddenEntriesCheckBox, 0, 0);
 			this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 1, 0);
 			this.tableLayoutPanel3.Controls.Add(this.ShowQuickLaunchArgumentsToggle, 1, 2);
@@ -232,8 +234,22 @@
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
 			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 79);
 			this.tableLayoutPanel3.TabIndex = 6;
+			// 
+			// useSentry
+			// 
+			this.useSentry.AutoSize = true;
+			this.useSentry.Location = new System.Drawing.Point(429, 29);
+			this.useSentry.Name = "useSentry";
+			this.useSentry.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useSentry.Size = new System.Drawing.Size(170, 20);
+			this.useSentry.TabIndex = 17;
+			this.useSentry.Text = "Send anonymous error reports";
+			this.toolTip.SetToolTip(this.useSentry, "If enabled, critical errors or other \r\npotential issues are automatically reporte" +
+        "d to\r\nour X2CommunityCore Sentry.io account.");
+			this.useSentry.UseVisualStyleBackColor = true;
 			// 
 			// showHiddenEntriesCheckBox
 			// 
@@ -244,7 +260,7 @@
 			this.showHiddenEntriesCheckBox.Size = new System.Drawing.Size(119, 20);
 			this.showHiddenEntriesCheckBox.TabIndex = 9;
 			this.showHiddenEntriesCheckBox.Text = "Show hidden mods";
-			this.toolTip.SetToolTip(this.showHiddenEntriesCheckBox, "Toggle showing hidden mod entries");
+			this.toolTip.SetToolTip(this.showHiddenEntriesCheckBox, "If enabled, hidden mod entries will \r\nbe shown in the mod list.");
 			this.showHiddenEntriesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// autoNumberModIndexesCheckBox
@@ -256,7 +272,7 @@
 			this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(151, 20);
 			this.autoNumberModIndexesCheckBox.TabIndex = 14;
 			this.autoNumberModIndexesCheckBox.Text = "Auto-number mod indexes";
-			this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-number mod indexes when one is changed (turn off to edit manually)");
+			this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "Auto-number mod indexes, when \r\none is changed (turn off to edit manually).");
 			this.autoNumberModIndexesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// ShowQuickLaunchArgumentsToggle
@@ -268,6 +284,8 @@
 			this.ShowQuickLaunchArgumentsToggle.Size = new System.Drawing.Size(172, 20);
 			this.ShowQuickLaunchArgumentsToggle.TabIndex = 17;
 			this.ShowQuickLaunchArgumentsToggle.Text = "Show quick launch arguments";
+			this.toolTip.SetToolTip(this.ShowQuickLaunchArgumentsToggle, "Displays a combo-box that allows \r\nto quickly toggle different launch \r\narguments" +
+        " on the main screen.");
 			this.ShowQuickLaunchArgumentsToggle.UseVisualStyleBackColor = true;
 			// 
 			// neverAdoptTagsAndCatFromprofile
@@ -279,8 +297,8 @@
 			this.neverAdoptTagsAndCatFromprofile.Size = new System.Drawing.Size(185, 20);
 			this.neverAdoptTagsAndCatFromprofile.TabIndex = 16;
 			this.neverAdoptTagsAndCatFromprofile.Text = "Never import tags and categories";
-			this.toolTip.SetToolTip(this.neverAdoptTagsAndCatFromprofile, "Turn on to suppress the confirmation dialog to override tags and categories when " +
-        "importing profiles, always preserving your current tags and profiles.");
+			this.toolTip.SetToolTip(this.neverAdoptTagsAndCatFromprofile, "If enabled, currently assigned tags and categories\r\nwill always be preserved when" +
+        " importing profiles.");
 			this.neverAdoptTagsAndCatFromprofile.UseVisualStyleBackColor = true;
 			// 
 			// closeAfterLaunchCheckBox
@@ -292,7 +310,7 @@
 			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(114, 20);
 			this.closeAfterLaunchCheckBox.TabIndex = 7;
 			this.closeAfterLaunchCheckBox.Text = "Close after launch";
-			this.toolTip.SetToolTip(this.closeAfterLaunchCheckBox, "Close the launcher after launching the game");
+			this.toolTip.SetToolTip(this.closeAfterLaunchCheckBox, "Close the launcher after launching the game.");
 			this.closeAfterLaunchCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// searchForUpdatesCheckBox
@@ -317,8 +335,8 @@
 			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(168, 20);
 			this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
 			this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
-			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified default category (turn off to h" +
-        "ave all mods appear in Unsorted)");
+			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified \r\ndefault category (turn off to" +
+        " have all mods appear in Unsorted).");
 			this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
 			// 
 			// checkForPreReleaseUpdates
@@ -331,6 +349,13 @@
 			this.checkForPreReleaseUpdates.TabIndex = 18;
 			this.checkForPreReleaseUpdates.Text = "Include Pre-Release/Beta updates";
 			this.checkForPreReleaseUpdates.UseVisualStyleBackColor = true;
+			// 
+			// toolTip
+			// 
+			this.toolTip.AutoPopDelay = 10000;
+			this.toolTip.InitialDelay = 300;
+			this.toolTip.IsBalloon = true;
+			this.toolTip.ReshowDelay = 100;
 			// 
 			// bOK
 			// 
@@ -411,5 +436,6 @@
 		private System.Windows.Forms.Button bCancel;
 		private System.Windows.Forms.Button bOK;
 		private System.Windows.Forms.CheckBox checkForPreReleaseUpdates;
+		private System.Windows.Forms.CheckBox useSentry;
 	}
 }
