@@ -97,8 +97,11 @@ namespace XCOM2Launcher.Forms
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            Settings.ModPaths.Add(dialog.SelectedPath + "\\");
-            modPathsListbox.Items.Add(dialog.SelectedPath + "\\");
+            // make sure the mod path ends with a trailing backslash as required for entry in XCOM ini file
+            var path = dialog.SelectedPath.EndsWith(@"\") ? dialog.SelectedPath : dialog.SelectedPath + @"\";
+
+            Settings.ModPaths.Add(path);
+            modPathsListbox.Items.Add(path);
         }
 
         private void SettingsDialog_Shown(object sender, EventArgs e)
