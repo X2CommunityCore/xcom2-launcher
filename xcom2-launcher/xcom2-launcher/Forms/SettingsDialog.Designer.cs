@@ -43,23 +43,28 @@
 			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-			this.useSentry = new System.Windows.Forms.CheckBox();
 			this.showHiddenEntriesCheckBox = new System.Windows.Forms.CheckBox();
 			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowQuickLaunchArgumentsToggle = new System.Windows.Forms.CheckBox();
 			this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
+			this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
+			this.useSentry = new System.Windows.Forms.CheckBox();
 			this.closeAfterLaunchCheckBox = new System.Windows.Forms.CheckBox();
 			this.searchForUpdatesCheckBox = new System.Windows.Forms.CheckBox();
-			this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
 			this.checkForPreReleaseUpdates = new System.Windows.Forms.CheckBox();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+			this.allowMutipleInstances = new System.Windows.Forms.CheckBox();
 			this.bOK = new System.Windows.Forms.Button();
 			this.bCancel = new System.Windows.Forms.Button();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
 			this.groupBox1.SuspendLayout();
 			this.tableLayoutPanel2.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.tableLayoutPanel3.SuspendLayout();
+			this.groupBox3.SuspendLayout();
+			this.tableLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// groupBox1
@@ -70,7 +75,7 @@
 			this.groupBox1.Controls.Add(this.tableLayoutPanel2);
 			this.groupBox1.Location = new System.Drawing.Point(12, 8);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(655, 215);
+			this.groupBox1.Size = new System.Drawing.Size(655, 210);
 			this.groupBox1.TabIndex = 9;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Game options";
@@ -98,13 +103,13 @@
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 186);
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 181);
 			this.tableLayoutPanel2.TabIndex = 6;
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(4, 160);
+			this.label1.Location = new System.Drawing.Point(4, 155);
 			this.label1.Margin = new System.Windows.Forms.Padding(4, 4, 3, 0);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(57, 13);
@@ -117,7 +122,7 @@
 			this.modPathsListbox.FormattingEnabled = true;
 			this.modPathsListbox.Location = new System.Drawing.Point(103, 53);
 			this.modPathsListbox.Name = "modPathsListbox";
-			this.modPathsListbox.Size = new System.Drawing.Size(462, 100);
+			this.modPathsListbox.Size = new System.Drawing.Size(462, 95);
 			this.modPathsListbox.TabIndex = 4;
 			// 
 			// label3
@@ -156,7 +161,7 @@
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(568, 50);
 			this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 106);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 101);
 			this.flowLayoutPanel1.TabIndex = 12;
 			// 
 			// addModPathButton
@@ -192,7 +197,7 @@
 			// argumentsTextBox
 			// 
 			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.argumentsTextBox.Location = new System.Drawing.Point(103, 159);
+			this.argumentsTextBox.Location = new System.Drawing.Point(103, 154);
 			this.argumentsTextBox.Name = "argumentsTextBox";
 			this.argumentsTextBox.Size = new System.Drawing.Size(462, 20);
 			this.argumentsTextBox.TabIndex = 15;
@@ -203,12 +208,12 @@
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.tableLayoutPanel3);
-			this.groupBox2.Location = new System.Drawing.Point(12, 229);
+			this.groupBox2.Location = new System.Drawing.Point(12, 307);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(655, 105);
+			this.groupBox2.Size = new System.Drawing.Size(655, 78);
 			this.groupBox2.TabIndex = 10;
 			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Miscellaneous";
+			this.groupBox2.Text = "Usability";
 			// 
 			// tableLayoutPanel3
 			// 
@@ -219,37 +224,19 @@
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-			this.tableLayoutPanel3.Controls.Add(this.useSentry, 2, 1);
 			this.tableLayoutPanel3.Controls.Add(this.showHiddenEntriesCheckBox, 0, 0);
 			this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 1, 0);
 			this.tableLayoutPanel3.Controls.Add(this.ShowQuickLaunchArgumentsToggle, 1, 2);
 			this.tableLayoutPanel3.Controls.Add(this.neverAdoptTagsAndCatFromprofile, 2, 0);
-			this.tableLayoutPanel3.Controls.Add(this.closeAfterLaunchCheckBox, 2, 2);
-			this.tableLayoutPanel3.Controls.Add(this.searchForUpdatesCheckBox, 0, 1);
 			this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 0, 2);
-			this.tableLayoutPanel3.Controls.Add(this.checkForPreReleaseUpdates, 1, 1);
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 20);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
 			this.tableLayoutPanel3.RowCount = 3;
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 79);
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 52);
 			this.tableLayoutPanel3.TabIndex = 6;
-			// 
-			// useSentry
-			// 
-			this.useSentry.AutoSize = true;
-			this.useSentry.Location = new System.Drawing.Point(429, 29);
-			this.useSentry.Name = "useSentry";
-			this.useSentry.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			this.useSentry.Size = new System.Drawing.Size(170, 20);
-			this.useSentry.TabIndex = 17;
-			this.useSentry.Text = "Send anonymous error reports";
-			this.toolTip.SetToolTip(this.useSentry, "If enabled, critical errors or other \r\npotential issues are automatically reporte" +
-        "d to\r\nour X2CommunityCore Sentry.io account.");
-			this.useSentry.UseVisualStyleBackColor = true;
 			// 
 			// showHiddenEntriesCheckBox
 			// 
@@ -278,7 +265,7 @@
 			// ShowQuickLaunchArgumentsToggle
 			// 
 			this.ShowQuickLaunchArgumentsToggle.AutoSize = true;
-			this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(216, 55);
+			this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(216, 29);
 			this.ShowQuickLaunchArgumentsToggle.Name = "ShowQuickLaunchArgumentsToggle";
 			this.ShowQuickLaunchArgumentsToggle.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			this.ShowQuickLaunchArgumentsToggle.Size = new System.Drawing.Size(172, 20);
@@ -301,10 +288,36 @@
         " importing profiles.");
 			this.neverAdoptTagsAndCatFromprofile.UseVisualStyleBackColor = true;
 			// 
+			// useModSpecifiedCategoriesCheckBox
+			// 
+			this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
+			this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(3, 29);
+			this.useModSpecifiedCategoriesCheckBox.Name = "useModSpecifiedCategoriesCheckBox";
+			this.useModSpecifiedCategoriesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(168, 20);
+			this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
+			this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
+			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified \r\ndefault category (turn off to" +
+        " have all mods appear in Unsorted).");
+			this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// useSentry
+			// 
+			this.useSentry.AutoSize = true;
+			this.useSentry.Location = new System.Drawing.Point(429, 3);
+			this.useSentry.Name = "useSentry";
+			this.useSentry.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useSentry.Size = new System.Drawing.Size(170, 20);
+			this.useSentry.TabIndex = 17;
+			this.useSentry.Text = "Send anonymous error reports";
+			this.toolTip.SetToolTip(this.useSentry, "If enabled, critical errors or other \r\npotential issues are automatically reporte" +
+        "d to\r\nour X2CommunityCore Sentry.io account.");
+			this.useSentry.UseVisualStyleBackColor = true;
+			// 
 			// closeAfterLaunchCheckBox
 			// 
 			this.closeAfterLaunchCheckBox.AutoSize = true;
-			this.closeAfterLaunchCheckBox.Location = new System.Drawing.Point(429, 55);
+			this.closeAfterLaunchCheckBox.Location = new System.Drawing.Point(216, 29);
 			this.closeAfterLaunchCheckBox.Name = "closeAfterLaunchCheckBox";
 			this.closeAfterLaunchCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			this.closeAfterLaunchCheckBox.Size = new System.Drawing.Size(114, 20);
@@ -316,7 +329,7 @@
 			// searchForUpdatesCheckBox
 			// 
 			this.searchForUpdatesCheckBox.AutoSize = true;
-			this.searchForUpdatesCheckBox.Location = new System.Drawing.Point(3, 29);
+			this.searchForUpdatesCheckBox.Location = new System.Drawing.Point(3, 3);
 			this.searchForUpdatesCheckBox.Name = "searchForUpdatesCheckBox";
 			this.searchForUpdatesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			this.searchForUpdatesCheckBox.Size = new System.Drawing.Size(116, 20);
@@ -326,28 +339,16 @@
 			this.searchForUpdatesCheckBox.UseVisualStyleBackColor = true;
 			this.searchForUpdatesCheckBox.CheckedChanged += new System.EventHandler(this.searchForUpdatesCheckBox_CheckedChanged);
 			// 
-			// useModSpecifiedCategoriesCheckBox
-			// 
-			this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
-			this.useModSpecifiedCategoriesCheckBox.Location = new System.Drawing.Point(3, 55);
-			this.useModSpecifiedCategoriesCheckBox.Name = "useModSpecifiedCategoriesCheckBox";
-			this.useModSpecifiedCategoriesCheckBox.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			this.useModSpecifiedCategoriesCheckBox.Size = new System.Drawing.Size(168, 20);
-			this.useModSpecifiedCategoriesCheckBox.TabIndex = 15;
-			this.useModSpecifiedCategoriesCheckBox.Text = "Use mod-specified categories";
-			this.toolTip.SetToolTip(this.useModSpecifiedCategoriesCheckBox, "Toggle whether new mods appear in their specified \r\ndefault category (turn off to" +
-        " have all mods appear in Unsorted).");
-			this.useModSpecifiedCategoriesCheckBox.UseVisualStyleBackColor = true;
-			// 
 			// checkForPreReleaseUpdates
 			// 
 			this.checkForPreReleaseUpdates.AutoSize = true;
-			this.checkForPreReleaseUpdates.Location = new System.Drawing.Point(216, 29);
+			this.checkForPreReleaseUpdates.Location = new System.Drawing.Point(216, 3);
 			this.checkForPreReleaseUpdates.Name = "checkForPreReleaseUpdates";
 			this.checkForPreReleaseUpdates.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
 			this.checkForPreReleaseUpdates.Size = new System.Drawing.Size(193, 20);
 			this.checkForPreReleaseUpdates.TabIndex = 18;
 			this.checkForPreReleaseUpdates.Text = "Include Pre-Release/Beta updates";
+			this.toolTip.SetToolTip(this.checkForPreReleaseUpdates, "Enabled this option, if you wold like to be notified about Pre-Release versions.");
 			this.checkForPreReleaseUpdates.UseVisualStyleBackColor = true;
 			// 
 			// toolTip
@@ -357,10 +358,22 @@
 			this.toolTip.IsBalloon = true;
 			this.toolTip.ReshowDelay = 100;
 			// 
+			// allowMutipleInstances
+			// 
+			this.allowMutipleInstances.AutoSize = true;
+			this.allowMutipleInstances.Location = new System.Drawing.Point(3, 29);
+			this.allowMutipleInstances.Name = "allowMutipleInstances";
+			this.allowMutipleInstances.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.allowMutipleInstances.Size = new System.Drawing.Size(140, 20);
+			this.allowMutipleInstances.TabIndex = 19;
+			this.allowMutipleInstances.Text = "Allow multiple instances";
+			this.toolTip.SetToolTip(this.allowMutipleInstances, "If enabled, multiple instances of AML can be run in parallel.");
+			this.allowMutipleInstances.UseVisualStyleBackColor = true;
+			// 
 			// bOK
 			// 
 			this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.bOK.Location = new System.Drawing.Point(453, 343);
+			this.bOK.Location = new System.Drawing.Point(453, 394);
 			this.bOK.Name = "bOK";
 			this.bOK.Size = new System.Drawing.Size(104, 24);
 			this.bOK.TabIndex = 12;
@@ -372,18 +385,54 @@
 			// 
 			this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.bCancel.Location = new System.Drawing.Point(563, 343);
+			this.bCancel.Location = new System.Drawing.Point(563, 394);
 			this.bCancel.Name = "bCancel";
 			this.bCancel.Size = new System.Drawing.Size(104, 24);
 			this.bCancel.TabIndex = 11;
 			this.bCancel.Text = "Cancel";
 			this.bCancel.UseVisualStyleBackColor = true;
 			// 
+			// groupBox3
+			// 
+			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox3.Controls.Add(this.tableLayoutPanel1);
+			this.groupBox3.Location = new System.Drawing.Point(12, 224);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(655, 77);
+			this.groupBox3.TabIndex = 13;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Application";
+			// 
+			// tableLayoutPanel1
+			// 
+			this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanel1.ColumnCount = 3;
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+			this.tableLayoutPanel1.Controls.Add(this.searchForUpdatesCheckBox, 0, 0);
+			this.tableLayoutPanel1.Controls.Add(this.checkForPreReleaseUpdates, 1, 0);
+			this.tableLayoutPanel1.Controls.Add(this.useSentry, 2, 0);
+			this.tableLayoutPanel1.Controls.Add(this.allowMutipleInstances, 0, 1);
+			this.tableLayoutPanel1.Controls.Add(this.closeAfterLaunchCheckBox, 1, 1);
+			this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 19);
+			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+			this.tableLayoutPanel1.RowCount = 2;
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(641, 52);
+			this.tableLayoutPanel1.TabIndex = 0;
+			// 
 			// SettingsDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(679, 379);
+			this.ClientSize = new System.Drawing.Size(679, 430);
+			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.bOK);
 			this.Controls.Add(this.bCancel);
 			this.Controls.Add(this.groupBox2);
@@ -401,6 +450,9 @@
 			this.groupBox2.ResumeLayout(false);
 			this.tableLayoutPanel3.ResumeLayout(false);
 			this.tableLayoutPanel3.PerformLayout();
+			this.groupBox3.ResumeLayout(false);
+			this.tableLayoutPanel1.ResumeLayout(false);
+			this.tableLayoutPanel1.PerformLayout();
 			this.ResumeLayout(false);
 
         }
@@ -437,5 +489,8 @@
 		private System.Windows.Forms.Button bOK;
 		private System.Windows.Forms.CheckBox checkForPreReleaseUpdates;
 		private System.Windows.Forms.CheckBox useSentry;
+		private System.Windows.Forms.GroupBox groupBox3;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.CheckBox allowMutipleInstances;
 	}
 }

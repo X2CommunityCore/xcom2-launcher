@@ -20,27 +20,28 @@ namespace XCOM2Launcher
         [JsonIgnore]
         private List<string> _argumentList = new List<string>();
 
-	    public static Settings Instance
-	    {
-		    get
-			{
-				if (_instance != null) return _instance;
-				try
-				{
-					_instance = Settings.FromFile("settings.json");
-				}
-				catch (FileNotFoundException e)
-				{
-					MessageBox.Show("Could not find file " + e.FileName);
-				}
-				catch (JsonSerializationException)
-				{
-					MessageBox.Show(@"settings.json could not be read.\r\nPlease delete or rename that file and try again.");
-					return null;
-				}
-				return _instance;
-		    }
-	    }
+        public static Settings Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+                try
+                {
+                    _instance = Settings.FromFile("settings.json");
+                }
+                catch (FileNotFoundException e)
+                {
+                    MessageBox.Show("Could not find file " + e.FileName);
+                }
+                catch (JsonSerializationException)
+                {
+                    MessageBox.Show(@"settings.json could not be read.\r\nPlease delete or rename that file and try again.");
+                    return null;
+                }
+
+                return _instance;
+            }
+        }
 
         public string GamePath
         {
@@ -79,7 +80,7 @@ namespace XCOM2Launcher
 
         public bool CloseAfterLaunch { get; set; } = false;
 
-	    public bool AutoNumberIndexes { get; set; } = true;
+        public bool AutoNumberIndexes { get; set; } = true;
 
         public bool UseSpecifiedCategories { get; set; } = true;
 
@@ -89,14 +90,16 @@ namespace XCOM2Launcher
 
         public bool NeverImportTags { get; set; } = false;
 
+        public bool AllowMultipleInstances { get; set; } = false;
+
         public ModList Mods { get; set; } = new ModList();
 
         public Dictionary<string, ModTag> Tags { get; set; } = new Dictionary<string, ModTag>();
 
-		/// <summary>
-		/// Mod ID
-		/// </summary>
-		//public Dictionary<string, ModSettingsList> ModSettings { get; set; } = new Dictionary<string, ModSettingsList>();
+        /// <summary>
+        /// Mod ID
+        /// </summary>
+        //public Dictionary<string, ModSettingsList> ModSettings { get; set; } = new Dictionary<string, ModSettingsList>();
 
         public Dictionary<string, WindowSettings> Windows { get; set; } = new Dictionary<string, WindowSettings>();
 

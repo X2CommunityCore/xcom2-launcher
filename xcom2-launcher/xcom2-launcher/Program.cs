@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
 using Sentry;
@@ -43,6 +44,8 @@ namespace XCOM2Launcher
                 Application.ThreadException += (sender, args) => HandleUnhandledException(args.Exception, "ThreadException");
             }
 
+            // Mutex is used to check if another instance of AML is already running
+            Mutex mutex = new Mutex(true, "E3241D27-3DD8-4615-888A-502252B9E2A1", out var isFirstInstance);
             IDisposable sentrySdkInstance = null;
 
             try
@@ -52,7 +55,7 @@ namespace XCOM2Launcher
 
                 InitAppSettings();
                 sentrySdkInstance = InitSentry();
-
+                
                 if (!CheckDotNet4_7_2())
                 {
                     var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.7.2 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
@@ -78,6 +81,12 @@ namespace XCOM2Launcher
                 if (settings == null)
                     return;
 
+                // Exit if another instance of AML is already running and multiple instances are disabled.
+                if (!settings.AllowMultipleInstances && !isFirstInstance) {
+                    MessageBox.Show("Another instance of AML is already running.", "AML already started", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 // Check for update
                 if (!IsDebugBuild && settings.CheckForUpdates)
                 {
@@ -99,6 +108,8 @@ namespace XCOM2Launcher
             {
                 sentrySdkInstance?.Dispose();
                 Properties.Settings.Default.Save();
+                GC.KeepAlive(mutex);    // prevent the mutex from being garbage collected early
+                mutex?.Dispose();
             }
         }
 
