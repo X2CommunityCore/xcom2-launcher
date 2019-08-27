@@ -603,7 +603,8 @@ namespace XCOM2Launcher.Forms
         private void cEnableGrouping_CheckedChanged(object sender, EventArgs e)
         {
             modlist_toggleGroupsButton.Enabled = cEnableGrouping.Checked;
-            modlist_ListObjectListView.ShowGroups = cEnableGrouping.Checked && !(modlist_ListObjectListView.LastSortColumn.Equals(olvcOrder) || modlist_ListObjectListView.LastSortColumn.Equals(olvcWorkshopID));
+            modlist_ListObjectListView.ShowGroups = cEnableGrouping.Checked && CheckIfGroupableColumn(modlist_ListObjectListView.LastSortColumn);
+            modlist_ListObjectListView.BuildGroups();
         }
 
 		private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)

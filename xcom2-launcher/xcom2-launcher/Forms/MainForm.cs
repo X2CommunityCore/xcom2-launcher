@@ -14,16 +14,15 @@ using Sentry;
 
 namespace XCOM2Launcher.Forms
 {
-	public partial class MainForm
-	{
+    public partial class MainForm
+    {
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 
         public Settings Settings { get; set; }
 
-		public MainForm(Settings settings)
+        public MainForm(Settings settings)
         {
-            //
             InitializeComponent();
 
             appRestartPendingLabel.Visible = false;
@@ -38,8 +37,10 @@ namespace XCOM2Launcher.Forms
             // Hide WotC and Challenge Mode buttons if necessary
             if (settings.GamePath != "")
             {
-                runWarOfTheChosenToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
-                runChallengeModeToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+                var wotcAvailable = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+                runWarOfTheChosenToolStripMenuItem.Visible = wotcAvailable;
+                runChallengeModeToolStripMenuItem.Visible = wotcAvailable;
+                importFromWotCToolStripMenuItem.Visible = wotcAvailable;
             }
 
             // Init interface

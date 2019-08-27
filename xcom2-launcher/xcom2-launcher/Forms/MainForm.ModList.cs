@@ -123,8 +123,10 @@ namespace XCOM2Launcher.Forms
             // Sort by Order or WorkshopID column removes groups
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
-                modlist_ListObjectListView.ShowGroups = cEnableGrouping.Checked &&
-                                                        !(args.ColumnToSort.Equals(olvcOrder) || args.ColumnToSort.Equals(olvcWorkshopID));
+                bool isGroupableColumn = CheckIfGroupableColumn(args.ColumnToSort);
+                modlist_ListObjectListView.ShowGroups = cEnableGrouping.Checked && isGroupableColumn;
+                modlist_toggleGroupsButton.Enabled = isGroupableColumn;
+                cEnableGrouping.Enabled = isGroupableColumn;
             };
 
             // Init DateTime columns
@@ -162,6 +164,16 @@ namespace XCOM2Launcher.Forms
 
             // Start out sorted by name
             modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
+        }
+
+        /// <summary>
+        /// We do not want to use grouping for columns where it doesn't make sense.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        private bool CheckIfGroupableColumn(OLVColumn column)
+        {
+            return !(column.Equals(olvcOrder) || column.Equals(olvcWorkshopID));
         }
 
         private void RenameTag(ModTag tag, string newTag)

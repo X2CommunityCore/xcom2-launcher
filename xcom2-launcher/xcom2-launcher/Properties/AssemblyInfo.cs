@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General information about an assembly will be available through the following
 // Attributes controlled. Change these attribute values to change the information,
 // associated with an assembly.
-[assembly: AssemblyTitle("Alternative Mod Launcher")]
+[assembly: AssemblyTitle("XCOM2 Alternative Mod Launcher")]
 [assembly: AssemblyDescription("The Alternative Mod Launcher (AML) is a replacement for the default XCOM 2 game launcher.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("XCOM Modding Community")]
-[assembly: AssemblyProduct("Alternative Mod Launcher")]
+[assembly: AssemblyProduct("XCOM2 Alternative Mod Launcher")]
 [assembly: AssemblyCopyright("GPLv3")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
