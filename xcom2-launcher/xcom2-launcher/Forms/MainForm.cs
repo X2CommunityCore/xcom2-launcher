@@ -14,17 +14,18 @@ using Sentry;
 
 namespace XCOM2Launcher.Forms
 {
-	public partial class MainForm
-	{
+    public partial class MainForm
+    {
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 
         public Settings Settings { get; set; }
 
-		public MainForm(Settings settings)
+        public MainForm(Settings settings)
         {
-            //
             InitializeComponent();
+
+            appRestartPendingLabel.Visible = false;
 
             // Settings
             SteamAPIWrapper.Init();
@@ -36,8 +37,10 @@ namespace XCOM2Launcher.Forms
             // Hide WotC and Challenge Mode buttons if necessary
             if (settings.GamePath != "")
             {
-                runWarOfTheChosenToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
-                runChallengeModeToolStripMenuItem.Visible = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+                var wotcAvailable = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+                runWarOfTheChosenToolStripMenuItem.Visible = wotcAvailable;
+                runChallengeModeToolStripMenuItem.Visible = wotcAvailable;
+                importFromWotCToolStripMenuItem.Visible = wotcAvailable;
             }
 
             // Init interface
@@ -492,6 +495,15 @@ namespace XCOM2Launcher.Forms
             return str.ToString();
         }
 
+        private void UpdateModDescription(ModEntry m)
+        {
+            modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
+            modinfo_info_DescriptionRichTextBox.Clear();
+            modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
+            btnDescSave.Enabled = false;
+            btnDescUndo.Enabled = false;
+        }
+
         private void UpdateModInfo(ModEntry m)
         {
             if (m == null)
@@ -509,10 +521,9 @@ namespace XCOM2Launcher.Forms
             modinfo_info_AuthorTextBox.Text = m.Author;
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
-            modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
-            modinfo_info_DescriptionRichTextBox.Clear();
-            modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
-            btnDescSave.Enabled = false;
+
+            UpdateModDescription(m);
+
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
 

@@ -33,6 +33,8 @@
 			this.main_statusstrip = new System.Windows.Forms.StatusStrip();
 			this.status_toolstrip_label = new System.Windows.Forms.ToolStripStatusLabel();
 			this.progress_toolstrip_progressbar = new System.Windows.Forms.ToolStripProgressBar();
+			this.labelFillsFreeSpace = new System.Windows.Forms.ToolStripStatusLabel();
+			this.appRestartPendingLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.main_menustrip = new System.Windows.Forms.MenuStrip();
 			this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,12 +51,20 @@
 			this.manageCategoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.importActiveModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.importFromXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.importFromWotCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.cleanModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runWarOfTheChosenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runChallengeModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.infoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+			this.openHomepageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.amlWikiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.openDiscordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.error_provider = new System.Windows.Forms.ErrorProvider(this.components);
 			this.main_tabcontrol = new System.Windows.Forms.TabControl();
 			this.modlist_tab = new System.Windows.Forms.TabPage();
@@ -81,10 +91,11 @@
 			this.olvBrowserLink = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.olvForWOTC = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.panel2 = new System.Windows.Forms.Panel();
-			this.checkBox1 = new System.Windows.Forms.CheckBox();
+			this.cEnableGrouping = new System.Windows.Forms.CheckBox();
 			this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
 			this.panel3 = new System.Windows.Forms.Panel();
 			this.modlist_filterClearButton = new System.Windows.Forms.Button();
+			this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
 			this.LauchOptionsPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.modTabToolStrip = new System.Windows.Forms.ToolStrip();
 			this.quickLaunchToolstripButton = new System.Windows.Forms.ToolStripDropDownButton();
@@ -98,6 +109,7 @@
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
 			this.modinfo_details_tab = new System.Windows.Forms.TabPage();
+			this.btnDescUndo = new System.Windows.Forms.Button();
 			this.btnDescSave = new System.Windows.Forms.Button();
 			this.modinfo_info_CreatedLabel = new System.Windows.Forms.Label();
 			this.modinfo_info_DescriptionLabel = new System.Windows.Forms.Label();
@@ -116,6 +128,7 @@
 			this.modinfo_config_tab = new System.Windows.Forms.TabPage();
 			this.modinfo_config_TableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_ConfigFCTB = new FastColoredTextBoxNS.FastColoredTextBox();
+			this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
 			this.modinfo_config_buttonsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.modinfo_config_ExpandButton = new System.Windows.Forms.Button();
 			this.modinfo_config_CompareButton = new System.Windows.Forms.Button();
@@ -146,10 +159,6 @@
 			this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
 			this.fillPanel = new System.Windows.Forms.Panel();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.appRestartPendingLabel = new System.Windows.Forms.ToolStripStatusLabel();
-			this.labelFillsFreeSpace = new System.Windows.Forms.ToolStripStatusLabel();
-			this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
-			this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
 			this.main_statusstrip.SuspendLayout();
 			this.main_menustrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -209,6 +218,22 @@
 			this.progress_toolstrip_progressbar.Name = "progress_toolstrip_progressbar";
 			this.progress_toolstrip_progressbar.Size = new System.Drawing.Size(100, 16);
 			// 
+			// labelFillsFreeSpace
+			// 
+			this.labelFillsFreeSpace.Name = "labelFillsFreeSpace";
+			this.labelFillsFreeSpace.Size = new System.Drawing.Size(709, 17);
+			this.labelFillsFreeSpace.Spring = true;
+			// 
+			// appRestartPendingLabel
+			// 
+			this.appRestartPendingLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.appRestartPendingLabel.ForeColor = System.Drawing.Color.Red;
+			this.appRestartPendingLabel.Name = "appRestartPendingLabel";
+			this.appRestartPendingLabel.Size = new System.Drawing.Size(158, 17);
+			this.appRestartPendingLabel.Text = "Application restart pending";
+			this.appRestartPendingLabel.ToolTipText = "Some changes to the settings won\'t take effect,\r\nuntil after the application has " +
+    "been restarted.";
+			// 
 			// main_menustrip
 			// 
 			this.main_menustrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -217,9 +242,11 @@
             this.toolsToolStripMenuItem,
             this.runXCOM2ToolStripMenuItem,
             this.runWarOfTheChosenToolStripMenuItem,
-            this.runChallengeModeToolStripMenuItem});
+            this.runChallengeModeToolStripMenuItem,
+            this.aboutToolStripMenuItem});
 			this.main_menustrip.Location = new System.Drawing.Point(0, 0);
 			this.main_menustrip.Name = "main_menustrip";
+			this.main_menustrip.ShowItemToolTips = true;
 			this.main_menustrip.Size = new System.Drawing.Size(984, 24);
 			this.main_menustrip.TabIndex = 6;
 			this.main_menustrip.Text = "menuStrip1";
@@ -241,41 +268,49 @@
 			// saveToolStripMenuItem
 			// 
 			this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-			this.saveToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-			this.saveToolStripMenuItem.Text = "Save";
+			this.saveToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.saveToolStripMenuItem.Text = "Save settings";
+			this.saveToolStripMenuItem.ToolTipText = "Saves the current settings and updates XCOM configuration \r\nfiles with respect to" +
+    " currently active mods and mod folders.";
 			// 
 			// reloadToolStripMenuItem
 			// 
 			this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-			this.reloadToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-			this.reloadToolStripMenuItem.Text = "Reset";
+			this.reloadToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.reloadToolStripMenuItem.Text = "Reset settings";
+			this.reloadToolStripMenuItem.ToolTipText = "Restores the settings from last manual save or\r\nsince last game launch.";
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(157, 6);
+			this.toolStripSeparator1.Size = new System.Drawing.Size(203, 6);
 			// 
 			// searchForModsToolStripMenuItem
 			// 
 			this.searchForModsToolStripMenuItem.Name = "searchForModsToolStripMenuItem";
-			this.searchForModsToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-			this.searchForModsToolStripMenuItem.Text = "Search for mods";
+			this.searchForModsToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.searchForModsToolStripMenuItem.Text = "Search for new mods";
+			this.searchForModsToolStripMenuItem.ToolTipText = "Scans all known mod directories for new mods and adds them to the mod list.\r\nThis" +
+    " is useful for adding new mods without re-starting AML.";
 			// 
 			// updateEntriesToolStripMenuItem
 			// 
 			this.updateEntriesToolStripMenuItem.Name = "updateEntriesToolStripMenuItem";
-			this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-			this.updateEntriesToolStripMenuItem.Text = "Update entries";
+			this.updateEntriesToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+			this.updateEntriesToolStripMenuItem.Text = "Update mod information";
+			this.updateEntriesToolStripMenuItem.ToolTipText = "Updates the current state of all mods, by performing some validations \r\nand by re" +
+    "questing the latest mod information from the Steam workshop.\r\nThis task is also " +
+    "performed when you start AML.";
 			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(157, 6);
+			this.toolStripSeparator2.Size = new System.Drawing.Size(203, 6);
 			// 
 			// exitToolStripMenuItem
 			// 
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-			this.exitToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+			this.exitToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
 			this.exitToolStripMenuItem.Text = "Exit";
 			// 
 			// settingsToolStripMenuItem
@@ -287,7 +322,7 @@
             this.manageCategoriesToolStripMenuItem});
 			this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
 			this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
-			this.settingsToolStripMenuItem.Text = "Settings";
+			this.settingsToolStripMenuItem.Text = "Options";
 			// 
 			// showHiddenModsToolStripMenuItem
 			// 
@@ -296,6 +331,7 @@
 			this.showHiddenModsToolStripMenuItem.Name = "showHiddenModsToolStripMenuItem";
 			this.showHiddenModsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
 			this.showHiddenModsToolStripMenuItem.Text = "Show hidden mods";
+			this.showHiddenModsToolStripMenuItem.ToolTipText = "Show/hide all mods, that are currently set to \"hidden\".";
 			// 
 			// toolStripSeparator3
 			// 
@@ -306,7 +342,7 @@
 			// 
 			this.editOptionsToolStripMenuItem.Name = "editOptionsToolStripMenuItem";
 			this.editOptionsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-			this.editOptionsToolStripMenuItem.Text = "Options...";
+			this.editOptionsToolStripMenuItem.Text = "Settings...";
 			// 
 			// manageCategoriesToolStripMenuItem
 			// 
@@ -319,35 +355,49 @@
 			this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importActiveModsToolStripMenuItem,
             this.cleanModsToolStripMenuItem,
-            this.resubscribeToModsToolStripMenuItem,
-            this.checkForUpdatesToolStripMenuItem});
+            this.resubscribeToModsToolStripMenuItem});
 			this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
 			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
 			this.toolsToolStripMenuItem.Text = "Tools";
 			// 
 			// importActiveModsToolStripMenuItem
 			// 
+			this.importActiveModsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importFromXCOM2ToolStripMenuItem,
+            this.importFromWotCToolStripMenuItem});
 			this.importActiveModsToolStripMenuItem.Name = "importActiveModsToolStripMenuItem";
-			this.importActiveModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+			this.importActiveModsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
 			this.importActiveModsToolStripMenuItem.Text = "Import active mods";
+			// 
+			// importFromXCOM2ToolStripMenuItem
+			// 
+			this.importFromXCOM2ToolStripMenuItem.Name = "importFromXCOM2ToolStripMenuItem";
+			this.importFromXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+			this.importFromXCOM2ToolStripMenuItem.Text = "XCOM 2";
+			this.importFromXCOM2ToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the X" +
+    "COM 2 basegame config file.";
+			// 
+			// importFromWotCToolStripMenuItem
+			// 
+			this.importFromWotCToolStripMenuItem.Name = "importFromWotCToolStripMenuItem";
+			this.importFromWotCToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+			this.importFromWotCToolStripMenuItem.Text = "WotC";
+			this.importFromWotCToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the W" +
+    "otC config file.";
 			// 
 			// cleanModsToolStripMenuItem
 			// 
 			this.cleanModsToolStripMenuItem.Name = "cleanModsToolStripMenuItem";
-			this.cleanModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-			this.cleanModsToolStripMenuItem.Text = "Clean mods";
+			this.cleanModsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.cleanModsToolStripMenuItem.Text = "Clean mods...";
 			// 
 			// resubscribeToModsToolStripMenuItem
 			// 
 			this.resubscribeToModsToolStripMenuItem.Name = "resubscribeToModsToolStripMenuItem";
-			this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-			this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to mods";
-			// 
-			// checkForUpdatesToolStripMenuItem
-			// 
-			this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-			this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-			this.checkForUpdatesToolStripMenuItem.Text = "Check for updates...";
+			this.resubscribeToModsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+			this.resubscribeToModsToolStripMenuItem.Text = "Resubscribe to uninstalled mods";
+			this.resubscribeToModsToolStripMenuItem.ToolTipText = "Subscribe to and download all workshop mods, \r\nthat are currently listed in AML, " +
+    "but no longer installed.";
 			// 
 			// runXCOM2ToolStripMenuItem
 			// 
@@ -371,6 +421,56 @@
 			this.runChallengeModeToolStripMenuItem.Name = "runChallengeModeToolStripMenuItem";
 			this.runChallengeModeToolStripMenuItem.Size = new System.Drawing.Size(146, 20);
 			this.runChallengeModeToolStripMenuItem.Text = "Run Challenge Mode";
+			// 
+			// aboutToolStripMenuItem
+			// 
+			this.aboutToolStripMenuItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+			this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.infoToolStripMenuItem,
+            this.checkForUpdatesToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.openHomepageToolStripMenuItem,
+            this.amlWikiToolStripMenuItem,
+            this.openDiscordToolStripMenuItem});
+			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+			this.aboutToolStripMenuItem.Text = "About";
+			// 
+			// infoToolStripMenuItem
+			// 
+			this.infoToolStripMenuItem.Name = "infoToolStripMenuItem";
+			this.infoToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+			this.infoToolStripMenuItem.Text = "Info...";
+			// 
+			// checkForUpdatesToolStripMenuItem
+			// 
+			this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+			this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+			this.checkForUpdatesToolStripMenuItem.Text = "Check for updates...";
+			// 
+			// toolStripSeparator4
+			// 
+			this.toolStripSeparator4.Name = "toolStripSeparator4";
+			this.toolStripSeparator4.Size = new System.Drawing.Size(186, 6);
+			// 
+			// openHomepageToolStripMenuItem
+			// 
+			this.openHomepageToolStripMenuItem.Name = "openHomepageToolStripMenuItem";
+			this.openHomepageToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+			this.openHomepageToolStripMenuItem.Text = "AML Project Page";
+			// 
+			// amlWikiToolStripMenuItem
+			// 
+			this.amlWikiToolStripMenuItem.Name = "amlWikiToolStripMenuItem";
+			this.amlWikiToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+			this.amlWikiToolStripMenuItem.Text = "AML Wiki";
+			// 
+			// openDiscordToolStripMenuItem
+			// 
+			this.openDiscordToolStripMenuItem.Name = "openDiscordToolStripMenuItem";
+			this.openDiscordToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+			this.openDiscordToolStripMenuItem.Text = "AML Discord Channel";
+			this.openDiscordToolStripMenuItem.ToolTipText = "Opens a Discord invite link to our channel \r\non the XCOM 2 Modding server.";
 			// 
 			// error_provider
 			// 
@@ -497,6 +597,7 @@
 			this.modlist_ListObjectListView.TabIndex = 0;
 			this.modlist_ListObjectListView.TintSortColumn = true;
 			this.modlist_ListObjectListView.UseCompatibleStateImageBehavior = false;
+			this.modlist_ListObjectListView.UseFilterIndicator = true;
 			this.modlist_ListObjectListView.UseFiltering = true;
 			this.modlist_ListObjectListView.UseHyperlinks = true;
 			this.modlist_ListObjectListView.View = System.Windows.Forms.View.Details;
@@ -657,7 +758,7 @@
 			// 
 			// panel2
 			// 
-			this.panel2.Controls.Add(this.checkBox1);
+			this.panel2.Controls.Add(this.cEnableGrouping);
 			this.panel2.Controls.Add(this.modlist_toggleGroupsButton);
 			this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.panel2.Location = new System.Drawing.Point(220, 0);
@@ -666,25 +767,26 @@
 			this.panel2.Size = new System.Drawing.Size(350, 30);
 			this.panel2.TabIndex = 2;
 			// 
-			// checkBox1
+			// cEnableGrouping
 			// 
-			this.checkBox1.AutoSize = true;
-			this.checkBox1.Location = new System.Drawing.Point(94, 7);
-			this.checkBox1.Name = "checkBox1";
-			this.checkBox1.Size = new System.Drawing.Size(122, 17);
-			this.checkBox1.TabIndex = 1;
-			this.checkBox1.Text = "Show Dupe Indexes";
-			this.checkBox1.UseVisualStyleBackColor = true;
-			this.checkBox1.Visible = false;
-			this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+			this.cEnableGrouping.AutoSize = true;
+			this.cEnableGrouping.Checked = true;
+			this.cEnableGrouping.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cEnableGrouping.Location = new System.Drawing.Point(144, 7);
+			this.cEnableGrouping.Name = "cEnableGrouping";
+			this.cEnableGrouping.Size = new System.Drawing.Size(103, 17);
+			this.cEnableGrouping.TabIndex = 1;
+			this.cEnableGrouping.Text = "Enable grouping";
+			this.cEnableGrouping.UseVisualStyleBackColor = true;
+			this.cEnableGrouping.CheckedChanged += new System.EventHandler(this.cEnableGrouping_CheckedChanged);
 			// 
 			// modlist_toggleGroupsButton
 			// 
 			this.modlist_toggleGroupsButton.Location = new System.Drawing.Point(3, 3);
 			this.modlist_toggleGroupsButton.Name = "modlist_toggleGroupsButton";
-			this.modlist_toggleGroupsButton.Size = new System.Drawing.Size(85, 23);
+			this.modlist_toggleGroupsButton.Size = new System.Drawing.Size(132, 23);
 			this.modlist_toggleGroupsButton.TabIndex = 0;
-			this.modlist_toggleGroupsButton.Text = "Toggle Groups";
+			this.modlist_toggleGroupsButton.Text = "Expand/collapse groups";
 			this.modlist_toggleGroupsButton.UseVisualStyleBackColor = true;
 			this.modlist_toggleGroupsButton.Click += new System.EventHandler(this.modlist_toggleGroupsButton_Click);
 			// 
@@ -712,8 +814,19 @@
 			this.modlist_filterClearButton.Name = "modlist_filterClearButton";
 			this.modlist_filterClearButton.Size = new System.Drawing.Size(22, 22);
 			this.modlist_filterClearButton.TabIndex = 1;
+			this.toolTip.SetToolTip(this.modlist_filterClearButton, "Clear filter");
 			this.modlist_filterClearButton.UseVisualStyleBackColor = true;
 			this.modlist_filterClearButton.Click += new System.EventHandler(this.modlist_filterClearButton_Click);
+			// 
+			// modlist_FilterCueTextBox
+			// 
+			this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+			this.modlist_FilterCueTextBox.CueText = "Filter Mods";
+			this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
+			this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
+			this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
+			this.modlist_FilterCueTextBox.TabIndex = 1;
+			this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
 			// 
 			// LauchOptionsPanel
 			// 
@@ -851,6 +964,7 @@
 			// 
 			// modinfo_details_tab
 			// 
+			this.modinfo_details_tab.Controls.Add(this.btnDescUndo);
 			this.modinfo_details_tab.Controls.Add(this.btnDescSave);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_CreatedLabel);
 			this.modinfo_details_tab.Controls.Add(this.modinfo_info_DescriptionLabel);
@@ -870,14 +984,25 @@
 			this.modinfo_details_tab.Text = "Info";
 			this.modinfo_details_tab.UseVisualStyleBackColor = true;
 			// 
+			// btnDescUndo
+			// 
+			this.btnDescUndo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnDescUndo.Location = new System.Drawing.Point(6, 115);
+			this.btnDescUndo.Name = "btnDescUndo";
+			this.btnDescUndo.Size = new System.Drawing.Size(84, 23);
+			this.btnDescUndo.TabIndex = 12;
+			this.btnDescUndo.Text = "Undo";
+			this.btnDescUndo.UseVisualStyleBackColor = true;
+			this.btnDescUndo.Click += new System.EventHandler(this.btnDescUndo_Click);
+			// 
 			// btnDescSave
 			// 
-			this.btnDescSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.btnDescSave.Location = new System.Drawing.Point(7, 75);
+			this.btnDescSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnDescSave.Location = new System.Drawing.Point(6, 86);
 			this.btnDescSave.Name = "btnDescSave";
-			this.btnDescSave.Size = new System.Drawing.Size(83, 23);
+			this.btnDescSave.Size = new System.Drawing.Size(84, 23);
 			this.btnDescSave.TabIndex = 11;
-			this.btnDescSave.Text = "Save Description";
+			this.btnDescSave.Text = "Save";
 			this.btnDescSave.UseVisualStyleBackColor = true;
 			this.btnDescSave.Click += new System.EventHandler(this.btnDescSave_Click);
 			// 
@@ -893,7 +1018,7 @@
 			// modinfo_info_DescriptionLabel
 			// 
 			this.modinfo_info_DescriptionLabel.AutoSize = true;
-			this.modinfo_info_DescriptionLabel.Location = new System.Drawing.Point(6, 58);
+			this.modinfo_info_DescriptionLabel.Location = new System.Drawing.Point(6, 59);
 			this.modinfo_info_DescriptionLabel.Name = "modinfo_info_DescriptionLabel";
 			this.modinfo_info_DescriptionLabel.Size = new System.Drawing.Size(60, 13);
 			this.modinfo_info_DescriptionLabel.TabIndex = 9;
@@ -1075,6 +1200,7 @@
 			this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
 			this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
 			this.modinfo_ConfigFCTB.IsReplaceMode = false;
 			this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
 			this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1087,6 +1213,19 @@
 			this.modinfo_ConfigFCTB.WordWrap = true;
 			this.modinfo_ConfigFCTB.Zoom = 100;
 			this.modinfo_ConfigFCTB.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.modinfo_ConfigFCTB_TextChanged);
+			// 
+			// modinfo_config_FileSelectCueComboBox
+			// 
+			this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
+			this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
+			this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
+			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
+			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
+			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
+			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
+			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
+			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
 			// 
 			// modinfo_config_buttonsTableLayoutPanel
 			// 
@@ -1432,46 +1571,6 @@
 			this.fillPanel.TabIndex = 6;
 			this.fillPanel.Visible = false;
 			// 
-			// appRestartPendingLabel
-			// 
-			this.appRestartPendingLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.appRestartPendingLabel.ForeColor = System.Drawing.Color.Red;
-			this.appRestartPendingLabel.Name = "appRestartPendingLabel";
-			this.appRestartPendingLabel.Size = new System.Drawing.Size(158, 17);
-			this.appRestartPendingLabel.Text = "Application restart pending";
-			this.appRestartPendingLabel.ToolTipText = "Some changes to the settings won\'t take effect,\r\nuntil after the application has " +
-    "been restarted.";
-			this.appRestartPendingLabel.Visible = false;
-			// 
-			// labelFillsFreeSpace
-			// 
-			this.labelFillsFreeSpace.Name = "labelFillsFreeSpace";
-			this.labelFillsFreeSpace.Size = new System.Drawing.Size(678, 17);
-			this.labelFillsFreeSpace.Spring = true;
-			// 
-			// modlist_FilterCueTextBox
-			// 
-			this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-			this.modlist_FilterCueTextBox.CueText = "Filter Mods";
-			this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
-			this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
-			this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
-			this.modlist_FilterCueTextBox.TabIndex = 1;
-			this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
-			// 
-			// modinfo_config_FileSelectCueComboBox
-			// 
-			this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
-			this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
-			this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
-			this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
-			this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
-			this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
-			this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
-			this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-			this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1485,7 +1584,7 @@
 			this.MainMenuStrip = this.main_menustrip;
 			this.MinimumSize = new System.Drawing.Size(800, 600);
 			this.Name = "MainForm";
-			this.Text = "XCOM 2 Mod Launcher";
+			this.Text = "XCOM 2 Alternative Mod Launcher";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.Shown += new System.EventHandler(this.MainForm_Shown);
@@ -1629,7 +1728,7 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Button modlist_filterClearButton;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox cEnableGrouping;
         private BrightIdeasSoftware.OLVColumn olvcSavedIni;
         private System.Windows.Forms.TableLayoutPanel modinfo_config_buttonsTableLayoutPanel;
         private System.Windows.Forms.Button modinfo_config_RemoveButton;
@@ -1649,7 +1748,6 @@
         private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
         private System.Windows.Forms.FlowLayoutPanel LauchOptionsPanel;
 		private System.Windows.Forms.ToolStripMenuItem manageCategoriesToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
 		private System.Windows.Forms.ToolStrip modTabToolStrip;
 		private System.Windows.Forms.ToolStripDropDownButton quickLaunchToolstripButton;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
@@ -1659,5 +1757,15 @@
 		private System.Windows.Forms.ToolStripMenuItem reviewToolStripMenuItem;
 		private System.Windows.Forms.ToolStripStatusLabel labelFillsFreeSpace;
 		private System.Windows.Forms.ToolStripStatusLabel appRestartPendingLabel;
+		private System.Windows.Forms.Button btnDescUndo;
+		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+		private System.Windows.Forms.ToolStripMenuItem openHomepageToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem openDiscordToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem amlWikiToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem importFromXCOM2ToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem importFromWotCToolStripMenuItem;
 	}
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
@@ -62,18 +63,21 @@ namespace XCOM2Launcher
                     return;
                 }
 
-                if (!SteamAPIWrapper.Init())
-                {
-                    MessageBox.Show("Please start steam first!");
+                if (!SteamAPIWrapper.Init()) {
+                    StringBuilder message = new StringBuilder();
+                    message.AppendLine("Please make sure that:");
+                    message.AppendLine("- Steam is running");
+                    message.AppendLine("- the file steam_appid.txt exists in the AML folder");
+                    message.AppendLine("- neither (or both) of Steam and AML are running\n  with admin privileges");
+                    MessageBox.Show(message.ToString(), "Error - unable to detect Steam!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                // SteamWorkshop.StartCallbackService();
 
                 // Load settings
                 var settings = InitializeSettings();
                 if (settings == null)
                     return;
-                
+
                 // Check for update
                 if (!IsDebugBuild && settings.CheckForUpdates)
                 {
