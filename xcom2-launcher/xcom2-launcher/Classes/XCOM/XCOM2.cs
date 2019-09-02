@@ -130,7 +130,7 @@ namespace XCOM2Launcher.XCOM
                 new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs")?
                     .Select(
                         path => Path.IsPathRooted(path)
-                            ? path
+                            ? path.EndsWith(@"\") ? path : path + @"\"
                             : Path.GetFullPath(Path.Combine(GameDir, "bin", "Win64", path))
                     )
                     .Where(Directory.Exists)

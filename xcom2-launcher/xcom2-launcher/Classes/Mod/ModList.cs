@@ -171,6 +171,12 @@ namespace XCOM2Launcher.Mod
                     $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
                 return null;
             }
+            catch (UnauthorizedAccessException)
+            {
+                // the user probably added a system folder or a root directory as mod folder
+                // where AML has no access rights to all or some of the sub-folders
+                return null;
+            }
 
             return infoFile;
         }

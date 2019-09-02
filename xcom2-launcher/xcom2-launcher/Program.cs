@@ -228,53 +228,50 @@ namespace XCOM2Launcher
         {
             var firstRun = !File.Exists("settings.json");
 
-	        var settings = firstRun ? new Settings() : Settings.Instance;
+            var settings = firstRun ? new Settings() : Settings.Instance;
 
-	        if (settings.ShowUpgradeWarning && !firstRun)
-	        {
-		        MessageBoxManager.Cancel = "Exit";
-		        MessageBoxManager.OK = "Continue";
-				MessageBoxManager.Register();
-				var choice = MessageBox.Show(
-					"WARNING!!\n\nThis launcher is NOT COMPATIBLE with the old 'settings.json' file.\nStop NOW and launch the old version to export a profile of your mods WITH GROUPS!\nOnce that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\nAfter loading, import the profile you saved to recover groups.\n\nIf you are not ready to do this, click 'Exit' to leave with no changes.",
-					"WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Stop, MessageBoxDefaultButton.Button2);
-				if (choice == DialogResult.Cancel) Environment.Exit(0);
-				MessageBoxManager.Unregister();
-			}
+            // Logic behind this:
+            // If the field ShowUpgradeWarning doesn't exists in the loaded settings file; it will be initialized to its default value "true".
+            // In that case, an old incompatible settings version is assumed and we issue a warning.
+            if (settings.ShowUpgradeWarning && !firstRun)
+            {
+                MessageBoxManager.Cancel = "Exit";
+                MessageBoxManager.OK = "Continue";
+                MessageBoxManager.Register();
+                var choice = MessageBox.Show("This launcher version is NOT COMPATIBLE with the old 'settings.json' file.\n" +
+                                             "Stop NOW and launch the old version to export a profile of your mods INCLUDING GROUPS!\n" +
+                                             "Once that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\n" +
+                                             "After loading, import the profile you saved to recover groups.\n\n" +
+                                             "If you are not ready to do this, click 'Exit' to leave with no changes.",
+                                             "WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
-			settings.ShowUpgradeWarning = false;
+                if (choice == DialogResult.Cancel)
+                    Environment.Exit(0);
 
-			// Verify Game Path
-			if (!Directory.Exists(settings.GamePath))
+                MessageBoxManager.Unregister();
+            }
+
+            settings.ShowUpgradeWarning = false;
+
+            // Verify Game Path
+            if (!Directory.Exists(settings.GamePath))
                 settings.GamePath = XCOM2.DetectGameDir();
 
             if (settings.GamePath == "")
                 MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.");
 
-            // Verify Mod Paths
-            var pathsToEdit = settings.ModPaths.Where(m => !m.EndsWith("\\")).ToList();
-            foreach (var modPath in pathsToEdit)
+            // Make sure, that all mod paths have a trailing backslash
+            var pathsWithMissingTrailingBackSlash = settings.ModPaths.Where(m => !m.EndsWith(@"\")).ToList();
+            for (var i = 0; i < pathsWithMissingTrailingBackSlash.Count; i++)
             {
-                settings.ModPaths.Add(modPath + "\\");
-                settings.ModPaths.Remove(modPath);
+                pathsWithMissingTrailingBackSlash[i] += @"\";
             }
 
-            var oldPaths = settings.ModPaths.Where(modPath => !Directory.Exists(modPath)).ToList();
-            foreach (var modPath in oldPaths)
-                settings.ModPaths.Remove(modPath);
+            // Check and potentially add new mod paths from XCOM ini file.
+            settings.ModPaths.AddRange(XCOM2.DetectModDirs().Where(modPath => !settings.ModPaths.Contains(modPath)));
 
-            foreach (var modPath in XCOM2.DetectModDirs())
-            {
-                if (!settings.ModPaths.Contains(modPath))
-                {
-                    if (!settings.ModPaths.Contains(modPath + "\\"))
-                    {
-                        settings.ModPaths.Add(modPath);
-                    }
-                }
-
-            }
-
+            // Remove obsolete mod paths
+            settings.ModPaths.RemoveAll(modPath => !Directory.Exists(modPath));
 
             if (settings.ModPaths.Count == 0)
                 MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
@@ -287,14 +284,14 @@ namespace XCOM2Launcher
                     cat.Index = ++index;
 
                 // Verify Mods 
-	            foreach (var mod in settings.Mods.All)
-	            {
-		            if (!settings.ModPaths.Any(mod.IsInModPath))
-						mod.AddState(ModState.NotLoaded);
+                foreach (var mod in settings.Mods.All)
+                {
+                    if (!settings.ModPaths.Any(mod.IsInModPath))
+                        mod.AddState(ModState.NotLoaded);
 
-					if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
+                    if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
                     {
-						mod.AddState(ModState.NotInstalled);
+                        mod.AddState(ModState.NotInstalled);
                     }
                     else if (!File.Exists(mod.GetModInfoFile()))
                     {
@@ -302,12 +299,12 @@ namespace XCOM2Launcher
                         if (newModInfo != null)
                             mod.ID = Path.GetFileNameWithoutExtension(newModInfo);
                         else
-						    mod.AddState(ModState.NotInstalled);
+                            mod.AddState(ModState.NotInstalled);
                     }
 
-	                // tags clean up
-	                mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
-	            }
+                    // tags clean up
+                    mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
+                }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();
                 if (newlyBrokenMods.Count > 0)
@@ -319,7 +316,7 @@ namespace XCOM2Launcher
 
                     foreach (var m in newlyBrokenMods)
                         m.isHidden = true;
-				}
+                }
             }
 
             // import mods
