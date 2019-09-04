@@ -551,9 +551,6 @@ namespace XCOM2Launcher.Forms
                 renameItem = new MenuItem("Rename");
                 renameItem.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
 
-                addTagItem = new MenuItem("Add tag");
-                addTagItem.Click += (sender, args) => modlist_ListObjectListView.StartCellEdit(currentItem, olvcTags.Index);
-
                 showInExplorerItem = new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); });
                 menu.MenuItems.Add(showInExplorerItem);
 
@@ -567,28 +564,24 @@ namespace XCOM2Launcher.Forms
                 }
             }
 
-            // create items that appear only when multiple mods are selected
-            if (selectedMods.Count > 1)
+            addTagItem = new MenuItem("Add tag(s)...");
+            addTagItem.Click += (sender, args) =>
             {
-                addTagItem = new MenuItem("Add tag(s)...");
-                addTagItem.Click += (sender, args) =>
+                var newTag = Interaction.InputBox($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedModCount} selected mod(s).", "Add tag(s)");
+
+                if (newTag == "")
+                    return;
+
+                var tags = newTag.Split(';');
+
+                foreach (ModEntry mod in modlist_ListObjectListView.SelectedObjects)
                 {
-                    var newTag = Interaction.InputBox($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedModCount} selected mods.", "Add tag(s)");
-
-                    if (newTag == "")
-                        return;
-
-                    var tags = newTag.Split(';');
-
-                    foreach (ModEntry mod in modlist_ListObjectListView.SelectedObjects)
+                    foreach (string tag in tags)
                     {
-                        foreach (string tag in tags)
-                        {
-                            AddTag(mod, tag.Trim());
-                        }
+                        AddTag(mod, tag.Trim());
                     }
-                };
-            }
+                }
+            };
 
             // Move to ...
             var moveToCategoryItem = new MenuItem("Move to category...");
@@ -656,7 +649,7 @@ namespace XCOM2Launcher.Forms
                 singleWorker.RunWorkerAsync();
             });
 
-            if (ModList.SelectedObjects.Any(mod => mod.Source == ModSource.SteamWorkshop))
+            if (ModList.SelectedObjects.Any(mod => mod.WorkshopID > 0))
             {
                 List<ModEntry> modsToUpdate = new List<ModEntry>(ModList.SelectedObjects.Where(mod => mod.Source == ModSource.SteamWorkshop));
 
@@ -714,9 +707,7 @@ namespace XCOM2Launcher.Forms
 
             menu.MenuItems.Add(updateItem);
             menu.MenuItems.Add("-");
-
-            if (addTagItem != null)
-                menu.MenuItems.Add(addTagItem);
+            menu.MenuItems.Add(addTagItem);
 
             if (fetchWorkshopTagsItem != null)
                 menu.MenuItems.Add(fetchWorkshopTagsItem);

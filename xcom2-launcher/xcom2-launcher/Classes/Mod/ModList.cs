@@ -139,6 +139,7 @@ namespace XCOM2Launcher.Mod
 
             if (source == ModSource.SteamWorkshop)
             {
+                // for Workshop mods, the folder name represents the Workshop-Id
                 var s = modDir.Split(Path.DirectorySeparatorChar).Last();
 
                 if (long.TryParse(s, out var workShopId))
@@ -151,6 +152,11 @@ namespace XCOM2Launcher.Mod
                                     $"\nPlease check that the following directory conforms to valid workshop numbering.\n\nPath: {modDir}");
                     return null;
                 }
+            }
+            else if (source == ModSource.Manual)
+            {
+                // for mods from a custom mod path with custom folder names, we check if the XComMod file contains a Workshop-Id (i.e. publishedfileid)
+                mod.WorkshopID = modinfo.PublishedFileID;
             }
 
             AddMod(modinfo.Category, mod);
