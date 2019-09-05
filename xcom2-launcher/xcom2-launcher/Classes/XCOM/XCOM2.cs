@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using Sentry;
 using Steamworks;
@@ -11,6 +12,8 @@ namespace XCOM2Launcher.XCOM
 {
     public static class XCOM2
     {
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+
         public const uint APPID = 268500;
 
         private static string _gameDir;
@@ -39,9 +42,9 @@ namespace XCOM2Launcher.XCOM
         public static string DetectGameDir()
         {
             // try steam
-            string gamedir;
-            if (SteamApps.GetAppInstallDir((AppId_t) APPID, out gamedir, 100) > 0 && Directory.Exists(gamedir))
+            if (SteamApps.GetAppInstallDir((AppId_t) APPID, out var gamedir, 100) > 0 && Directory.Exists(gamedir))
             {
+                Log.Info("Game directory detected using Steam " + gamedir);
                 _gameDir = gamedir;
                 return gamedir;
             }
@@ -51,23 +54,26 @@ namespace XCOM2Launcher.XCOM
             foreach (var dir in dirs.Where(dir => dir.ToLower().Contains("\\steamapps\\")))
             {
                 _gameDir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
+                Log.Warn("Game directory detected from fallback method " + _gameDir);
                 return _gameDir;
             }
 
+            Log.Error("Unable to detect game directory");
             // abandon hope
             return "";
         }
 
-		/// <summary>
-		/// Runs the game with the selected arguments
-		/// </summary>
-		/// <param name="gameDir"></param>
-		/// <param name="args"></param>
+        /// <summary>
+        /// Runs the game with the selected arguments
+        /// </summary>
+        /// <param name="gameDir"></param>
+        /// <param name="args"></param>
         public static void RunGame(string gameDir, string args)
         {
+            Log.Info("Starting XCOM 2 (vanilla)");
+
             if (!SteamAPIWrapper.Init())
                 MessageBox.Show("Could not connect to steam.");
-
 
             var p = new Process
             {
@@ -85,15 +91,16 @@ namespace XCOM2Launcher.XCOM
         }
 
         /// <summary>
-		/// Runs War of the Chosen with the selected arguments
-		/// </summary>
-		/// <param name="gameDir"></param>
-		/// <param name="args"></param>
+        /// Runs War of the Chosen with the selected arguments
+        /// </summary>
+        /// <param name="gameDir"></param>
+        /// <param name="args"></param>
         public static void RunWotC(string gameDir, string args)
         {
+            Log.Info("Starting WotC");
+
             if (!SteamAPIWrapper.Init())
                 MessageBox.Show("Could not connect to steam.");
-
 
             var p = new Process
             {
@@ -150,6 +157,7 @@ namespace XCOM2Launcher.XCOM
             }
             catch (IOException ex)
             {
+                Log.Warn("Unable to access XComModOptions.ini", ex);
                 SentrySdk.CaptureException(ex);
                 Debug.Fail(ex.Message);
                 return new string[0];

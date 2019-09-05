@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Steamworks;
@@ -16,6 +17,7 @@ namespace XCOM2Launcher.Forms
 {
     public partial class MainForm
     {
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 
@@ -102,6 +104,7 @@ namespace XCOM2Launcher.Forms
             {
                 // Steamworks not initialized?
                 // Game taking over?
+                Log.Warn("Error checking for new mods", ex);
                 SentrySdk.CaptureException(ex);
                 status_toolstrip_label.Text = "Error checking for new mods.";
                 return;
@@ -258,11 +261,14 @@ namespace XCOM2Launcher.Forms
             // Check for WOTC only mods
             if (Settings.Mods.Active.Count(e => e.BuiltForWOTC) > 0)
             {
-                if (FlexibleMessageBox.Show(this, 
-                    "Are you sure you want to proceed? Please be warned that this is very likely to crash your game. Offending mods:\r\n" + 
-                    String.Join("\r\n", Settings.Mods.Active.Where(e => e.BuiltForWOTC).Select(e => e.Name)),
-                    "You are trying to launch vanilla game with mods built for WOTC", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (FlexibleMessageBox.Show(this,
+                                            "Are you sure you want to proceed? Please be warned that this is very likely to crash your game. Offending mods:\r\n" +
+                                            String.Join("\r\n", Settings.Mods.Active.Where(e => e.BuiltForWOTC).Select(e => e.Name)),
+                                            "You are trying to launch vanilla game with mods built for WOTC", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    Log.Warn("User chose to run Vanilla XCOM with WotC mods");
                     RunVanilla();
+                }
             }
             else
             {

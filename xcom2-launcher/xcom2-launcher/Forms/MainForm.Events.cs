@@ -31,34 +31,52 @@ namespace XCOM2Launcher.Forms
             runChallengeModeToolStripMenuItem.Click += (a, b) => { RunChallengeMode(); };
 
             #region Menu->File
-            saveToolStripMenuItem.Click += delegate { Save(Settings.Instance.LastLaunchedWotC); };
+
+            saveToolStripMenuItem.Click += delegate
+            {
+                Log.Info("Menu->File->Save settings");
+                Save(Settings.Instance.LastLaunchedWotC);
+            };
 
             reloadToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->File->Reset settings");
                 // Confirmation dialog
-                var r = MessageBox.Show("Unsaved changes will be lost.\r\nAre you sure?", "Reload mod list?", MessageBoxButtons.OKCancel);
+                var r = MessageBox.Show("Unsaved changes will be lost.\r\nAre you sure?", "Reload settings?", MessageBoxButtons.OKCancel);
                 if (r != DialogResult.OK)
                     return;
 
                 Reset();
             };
-            searchForModsToolStripMenuItem.Click += delegate { Settings.ImportMods(); };
+            searchForModsToolStripMenuItem.Click += delegate
+            {
+                Log.Info("Menu->File->Search for new mods");
+                Settings.ImportMods();
+            };
 
             updateEntriesToolStripMenuItem.Click += delegate
             {
                 if (_updateWorker.IsBusy)
                     return;
 
+                Log.Info("Menu->File->Update mod info");
                 CheckSteamForUpdates();
             };
 
-            exitToolStripMenuItem.Click += (sender, e) => { Close(); };
+            exitToolStripMenuItem.Click += (sender, e) =>
+            {
+                Log.Info("Menu->Close");
+                Close();
+            };
+
             #endregion Menu->File
-            
+
             #region Menu->Options
+
             // show hidden
             showHiddenModsToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->File->Update mod info");
                 Settings.ShowHiddenElements = showHiddenModsToolStripMenuItem.Checked;
                 olvcHidden.IsVisible = showHiddenModsToolStripMenuItem.Checked;
                 RefreshModList(true);
@@ -67,6 +85,7 @@ namespace XCOM2Launcher.Forms
             // open Settings
             editOptionsToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->Options->Settings");
                 var dialog = new SettingsDialog(Settings);
 
                 if (dialog.ShowDialog() == DialogResult.OK)
@@ -95,18 +114,21 @@ namespace XCOM2Launcher.Forms
 
             importFromXCOM2ToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->Tools->Import vanilla");
                 XCOM2.ImportActiveMods(Settings, false);
                 RefreshModList();
             };
 
             importFromWotCToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->Tools->Import WotC");
                 XCOM2.ImportActiveMods(Settings, true);
                 RefreshModList();
             };
 
             resubscribeToModsToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->Tools->Resubscribe");
                 var modsToDownload = Mods.All.Where(m => m.State.HasFlag(ModState.NotInstalled) && m.Source == ModSource.SteamWorkshop).ToList();
                 var choice = false;
 
@@ -121,6 +143,7 @@ namespace XCOM2Launcher.Forms
                 {
                     foreach (var m in modsToDownload)
                     {
+                        Log.Info("Subscribe and download " + m.ID);
                         Workshop.Subscribe((ulong) m.WorkshopID);
                         Workshop.DownloadItem((ulong) m.WorkshopID);
                     }
@@ -135,12 +158,15 @@ namespace XCOM2Launcher.Forms
 
             infoToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->About->About");
                 AboutBox about = new AboutBox();
                 about.ShowDialog();
             };
 
             checkForUpdatesToolStripMenuItem.Click += delegate
             {
+                Log.Info("Menu->About->Check Update");
+
                 if (!Program.CheckForUpdate())
                 {
                     MessageBox.Show("No updates available", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -198,19 +224,24 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-		private void ManageCategoriesToolStripMenuItem_Click(object sender, EventArgs e) {
-			CategoryManager catManager = new CategoryManager(Settings);
-			var result = catManager.ShowDialog();
+        private void ManageCategoriesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Log.Info("Menu->Options->Categories");
 
-			if (result == DialogResult.OK) {
-				RefreshModList();
-			}
-		}
+            CategoryManager catManager = new CategoryManager(Settings);
+            var result = catManager.ShowDialog();
 
-		private void Resubscribe_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
+            if (result == DialogResult.OK)
+            {
+                RefreshModList();
+            }
+        }
+
+        private void Resubscribe_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
         {
             var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
+            // review: should this be (mod.State & ModState.NotInstalled)?
             if ((mod.State | ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
             {
                 mod.RemoveState(ModState.NotInstalled);
@@ -301,6 +332,7 @@ namespace XCOM2Launcher.Forms
             {
                 if (_updateWorker.CancellationPending || Disposing || IsDisposed)
                 {
+                    Log.Info("Mod update BackgroundWorker cancelled");
                     e.Cancel = true;
                     return;
                 }
@@ -311,6 +343,7 @@ namespace XCOM2Launcher.Forms
                 }
                 catch (Exception ex)
                 {
+                    Log.Warn($"Error updating mod {mod.ID}", ex);
                     SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message + "\r\n" + ex.StackTrace);
                 }
@@ -366,6 +399,7 @@ namespace XCOM2Launcher.Forms
                 return;
             }
 
+            Log.Info("Mod update BackgroundWorker finished");
             progress_toolstrip_progressbar.Visible = false;
             status_toolstrip_label.Text = StatusBarIdleString;
             RefreshModList();

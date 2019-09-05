@@ -20,6 +20,7 @@ namespace XCOM2Launcher
 {
     internal static class Program
     {
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
         public static readonly bool IsDebugBuild;
 
         static Program()
@@ -29,6 +30,8 @@ namespace XCOM2Launcher
             #else
                 IsDebugBuild = false;
             #endif
+
+            Log.Info("Application started" + (IsDebugBuild ? " (DEBUG)" : ""));
         }
 
         /// <summary>
@@ -58,6 +61,8 @@ namespace XCOM2Launcher
                 
                 if (!CheckDotNet4_7_2())
                 {
+                    Log.Warn(".NET Framework v4.7.2 required");
+
                     var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.7.2 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
                     if (result == DialogResult.Yes)
@@ -67,6 +72,8 @@ namespace XCOM2Launcher
                 }
 
                 if (!SteamAPIWrapper.Init()) {
+                    Log.Warn("Failed to detect Steam");
+
                     StringBuilder message = new StringBuilder();
                     message.AppendLine("Please make sure that:");
                     message.AppendLine("- Steam is running");
@@ -79,7 +86,10 @@ namespace XCOM2Launcher
                 // Load settings
                 var settings = InitializeSettings();
                 if (settings == null)
+                {
+                    Log.Error("Failed to initialize settings");
                     return;
+                }
 
                 // Exit if another instance of AML is already running and multiple instances are disabled.
                 if (!settings.AllowMultipleInstances && !isFirstInstance) {
@@ -106,15 +116,17 @@ namespace XCOM2Launcher
             }
             finally
             {
+                Log.Info("Shutting down...");
                 sentrySdkInstance?.Dispose();
                 Properties.Settings.Default.Save();
                 GC.KeepAlive(mutex);    // prevent the mutex from being garbage collected early
-                mutex?.Dispose();
+                mutex.Dispose();
             }
         }
 
         static void HandleUnhandledException(Exception e, string source)
         {
+            Log.Error("Unhandled exception", e);
             SentrySdk.CaptureException(e);
             File.WriteAllText("error.log", $"Sentry GUID: {Properties.Settings.Default.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
             MessageBox.Show("An unhandled exception occured. See 'error.log' in application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -129,10 +141,15 @@ namespace XCOM2Launcher
         private static IDisposable InitSentry()
         {
             if (!Properties.Settings.Default.IsSentryEnabled || IsDebugBuild)
+            {
+                Log.Info("Sentry is disabled");
                 return null;
+            }
+
+            Log.Info("Initializing Sentry");
 
             IDisposable sentrySdkInstance = null;
-
+            
             try
             {
                 sentrySdkInstance = SentrySdk.Init(o =>
@@ -158,10 +175,12 @@ namespace XCOM2Launcher
                     };
                 });
 
-                // SentrySdk.CaptureMessage("Sentry test message", SentryLevel.Debug);
+                SentrySdk.CaptureMessage("Sentry initialized");
             }
             catch (Exception ex)
             {
+                Log.Error("Sentry setup failed", ex);
+
                 // If Sentry wasn't initialized correctly we at least try to send one message to report this.
                 // (this won't throw another Ex, even if Init() failed)
                 SentrySdk.CaptureException(ex);
@@ -184,6 +203,7 @@ namespace XCOM2Launcher
 
             // Upgrade settings from previous version if required
             if (appSettings.IsSettingsUpgradeRequired) {
+                Log.Info("Upgrading ApplicationSettings from older version.");
                 appSettings.Upgrade();
                 appSettings.IsSettingsUpgradeRequired = false;
 
@@ -246,6 +266,8 @@ namespace XCOM2Launcher
             // In that case, an old incompatible settings version is assumed and we issue a warning.
             if (settings.ShowUpgradeWarning && !firstRun)
             {
+                Log.Warn("Incompatible settings.json");
+
                 MessageBoxManager.Cancel = "Exit";
                 MessageBoxManager.OK = "Continue";
                 MessageBoxManager.Register();
@@ -259,6 +281,7 @@ namespace XCOM2Launcher
                 if (choice == DialogResult.Cancel)
                     Environment.Exit(0);
 
+                Log.Warn("User ignored incompatibility");
                 MessageBoxManager.Unregister();
             }
 
@@ -269,7 +292,10 @@ namespace XCOM2Launcher
                 settings.GamePath = XCOM2.DetectGameDir();
 
             if (settings.GamePath == "")
+            {
+                Log.Warn("Unable to detect XCOM 2 installation path");
                 MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.");
+            }
 
             // Make sure, that all mod paths have a trailing backslash
             var pathsWithMissingTrailingBackSlash = settings.ModPaths.Where(m => !m.EndsWith(@"\")).ToList();
@@ -285,7 +311,10 @@ namespace XCOM2Launcher
             settings.ModPaths.RemoveAll(modPath => !Directory.Exists(modPath));
 
             if (settings.ModPaths.Count == 0)
+            {
+                Log.Warn("No XCOM 2 mod directories configured");
                 MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
+            }
 
             if (settings.Mods.Entries.Count > 0)
             {
@@ -298,19 +327,28 @@ namespace XCOM2Launcher
                 foreach (var mod in settings.Mods.All)
                 {
                     if (!settings.ModPaths.Any(mod.IsInModPath))
-                        mod.AddState(ModState.NotLoaded);
-
-                    if (!Directory.Exists(mod.Path) || !File.Exists(mod.GetModInfoFile()))
                     {
+                        Log.Warn($"The mod {mod.ID} is not located in any of the configured mod directories -> ModState.NotLoaded");
+                        mod.AddState(ModState.NotLoaded);
+                    }
+
+                    if (!Directory.Exists(mod.Path))
+                    {
+                        Log.Warn($"The mod {mod.ID} is no longer available in the directory {mod.Path} -> ModState.NotInstalled");
                         mod.AddState(ModState.NotInstalled);
                     }
                     else if (!File.Exists(mod.GetModInfoFile()))
                     {
                         string newModInfo = settings.Mods.FindModInfo(mod.Path);
                         if (newModInfo != null)
+                        {
                             mod.ID = Path.GetFileNameWithoutExtension(newModInfo);
+                        }
                         else
+                        {
+                            Log.Warn($"The XComMod file for the mod {mod.ID} is missing -> ModState.NotInstalled");
                             mod.AddState(ModState.NotInstalled);
+                        }
                     }
 
                     // tags clean up
@@ -338,6 +376,8 @@ namespace XCOM2Launcher
 
         public static bool CheckForUpdate()
         {
+            Log.Info("Checking for Updates...");
+
             try
             {
                 using (var client = new System.Net.WebClient())
@@ -347,6 +387,7 @@ namespace XCOM2Launcher
 
                     if (Settings.Instance.CheckForPreReleaseUpdates)
                     {
+                        Log.Info("Pre-Release updates enabled");
                         // fetch all releases including pre-releases and select the first/newest 
                         var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
                         var allReleases = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
@@ -360,7 +401,10 @@ namespace XCOM2Launcher
                     }
 
                     if (release == null)
+                    {
+                        Log.Warn("No release information found");
                         return false;
+                    }
 
                     var regexVersionNumber = new Regex("[^0-9.]");
 
@@ -373,6 +417,7 @@ namespace XCOM2Launcher
                         if (currentVersion.CompareTo(newVersion) < 0)
                         {
                             // New version available
+                            Log.Info("New version available " + newVersion);
                             new UpdateAvailableDialog(release, currentVersion, newVersion).ShowDialog();
                             return true;
                         }
@@ -380,6 +425,7 @@ namespace XCOM2Launcher
                     else
                     {
                         string message = $"{nameof(CheckForUpdate)}: Error parsing version information '{releaseVersionString}'.";
+                        Log.Error(message);
                         SentrySdk.CaptureMessage(message, SentryLevel.Warning);
                         Debug.Fail(message);
                     }
@@ -387,6 +433,7 @@ namespace XCOM2Launcher
             }
             catch (System.Net.WebException ex)
             {
+                Log.Warn("Web request failed", ex);
                 Debug.WriteLine(nameof(CheckForUpdate) + ": " + ex.Message);
             }
 
