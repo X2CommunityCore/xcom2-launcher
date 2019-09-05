@@ -32,6 +32,7 @@ namespace XCOM2Launcher.Forms
             ShowQuickLaunchArgumentsToggle.Checked = settings.ShowQuickLaunchArguments;
             checkForPreReleaseUpdates.Checked = settings.CheckForPreReleaseUpdates;
             useSentry.Checked = Properties.Settings.Default.IsSentryEnabled;
+            allowMutipleInstances.Checked = settings.AllowMultipleInstances;
 
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
 
@@ -126,6 +127,7 @@ namespace XCOM2Launcher.Forms
             Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
             Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
             Properties.Settings.Default.IsSentryEnabled = useSentry.Checked;
+            Settings.AllowMultipleInstances = allowMutipleInstances.Checked;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
             Settings.ArgumentList = newArguments.AsReadOnly();
