@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Sentry;
 
 namespace XCOM2Launcher.Mod
@@ -16,7 +15,7 @@ namespace XCOM2Launcher.Mod
             LoadFile(filepath);
         }
 
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModInfo));
         public const string DEFAULT_CATEGORY_NAME = "Unsorted";
 
         public int PublishedFileID { get; set; } = -1;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Sentry;
@@ -15,7 +14,7 @@ namespace XCOM2Launcher.Mod
     public class ModList
     {
         [JsonIgnore]
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModList));
 
         public Dictionary<string, ModCategory> Entries { get; } = new Dictionary<string, ModCategory>();
 
@@ -205,9 +204,10 @@ namespace XCOM2Launcher.Mod
         {
             if (mod.Index == -1)
                 mod.Index = All.Count();
+
             this[category].Entries.Add(mod);
 
-            Log.Info("New mod added " + mod.ID);
+            Log.Info($"Mod '{mod.ID}' added to category '{category}'");
         }
 
         public void RemoveMod(ModEntry mod)
@@ -215,7 +215,7 @@ namespace XCOM2Launcher.Mod
             var category = GetCategory(mod);
             this[category].Entries.Remove(mod);
 
-            Log.Info("Mod removed " + mod.ID);
+            Log.Info($"Mod '{mod.ID}' removed from category '{category}'");
         }
 
         internal void UpdateMod(ModEntry m, Settings settings)

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,7 +8,7 @@ namespace XCOM2Launcher.Mod
 {
     public static class ModChangelogCache
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModChangelogCache));
         private static readonly Dictionary<long, string> Cache = new Dictionary<long, string>();
 
         private static readonly Regex Regexp = new Regex(@"<div class=""detailBox workshopAnnouncement noFooter"">\s*<div class=""changelog headline"">\s*(.*)\s*</div>\s*<p id=""[0-9]+"">(.*)</p>", RegexOptions.Compiled);
@@ -48,6 +47,7 @@ namespace XCOM2Launcher.Mod
             }
             catch (WebException ex)
             {
+                Sentry.SentrySdk.CaptureException(ex);
                 Log.Warn($"Error loading changelog for Workshop Id: {workshopID}", ex);
                 return "An error occurred while loading the changelog.";
             }

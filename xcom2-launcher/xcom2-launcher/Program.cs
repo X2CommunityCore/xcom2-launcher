@@ -20,7 +20,7 @@ namespace XCOM2Launcher
 {
     internal static class Program
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Program));
         public static readonly bool IsDebugBuild;
 
         static Program()

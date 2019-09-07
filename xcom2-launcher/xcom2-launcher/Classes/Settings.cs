@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using XCOM2Launcher.Mod;
@@ -15,7 +14,7 @@ namespace XCOM2Launcher
     public class Settings
     {
         [JsonIgnore]
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Settings));
         [JsonIgnore]
         private static Settings _instance;
         [JsonIgnore]

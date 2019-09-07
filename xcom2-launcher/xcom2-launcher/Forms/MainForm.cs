@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Steamworks;
@@ -17,7 +16,7 @@ namespace XCOM2Launcher.Forms
 {
     public partial class MainForm
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(MainForm));
         private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
 

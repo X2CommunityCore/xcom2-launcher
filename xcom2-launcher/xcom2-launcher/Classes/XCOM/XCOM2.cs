@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using Sentry;
 using Steamworks;
@@ -12,7 +11,7 @@ namespace XCOM2Launcher.XCOM
 {
     public static class XCOM2
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType?.Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(XCOM2));
 
         public const uint APPID = 268500;
 
