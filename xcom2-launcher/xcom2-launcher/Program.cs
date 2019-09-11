@@ -227,10 +227,12 @@ namespace XCOM2Launcher
                 appSettings.Guid = Guid.NewGuid().ToString();
             }
 
-            // Version information can be used to perform version specific migrations if required.
-            if (appSettings.Version != GetCurrentVersionString()) {
+            var currentVersion = GetCurrentVersion().ToString(3);
+
+			// Version information can be used to perform version specific migrations if required.
+			if (appSettings.Version != currentVersion) {
                 // IF required at some point
-                appSettings.Version = GetCurrentVersionString();
+                appSettings.Version = currentVersion;
             }
 
             appSettings.Save();
@@ -456,14 +458,20 @@ namespace XCOM2Launcher
             return new Version(major, minor, patch);
         }
 
-        public static string GetCurrentVersionString(bool includeDebugPostfix = false) {
+        public static string GetCurrentVersionString(bool includePostfix = false) {
             var ver = GetCurrentVersion();
-
             var result = $"v{ver.Major}.{ver.Minor}.{ver.Build}";
 
-            if (IsDebugBuild && includeDebugPostfix)
-                result += " DEBUG";
-            
+            if (includePostfix)
+            {
+                if (IsDebugBuild)
+                    result += " DEBUG";
+
+                #if BETA
+                    result += " BETA";
+                #endif
+            }
+
             return result;
         }
     }

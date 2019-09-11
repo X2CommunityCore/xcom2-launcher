@@ -15,9 +15,9 @@ namespace XCOM2Launcher.Forms
         {
             Text = $"About {AssemblyTitle}";
             labelProductName.Text = AssemblyProduct;
-            labelVersion.Text = $"Version {AssemblyVersion}";
-            labelCopyright.Text = AssemblyCopyright;
-            labelCompanyName.Text = AssemblyCompany;
+            labelVersion.Text = $"{Program.GetCurrentVersionString(true)}";
+            labelCopyright.Text = $"License {AssemblyCopyright}";
+            labelCompanyName.Text = $"Created by {AssemblyCompany}";
             textBoxDescription.Text = AssemblyDescription;
         }
 
