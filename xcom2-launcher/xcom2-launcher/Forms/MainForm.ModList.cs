@@ -338,6 +338,8 @@ namespace XCOM2Launcher.Forms
             var mods = ModList.SelectedObjects.ToList();
             foreach (var mod in mods)
             {
+                Log.Info("Deleting/unsubscribing mod " + mod.ID);
+
                 // unsubscribe
                 if (mod.Source == ModSource.SteamWorkshop)
                     Steam.Workshop.Unsubscribe((ulong) mod.WorkshopID);
@@ -356,6 +358,7 @@ namespace XCOM2Launcher.Forms
                 } catch (IOException ex) {
                     string message = $"Error while deleting mod folder: {Environment.NewLine}";
                     message += $"'{mod.Path}' {Environment.NewLine} {Environment.NewLine} {ex.Message}";
+                    Log.Warn(message, ex);
                     MessageBox.Show(message, "Error");
                 }
             }
@@ -658,14 +661,15 @@ namespace XCOM2Launcher.Forms
                 {
                     if (modsToUpdate.Count > 1)
                     {
-                        var result = MessageBox.Show(
-                                                     "Are you sure you want to replace the existing tags with tags from the workshop? " +
-                                                     Environment.NewLine + $"This process will override the tags of '{modsToUpdate.Count}' mods.",
-                                                     "Fetch workshop tags", MessageBoxButtons.YesNo);
+                        var result = MessageBox.Show($"Tags from the workshop will replace the existing tags for {modsToUpdate.Count} mods." + 
+                                                     Environment.NewLine + "Do you want to continue?",
+                                                     "Use workshop tags", MessageBoxButtons.YesNo);
 
                         if (result != DialogResult.Yes)
                             return;
                     }
+
+                    Log.Info($"Fetching workshop tags for {modsToUpdate.Count} mods.");
 
                     System.ComponentModel.BackgroundWorker singleWorker = new System.ComponentModel.BackgroundWorker
                     {

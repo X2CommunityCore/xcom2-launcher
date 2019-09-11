@@ -13,6 +13,9 @@ namespace XCOM2Launcher.Mod
 {
     public class ModList
     {
+        [JsonIgnore]
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModList));
+
         public Dictionary<string, ModCategory> Entries { get; } = new Dictionary<string, ModCategory>();
 
         [JsonIgnore]
@@ -85,16 +88,23 @@ namespace XCOM2Launcher.Mod
 
         public void ImportMods(List<string> modPaths)
         {
+            Log.Info("Checking mod directories for new mods");
+
             if (modPaths == null)
                 throw new ArgumentNullException(nameof(modPaths));
 
             foreach (var dir in modPaths)
             {
                 if (!Directory.Exists(dir))
+                {
+                    Log.Info("Directory is missing: " + dir);
                     continue;
+                }
+
+                Log.Info("Checking " + dir);
 
                 // (try to) load mods
-                foreach (var modDir in Directory.GetDirectories(dir)) 
+                foreach (var modDir in Directory.GetDirectories(dir))
                 {
                     var source = modDir.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1
                         ? ModSource.SteamWorkshop
@@ -148,6 +158,7 @@ namespace XCOM2Launcher.Mod
                 }
                 else
                 {
+                    Log.Error($"Unable to parse WorkShop-Id ({s}) from Steam mod directory " + modDir);
                     MessageBox.Show("A mod could not be loaded because the workshop ID failed to parse." +
                                     $"\nPlease check that the following directory conforms to valid workshop numbering.\n\nPath: {modDir}");
                     return null;
@@ -173,6 +184,7 @@ namespace XCOM2Launcher.Mod
             }
             catch (InvalidOperationException)
             {
+                Log.Error("Multiple XComMod files in folder " + modDir);
                 MessageBox.Show(
                     $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
                 return null;
@@ -181,6 +193,7 @@ namespace XCOM2Launcher.Mod
             {
                 // the user probably added a system folder or a root directory as mod folder
                 // where AML has no access rights to all or some of the sub-folders
+                Log.Error("Unauthorized access to directory " + modDir);
                 return null;
             }
 
@@ -191,13 +204,18 @@ namespace XCOM2Launcher.Mod
         {
             if (mod.Index == -1)
                 mod.Index = All.Count();
+
             this[category].Entries.Add(mod);
+
+            Log.Info($"Mod '{mod.ID}' added to category '{category}'");
         }
 
         public void RemoveMod(ModEntry mod)
         {
             var category = GetCategory(mod);
             this[category].Entries.Remove(mod);
+
+            Log.Info($"Mod '{mod.ID}' removed from category '{category}'");
         }
 
         internal void UpdateMod(ModEntry m, Settings settings)
@@ -205,6 +223,7 @@ namespace XCOM2Launcher.Mod
             // Check if mod directory exists
             if (!Directory.Exists(m.Path))
             {
+                Log.Warn($"Hiding mod {m.ID} because the directory {m.Path} no longer exists.");
                 m.AddState(ModState.NotInstalled);
                 m.AddState(ModState.NotLoaded);
                 m.isHidden = true;
@@ -213,17 +232,21 @@ namespace XCOM2Launcher.Mod
 
             // Check if in ModPaths
             if (!settings.ModPaths.Any(modPath => m.IsInModPath(modPath)))
+            {
+                Log.Warn($"The mod {m.ID} is not located in any of the configured mod directories -> ModState.NotLoaded");
                 m.AddState(ModState.NotLoaded);
+            }
 
             // Update Source
             if (m.Source == ModSource.Unknown)
             {
                 if (m.Path.IndexOf(@"\SteamApps\workshop\", StringComparison.OrdinalIgnoreCase) != -1)
                     m.SetSource(ModSource.SteamWorkshop);
-
                 else
                     // in workshop path but not loaded via steam
                     m.SetSource(ModSource.Manual);
+
+                Log.Info("Updated unknown mod source to " + m.Source);
             }
 
             // Ensure source ID exists
@@ -237,6 +260,9 @@ namespace XCOM2Launcher.Mod
                 {
                     m.WorkshopID = new ModInfo(m.GetModInfoFile()).PublishedFileID;
                 }
+
+                if (m.WorkshopID > 0)
+                    Log.Info("Updated uninitialized WorkShop Id to " + m.WorkshopID);
             }
 
             // Fill Date Added
@@ -253,6 +279,8 @@ namespace XCOM2Launcher.Mod
 
             if (workshopDetails.m_eResult == EResult.k_EResultOK)
             {
+                Log.Debug("Processing Workshop details for " + m.ID);
+
                 if (!m.ManualName)
                     m.Name = workshopDetails.m_rgchTitle;
 
@@ -291,7 +319,10 @@ namespace XCOM2Launcher.Mod
                 if (m.Source == ModSource.SteamWorkshop)
                 {
                     if (Workshop.GetDownloadStatus((ulong) m.WorkshopID).HasFlag(EItemState.k_EItemStateNeedsUpdate))
+                    {
+                        Log.Info("Update available for " + m.ID);
                         m.AddState(ModState.UpdateAvailable);
+                    }
                 }
 
                 // Check if it is built for WOTC
@@ -303,15 +334,17 @@ namespace XCOM2Launcher.Mod
                 }
                 catch (InvalidOperationException ex)
                 {
+                    Log.Error("Failed parsing XComMod file for " + m.ID, ex);
                     SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message);
                 }
             }
             else
             {
+                Log.Debug("Processing local information for " + m.ID);
+
                 m.DateCreated = Directory.GetCreationTime(m.Path);
                 m.DateUpdated = Directory.GetLastWriteTime(m.Path);
-
 
                 // Update directory size
                 // slow, but necessary ?
@@ -332,6 +365,7 @@ namespace XCOM2Launcher.Mod
                 }
                 catch (InvalidOperationException ex)
                 {
+                    Log.Error("Failed parsing XComMod file for " + m.ID, ex);
                     SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message);
                 }

@@ -14,6 +14,8 @@ namespace XCOM2Launcher
     public class Settings
     {
         [JsonIgnore]
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Settings));
+        [JsonIgnore]
         private static Settings _instance;
         [JsonIgnore]
         private string _gamePath;
@@ -31,10 +33,12 @@ namespace XCOM2Launcher
                 }
                 catch (FileNotFoundException e)
                 {
+                    Log.Warn("settings.json not found", e);
                     MessageBox.Show("Could not find file " + e.FileName);
                 }
-                catch (JsonSerializationException)
+                catch (JsonSerializationException ex)
                 {
+                    Log.Error("Unable to parse settings.json", ex);
                     MessageBox.Show(@"settings.json could not be read.\r\nPlease delete or rename that file and try again.");
                     return null;
                 }

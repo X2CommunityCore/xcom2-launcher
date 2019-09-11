@@ -15,7 +15,8 @@ namespace XCOM2Launcher.Mod
             LoadFile(filepath);
         }
 
-		public const string DEFAULT_CATEGORY_NAME = "Unsorted";
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModInfo));
+        public const string DEFAULT_CATEGORY_NAME = "Unsorted";
 
         public int PublishedFileID { get; set; } = -1;
         public string Title { get; set; }
@@ -97,6 +98,7 @@ namespace XCOM2Launcher.Mod
             }
             catch (FormatException ex)
             {
+                Log.Error("Invalid publishedfileid: " + values["publishedfileid"], ex);
                 SentrySdk.CaptureException(ex);
                 PublishedFileID = -1;
             }
@@ -124,6 +126,7 @@ namespace XCOM2Launcher.Mod
                 }
                 catch (Exception ex)
                 {
+                    Log.Error("Failed processing contentimage: " + values["contentimage"], ex);
                     SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message);
                 }
