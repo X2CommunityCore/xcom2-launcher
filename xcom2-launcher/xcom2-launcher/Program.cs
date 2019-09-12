@@ -31,7 +31,7 @@ namespace XCOM2Launcher
                 IsDebugBuild = false;
             #endif
 
-            Log.Info("Application started" + (IsDebugBuild ? " (DEBUG)" : ""));
+            Log.Info($"Application started (AML {GetCurrentVersionString(true)})");
         }
 
         /// <summary>
