@@ -200,25 +200,20 @@ namespace XCOM2Launcher
         private static void InitAppSettings()
         {
             var appSettings = Properties.Settings.Default;
+            var currentVersion = GetCurrentVersion().ToString(3);
 
             // Upgrade settings from previous version if required
-            if (appSettings.IsSettingsUpgradeRequired) {
-                Log.Info("Upgrading ApplicationSettings from older version.");
+            if (appSettings.IsSettingsUpgradeRequired)
+            {
+                Log.Info($"Upgrading ApplicationSettings from version '{appSettings.Version}' to '{currentVersion}'.");
                 appSettings.Upgrade();
                 appSettings.IsSettingsUpgradeRequired = false;
 
-                // Ask user to opt-in for Sentry error reporting on first run or after updating to new version if it is disabled
-                if (!appSettings.IsSentryEnabled)
-                {
-                    var result = MessageBox.Show("Please help us to improve AML, by enabling anonymous error reporting! \n\n" +
-                                                 "Critical errors or other potential issues are then automatically " +
-                                                 "reported to our X2CommunityCore Sentry.io account. \n" +
-                                                 "You can enable/disable this feature at any time in the Settings dialog. \n\n" +
-                                                 "Do you want to enable anonymous error reporting now?",
-                                                 "Enable/disable AML error reporting", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                // Show Welcome Dialog and ask user to opt-in for Sentry error reporting
+                WelcomeDialog dlg = new WelcomeDialog();
+                dlg.ShowDialog();
 
-                    appSettings.IsSentryEnabled = result == DialogResult.Yes;
-                }
+                appSettings.IsSentryEnabled = dlg.UseSentry;
             }
 
             // Initialize GUID (used for error reporting)
@@ -228,9 +223,10 @@ namespace XCOM2Launcher
             }
 
             // Version information can be used to perform version specific migrations if required.
-            if (appSettings.Version != GetCurrentVersionString()) {
+            if (appSettings.Version != currentVersion)
+            {
                 // IF required at some point
-                appSettings.Version = GetCurrentVersionString();
+                appSettings.Version = currentVersion;
             }
 
             appSettings.Save();
@@ -456,14 +452,20 @@ namespace XCOM2Launcher
             return new Version(major, minor, patch);
         }
 
-        public static string GetCurrentVersionString(bool includeDebugPostfix = false) {
+        public static string GetCurrentVersionString(bool includePostfix = false) {
             var ver = GetCurrentVersion();
-
             var result = $"v{ver.Major}.{ver.Minor}.{ver.Build}";
 
-            if (IsDebugBuild && includeDebugPostfix)
-                result += " DEBUG";
-            
+            if (includePostfix)
+            {
+                if (IsDebugBuild)
+                    result += " DEBUG";
+
+                #if BETA
+                    result += " BETA";
+                #endif
+            }
+
             return result;
         }
     }
