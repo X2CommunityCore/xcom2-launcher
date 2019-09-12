@@ -1,3 +1,5 @@
+![AML-Logo](https://user-images.githubusercontent.com/936992/64764499-79d3eb00-d542-11e9-8fb4-0698443a2233.png)
+
 The Alternative Mod Launcher (AML) is a replacement for the default XCOM 2 game launcher.
 
 If you have any questions or suggestions regarding AML, you are welcome to join our [Discord channel](https://discord.gg/QHSVGRn) on the "XCOM 2 Modding" server.
@@ -49,4 +51,5 @@ Released under GPL, due to [objectlistview](http://objectlistview.sourceforge.ne
 If you encounter issues, please [consider reporting it](https://github.com/X2CommunityCore/xcom2-launcher/issues). You may want to include the AML.log and/or settings.json files in the issue report. Those files are located in the AML folder. 
 
 # Credit
-The XCOM 2 and War of the Chosen icons are property of Firaxis.
+* The AML Logo is based on the original XCOM 2 logo by Fireaxis and was created by [Puma_The_Great](https://steamcommunity.com/id/Sexiest_Man_Alive/).
+* The XCOM 2 and War of the Chosen icons are property of Firaxis.
