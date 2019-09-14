@@ -97,7 +97,9 @@ namespace XCOM2Launcher.Mod
 
             if (CleanBBCode)
             {
-                dsc = dsc.Replace(@"\", @"\\");
+                dsc = dsc.Replace(@"\", @"\'5c");
+                dsc = dsc.Replace(@"{", @"\'7b");
+                dsc = dsc.Replace(@"}", @"\'7d");
                 Regex Regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
                 dsc = Regexp.Replace(dsc, RTFEvaluator);
                 Regex replace_linebreaks = new Regex(@"[\r\n]{1,2}");
