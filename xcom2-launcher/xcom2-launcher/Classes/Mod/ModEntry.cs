@@ -116,9 +116,13 @@ namespace XCOM2Launcher.Mod
                 {
                     return @"}}}";
                 }
-                else
+                else if (match.Groups[2].Value.Length > 3 && match.Groups[2].Value[3] == '=')
                 {
                     return @"{\field{\*\fldinst{HYPERLINK """ + match.Groups[2].Value.Substring(4) + @"""}}{\fldrslt{\ul ";
+                }
+                else
+                {
+                    return @"{{{";
                 }
             }
             else
