@@ -121,6 +121,10 @@
     <Compile Include="Classes\GitHub\User.cs" />
     <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
     <Compile Include="Classes\Helper\MessageBoxManager.cs" />
+    <Compile Include="Classes\Log4Net\AssemblyExtensions.cs" />
+    <Compile Include="Classes\Log4Net\Constants.cs" />
+    <Compile Include="Classes\Log4Net\LevelMapping.cs" />
+    <Compile Include="Classes\Log4Net\SentryAppender.cs" />
     <Compile Include="Classes\Mod\ColorExtensions.cs" />
     <Compile Include="Classes\Mod\ModChangelogCache.cs" />
     <Compile Include="Classes\Mod\ModConflict.cs" />
@@ -261,10 +265,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="GitVersionConfig.yaml" />
     <None Include="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using Sentry;
 using Steamworks;
 using XCOM2Launcher.Steam;
 
@@ -335,7 +334,6 @@ namespace XCOM2Launcher.Mod
                 catch (InvalidOperationException ex)
                 {
                     Log.Error("Failed parsing XComMod file for " + m.ID, ex);
-                    SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message);
                 }
             }
@@ -366,7 +364,6 @@ namespace XCOM2Launcher.Mod
                 catch (InvalidOperationException ex)
                 {
                     Log.Error("Failed parsing XComMod file for " + m.ID, ex);
-                    SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message);
                 }
             }
