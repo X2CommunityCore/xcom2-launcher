@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using XCOM2Launcher.Classes;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
@@ -31,7 +32,7 @@ namespace XCOM2Launcher.Forms
             neverAdoptTagsAndCatFromprofile.Checked = settings.NeverImportTags;
             ShowQuickLaunchArgumentsToggle.Checked = settings.ShowQuickLaunchArguments;
             checkForPreReleaseUpdates.Checked = settings.CheckForPreReleaseUpdates;
-            useSentry.Checked = Properties.Settings.Default.IsSentryEnabled;
+            useSentry.Checked = GlobalSettings.Instance.IsSentryEnabled;
             allowMutipleInstances.Checked = settings.AllowMultipleInstances;
 
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
@@ -114,7 +115,7 @@ namespace XCOM2Launcher.Forms
         private void bOK_Click(object sender, EventArgs e)
         {
             // indicate if some changes require an application restart
-            IsRestartRequired = useSentry.Checked != Properties.Settings.Default.IsSentryEnabled;
+            IsRestartRequired = useSentry.Checked != GlobalSettings.Instance.IsSentryEnabled;
 
             // Apply changes
             Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
@@ -126,7 +127,7 @@ namespace XCOM2Launcher.Forms
             Settings.NeverImportTags = neverAdoptTagsAndCatFromprofile.Checked;
             Settings.ShowQuickLaunchArguments = ShowQuickLaunchArgumentsToggle.Checked;
             Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
-            Properties.Settings.Default.IsSentryEnabled = useSentry.Checked;
+            GlobalSettings.Instance.IsSentryEnabled = useSentry.Checked;
             Settings.AllowMultipleInstances = allowMutipleInstances.Checked;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
@@ -135,7 +136,7 @@ namespace XCOM2Launcher.Forms
             // Save dimensions
             Settings.Windows["settings"] = new WindowSettings(this);
 
-            Properties.Settings.Default.Save();
+            GlobalSettings.Instance.Save();
             DialogResult = DialogResult.OK;
             Close();
         }
