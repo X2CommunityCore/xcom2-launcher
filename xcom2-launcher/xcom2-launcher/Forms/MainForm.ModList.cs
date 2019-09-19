@@ -173,7 +173,7 @@ namespace XCOM2Launcher.Forms
         /// <returns></returns>
         private bool CheckIfGroupableColumn(OLVColumn column)
         {
-            return !(column.Equals(olvcOrder) || column.Equals(olvcWorkshopID));
+            return column != null && !(column.Equals(olvcOrder) || column.Equals(olvcWorkshopID));
         }
 
         private void RenameTag(ModTag tag, string newTag)
