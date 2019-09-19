@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
 using Sentry;
 using Sentry.Protocol;
+using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Mod;
@@ -118,7 +119,7 @@ namespace XCOM2Launcher
             {
                 Log.Info("Shutting down...");
                 sentrySdkInstance?.Dispose();
-                Properties.Settings.Default.Save();
+                GlobalSettings.Instance.Save();
                 GC.KeepAlive(mutex);    // prevent the mutex from being garbage collected early
                 mutex.Dispose();
             }
@@ -127,8 +128,8 @@ namespace XCOM2Launcher
         static void HandleUnhandledException(Exception e, string source)
         {
             Log.Fatal("Unhandled exception", e);
-            File.WriteAllText("error.log", $"Sentry GUID: {Properties.Settings.Default.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
-            MessageBox.Show("An unhandled exception occured. See 'error.log' in application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            File.WriteAllText("error.log", $"Sentry GUID: {GlobalSettings.Instance.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
+            MessageBox.Show("A critical error occured. See 'AML.log' and 'error.log' files in the application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
         }
 
@@ -139,7 +140,7 @@ namespace XCOM2Launcher
         /// <returns></returns>
         private static IDisposable InitSentry()
         {
-            if (!Properties.Settings.Default.IsSentryEnabled || IsDebugBuild)
+            if (!GlobalSettings.Instance.IsSentryEnabled || IsDebugBuild)
             {
                 Log.Info("Sentry is disabled");
                 return null;
@@ -161,7 +162,7 @@ namespace XCOM2Launcher
 
                 sentrySdkInstance = SentrySdk.Init(o =>
                 {
-                    o.Dsn = new Dsn(Properties.Settings.Default.SentryDsn);
+                    o.Dsn = new Dsn("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084");
                     o.Release = "AML@" + GetCurrentVersionString();     // prefix because releases are global per organization
                     o.Debug = false;
                     o.Environment = environment;
@@ -177,13 +178,14 @@ namespace XCOM2Launcher
                 {
                     scope.User = new User
                     {
-                        Id = Properties.Settings.Default.Guid,
-                        Username = Properties.Settings.Default.Username,
+                        Id = GlobalSettings.Instance.Guid,
+                        Username = GlobalSettings.Instance.UserName,
                         IpAddress = null
                     };
                 });
 
                 SentrySdk.CaptureMessage("Sentry initialized");
+                Log.Info($"Sentry initialized ({GlobalSettings.Instance.Guid})");
             }
             catch (Exception ex)
             {
@@ -199,40 +201,23 @@ namespace XCOM2Launcher
 
 
         /// <summary>
-        /// Initializes the Properties.Settings .NET applications settings.
+        /// Initializes GlobalSettings class.
         /// Used for all settings that we want to persist, even if the user decides to delete the
         /// json settings file or starts AML from different folders.
         /// </summary>
-        private static void InitAppSettings()
-        {
-            var appSettings = Properties.Settings.Default;
-            var currentVersion = GetCurrentVersion().ToString(3);
+        private static void InitAppSettings() {
+            var appSettings = GlobalSettings.Instance;
+            var currentVersion = GetCurrentVersion();
 
-            // Upgrade settings from previous version if required
-            if (appSettings.IsSettingsUpgradeRequired)
-            {
-                Log.Info($"Upgrading ApplicationSettings from version '{appSettings.Version}' to '{currentVersion}'.");
-                appSettings.Upgrade();
-                appSettings.IsSettingsUpgradeRequired = false;
+            if (appSettings.MaxVersion < currentVersion) {
+                Log.Info($"AML was upgraded from '{appSettings.MaxVersion}' to '{currentVersion}'.");
 
-                // Show Welcome Dialog and ask user to opt-in for Sentry error reporting
+                // Show Welcome Dialog and ask user to opt-in for Sentry error reporting.
                 WelcomeDialog dlg = new WelcomeDialog();
                 dlg.ShowDialog();
-
                 appSettings.IsSentryEnabled = dlg.UseSentry;
-            }
 
-            // Initialize GUID (used for error reporting)
-            if (string.IsNullOrEmpty(appSettings.Guid))
-            {
-                appSettings.Guid = Guid.NewGuid().ToString();
-            }
-
-            // Version information can be used to perform version specific migrations if required.
-            if (appSettings.Version != currentVersion)
-            {
-                // IF required at some point
-                appSettings.Version = currentVersion;
+                appSettings.MaxVersion = currentVersion;
             }
 
             appSettings.Save();
@@ -265,7 +250,7 @@ namespace XCOM2Launcher
 
             // Logic behind this:
             // If the field ShowUpgradeWarning doesn't exists in the loaded settings file; it will be initialized to its default value "true".
-            // In that case, an old incompatible settings version is assumed and we issue a warning.
+            // In that case, an old incompatible settings version is assumed and we report a warning.
             if (settings.ShowUpgradeWarning && !firstRun)
             {
                 Log.Warn("Incompatible settings.json");
