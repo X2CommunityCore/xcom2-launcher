@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using XCOM2Launcher.GitHub;
+using XCOM2Launcher.Helper;
 
 namespace XCOM2Launcher.Forms
 {
@@ -45,7 +46,7 @@ namespace XCOM2Launcher.Forms
 
         private void show_button_Click(object sender, System.EventArgs e)
         {
-            Process.Start(Release.html_url);
+            Tools.StartProcess(Release.html_url);
         }
     }
 }

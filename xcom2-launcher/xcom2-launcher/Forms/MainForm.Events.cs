@@ -12,6 +12,7 @@ using BrightIdeasSoftware;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
 using Steamworks;
+using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.PropertyGrid;
 using XCOM2Launcher.Steam;
@@ -172,11 +173,11 @@ namespace XCOM2Launcher.Forms
                 }
             };
 
-            openHomepageToolStripMenuItem.Click += delegate { Process.Start(@"https://github.com/X2CommunityCore/xcom2-launcher"); };
+            openHomepageToolStripMenuItem.Click += delegate { Tools.StartProcess(@"https://github.com/X2CommunityCore/xcom2-launcher"); };
 
-            amlWikiToolStripMenuItem.Click += delegate { Process.Start(@"https://github.com/X2CommunityCore/xcom2-launcher/wiki"); };
+            amlWikiToolStripMenuItem.Click += delegate { Tools.StartProcess(@"https://github.com/X2CommunityCore/xcom2-launcher/wiki"); };
 
-            openDiscordToolStripMenuItem.Click += delegate { Process.Start(@"https://discord.gg/QHSVGRn"); };
+            openDiscordToolStripMenuItem.Click += delegate { Tools.StartProcess(@"https://discord.gg/QHSVGRn"); };
 
             #endregion
 
@@ -599,7 +600,7 @@ namespace XCOM2Launcher.Forms
 
         private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
         {
-            Process.Start(e.LinkText);
+            Tools.StartProcess(e.LinkText);
         }
 
 		private void filterMods_TextChanged(object sender, EventArgs e)

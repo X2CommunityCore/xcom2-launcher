@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -83,7 +84,15 @@ namespace XCOM2Launcher.XCOM
                 }
             };
 
-            p.Start();
+            try
+            {
+                p.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                Log.Warn("Failed to start game process", ex);
+                MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             SteamAPIWrapper.Shutdown();
         }
@@ -110,7 +119,15 @@ namespace XCOM2Launcher.XCOM
                 }
             };
 
-            p.Start();
+            try
+            {
+                p.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                Log.Warn("Failed to start game process", ex);
+                MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             SteamAPIWrapper.Shutdown();
         }
