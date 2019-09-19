@@ -789,10 +789,13 @@ namespace XCOM2Launcher.Forms
 
         private void btnDescSave_Click(object sender, EventArgs e)
         {
-            var contents = modinfo_info_DescriptionRichTextBox.Text;
+            if (CurrentMod != null)
+            {
+                var contents = modinfo_info_DescriptionRichTextBox.Text;
 
-            if (!CurrentMod.Description.Equals(contents))
-                CurrentMod.Description = contents;
+                if (!CurrentMod.Description.Equals(contents))
+                    CurrentMod.Description = contents;
+            }
 
             btnDescSave.Enabled = false;
             btnDescUndo.Enabled = false;

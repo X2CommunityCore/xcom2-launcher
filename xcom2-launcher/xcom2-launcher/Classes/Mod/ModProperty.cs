@@ -27,7 +27,7 @@ namespace XCOM2Launcher.Classes.Mod
                 modEntry.Index = value;
 
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("Index");
-                PropertyChanged(this, e);
+                PropertyChanged?.Invoke(this, e);
             }
         }
 
@@ -67,14 +67,14 @@ namespace XCOM2Launcher.Classes.Mod
                     modEntry.ManualName = false;
                     Settings.Instance.Mods.UpdateMod(modEntry, Settings.Instance);
                     PropertyChangedEventArgs e = new PropertyChangedEventArgs("Name");
-                    PropertyChanged(this, e);
+                    PropertyChanged?.Invoke(this, e);
                 }
                 else if (!value.Equals(modEntry.Name))
                 {
                     modEntry.Name = value;
                     modEntry.ManualName = true;
                     PropertyChangedEventArgs e = new PropertyChangedEventArgs("Name");
-                    PropertyChanged(this, e);
+                    PropertyChanged?.Invoke(this, e);
                 }
             }
         }
@@ -89,7 +89,7 @@ namespace XCOM2Launcher.Classes.Mod
             set {
                 modEntry.Author = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("Author");
-                PropertyChanged(this, e);
+                PropertyChanged?.Invoke(this, e);
             }
         }
 
@@ -100,7 +100,7 @@ namespace XCOM2Launcher.Classes.Mod
             set {
                 modEntry.Description = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("Description");
-                PropertyChanged(this, e);
+                PropertyChanged?.Invoke(this, e);
             }
         }
 
@@ -117,7 +117,7 @@ namespace XCOM2Launcher.Classes.Mod
             set {
                 modEntry.isActive = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("isActive");
-                PropertyChanged(this, e);
+                PropertyChanged?.Invoke(this, e);
             }
         }
 
@@ -128,7 +128,7 @@ namespace XCOM2Launcher.Classes.Mod
             set {
                 modEntry.isHidden = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("isHidden");
-                PropertyChanged(this, e);
+                PropertyChanged?.Invoke(this, e);
             }
         }
 
