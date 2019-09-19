@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using Sentry;
 
 namespace XCOM2Launcher.Mod
 {
@@ -99,7 +98,6 @@ namespace XCOM2Launcher.Mod
             catch (FormatException ex)
             {
                 Log.Error("Invalid publishedfileid: " + values["publishedfileid"], ex);
-                SentrySdk.CaptureException(ex);
                 PublishedFileID = -1;
             }
 
@@ -127,7 +125,6 @@ namespace XCOM2Launcher.Mod
                 catch (Exception ex)
                 {
                     Log.Error("Failed processing contentimage: " + values["contentimage"], ex);
-                    SentrySdk.CaptureException(ex);
                     Debug.Fail(ex.Message);
                 }
             }

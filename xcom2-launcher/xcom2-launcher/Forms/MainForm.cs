@@ -10,7 +10,6 @@ using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
-using Sentry;
 
 namespace XCOM2Launcher.Forms
 {
@@ -103,8 +102,7 @@ namespace XCOM2Launcher.Forms
             {
                 // Steamworks not initialized?
                 // Game taking over?
-                Log.Warn("Error checking for new mods", ex);
-                SentrySdk.CaptureException(ex);
+                Log.Error("Error checking for new mods", ex);
                 status_toolstrip_label.Text = "Error checking for new mods.";
                 return;
             }

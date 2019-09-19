@@ -127,8 +127,7 @@ namespace XCOM2Launcher
 
         static void HandleUnhandledException(Exception e, string source)
         {
-            Log.Error("Unhandled exception", e);
-            SentrySdk.CaptureException(e);
+            Log.Fatal("Unhandled exception", e);
             File.WriteAllText("error.log", $"Sentry GUID: {GlobalSettings.Instance.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
             MessageBox.Show("A critical error occured. See 'AML.log' and 'error.log' files in the application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Application.Exit();
@@ -153,12 +152,21 @@ namespace XCOM2Launcher
             
             try
             {
+                string environment = "Release";
+                
+                #if DEBUG
+                    environment = "Debug";
+                #elif BETA
+                    environment = "Beta";
+                #endif
+
                 sentrySdkInstance = SentrySdk.Init(o =>
                 {
                     o.Dsn = new Dsn("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084");
                     o.Release = "AML@" + GetCurrentVersionString();     // prefix because releases are global per organization
                     o.Debug = false;
-                    o.Environment = IsDebugBuild ? "Debug" : "Release"; // Maybe use "Beta" for Pre-Release version (new/separate build configuration)
+                    o.Environment = environment;
+                    o.MaxBreadcrumbs = 50;
                     o.BeforeSend = sentryEvent =>
                     {
                         sentryEvent.User.Email = null;
@@ -181,11 +189,9 @@ namespace XCOM2Launcher
             }
             catch (Exception ex)
             {
-                Log.Error("Sentry setup failed", ex);
-
                 // If Sentry wasn't initialized correctly we at least try to send one message to report this.
                 // (this won't throw another Ex, even if Init() failed)
-                SentrySdk.CaptureException(ex);
+                Log.Error("Sentry setup failed", ex);
                 SentrySdk.Close();
                 Debug.WriteLine(ex.Message);
             }
@@ -407,7 +413,6 @@ namespace XCOM2Launcher
                     {
                         string message = $"{nameof(CheckForUpdate)}: Error parsing version information '{releaseVersionString}'.";
                         Log.Error(message);
-                        SentrySdk.CaptureMessage(message, SentryLevel.Warning);
                         Debug.Fail(message);
                     }
                 }

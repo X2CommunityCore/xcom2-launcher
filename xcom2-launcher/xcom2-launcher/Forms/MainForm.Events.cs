@@ -11,7 +11,6 @@ using System.Windows.Forms;
 using BrightIdeasSoftware;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
-using Sentry;
 using Steamworks;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.PropertyGrid;
@@ -343,8 +342,7 @@ namespace XCOM2Launcher.Forms
                 }
                 catch (Exception ex)
                 {
-                    Log.Warn($"Error updating mod {mod.ID}", ex);
-                    SentrySdk.CaptureException(ex);
+                    Log.Error($"Error updating mod {mod.ID}", ex);
                     Debug.Fail(ex.Message + "\r\n" + ex.StackTrace);
                 }
 

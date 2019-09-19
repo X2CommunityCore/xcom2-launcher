@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Sentry;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 
@@ -156,8 +155,7 @@ namespace XCOM2Launcher.XCOM
             }
             catch (IOException ex)
             {
-                Log.Warn("Unable to access XComModOptions.ini", ex);
-                SentrySdk.CaptureException(ex);
+                Log.Error("Unable to access XComModOptions.ini", ex);
                 Debug.Fail(ex.Message);
                 return new string[0];
             }
