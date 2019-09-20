@@ -90,14 +90,14 @@ namespace XCOM2Launcher.Mod
             if (Settings.Instance.UseSpecifiedCategories && values.ContainsKey("category") && values["category"].Length > 0)
                 Category = values["category"];
 
-            try
+            if (values.ContainsKey("publishedfileid") && int.TryParse(values["publishedfileid"], out var publishId))
             {
-                if (values.ContainsKey("publishedfileid"))
-                    PublishedFileID = int.Parse(values["publishedfileid"]);
+                PublishedFileID = publishId;
             }
-            catch (FormatException ex)
+            else
             {
-                Log.Error("Invalid publishedfileid: " + values["publishedfileid"], ex);
+                var modFileContent = File.ReadAllText(filepath);
+                Log.Error($"Error while parsing 'publishedfileid' field in '{filepath}'" + Environment.NewLine + modFileContent);
                 PublishedFileID = -1;
             }
 
@@ -124,7 +124,8 @@ namespace XCOM2Launcher.Mod
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Failed processing contentimage: " + values["contentimage"], ex);
+                    var modFileContent = File.ReadAllText(filepath);
+                    Log.Error($"Error while parsing 'contentimage' field in '{filepath}'" + Environment.NewLine + modFileContent, ex);
                     Debug.Fail(ex.Message);
                 }
             }
