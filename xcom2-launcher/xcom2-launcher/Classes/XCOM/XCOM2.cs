@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -125,22 +127,42 @@ namespace XCOM2Launcher.XCOM
                     mod.isActive = true;
         }
 
-        public static string[] DetectModDirs()
+        public static IEnumerable<string> DetectModDirs()
         {
             // Prevent stack overflow (Issue #19)
             if (_gameDir == null)
                 return new string[0];
 
-            return
-                new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs")?
-                    .Select(
-                        path => Path.IsPathRooted(path)
-                            ? path.EndsWith(@"\") ? path : path + @"\"
-                            : Path.GetFullPath(Path.Combine(GameDir, "bin", "Win64", path))
-                    )
-                    .Where(Directory.Exists)
-                    .ToArray()
-                ?? new string[0];
+            var currentModDirs = new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
+            var validModDirs = new List<string>();
+
+            foreach (var modDir in currentModDirs)
+            {
+                try
+                {
+                    string dir;
+
+                    if (Path.IsPathRooted(modDir))
+                    {
+                        // make sure all directories end with '\' (can only happen if someone adds a dir manually?)
+                        dir = modDir.EndsWith(@"\") ? modDir : modDir + @"\";
+                    }
+                    else
+                    {
+                        dir = Path.GetFullPath(Path.Combine(GameDir, "bin", "Win64", modDir));
+                        Log.Debug($"Changed non rooted mod directory from '{modDir}' to '{dir}'");
+                    }
+
+                    if (Directory.Exists(dir))
+                        validModDirs.Add(dir);
+                }
+                catch (ArgumentException ex)
+                {
+                    Log.Error($"Invalid mod directory '{modDir}'", ex);
+                }
+            }
+
+            return validModDirs;
         }
 
         /// <summary>
