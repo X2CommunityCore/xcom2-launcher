@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using XCOM2Launcher.Helper;
 using FilePath = System.IO.Path;
 
 namespace XCOM2Launcher.Mod
@@ -229,17 +230,17 @@ namespace XCOM2Launcher.Mod
 
         public void ShowOnSteam()
         {
-			Process.Start("explorer", GetSteamLink());
+            Tools.StartProcess("explorer", GetSteamLink());
         }
 
-	    public void ShowInBrowser()
-		{
-			Process.Start(GetWorkshopLink());
-		}
+        public void ShowInBrowser()
+        {
+            Tools.StartProcess(GetWorkshopLink());
+        }
 
         public void ShowInExplorer()
         {
-            Process.Start("explorer", Path);
+            Tools.StartProcess("explorer", Path);
         }
 
         public string GetWorkshopLink()

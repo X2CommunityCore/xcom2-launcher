@@ -14,6 +14,7 @@ using Sentry.Protocol;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
+using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
@@ -67,7 +68,7 @@ namespace XCOM2Launcher
                     var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.7.2 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
                     if (result == DialogResult.Yes)
-                        Process.Start("https://dotnet.microsoft.com/download/dotnet-framework");
+                        Tools.StartProcess("https://dotnet.microsoft.com/download/dotnet-framework");
 
                     return;
                 }
