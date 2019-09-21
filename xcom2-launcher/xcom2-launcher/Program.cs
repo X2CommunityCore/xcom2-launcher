@@ -130,7 +130,8 @@ namespace XCOM2Launcher
         {
             Log.Fatal("Unhandled exception", e);
             File.WriteAllText("error.log", $"Sentry GUID: {GlobalSettings.Instance.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
-            MessageBox.Show("A critical error occured. See 'AML.log' and 'error.log' files in the application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var dlg = new UnhandledExceptionDialog(e);
+            dlg.ShowDialog();
             Application.Exit();
         }
 
