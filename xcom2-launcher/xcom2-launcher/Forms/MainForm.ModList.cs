@@ -124,8 +124,9 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
                 bool isGroupableColumn = CheckIfGroupableColumn(args.ColumnToSort);
-                modlist_ListObjectListView.ShowGroups = cEnableGrouping.Checked && isGroupableColumn;
-                modlist_toggleGroupsButton.Enabled = isGroupableColumn;
+                bool useGrouping = cEnableGrouping.Checked && isGroupableColumn;
+                modlist_ListObjectListView.ShowGroups = useGrouping;
+                modlist_toggleGroupsButton.Enabled = useGrouping;
                 cEnableGrouping.Enabled = isGroupableColumn;
             };
 
