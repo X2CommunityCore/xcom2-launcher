@@ -42,7 +42,7 @@ namespace XCOM2Launcher.Forms
             {
                 Log.Info("Menu->File->Reset settings");
                 // Confirmation dialog
-                var r = MessageBox.Show("Unsaved changes will be lost.\r\nAre you sure?", "Reload settings?", MessageBoxButtons.OKCancel);
+                var r = MessageBox.Show("Unsaved changes will be lost.\r\nAre you sure?", "Reload settings?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (r != DialogResult.OK)
                     return;
 
@@ -133,7 +133,7 @@ namespace XCOM2Launcher.Forms
                 var choice = false;
 
                 if (modsToDownload.Count == 0)
-                    MessageBox.Show("No uninstalled workshop mods were found.");
+                    MessageBox.Show("No uninstalled workshop mods were found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 else if (modsToDownload.Count == 1)
                     choice = MessageBox.Show($"Are you sure you want to download the mod {modsToDownload[0].Name}?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
                 else
@@ -148,7 +148,7 @@ namespace XCOM2Launcher.Forms
                         Workshop.DownloadItem((ulong) m.WorkshopID);
                     }
 
-                    MessageBox.Show("Launch XCOM 2 after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."));
+                    MessageBox.Show("Launch XCOM 2 after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             };
 
@@ -254,7 +254,7 @@ namespace XCOM2Launcher.Forms
         {
             if (e.Result.m_eResult != EResult.k_EResultOK)
             {
-                MessageBox.Show($"{e.Result.m_nPublishedFileId}: {e.Result.m_eResult}");
+                MessageBox.Show($"{e.Result.m_nPublishedFileId}: {e.Result.m_eResult}", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -280,7 +280,7 @@ namespace XCOM2Launcher.Forms
             }
             m = Mods.All.Single(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
-            MessageBox.Show($"{m.Name} finished download.");
+            MessageBox.Show($"{m.Name} finished download.", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 #endif
 
@@ -438,7 +438,7 @@ namespace XCOM2Launcher.Forms
             if (!Settings.NeverImportTags)
             {
                 OverrideTags = MessageBox.Show("Do you want to override the tags and categories of your current mods with the tags saved in your profile?\r\n" +
-                    "Warning: This action cannot be undone", "Importing profile", MessageBoxButtons.YesNo) == DialogResult.Yes;
+                    "Warning: This action cannot be undone", "Importing profile", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
             }
             else
             {
@@ -500,7 +500,7 @@ namespace XCOM2Launcher.Forms
             // Check entries
             if (activeMods.Count == 0)
             {
-                MessageBox.Show("No mods found. Bad profile?");
+                MessageBox.Show("No mods found. Bad profile?", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -538,7 +538,7 @@ namespace XCOM2Launcher.Forms
                             SteamUGC.SubscribeItem(id.ToPublishedFileID());
                         }
 
-                        MessageBox.Show("Done. Close the launcher, wait for steam to download the mod(s) and try again.");
+                        MessageBox.Show("Done. Close the launcher, wait for steam to download the mod(s) and try again.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
                 }

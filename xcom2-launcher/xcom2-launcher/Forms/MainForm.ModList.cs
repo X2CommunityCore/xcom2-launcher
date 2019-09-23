@@ -330,7 +330,7 @@ namespace XCOM2Launcher.Forms
 
             text += "\r\nThis can not be undone.";
 
-            var r = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel);
+            var r = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
             if (r != DialogResult.OK)
                 return;
 
@@ -359,7 +359,7 @@ namespace XCOM2Launcher.Forms
                     string message = $"Error while deleting mod folder: {Environment.NewLine}";
                     message += $"'{mod.Path}' {Environment.NewLine} {Environment.NewLine} {ex.Message}";
                     Log.Warn(message, ex);
-                    MessageBox.Show(message, "Error");
+                    MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -663,7 +663,7 @@ namespace XCOM2Launcher.Forms
                     {
                         var result = MessageBox.Show($"Tags from the workshop will replace the existing tags for {modsToUpdate.Count} mods." + 
                                                      Environment.NewLine + "Do you want to continue?",
-                                                     "Use workshop tags", MessageBoxButtons.YesNo);
+                                                     "Use workshop tags", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                         if (result != DialogResult.Yes)
                             return;

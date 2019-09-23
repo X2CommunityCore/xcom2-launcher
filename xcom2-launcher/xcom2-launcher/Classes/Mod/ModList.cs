@@ -159,7 +159,7 @@ namespace XCOM2Launcher.Mod
                 {
                     Log.Error($"Unable to parse WorkShop-Id ({s}) from Steam mod directory " + modDir);
                     MessageBox.Show("A mod could not be loaded because the workshop ID failed to parse." +
-                                    $"\nPlease check that the following directory conforms to valid workshop numbering.\n\nPath: {modDir}");
+                                    $"\nPlease check that the following directory conforms to valid workshop numbering.\n\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
             }
@@ -185,7 +185,7 @@ namespace XCOM2Launcher.Mod
             {
                 Log.Error("Multiple XComMod files in folder " + modDir);
                 MessageBox.Show(
-                    $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}");
+                    $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
             catch (UnauthorizedAccessException)

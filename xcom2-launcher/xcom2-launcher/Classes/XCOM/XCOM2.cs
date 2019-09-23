@@ -72,7 +72,7 @@ namespace XCOM2Launcher.XCOM
             Log.Info("Starting XCOM 2 (vanilla)");
 
             if (!SteamAPIWrapper.Init())
-                MessageBox.Show("Could not connect to steam.");
+                MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             var p = new Process
             {
@@ -107,7 +107,7 @@ namespace XCOM2Launcher.XCOM
             Log.Info("Starting WotC");
 
             if (!SteamAPIWrapper.Init())
-                MessageBox.Show("Could not connect to steam.");
+                MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             var p = new Process
             {
