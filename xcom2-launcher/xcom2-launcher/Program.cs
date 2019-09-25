@@ -283,7 +283,7 @@ namespace XCOM2Launcher
             if (settings.GamePath == "")
             {
                 Log.Warn("Unable to detect XCOM 2 installation path");
-                MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.");
+                MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             // Make sure, that all mod paths have a trailing backslash
@@ -302,7 +302,7 @@ namespace XCOM2Launcher
             if (settings.ModPaths.Count == 0)
             {
                 Log.Warn("No XCOM 2 mod directories configured");
-                MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
+                MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             if (settings.Mods.Entries.Count > 0)

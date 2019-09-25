@@ -16,6 +16,8 @@ namespace XCOM2Launcher.Mod
 {
     public class ModEntry
     {
+        [JsonIgnore] private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModEntry));
+
         [JsonIgnore] private string _image;
 
         [JsonIgnore] private IEnumerable<ModClassOverride> _overrides;
@@ -176,7 +178,19 @@ namespace XCOM2Launcher.Mod
                 return overrides;
             }
 
-            var sourceFiles = Directory.GetFiles(sourceDirectory, "*.uc", SearchOption.AllDirectories);
+
+            string[] sourceFiles;
+
+            try
+            {
+                sourceFiles = Directory.GetFiles(sourceDirectory, "*.uc", SearchOption.AllDirectories);
+            }
+            catch (IOException ex)
+            {
+                // We expect IOException because it happened in rare cases (Issue #122).
+                Log.Error("Unable to get files from directory: " + sourceDirectory, ex);
+                return overrides;
+            }
 
             Parallel.ForEach(sourceFiles, sourceFile =>
             {
@@ -406,11 +420,20 @@ namespace XCOM2Launcher.Mod
 			else
 				setting.Contents = contents;
 
-			using (var stream = new StreamWriter(fullpath) )
-			{
-				stream.Write(contents);
-			}
-			return true;
+            try
+            {
+                using (var stream = new StreamWriter(fullpath))
+                {
+                    stream.Write(contents);
+                }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Log.Warn("Error saving configuration file " + fullpath, ex);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return true;
 
 	    }
 

@@ -21,9 +21,8 @@ namespace XCOM2Launcher.Forms
 
             Settings = settings;
 
-            // Restore states
+            // Init GUI and other locals
             gamePathTextBox.Text = settings.GamePath;
-
             closeAfterLaunchCheckBox.Checked = settings.CloseAfterLaunch;
             searchForUpdatesCheckBox.Checked = settings.CheckForUpdates;
             showHiddenEntriesCheckBox.Checked = settings.ShowHiddenElements;
@@ -34,7 +33,6 @@ namespace XCOM2Launcher.Forms
             checkForPreReleaseUpdates.Checked = settings.CheckForPreReleaseUpdates;
             useSentry.Checked = GlobalSettings.Instance.IsSentryEnabled;
             allowMutipleInstances.Checked = settings.AllowMultipleInstances;
-
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
 
             foreach (var modPath in settings.ModPaths)
@@ -74,7 +72,6 @@ namespace XCOM2Launcher.Forms
 
             var path = Path.GetFullPath(Path.Combine(dialog.FileName, "../../.."));
             gamePathTextBox.Text = path;
-            Settings.GamePath = path;
         }
 
         private void RemoveModPathButtonOnClick(object sender, EventArgs e)
@@ -84,7 +81,6 @@ namespace XCOM2Launcher.Forms
 
             var path = (string) modPathsListbox.SelectedItem;
             modPathsListbox.Items.Remove(path);
-            Settings.ModPaths.Remove(path);
         }
 
         private void AddModPathButtonOnClick(object sender, EventArgs eventArgs)
@@ -102,7 +98,6 @@ namespace XCOM2Launcher.Forms
             // make sure the mod path ends with a trailing backslash as required for entry in XCOM ini file
             var path = dialog.SelectedPath.EndsWith(@"\") ? dialog.SelectedPath : dialog.SelectedPath + @"\";
 
-            Settings.ModPaths.Add(path);
             modPathsListbox.Items.Add(path);
         }
 
@@ -114,8 +109,13 @@ namespace XCOM2Launcher.Forms
 
         private void bOK_Click(object sender, EventArgs e)
         {
+            var newModPaths = modPathsListbox.Items.Cast<string>().ToList();
+
             // indicate if some changes require an application restart
-            IsRestartRequired = useSentry.Checked != GlobalSettings.Instance.IsSentryEnabled;
+            bool sentryEnableChanged = useSentry.Checked != GlobalSettings.Instance.IsSentryEnabled;
+            bool gamePathChanged = !gamePathTextBox.Text.Equals(Settings.GamePath, StringComparison.OrdinalIgnoreCase);
+            var modFoldersChanged = !Settings.ModPaths.OrderBy(x => x).SequenceEqual(newModPaths.OrderBy(x => x));
+            IsRestartRequired = sentryEnableChanged || gamePathChanged || modFoldersChanged;
 
             // Apply changes
             Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
@@ -129,6 +129,8 @@ namespace XCOM2Launcher.Forms
             Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
             GlobalSettings.Instance.IsSentryEnabled = useSentry.Checked;
             Settings.AllowMultipleInstances = allowMutipleInstances.Checked;
+            Settings.GamePath = gamePathTextBox.Text;
+            Settings.ModPaths = newModPaths;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
             Settings.ArgumentList = newArguments.AsReadOnly();

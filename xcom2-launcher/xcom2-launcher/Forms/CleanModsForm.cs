@@ -24,7 +24,7 @@ namespace XCOM2Launcher.Forms
 
         private void onStartButtonClicked(object sender, EventArgs e)
         {
-            var dialogResult = MessageBox.Show("Are you sure?\r\nThis might cause problems and can not be undone.", "Confirm", MessageBoxButtons.OKCancel);
+            var dialogResult = MessageBox.Show("Are you sure?\r\nThis might cause problems and can not be undone.", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
             
             if (dialogResult != DialogResult.OK)
                 return;
