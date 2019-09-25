@@ -24,8 +24,9 @@ namespace XCOM2Launcher.Forms
 
         private void onStartButtonClicked(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure?\r\nThis might cause problems and can not be undone.", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-            if (result != DialogResult.OK)
+            var dialogResult = MessageBox.Show("Are you sure?\r\nThis might cause problems and can not be undone.", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            
+            if (dialogResult != DialogResult.OK)
                 return;
             
             var source_mode = source_groupbox.Controls.OfType<RadioButton>().FirstOrDefault(r => r.Checked).Name;
@@ -33,26 +34,37 @@ namespace XCOM2Launcher.Forms
 
             foreach (var m in Mods.All)
             {
-                // Source Files
-                if (hasSourceFiles(m) && !hasCookedPCConsole(m))
+                try
                 {
-                    if (source_mode == "src_all_radiobutton")
-                        deleteSourceFiles(m);
+                    // Source Files
+                    if (hasSourceFiles(m) && !hasCookedPCConsole(m))
+                    {
+                        if (source_mode == "src_all_radiobutton")
+                            deleteSourceFiles(m);
 
-                    else if (source_mode == "src_xcomgame_radiobutton")
-                        if (hasXComGameSourceFiles(m))
-                            deleteXComGameSourceFiles(m);
-                }
+                        else if (source_mode == "src_xcomgame_radiobutton")
+                            if (hasXComGameSourceFiles(m))
+                                deleteXComGameSourceFiles(m);
+                    }
 
-                // Shader Cache
-                if (hasModShaderCache(m))
-                {
-                    if (shader_mode == "shadercache_all_radiobutton")
-                        deleteModShaderCache(m);
-
-                    else if (shader_mode == "shadercache_empty_radiobutton")
-                        if (hasEmptyModShaderCache(m))
+                    // Shader Cache
+                    if (hasModShaderCache(m))
+                    {
+                        if (shader_mode == "shadercache_all_radiobutton")
                             deleteModShaderCache(m);
+
+                        else if (shader_mode == "shadercache_empty_radiobutton")
+                            if (hasEmptyModShaderCache(m))
+                                deleteModShaderCache(m);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    dialogResult = MessageBox.Show(ex.Message + Environment.NewLine + Environment.NewLine +
+                                                 "Do you want to continue?", "Error", MessageBoxButtons.YesNo);
+
+                    if (dialogResult != DialogResult.Yes)
+                        break;
                 }
             }
 
