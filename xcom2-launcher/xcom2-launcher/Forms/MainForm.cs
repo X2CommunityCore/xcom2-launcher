@@ -498,11 +498,20 @@ namespace XCOM2Launcher.Forms
             return str.ToString();
         }
 
+        /// <summary>
+        /// Updates the mod description user interface with the description from the provided Mod.
+        /// </summary>
+        /// <param name="m">The desired mod. Use null to clear/reset description.</param>
         private void UpdateModDescription(ModEntry m)
         {
-            modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
             modinfo_info_DescriptionRichTextBox.Clear();
-            modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
+
+            if (m != null)
+            {
+                modinfo_info_DescriptionRichTextBox.Font = DefaultFont;
+                modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
+            }
+
             btnDescSave.Enabled = false;
             btnDescUndo.Enabled = false;
         }
@@ -511,8 +520,18 @@ namespace XCOM2Launcher.Forms
         {
             if (m == null)
             {
-                // hide panel
-                //horizontal_splitcontainer.Panel2Collapsed = true;
+                modinfo_info_TitleTextBox.Text = "No mod selected";
+                modinfo_info_AuthorTextBox.Clear();
+                modinfo_info_DateCreatedTextBox.Clear();
+                modinfo_info_InstalledTextBox.Clear();
+                modinfo_readme_RichTextBox.Clear();
+                UpdateModDescription(null);
+                modinfo_image_picturebox.ImageLocation = null;
+                modinfo_inspect_propertygrid.SelectedObject = null;
+                modinfo_config_FileSelectCueComboBox.Items.Clear();
+                modinfo_config_LoadButton.Enabled = false;
+                modinfo_config_RemoveButton.Enabled = false;
+                modinfo_ConfigFCTB.Clear();
                 return;
             }
 
@@ -531,30 +550,36 @@ namespace XCOM2Launcher.Forms
             modinfo_image_picturebox.ImageLocation = m.Image;
 
             var sel_obj = m.GetProperty();
-            sel_obj.PropertyChanged += (sender, e) => { RefreshModList(); modinfo_inspect_propertygrid.Refresh(); };
+            
+            sel_obj.PropertyChanged += (sender, e) =>
+            {
+                RefreshModList(); 
+                modinfo_inspect_propertygrid.Refresh();
+            };
+            
             modinfo_inspect_propertygrid.SelectedObject = sel_obj;
 
-			#region Config
+            #region Config
 
-			// config files
-			string[] configFiles = m.GetConfigFiles();
+            // config files
+            string[] configFiles = m.GetConfigFiles();
 
-			// clear
-			modinfo_config_FileSelectCueComboBox.Items.Clear();
-	        modinfo_ConfigFCTB.Text = "";
-	        modinfo_config_LoadButton.Enabled = false;
-			modinfo_config_RemoveButton.Enabled = false;
+            // clear
+            modinfo_config_FileSelectCueComboBox.Items.Clear();
+            modinfo_ConfigFCTB.Text = "";
+            modinfo_config_LoadButton.Enabled = false;
+            modinfo_config_RemoveButton.Enabled = false;
 
-			if (configFiles.Length > 0)
-			{
-				foreach (var configFile in configFiles)
-				{
-					if (configFile != null) modinfo_config_FileSelectCueComboBox.Items.Add(CurrentMod.GetPathRelative(configFile));
-				}
-			}
+            if (configFiles.Length > 0)
+            {
+                foreach (var configFile in configFiles)
+                {
+                    if (configFile != null) modinfo_config_FileSelectCueComboBox.Items.Add(CurrentMod.GetPathRelative(configFile));
+                }
+            }
 
-			#endregion
-		}
+            #endregion
+        }
 
         /// <summary>
         /// Updates the quick launch menu items check-states, depending on if the the respective argument is enabled in the settings.

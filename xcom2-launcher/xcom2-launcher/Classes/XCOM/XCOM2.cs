@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -73,7 +73,7 @@ namespace XCOM2Launcher.XCOM
             Log.Info("Starting XCOM 2 (vanilla)");
 
             if (!SteamAPIWrapper.Init())
-                MessageBox.Show("Could not connect to steam.");
+                MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             var p = new Process
             {
@@ -85,7 +85,15 @@ namespace XCOM2Launcher.XCOM
                 }
             };
 
-            p.Start();
+            try
+            {
+                p.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                Log.Warn("Failed to start game process", ex);
+                MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             SteamAPIWrapper.Shutdown();
         }
@@ -100,7 +108,7 @@ namespace XCOM2Launcher.XCOM
             Log.Info("Starting WotC");
 
             if (!SteamAPIWrapper.Init())
-                MessageBox.Show("Could not connect to steam.");
+                MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             var p = new Process
             {
@@ -112,7 +120,15 @@ namespace XCOM2Launcher.XCOM
                 }
             };
 
-            p.Start();
+            try
+            {
+                p.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                Log.Warn("Failed to start game process", ex);
+                MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             SteamAPIWrapper.Shutdown();
         }

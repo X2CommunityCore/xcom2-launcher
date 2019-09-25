@@ -60,7 +60,7 @@ namespace XCOM2Launcher.Forms
 
             if (category == ModInfo.DEFAULT_CATEGORY_NAME)
             {
-                MessageBox.Show($"Default category '{ModInfo.DEFAULT_CATEGORY_NAME}' can not be removed.", "Info");
+                MessageBox.Show($"Default category '{ModInfo.DEFAULT_CATEGORY_NAME}' can not be removed.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace XCOM2Launcher.Forms
             var oldName = (string) categoriesListBox.Items[index];
 
             if (oldName == ModInfo.DEFAULT_CATEGORY_NAME) {
-                MessageBox.Show($"Default category '{ModInfo.DEFAULT_CATEGORY_NAME}' can not be renamed.", "Info");
+                MessageBox.Show($"Default category '{ModInfo.DEFAULT_CATEGORY_NAME}' can not be renamed.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

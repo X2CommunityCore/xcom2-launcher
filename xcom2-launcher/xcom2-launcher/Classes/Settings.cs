@@ -34,12 +34,12 @@ namespace XCOM2Launcher
                 catch (FileNotFoundException e)
                 {
                     Log.Warn("settings.json not found", e);
-                    MessageBox.Show("Could not find file " + e.FileName);
+                    MessageBox.Show("Could not find file " + e.FileName, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 catch (JsonSerializationException ex)
                 {
                     Log.Error("Unable to parse settings.json", ex);
-                    MessageBox.Show(@"settings.json could not be read.\r\nPlease delete or rename that file and try again.");
+                    MessageBox.Show(@"settings.json could not be read.\r\nPlease delete or rename that file and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
                 }
 

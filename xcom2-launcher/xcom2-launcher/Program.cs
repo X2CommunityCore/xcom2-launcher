@@ -14,6 +14,7 @@ using Sentry.Protocol;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
+using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
@@ -67,7 +68,7 @@ namespace XCOM2Launcher
                     var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.7.2 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
                     if (result == DialogResult.Yes)
-                        Process.Start("https://dotnet.microsoft.com/download/dotnet-framework");
+                        Tools.StartProcess("https://dotnet.microsoft.com/download/dotnet-framework");
 
                     return;
                 }
@@ -129,7 +130,8 @@ namespace XCOM2Launcher
         {
             Log.Fatal("Unhandled exception", e);
             File.WriteAllText("error.log", $"Sentry GUID: {GlobalSettings.Instance.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
-            MessageBox.Show("A critical error occured. See 'AML.log' and 'error.log' files in the application folder for additional details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var dlg = new UnhandledExceptionDialog(e);
+            dlg.ShowDialog();
             Application.Exit();
         }
 
@@ -281,7 +283,7 @@ namespace XCOM2Launcher
             if (settings.GamePath == "")
             {
                 Log.Warn("Unable to detect XCOM 2 installation path");
-                MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.");
+                MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             // Make sure, that all mod paths have a trailing backslash
@@ -300,7 +302,7 @@ namespace XCOM2Launcher
             if (settings.ModPaths.Count == 0)
             {
                 Log.Warn("No XCOM 2 mod directories configured");
-                MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.");
+                MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             if (settings.Mods.Entries.Count > 0)

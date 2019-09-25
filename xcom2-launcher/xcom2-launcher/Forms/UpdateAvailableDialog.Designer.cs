@@ -164,6 +164,7 @@
 			// 
 			// lBetaVersion
 			// 
+			this.lBetaVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.lBetaVersion.AutoSize = true;
 			this.lBetaVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.lBetaVersion.ForeColor = System.Drawing.Color.Red;
@@ -183,7 +184,6 @@
 			this.Controls.Add(this.filesize_value_label);
 			this.Controls.Add(this.filesize_label);
 			this.Controls.Add(this.date_label);
-			this.Controls.Add(this.lBetaVersion);
 			this.Controls.Add(this.version_new_value_label);
 			this.Controls.Add(this.version_current_label);
 			this.Controls.Add(this.version_current_value_label);
@@ -192,6 +192,7 @@
 			this.Controls.Add(this.changelog_label);
 			this.Controls.Add(this.changelog_textbox);
 			this.Controls.Add(this.close_button);
+			this.Controls.Add(this.lBetaVersion);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "UpdateAvailableDialog";
 			this.Text = "Update available!";
