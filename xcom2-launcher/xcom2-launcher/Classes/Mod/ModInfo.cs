@@ -37,7 +37,6 @@ namespace XCOM2Launcher.Mod
             using (var reader = new StreamReader(stream))
             {
                 string key = null;
-                string val;
 
                 reader.ReadLine(); // skip [mod] line
 
@@ -46,6 +45,7 @@ namespace XCOM2Launcher.Mod
                     var line = reader.ReadLine();
                     Contract.Assume(line != null);
 
+                    // Expected format is "key=value"
                     if (key == null || line.Contains("="))
                     {
                         var data = line.Split(new[] { '=' }, 2);
@@ -55,31 +55,39 @@ namespace XCOM2Launcher.Mod
                         {
                             // probably right
                             key = temp;
-                            val = data[1];
+                            var val = data[1];
 
+                            // A multi-line value should be indicated by a trailing '\' (source?) but most of the time isn't !?
                             while (line.Last() == '\\')
                             {
-                                // wow, someone knew what they were doing ?!?!
                                 line = reader.ReadLine();
                                 Contract.Assume(line != null);
                                 val += "\r\n" + line;
                             }
 
                             if (values.ContainsKey(key))
+                            {
+                                // This only happens if a tag appears multiple times.
                                 values[key] = val;
+                            }
                             else
+                            {
                                 values.Add(key, val);
+                            }
                         }
                         else
                         {
-                            // probably wrong
+                            // When the current line contains a '=' but has no valid key as prefix,
+                            // it is assumed that it is part of the previous tag.
                             values[key] += "\r\n" + line;
                         }
                     }
                     else
                     {
-                        // definitely wrong
-                        values[key] += "\r\n" + line;
+                        // If the current line does not contain a '=', it is assumed that it is part of the previous tag.
+                        // But only if the current value is not empty (i.e. there was content directly after the initial '=').
+                        if (!string.IsNullOrEmpty(values[key]))
+                            values[key] += "\r\n" + line;
                     }
                 }
             }
