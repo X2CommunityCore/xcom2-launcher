@@ -98,14 +98,22 @@ namespace XCOM2Launcher.Mod
             if (Settings.Instance.UseSpecifiedCategories && keyValPairs.ContainsKey("category") && keyValPairs["category"].Length > 0)
                 Category = keyValPairs["category"];
 
-            if (keyValPairs.ContainsKey("publishedfileid") && int.TryParse(keyValPairs["publishedfileid"], out var publishId))
+            if (keyValPairs.ContainsKey("publishedfileid") && !string.IsNullOrEmpty(keyValPairs["publishedfileid"]))
             {
-                PublishedFileID = publishId;
+                if (int.TryParse(keyValPairs["publishedfileid"], out var publishId))
+                {
+                    PublishedFileID = publishId;
+                }
+                else
+                {
+                    var modFileContent = File.ReadAllText(filepath);
+                    Log.Error($"Error while parsing 'publishedfileid' field in '{filepath}'" + Environment.NewLine + modFileContent);
+                    PublishedFileID = -1;
+                }
             }
             else
             {
-                var modFileContent = File.ReadAllText(filepath);
-                Log.Error($"Error while parsing 'publishedfileid' field in '{filepath}'" + Environment.NewLine + modFileContent);
+                Log.Warn("Key 'publishedfileid' in '{filepath}' is missing or value is empty.");
                 PublishedFileID = -1;
             }
 
