@@ -30,13 +30,13 @@ namespace XCOM2Launcher.Mod
             if (!File.Exists(filepath))
                 return;
 
-            string[] keys = { "publishedfileid", "title", "category", "description", "tags", "contentimage", "requiresxpack" };
-            var values = new Dictionary<string, string>();
+            string[] validKeys = { "publishedfileid", "title", "category", "description", "tags", "contentimage", "requiresxpack" };
+            var keyValPairs = new Dictionary<string, string>();
 
             using (var stream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(stream))
             {
-                string key = null;
+                string currentKey = null;
 
                 reader.ReadLine(); // skip [mod] line
 
@@ -46,59 +46,59 @@ namespace XCOM2Launcher.Mod
                     Contract.Assume(line != null);
 
                     // Expected format is "key=value"
-                    if (key == null || line.Contains("="))
+                    if (currentKey == null || line.Contains("="))
                     {
-                        var data = line.Split(new[] { '=' }, 2);
-                        var temp = data[0].Trim().ToLower();
+                        var keyValPair = line.Split(new[] { '=' }, 2);
+                        var newKey = keyValPair[0].Trim().ToLower();
 
-                        if (key == null || keys.Contains(temp))
+                        if (currentKey == null || validKeys.Contains(newKey))
                         {
                             // probably right
-                            key = temp;
-                            var val = data[1];
+                            currentKey = newKey;
+                            var currentValue = keyValPair[1];
 
                             // A multi-line value should be indicated by a trailing '\' (source?) but most of the time isn't !?
                             while (line.Last() == '\\')
                             {
                                 line = reader.ReadLine();
                                 Contract.Assume(line != null);
-                                val += "\r\n" + line;
+                                currentValue += "\r\n" + line;
                             }
 
-                            if (values.ContainsKey(key))
+                            if (keyValPairs.ContainsKey(currentKey))
                             {
                                 // This only happens if a tag appears multiple times.
-                                values[key] = val;
+                                keyValPairs[currentKey] = currentValue;
                             }
                             else
                             {
-                                values.Add(key, val);
+                                keyValPairs.Add(currentKey, currentValue);
                             }
                         }
                         else
                         {
                             // When the current line contains a '=' but has no valid key as prefix,
                             // it is assumed that it is part of the previous tag.
-                            values[key] += "\r\n" + line;
+                            keyValPairs[currentKey] += "\r\n" + line;
                         }
                     }
                     else
                     {
                         // If the current line does not contain a '=', it is assumed that it is part of the previous tag.
                         // But only if the current value is not empty (i.e. there was content directly after the initial '=').
-                        if (!string.IsNullOrEmpty(values[key]))
-                            values[key] += "\r\n" + line;
+                        if (!string.IsNullOrEmpty(keyValPairs[currentKey]))
+                            keyValPairs[currentKey] += "\r\n" + line;
                     }
                 }
             }
 
-            if (values.ContainsKey("title"))
-                Title = values["title"];
+            if (keyValPairs.ContainsKey("title"))
+                Title = keyValPairs["title"];
 
-            if (Settings.Instance.UseSpecifiedCategories && values.ContainsKey("category") && values["category"].Length > 0)
-                Category = values["category"];
+            if (Settings.Instance.UseSpecifiedCategories && keyValPairs.ContainsKey("category") && keyValPairs["category"].Length > 0)
+                Category = keyValPairs["category"];
 
-            if (values.ContainsKey("publishedfileid") && int.TryParse(values["publishedfileid"], out var publishId))
+            if (keyValPairs.ContainsKey("publishedfileid") && int.TryParse(keyValPairs["publishedfileid"], out var publishId))
             {
                 PublishedFileID = publishId;
             }
@@ -109,18 +109,18 @@ namespace XCOM2Launcher.Mod
                 PublishedFileID = -1;
             }
 
-            if (values.ContainsKey("description"))
-                Description = values["description"];
+            if (keyValPairs.ContainsKey("description"))
+                Description = keyValPairs["description"];
 
-            if (values.ContainsKey("tags"))
-                Tags = values["tags"];
+            if (keyValPairs.ContainsKey("tags"))
+                Tags = keyValPairs["tags"];
 
-            if (values.ContainsKey("requiresxpack"))
-                RequiresXPACK = values["requiresxpack"].ToLower().Trim('\r', '\n', '\t', ' ') == "true";
+            if (keyValPairs.ContainsKey("requiresxpack"))
+                RequiresXPACK = keyValPairs["requiresxpack"].ToLower().Trim('\r', '\n', '\t', ' ') == "true";
 
-            if (values.ContainsKey("contentimage"))
+            if (keyValPairs.ContainsKey("contentimage"))
             {
-                var val = values["contentimage"].Trim('\r', '\n', '\t', ' ');
+                var val = keyValPairs["contentimage"].Trim('\r', '\n', '\t', ' ');
                 // todo fix illegal chars?
                 try
                 {
@@ -128,7 +128,7 @@ namespace XCOM2Launcher.Mod
                     Contract.Assert(path != null);
 
                     if (val.Length > 0 && File.Exists(Path.Combine(path, val)))
-                        ContentImage = values["contentimage"];
+                        ContentImage = keyValPairs["contentimage"];
                 }
                 catch (Exception ex)
                 {
