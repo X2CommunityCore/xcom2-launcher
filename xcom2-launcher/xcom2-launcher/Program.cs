@@ -186,7 +186,6 @@ namespace XCOM2Launcher
                     };
                 });
 
-                SentrySdk.CaptureMessage("Sentry initialized");
                 Log.Info($"Sentry initialized ({GlobalSettings.Instance.Guid})");
             }
             catch (Exception ex)
