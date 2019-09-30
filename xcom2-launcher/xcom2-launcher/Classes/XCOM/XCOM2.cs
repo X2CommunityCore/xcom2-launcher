@@ -152,6 +152,11 @@ namespace XCOM2Launcher.XCOM
             var currentModDirs = new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
             var validModDirs = new List<string>();
 
+            if (currentModDirs == null) {
+                Log.Warn("No mod directories found in XComEngine.ini");
+                return new string[0];
+            }
+
             foreach (var modDir in currentModDirs)
             {
                 try
