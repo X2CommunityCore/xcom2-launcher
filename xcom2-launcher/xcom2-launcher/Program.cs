@@ -294,7 +294,16 @@ namespace XCOM2Launcher
             }
 
             // Check and potentially add new mod paths from XCOM ini file.
-            settings.ModPaths.AddRange(XCOM2.DetectModDirs().Where(modPath => !settings.ModPaths.Contains(modPath)));
+            var modPathsFromIni = XCOM2.DetectModDirs();
+
+            if (modPathsFromIni != null)
+            {
+                settings.ModPaths.AddRange(modPathsFromIni.Where(modPath => !settings.ModPaths.Contains(modPath)));
+            }
+            else
+            {
+                MessageBox.Show("Unable to read mod directories from 'XComEngine.ini'. See file 'AML.log' for details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             // Remove obsolete mod paths
             settings.ModPaths.RemoveAll(modPath => !Directory.Exists(modPath));
