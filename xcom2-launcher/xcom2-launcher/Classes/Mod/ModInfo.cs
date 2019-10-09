@@ -134,8 +134,7 @@ namespace XCOM2Launcher.Mod
                 catch (Exception ex)
                 {
                     var modFileContent = File.ReadAllText(filepath);
-                    Log.Error($"Error while parsing 'contentimage' field in '{filepath}'" + Environment.NewLine + modFileContent, ex);
-                    Debug.Fail(ex.Message);
+                    Log.Warn($"Error while parsing 'contentimage' field in '{filepath}'" + Environment.NewLine + modFileContent, ex);
                 }
             }
         }
