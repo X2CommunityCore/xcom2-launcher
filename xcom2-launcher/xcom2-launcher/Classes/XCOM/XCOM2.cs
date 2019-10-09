@@ -143,14 +143,33 @@ namespace XCOM2Launcher.XCOM
                     mod.isActive = true;
         }
 
+        /// <summary>
+        /// Reads the mod directories from the XComEngine.ini file.
+        /// </summary>
+        /// <returns>List of mod directories. NULL if the ini file is missing or couldn't be accessed.</returns>
         public static IEnumerable<string> DetectModDirs()
         {
             // Prevent stack overflow (Issue #19)
             if (_gameDir == null)
                 return new string[0];
 
-            var currentModDirs = new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
+            List<string> currentModDirs;
             var validModDirs = new List<string>();
+
+            try
+            {
+                currentModDirs = new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
+            }
+            catch (IOException ex)
+            {
+                Log.Warn("Unable to access 'XComEngine.ini'", ex);
+                return null;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Log.Warn("Unable to access 'XComEngine.ini'", ex);
+                return null;
+            }
 
             foreach (var modDir in currentModDirs)
             {
