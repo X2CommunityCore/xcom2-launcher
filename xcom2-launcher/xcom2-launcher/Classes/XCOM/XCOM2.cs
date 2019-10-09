@@ -170,6 +170,11 @@ namespace XCOM2Launcher.XCOM
                 Log.Warn("Unable to access 'XComEngine.ini'", ex);
                 return null;
             }
+          
+            if (currentModDirs == null) {
+                Log.Warn("No mod directories found in XComEngine.ini");
+                return new string[0];
+            }
 
             foreach (var modDir in currentModDirs)
             {
