@@ -65,15 +65,8 @@ namespace XCOM2Launcher.Mod
                                 currentValue += "\r\n" + line;
                             }
 
-                            if (keyValPairs.ContainsKey(currentKey))
-                            {
-                                // This only happens if a tag appears multiple times.
-                                keyValPairs[currentKey] = currentValue;
-                            }
-                            else
-                            {
-                                keyValPairs.Add(currentKey, currentValue);
-                            }
+                            // add or update key (if a key appears multiple times the last entry is effectively used)
+                            keyValPairs[currentKey] = currentValue;
                         }
                         else
                         {
