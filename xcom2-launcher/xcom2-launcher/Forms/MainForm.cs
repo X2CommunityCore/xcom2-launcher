@@ -245,8 +245,18 @@ namespace XCOM2Launcher.Forms
 
         private void Save(bool WotC)
         {
-            XCOM2.SaveChanges(Settings, WotC, ChallengeMode);
-            Settings.SaveFile("settings.json");
+            try
+            {
+                XCOM2.SaveChanges(Settings, WotC, ChallengeMode);
+                Settings.SaveFile("settings.json");
+            }
+            catch (Exception ex)
+            {
+                // lets report any issues that occur while writing the settings.json or the ini files
+                Log.Warn("Failed so save/apply settings", ex);
+                MessageBox.Show("An error occurred while saving changes." +
+                                Environment.NewLine + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void RunGame()
