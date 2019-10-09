@@ -117,6 +117,12 @@ namespace XCOM2Launcher.Forms
             var modFoldersChanged = !Settings.ModPaths.OrderBy(x => x).SequenceEqual(newModPaths.OrderBy(x => x));
             IsRestartRequired = sentryEnableChanged || gamePathChanged || modFoldersChanged;
 
+            // Verify settings
+            if (!Directory.Exists(gamePathTextBox.Text)) {
+                MessageBox.Show("The specified base path does not exist.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
             // Apply changes
             Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
             Settings.CloseAfterLaunch = closeAfterLaunchCheckBox.Checked;
