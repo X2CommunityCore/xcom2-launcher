@@ -64,7 +64,7 @@ namespace XCOM2Launcher.Classes {
             Log.Debug("Initializing global settings");
 
             var fileLocation = GetFileLocation();
-            GlobalSettings settings = new GlobalSettings();
+            GlobalSettings settings = null;
 
             if (File.Exists(fileLocation)) {
                 Log.Debug($"Loading global settings from {fileLocation}.");
@@ -79,18 +79,24 @@ namespace XCOM2Launcher.Classes {
                             }
 
                             settings = (GlobalSettings)serializer.Deserialize(reader, typeof(GlobalSettings));
+
+                            if (settings == null) {
+                                Log.Warn("Deserialization result was NULL.");
+                            }
                         }
                     }
                 } catch (JsonSerializationException ex) {
                     Log.Warn("Settings file seems to contain incompatible data.", ex);
-                    SentrySdk.CaptureException(ex);
                 } catch (JsonReaderException ex) {
                     Log.Warn("Settings file format seems to be invalid.", ex);
-                    SentrySdk.CaptureException(ex);
                 } catch (Exception ex) {
                     Log.Warn("Failed to deserialize settings file.", ex);
-                    SentrySdk.CaptureException(ex);
                 }
+            }
+
+            if (settings == null) {
+                Log.Info("Using default settings.");
+                settings = new GlobalSettings();
             }
 
             return settings;
