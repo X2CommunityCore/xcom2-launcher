@@ -115,9 +115,9 @@ namespace XCOM2Launcher
             _argumentList.Add("-noRedscreens");
         }
 
-        internal void ImportMods()
+        internal List<ModEntry> ImportMods()
         {
-            Mods.ImportMods(ModPaths);
+            return Mods.ImportMods(ModPaths);
         }
 
         public string GetWorkshopPath()

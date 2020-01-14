@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Steamworks;
 using XCOM2Launcher.Helper;
 using FilePath = System.IO.Path;
 
@@ -16,6 +17,8 @@ namespace XCOM2Launcher.Mod
 {
     public class ModEntry
     {
+        [JsonIgnore] public const string DEFAULT_AUTHOR_NAME = "Unknown";
+
         [JsonIgnore] private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModEntry));
 
         [JsonIgnore] private string _image;
@@ -35,7 +38,7 @@ namespace XCOM2Launcher.Mod
         public string Name { get; set; }
         public bool ManualName { get; set; } = false;
 
-        public string Author { get; set; } = "Unknown";
+        public string Author { get; set; } = DEFAULT_AUTHOR_NAME;
 	    public string Description { get; set; } = "";
 
 	    public string Path { get; set; } = "";
@@ -60,6 +63,10 @@ namespace XCOM2Launcher.Mod
 
         public string Note { get; set; } = null;
 
+        public List<long> Dependencies { get; set; } = new List<long>();
+
+        public List<string> SteamTags { get; set; } = new List<string>();
+
 		[JsonIgnore]
 	    public bool HasBackedUpSettings => Settings.Count > 0;
 
@@ -77,11 +84,27 @@ namespace XCOM2Launcher.Mod
 
 	    [JsonIgnore]
 	    public string BrowserLink => GetWorkshopLink();
-        
+
         [Browsable(false)]
         public IList<string> Tags { get; set; } = new List<string>();
 
         public bool BuiltForWOTC { get; set; } = false;
+
+        public ModEntry() {}
+
+        public ModEntry(SteamUGCDetails_t workshopDetails)
+        {
+            if (workshopDetails.m_eResult != EResult.k_EResultOK)
+            {
+                return;
+            }
+
+            State = ModState.NotInstalled;
+            WorkshopID = (long)workshopDetails.m_nPublishedFileId.m_PublishedFileId;
+            Source = ModSource.SteamWorkshop;
+            Name = workshopDetails.m_rgchTitle;
+            Description = workshopDetails.m_rgchDescription;
+        }
 
         public Classes.Mod.ModProperty GetProperty()
         {
@@ -274,16 +297,6 @@ namespace XCOM2Launcher.Mod
             }
             return "";
 	    }
-
-        public String[] GetSteamTags()
-        {
-            if (WorkshopID > 0)
-            {
-                var details = Steam.Workshop.GetDetails((ulong) WorkshopID);
-                return details.m_rgchTags.Split(',').Select(s => s.TrimStart(' ').TrimEnd(' ')).Where(s => !String.IsNullOrWhiteSpace(s)).ToArray();
-            }
-            return new String[0];
-        }
 
         public override string ToString()
         {
