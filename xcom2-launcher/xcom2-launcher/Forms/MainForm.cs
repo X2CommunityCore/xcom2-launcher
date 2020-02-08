@@ -37,6 +37,13 @@ namespace XCOM2Launcher.Forms
 
             // Restore states 
             showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
+            cShowStateFilter.Checked = settings.ShowStateFilter;
+            cEnableGrouping.Checked = settings.ShowModListGroups;
+            cShowPrimaryDuplicates.Checked = Settings.ShowPrimaryDuplicateAsDependency;
+            cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
+            modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+            olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+            olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
 
             // Hide WotC and Challenge Mode buttons if necessary
             if (settings.GamePath != "")
@@ -376,16 +383,10 @@ namespace XCOM2Launcher.Forms
         {
             error_provider.Clear();
 
-            // Incompability warnings and overwrites grid
-            UpdateConflicts();
-
-            // ModEntry list
-            // RefreshModList();
-
-            // ModEntry details
+            UpdateConflictInfo();
             UpdateModInfo(modlist_ListObjectListView.SelectedObject as ModEntry);
-
             UpdateLabels();
+            UpdateStateFilterLabels();
         }
 
         private void UpdateLabels()
@@ -397,9 +398,27 @@ namespace XCOM2Launcher.Forms
             conflicts_tab.ImageKey = hasConflicts ? ExclamationIconKey : null;
         }
 
+        /// <summary>
+        /// Updates labels from filter controls with number of currently matching mods.
+        /// </summary>
+        private void UpdateStateFilterLabels()
+        {
+            var allMods = Mods.All.ToList();
+            cFilterConflicted.Text = $"Conflicts ({allMods.Count(m => m.State.HasFlag(ModState.ModConflict))})";
+            cFilterDuplicate.Text = $"Duplicates ({allMods.Count(m => m.State.HasFlag(ModState.DuplicateID))})";
+            cFilterNew.Text = $"New ({allMods.Count(m => m.State.HasFlag(ModState.New))})";
+            cFilterNotInstalled.Text = $"Not installed ({allMods.Count(m => m.State.HasFlag(ModState.NotInstalled))})";
+            cFilterNotLoaded.Text = $"Not loaded ({allMods.Count(m => m.State.HasFlag(ModState.NotLoaded))})";
+            cFilterMissingDependency.Text = $"Missing dependencies ({allMods.Count(m => m.isActive && m.State.HasFlag(ModState.MissingDependencies))})";
+            cFilterHidden.Text = $"Hidden ({allMods.Count(m => m.isHidden)})";
+        }
+
         public int NumConflicts;
 
-        private void UpdateConflicts()
+        /// <summary>
+        /// Update incompatibility warnings and overrides grid.
+        /// </summary>
+        private void UpdateConflictInfo()
         {
             // Incremented later in GetDuplicatesString() and GetOverridesString()
             NumConflicts = 0;
@@ -471,21 +490,31 @@ namespace XCOM2Launcher.Forms
 
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
-
-            // Update interface
-            modlist_ListObjectListView.RefreshObjects(mods);
-            UpdateLabels();
         }
 
         private string GetDuplicatesString()
         {
             var str = new StringBuilder();
 
-            var duplicates = Mods.GetDuplicates().ToList();
+            var duplicates = Mods.GetDuplicates().Where(delegate(IGrouping<string, ModEntry> entries)
+            {
+                // Only show duplicate-groups that have not been resolved (ModState.DuplicateDisabled / ModState.DuplicatePrimary)
+                return entries?.All(m => m.State.HasFlag(ModState.DuplicateID)) == true;
+            }).ToList();
+
+
             if (duplicates.Any())
             {
-                str.AppendLine("Mods with colliding package ids found!");
-                str.AppendLine("These can only be (de-)activated together.");
+                str.AppendLine("Mods with identical package ids found!");
+                if (Settings.EnableDuplicateModIdWorkaround)
+                {
+                    str.AppendLine("You can set a preferred duplicate from the mod list context menu to resolve this.");
+                }
+                else
+                {
+                    str.AppendLine("These can only be (de-)activated together.");
+                }
+
                 str.AppendLine();
 
                 foreach (var grouping in duplicates)
@@ -516,8 +545,8 @@ namespace XCOM2Launcher.Forms
 
             var str = new StringBuilder();
 
-            str.AppendLine("Mods with colliding overrides found!");
-            str.AppendLine("These mods will not (fully) work when run together.");
+            str.AppendLine("Mods with conflicting overrides found!");
+            str.AppendLine("These mods will probably not work as intended, or cause instabilities when run together.");
             str.AppendLine();
 
             foreach (var conflict in conflicts)
@@ -579,11 +608,15 @@ namespace XCOM2Launcher.Forms
 
             // update dependency information
             olvRequiredMods.ClearObjects();
-            olvRequiredMods.AddObjects(Mods.GetRequiredMods(m, false));
+            olvRequiredMods.AddObjects(Mods.GetRequiredMods(m, cShowPrimaryDuplicates.Checked));
             olvDependentMods.ClearObjects();
             olvDependentMods.AddObjects(Mods.GetDependentMods(m, false));
         }
 
+        /// <summary>
+        /// Update mod information panel with data from specified mod.
+        /// </summary>
+        /// <param name="m"></param>
         private void UpdateModInfo(ModEntry m)
         {
             if (m == null)
@@ -680,24 +713,18 @@ namespace XCOM2Launcher.Forms
         {
             var mod = rowobject as ModEntry;
 
-            if (mod?.State.HasFlag(ModState.NotInstalled) == true)
+            Debug.WriteLine("olvRequiredMods_ItemCheck: " + mod.isActive + " -> " + newValue);
+            newValue = ProcessNewModState(mod, newValue);
+            Debug.WriteLine("olvRequiredMods_ItemCheck: " + mod.isActive + " -> " + newValue);
+
+            // change check state for the mod in main list accordingly
+            if (newValue)
             {
-                return false;
+                modlist_ListObjectListView.CheckObject(mod);
             }
-
-            // change check state in main list accordingly and refresh display
-            if (ModList.Objects.Contains(mod))
+            else
             {
-                if (newValue)
-                {
-                    modlist_ListObjectListView.CheckObject(mod);
-                }
-                else
-                {
-                    modlist_ListObjectListView.UncheckObject(mod);
-                }
-
-                modlist_ListObjectListView.RefreshObject(mod);
+                modlist_ListObjectListView.UncheckObject(mod);
             }
 
             return newValue;
@@ -723,7 +750,7 @@ namespace XCOM2Launcher.Forms
 
             SetModListItemColor(e.Item, mod);
         }
-        
+
         #endregion
     }
 }

@@ -272,15 +272,15 @@
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>546, 17</value>
   </metadata>
-  <data name="label10.ToolTip" xml:space="preserve">
+  <data name="cFilterHidden.ToolTip" xml:space="preserve">
+    <value>A mod will be automatically hidden, when it is no longer available ("Not installed" or "Not loaded").
+Mods can manually be (un-)hidden using the mod lists context menu.
+Hidden mods can be shown by activating "Options -&gt; Show hidden mods".</value>
+  </data>
+  <data name="cFilterNew.ToolTip" xml:space="preserve">
     <value>Mods are flagged as "New", when they were added during the last mod import/update process.
 The "New" flag for all mods will be removed after AML has been restarted.
 The "New" flag for a single mod will be removed when it is selected.</value>
-  </data>
-  <data name="label9.ToolTip" xml:space="preserve">
-    <value>A mod will be automatically hidden, when it is no longer available ("Not installed" or "Not loaded").
-Mods can manually be (un-)hidden using the mod lists context menu.
-Hidden mods can be show by activating "Options -&gt; Show hidden mods".</value>
   </data>
   <metadata name="modTabToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>636, 17</value>

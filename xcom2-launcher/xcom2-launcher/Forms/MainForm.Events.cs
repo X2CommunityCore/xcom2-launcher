@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
 using Steamworks;
@@ -85,11 +83,7 @@ namespace XCOM2Launcher.Forms
                 SetStatus("Updating all mods...");
 
                 var mods = Settings.Mods.All.ToList();
-
-                UpdateMods(mods, () =>
-                {
-                    modlist_ListObjectListView.RefreshObjects(mods);
-                });
+                UpdateMods(mods);
             };
 
             exitToolStripMenuItem.Click += (sender, e) =>
@@ -119,9 +113,24 @@ namespace XCOM2Launcher.Forms
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
+                    // If the duplicate mod workaround is disabled, make sure that all mod info files are enabled.
+                    if (!Settings.EnableDuplicateModIdWorkaround)
+                    {
+                        foreach (var mod in Mods.All)
+                        {
+                            mod.EnableModFile();
+                        }
+
+                        Mods.MarkDuplicates();
+                    }
+
                     // refresh/update settings dependent functions
                     RefreshModList();
                     showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
+                    modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+                    olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+                    olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+                    cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
                     UpdateQuickArgumentsMenu();
 
                     if (dialog.IsRestartRequired)
@@ -284,6 +293,9 @@ namespace XCOM2Launcher.Forms
         {
             // Save dimensions
             Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_ListObjectListView.SaveState() };
+            Settings.ShowStateFilter = cShowStateFilter.Checked;
+            Settings.ShowModListGroups = cEnableGrouping.Checked;
+            Settings.ShowPrimaryDuplicateAsDependency = cShowPrimaryDuplicates.Checked;
 
             Save(Settings.Instance.LastLaunchedWotC);
         }
@@ -492,34 +504,10 @@ namespace XCOM2Launcher.Forms
             Tools.StartProcess(e.LinkText);
         }
 
-		private void filterMods_TextChanged(object sender, EventArgs e)
-		{
-			TextMatchFilter filter = null;
-			int matchKind = 0;
-			string txt = ((TextBox) sender).Text;
-			if (!String.IsNullOrEmpty(txt))
-			{
-				switch (matchKind)
-				{
-                    default:
-						filter = TextMatchFilter.Contains(modlist_ListObjectListView, txt);
-						break;
-					case 1:
-						filter = TextMatchFilter.Prefix(modlist_ListObjectListView, txt);
-						break;
-					case 2:
-						filter = TextMatchFilter.Regex(modlist_ListObjectListView, txt);
-						break;
-				}
-			}
-
-			// Text highlighting requires at least a default renderer
-			if (modlist_ListObjectListView.DefaultRenderer == null)
-				modlist_ListObjectListView.DefaultRenderer = new HighlightTextRenderer(filter);
-
-			modlist_ListObjectListView.AdditionalFilter = filter;
-
-		}
+        private void filterMods_TextChanged(object sender, EventArgs e)
+        {
+            RefreshModelFilter();
+        }
 
         private void cEnableGrouping_CheckedChanged(object sender, EventArgs e)
         {
@@ -530,7 +518,7 @@ namespace XCOM2Launcher.Forms
 
         private void cShowLegend_CheckedChanged(object sender, EventArgs e)
         {
-            pModsLegend.Visible = cShowLegend.Checked;
+            pModsLegend.Visible = cShowStateFilter.Checked;
         }
 
 		private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
@@ -718,6 +706,29 @@ namespace XCOM2Launcher.Forms
         private void modlist_filterClearButton_Click(object sender, EventArgs e)
         {
             modlist_FilterCueTextBox.Text = "";
+        }
+
+        private void cStateFilter_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                checkBox.Font = checkBox.Checked ? new Font(checkBox.Font, FontStyle.Bold) : new Font(checkBox.Font, FontStyle.Regular);
+            }
+
+            RefreshModelFilter();
+        }
+
+        private void bRefreshStateFilter_Click(object sender, EventArgs e)
+        {
+            RefreshModelFilter();
+        }
+
+        private void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
+        {
+            if (modlist_ListObjectListView.SelectedObject is ModEntry mod)
+            {
+                UpdateDependencyInformation(mod);
+            }
         }
 
         #endregion

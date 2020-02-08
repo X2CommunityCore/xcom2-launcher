@@ -93,6 +93,22 @@ namespace XCOM2Launcher.Mod
             }
         }
 
+        /// <summary>
+        /// Checks if all required mods for the specified <paramref name="mod"/> are properly installed and activated.
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <returns></returns>
+        public void UpdatedModDependencyState(ModEntry mod)
+        {
+            var requiredMods = GetRequiredMods(mod);
+            var allRequiredModsAvailable = requiredMods.All(m => m.WorkshopID != 0 && m.isActive && !m.State.HasFlag(ModState.NotInstalled) && !m.State.HasFlag(ModState.NotLoaded));
+            
+            if (allRequiredModsAvailable)
+                mod.RemoveState(ModState.MissingDependencies);
+            else 
+                mod.AddState(ModState.MissingDependencies);
+        }
+
         public List<ModEntry> ImportMods(List<string> modPaths)
         {
             Log.Info("Checking mod directories for new mods");
@@ -259,7 +275,7 @@ namespace XCOM2Launcher.Mod
                 if (!VerifyModState(mod, settings))
                     continue;
 
-                if (mod.Source == ModSource.SteamWorkshop && mod.WorkshopID != 0)
+                if (mod.WorkshopID != 0)
                 {
                     steamMods.Add(mod);
                 }
@@ -431,7 +447,7 @@ namespace XCOM2Launcher.Mod
 
         void UpdateSteamMod(ModEntry m, SteamUGCDetails_t workshopDetails)
         {
-            if (m == null || m.Source != ModSource.SteamWorkshop)
+            if (m == null || m.WorkshopID <= 0)
             {
                 return;
             }
@@ -547,7 +563,7 @@ namespace XCOM2Launcher.Mod
         public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true)
         {
             List<ModEntry> requiredMods = new List<ModEntry>();
-            var installedSteamMods = All.Where(m => m.WorkshopID != 0).ToList();
+            var installedSteamMods = All.Where(m => m.WorkshopID != 0 && m.Source == ModSource.SteamWorkshop).ToList();
             
             foreach (var id in mod.Dependencies)
             {
@@ -606,12 +622,15 @@ namespace XCOM2Launcher.Mod
             return All.GroupBy(m => m.ID, StringComparer.InvariantCultureIgnoreCase).Where(g => g.Count() > 1);
         }
 
+        /// <summary>
+        /// Sets the appropriate ModState flags for all duplicate mods.
+        /// </summary>
         public void MarkDuplicates()
         {
             foreach (var duplicateGroup in GetDuplicates())
             {
                 // If any mod from a group of duplicates is disabled, we indicate this by adding special mod states to all mods of this group.
-                if (duplicateGroup.Any(m => m.CheckModFileDisabled()))
+                if (Settings.Instance.EnableDuplicateModIdWorkaround && duplicateGroup.Any(m => m.CheckModFileDisabled()))
                 {
                     Log.Debug($"Duplicate mod workaround active for mod ID '{duplicateGroup.First().ID}'");
                     bool primaryAlreadyAssigned = false;
