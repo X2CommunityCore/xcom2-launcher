@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Management;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
@@ -188,18 +189,28 @@ namespace XCOM2Launcher.Mod
             return mod;
         }
 
+        /// <summary>
+        /// Checks if a single mod information file (.XComMod) exists in the given folder.
+        /// </summary>
+        /// <param name="modDir">The mod directory were the mod information file is expected to be located.</param>
+        /// <returns>Full path to the file if found. NULL if no match or multiple matches were found or the folder could not be accessed.</returns>
         public string FindModInfo(string modDir)
         {
             string infoFile;
             try
             {
                 infoFile = Directory.GetFiles(modDir, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
+
+                if (infoFile == null)
+                {
+                    infoFile = Directory.GetFiles(modDir, "*.XComMod" + ModEntry.MODFILE_DISABLE_POSTFIX, SearchOption.TopDirectoryOnly).SingleOrDefault();
+                }
             }
             catch (InvalidOperationException)
             {
                 Log.Error("Multiple XComMod files in folder " + modDir);
                 MessageBox.Show(
-                                $"A mod could not be loaded since it contains multiple .xcommod files\r\nPlease notify the mod creator.\r\n\r\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                $"A mod could not be loaded since it contains multiple .XComMod files\r\n\r\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
             catch (UnauthorizedAccessException)
@@ -248,7 +259,7 @@ namespace XCOM2Launcher.Mod
                 if (!VerifyModState(mod, settings))
                     continue;
 
-                if (mod.WorkshopID != 0)
+                if (mod.Source == ModSource.SteamWorkshop && mod.WorkshopID != 0)
                 {
                     steamMods.Add(mod);
                 }
@@ -261,7 +272,6 @@ namespace XCOM2Launcher.Mod
             var steamModsCopy = new List<ModEntry>(steamMods);
             var getDetailsTasks = new List<Task<List<SteamUGCDetails_t>>>();
             var totalModCount = steamMods.Count + localMods.Count;
-            var totalProgress = 1;
             var steamProgress = 1;
             
             while(steamModsCopy.Any())
@@ -313,7 +323,7 @@ namespace XCOM2Launcher.Mod
             await Task.WhenAll(getDetailsTasks);
             Log.Debug("GetDetails tasks completed.");
 
-            totalProgress += steamProgress;
+            var totalProgress = steamProgress;
 
             Log.Debug("Updating local mods.");
 
@@ -515,23 +525,26 @@ namespace XCOM2Launcher.Mod
         }
 
         /// <summary>
-        /// Returns all mods that depend on the specified mod.
-        /// (based on REQUIRED ITEMS section in the workshop)
+        /// Returns all mods that depend on the specified mod (based on REQUIRED ITEMS section in the workshop).
         /// </summary>
         /// <param name="mod"></param>
+        /// <param name="compareModId">If set to false, dependencies are checked against the workshop ID. Otherwise, the mod ID is used which also matches for duplicates.</param>
         /// <returns></returns>
-        public List<ModEntry> GetDependentMods(ModEntry mod)
+        public List<ModEntry> GetDependentMods(ModEntry mod, bool compareModId = true)
         {
+            if (compareModId)
+                return All.Where(m => GetRequiredMods(m).Select(requiredMod => requiredMod.ID).Contains(mod.ID)).ToList();
+
             return All.Where(m => m.Dependencies.Contains(mod.WorkshopID)).ToList();
         }
 
         /// <summary>
-        /// Returns all mods that are required for the the specified mod.
-        /// (based on REQUIRED ITEMS section in the workshop)
+        /// Returns all mods that are required for the the specified mod (based on REQUIRED ITEMS section in the workshop).
         /// </summary>
-        /// <param name="mod"></param>
+        /// <param name="mod">Mod to check required mods for</param>
+        /// <param name="substituteDuplicates">If set to true, the primary duplicate will be returned if the real dependency is a disabled duplicate.</param>
         /// <returns></returns>
-        public List<ModEntry> GetRequiredMods(ModEntry mod)
+        public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true)
         {
             List<ModEntry> requiredMods = new List<ModEntry>();
             var installedSteamMods = All.Where(m => m.WorkshopID != 0).ToList();
@@ -543,6 +556,17 @@ namespace XCOM2Launcher.Mod
 
                 if (result != null)
                 {
+                    // If the required mod is installed but disabled a duplicate, use the primary duplicate
+                    if (substituteDuplicates && result.State.HasFlag(ModState.DuplicateDisabled))
+                    {
+                        var primaryDuplicate = All.FirstOrDefault(m => m.ID == result.ID && m.State.HasFlag(ModState.DuplicatePrimary));
+
+                        if (primaryDuplicate != null)
+                        {
+                            result = primaryDuplicate;
+                        }
+                    }
+
                     requiredMods.Add(result);
                 }
                 else
@@ -584,8 +608,47 @@ namespace XCOM2Launcher.Mod
 
         public void MarkDuplicates()
         {
-            foreach (var m in GetDuplicates().SelectMany(group => group))
-                m.AddState(ModState.DuplicateID);
+            foreach (var duplicateGroup in GetDuplicates())
+            {
+                // If any mod from a group of duplicates is disabled, we indicate this by adding special mod states to all mods of this group.
+                if (duplicateGroup.Any(m => m.CheckModFileDisabled()))
+                {
+                    Log.Debug($"Duplicate mod workaround active for mod ID '{duplicateGroup.First().ID}'");
+                    bool primaryAlreadyAssigned = false;
+                    
+                    foreach (var mod in duplicateGroup.OrderBy(m => m.DateAdded))
+                    {
+                        if (mod.CheckModFileDisabled())
+                        {
+                            Log.Debug($"Duplicate {mod.Name} ({mod.WorkshopID}) is disabled");
+                            mod.AddState(ModState.DuplicateDisabled);
+                        }
+                        else
+                        {
+                            // Make sure, there is only one primary mod.
+                            if (primaryAlreadyAssigned)
+                            {
+                                Log.Debug($"Duplicate {mod.Name} ({mod.WorkshopID}) will now be disabled");
+                                mod.DisableModFile();
+                                mod.AddState(ModState.DuplicateDisabled);
+                            }
+                            else
+                            {
+                                Log.Debug($"Duplicate {mod.Name} ({mod.WorkshopID}) is the primary mod");
+                                mod.AddState(ModState.DuplicatePrimary);
+                                primaryAlreadyAssigned = true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var mod in duplicateGroup)
+                    {
+                        mod.AddState(ModState.DuplicateID);
+                    }
+                }
+            }
         }
     }
 

@@ -188,6 +188,7 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
             this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -227,6 +228,7 @@
             this.export_tab.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // main_statusstrip
@@ -270,7 +272,7 @@
             this.appRestartPendingLabel.Size = new System.Drawing.Size(158, 17);
             this.appRestartPendingLabel.Text = "Application restart pending";
             this.appRestartPendingLabel.ToolTipText = "Some changes to the settings won\'t take effect,\r\nuntil after the application has " +
-    "been restarted.";
+                                                      "been restarted.";
             // 
             // main_menustrip
             // 
@@ -832,7 +834,7 @@
             this.label8.Text = "Duplicate ID";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.toolTip.SetToolTip(this.label8, "A pair of mods are flagged as \"Duplicate ID\", when the IDs of those\r\nmods are ide" +
-        "ntical, because they are supposed to be unique.");
+                                                 "ntical, because they are supposed to be unique.");
             // 
             // label7
             // 
@@ -846,7 +848,7 @@
             this.label7.Text = "Conflicted";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.toolTip.SetToolTip(this.label7, "A pair of mods are flagged as \"Conflicted\", when the class\r\noverrides are likely " +
-        "to cause issues.");
+                                                 "to cause issues.");
             // 
             // label4
             // 
@@ -860,7 +862,7 @@
             this.label4.Text = "Not loaded";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.toolTip.SetToolTip(this.label4, "A mod is flagged as \"Not loaded\" when the mods installation folder is no longer \r" +
-        "\nlocated in one of the configured mod directories (Option->Settings).");
+                                                 "\nlocated in one of the configured mod directories (Option->Settings).");
             // 
             // label3
             // 
@@ -874,7 +876,7 @@
             this.label3.Text = "Missing dependency";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.toolTip.SetToolTip(this.label3, "A mod will indicate a \"Missing dependency\", when not all required mods \r\nare enab" +
-        "led or installed. Check \"Mod Info -> Dependency Tab\".");
+                                                 "led or installed. Check \"Mod Info -> Dependency Tab\".");
             // 
             // label2
             // 
@@ -897,7 +899,7 @@
             this.label1.Text = "Not installed";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.toolTip.SetToolTip(this.label1, "A mod is flagged as \"Not installed\" when the mod folder\r\nno longer exists, or whe" +
-        "n the XComMod file is missing.");
+                                                 "n the XComMod file is missing.");
             // 
             // pModsTop
             // 
@@ -1471,8 +1473,7 @@
             // 
             // modinfo_dependencies_tab
             // 
-            this.modinfo_dependencies_tab.Controls.Add(this.panel5);
-            this.modinfo_dependencies_tab.Controls.Add(this.panel4);
+            this.modinfo_dependencies_tab.Controls.Add(this.tableLayoutPanel1);
             this.modinfo_dependencies_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_dependencies_tab.Name = "modinfo_dependencies_tab";
             this.modinfo_dependencies_tab.Padding = new System.Windows.Forms.Padding(3);
@@ -1488,7 +1489,7 @@
             this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel5.Location = new System.Drawing.Point(3, 98);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(754, 96);
+            this.panel5.Size = new System.Drawing.Size(748, 90);
             this.panel5.TabIndex = 3;
             // 
             // olvDependentMods
@@ -1519,7 +1520,7 @@
             this.olvDependentMods.Name = "olvDependentMods";
             this.olvDependentMods.ShowGroups = false;
             this.olvDependentMods.ShowItemCountOnGroups = true;
-            this.olvDependentMods.Size = new System.Drawing.Size(754, 81);
+            this.olvDependentMods.Size = new System.Drawing.Size(748, 75);
             this.olvDependentMods.SortGroupItemsByPrimaryColumn = false;
             this.olvDependentMods.TabIndex = 2;
             this.olvDependentMods.TintSortColumn = true;
@@ -1589,7 +1590,7 @@
             this.label6.Dock = System.Windows.Forms.DockStyle.Top;
             this.label6.Location = new System.Drawing.Point(0, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(754, 15);
+            this.label6.Size = new System.Drawing.Size(748, 15);
             this.label6.TabIndex = 3;
             this.label6.Text = "Dependent mods:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1598,10 +1599,10 @@
             // 
             this.panel4.Controls.Add(this.olvRequiredMods);
             this.panel4.Controls.Add(this.label5);
-            this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(3, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(754, 95);
+            this.panel4.Size = new System.Drawing.Size(748, 89);
             this.panel4.TabIndex = 1;
             // 
             // olvRequiredMods
@@ -1632,7 +1633,7 @@
             this.olvRequiredMods.Name = "olvRequiredMods";
             this.olvRequiredMods.ShowGroups = false;
             this.olvRequiredMods.ShowItemCountOnGroups = true;
-            this.olvRequiredMods.Size = new System.Drawing.Size(754, 80);
+            this.olvRequiredMods.Size = new System.Drawing.Size(748, 74);
             this.olvRequiredMods.SortGroupItemsByPrimaryColumn = false;
             this.olvRequiredMods.TabIndex = 1;
             this.olvRequiredMods.TintSortColumn = true;
@@ -1692,7 +1693,7 @@
             this.label5.Dock = System.Windows.Forms.DockStyle.Top;
             this.label5.Location = new System.Drawing.Point(0, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(754, 15);
+            this.label5.Size = new System.Drawing.Size(748, 15);
             this.label5.TabIndex = 2;
             this.label5.Text = "Required mods:";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -1956,6 +1957,21 @@
             this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
             this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.panel4, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.panel5, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(754, 191);
+            this.tableLayoutPanel1.TabIndex = 4;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2022,6 +2038,7 @@
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2135,57 +2152,58 @@
         private System.Windows.Forms.Button btnDescSave;
         private BrightIdeasSoftware.OLVColumn olvAuthor;
         private System.Windows.Forms.ToolStripMenuItem runChallengeModeToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem manageCategoriesToolStripMenuItem;
-		private System.Windows.Forms.ToolStrip modTabToolStrip;
-		private System.Windows.Forms.ToolStripDropDownButton quickLaunchToolstripButton;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
-		private System.Windows.Forms.ToolStripMenuItem noSeekFreeLoadingToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem autoDebugToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem reviewToolStripMenuItem;
-		private System.Windows.Forms.ToolStripStatusLabel labelFillsFreeSpace;
-		private System.Windows.Forms.ToolStripStatusLabel appRestartPendingLabel;
-		private System.Windows.Forms.Button btnDescUndo;
-		private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-		private System.Windows.Forms.ToolStripMenuItem openHomepageToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem openDiscordToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem amlWikiToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem importFromXCOM2ToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem importFromWotCToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem manageCategoriesToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip modTabToolStrip;
+        private System.Windows.Forms.ToolStripDropDownButton quickLaunchToolstripButton;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
+        private System.Windows.Forms.ToolStripMenuItem noSeekFreeLoadingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autoDebugToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reviewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel labelFillsFreeSpace;
+        private System.Windows.Forms.ToolStripStatusLabel appRestartPendingLabel;
+        private System.Windows.Forms.Button btnDescUndo;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem openHomepageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openDiscordToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem amlWikiToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importFromXCOM2ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem importFromWotCToolStripMenuItem;
         private System.Windows.Forms.TabPage modinfo_dependencies_tab;
-		private System.Windows.Forms.Panel pModsLegend;
-		private System.Windows.Forms.Panel pModsTop;
-		private System.Windows.Forms.Panel LauchOptionsPanel;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.CheckBox cShowLegend;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.Panel panel4;
-		private BrightIdeasSoftware.ObjectListView olvRequiredMods;
-		private BrightIdeasSoftware.OLVColumn olvColReqModsActive;
-		private BrightIdeasSoftware.OLVColumn olvColReqModsName;
-		private BrightIdeasSoftware.OLVColumn olvColReqModsState;
-		private BrightIdeasSoftware.OLVColumn olvColReqModsHidden;
-		private BrightIdeasSoftware.OLVColumn olvColReqModsWotc;
-		private BrightIdeasSoftware.ObjectListView olvDependentMods;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsActive;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsName;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsState;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsHidden;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsSteamUrl;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsWotc;
-		private System.Windows.Forms.Panel panel5;
-		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.Label label10;
-		private BrightIdeasSoftware.OLVColumn olvColDepModsUrl;
-		private BrightIdeasSoftware.OLVColumn olvColReqModsSteamUrl;
-	}
+        private System.Windows.Forms.Panel pModsLegend;
+        private System.Windows.Forms.Panel pModsTop;
+        private System.Windows.Forms.Panel LauchOptionsPanel;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox cShowLegend;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Panel panel4;
+        private BrightIdeasSoftware.ObjectListView olvRequiredMods;
+        private BrightIdeasSoftware.OLVColumn olvColReqModsActive;
+        private BrightIdeasSoftware.OLVColumn olvColReqModsName;
+        private BrightIdeasSoftware.OLVColumn olvColReqModsState;
+        private BrightIdeasSoftware.OLVColumn olvColReqModsHidden;
+        private BrightIdeasSoftware.OLVColumn olvColReqModsWotc;
+        private BrightIdeasSoftware.ObjectListView olvDependentMods;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsActive;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsName;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsState;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsHidden;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsSteamUrl;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsWotc;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private BrightIdeasSoftware.OLVColumn olvColDepModsUrl;
+        private BrightIdeasSoftware.OLVColumn olvColReqModsSteamUrl;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+    }
 }

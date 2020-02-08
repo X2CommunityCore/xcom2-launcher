@@ -8,11 +8,11 @@ namespace XCOM2Launcher.Mod
         None = 0,
         New = 1,
         UpdateAvailable = 2,
-
-
         ModConflict = 8,
         DuplicateID = 16,
         NotLoaded = 32,
         NotInstalled = 64,
+        DuplicatePrimary = 128,
+        DuplicateDisabled = 256,
     }
 }

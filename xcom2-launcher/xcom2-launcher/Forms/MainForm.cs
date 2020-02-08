@@ -579,9 +579,9 @@ namespace XCOM2Launcher.Forms
 
             // update dependency information
             olvRequiredMods.ClearObjects();
-            olvRequiredMods.AddObjects(Mods.GetRequiredMods(m));
+            olvRequiredMods.AddObjects(Mods.GetRequiredMods(m, false));
             olvDependentMods.ClearObjects();
-            olvDependentMods.AddObjects(Mods.GetDependentMods(m));
+            olvDependentMods.AddObjects(Mods.GetDependentMods(m, false));
         }
 
         private void UpdateModInfo(ModEntry m)

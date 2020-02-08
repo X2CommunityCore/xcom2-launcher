@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using Microsoft.VisualBasic;
@@ -21,8 +22,6 @@ namespace XCOM2Launcher.Forms
         public Dictionary<string, ModTag> AvailableTags => Settings.Tags;
 
         public TypedObjectListView<ModEntry> ModList { get; private set; }
-
-        public List<ModEntry> Downloads { get; } = new List<ModEntry>();
 
         public ModEntry CurrentMod;
 
@@ -152,6 +151,12 @@ namespace XCOM2Launcher.Forms
             if (mod.State.HasFlag(ModState.UpdateAvailable))
                 return "Update Available";
 
+            if (mod.State.HasFlag(ModState.DuplicateDisabled))
+                return "Duplicate (disabled)";
+
+            if (mod.State.HasFlag(ModState.DuplicatePrimary))
+                return "Duplicate (primary)";
+
             return "OK";
         }
 
@@ -251,7 +256,7 @@ namespace XCOM2Launcher.Forms
         private void SetModListItemColor(OLVListItem item, ModEntry mod)
         {
             var activeSteamMods = Mods.All.Where(m => m.WorkshopID != 0 && m.isActive && !m.State.HasFlag(ModState.NotInstalled) && !m.State.HasFlag(ModState.NotLoaded));
-            
+            var requiredMods = Mods.GetRequiredMods(mod);
 /*
             // Using the the ID instead of the WorkShopID to verify dependencies would better, but we do not get the ID for mods 
             // that are not installed (comes from XComMod file, not from the API).
@@ -269,7 +274,7 @@ namespace XCOM2Launcher.Forms
                 item.BackColor = Color.LightSteelBlue;
                 item.ForeColor = Color.Black;
             }
-            else if (mod.isActive && !mod.Dependencies.All(depId => activeSteamMods.Select(m => m.WorkshopID).Contains(depId)))
+            else if (mod.isActive && !requiredMods.All(requiredMod => activeSteamMods.Select(steamMod => steamMod.WorkshopID).Contains(requiredMod.WorkshopID)))
             {
                 item.BackColor = Color.LightSalmon;
                 item.ForeColor = Color.Black;
@@ -279,7 +284,7 @@ namespace XCOM2Launcher.Forms
                 item.BackColor = Color.LightCoral;
                 item.ForeColor = Color.Black;
             }
-            else if (mod.State.HasFlag(ModState.DuplicateID))
+            else if (mod.State.HasFlag(ModState.DuplicateID) && !mod.CheckModFileDisabled())
             {
                 item.BackColor = Color.Plum;
                 item.ForeColor = Color.Black;
@@ -338,6 +343,7 @@ namespace XCOM2Launcher.Forms
                 return;
             }
 
+            Log.Info($"Updating {mods.Count} mods...");
             SetStatus($"Updating {mods.Count} mods...");
             progress_toolstrip_progressbar.Visible = true;
             
@@ -353,9 +359,9 @@ namespace XCOM2Launcher.Forms
             ModUpdateTask = Settings.Mods.UpdateModsAsync(mods, Settings, reporter).ContinueWith(e =>
             {
                 SetStatusIdle();
-                Log.Debug("ModUpdateTask completed");
+                Log.Info("ModUpdateTask completed");
                 afterUpdateAction?.Invoke();
-            });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void DeleteMods()
@@ -594,6 +600,8 @@ namespace XCOM2Launcher.Forms
             MenuItem fetchWorkshopTagsItem = null;
             MenuItem enableAllItem = null;
             MenuItem disableAllItem = null;
+            MenuItem disableDuplicates = null;
+            MenuItem restoreDuplicates = null;
 
             // create items that appear only when a single mod is selected
             if (selectedMods.Count == 1)
@@ -611,6 +619,64 @@ namespace XCOM2Launcher.Forms
 
                     showInBrowser = new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); });
                     menu.MenuItems.Add(showInBrowser);
+                }
+
+                var duplicateMods = Mods.All.Where(mod => mod.ID == m.ID && mod != m).ToList();
+                if (duplicateMods.Any())
+                {
+                    if (!m.State.HasFlag(ModState.DuplicatePrimary))
+                    {
+                        disableDuplicates = new MenuItem("Prefer this duplicate");
+                        disableDuplicates.Click += delegate
+                        {
+                            // disable all other duplicates
+                            foreach (var duplicate in duplicateMods)
+                            {
+                                duplicate.DisableModFile();
+                                duplicate.RemoveState(ModState.DuplicateID);
+                                duplicate.RemoveState(ModState.DuplicatePrimary);
+                                duplicate.AddState(ModState.DuplicateDisabled);
+                                duplicate.isActive = false;
+                                modlist_ListObjectListView.RefreshObject(duplicate);
+                            }
+
+                            // mark selected mod as primary duplicate
+                            m.EnableModFile();
+                            m.RemoveState(ModState.DuplicateID);
+                            m.RemoveState(ModState.DuplicateDisabled);
+                            m.AddState(ModState.DuplicatePrimary);
+                            m.isActive = true;
+                            modlist_ListObjectListView.RefreshObject(m);
+                            ProcessModListItemCheckChanged(m);
+                        };
+                    }
+
+                    if (m.State.HasFlag(ModState.DuplicatePrimary) || m.State.HasFlag(ModState.DuplicateDisabled))
+                    {
+                        restoreDuplicates = new MenuItem("Restore duplicates");
+                        restoreDuplicates.Click += delegate
+                        {
+                            // restore normal duplicate state
+                            foreach (var duplicate in duplicateMods)
+                            {
+                                duplicate.EnableModFile();
+                                duplicate.RemoveState(ModState.DuplicateDisabled);
+                                duplicate.RemoveState(ModState.DuplicatePrimary);
+                                duplicate.AddState(ModState.DuplicateID);
+                                duplicate.isActive = false;
+                                modlist_ListObjectListView.RefreshObject(duplicate);
+                            }
+
+                            // mark selected mod as primary duplicate
+                            m.EnableModFile();
+                            m.RemoveState(ModState.DuplicateDisabled);
+                            m.RemoveState(ModState.DuplicatePrimary);
+                            m.AddState(ModState.DuplicateID);
+                            m.isActive = false;
+                            modlist_ListObjectListView.RefreshObject(m);
+                            ProcessModListItemCheckChanged(m);
+                        };
+                    }
                 }
             }
 
@@ -790,12 +856,33 @@ namespace XCOM2Launcher.Forms
             menu.MenuItems.Add(toggleVisibility);
             menu.MenuItems.Add(deleteItem);
 
+            if (disableDuplicates != null)
+            {
+                menu.MenuItems.Add("-");
+                menu.MenuItems.Add(disableDuplicates);
+            }
+
+            if (restoreDuplicates != null)
+            {
+                // prevent double separator
+                if (menu.MenuItems[menu.MenuItems.Count - 1] != disableDuplicates)
+                    menu.MenuItems.Add("-");
+
+                menu.MenuItems.Add(restoreDuplicates);
+            }
+
             return menu;
         }
 
         void ProcessModListItemCheckChanged(ModEntry modChecked)
         {
-            // Debug.WriteLine(nameof(ProcessModListItemCheckChanged));
+            if (modChecked.CheckModFileDisabled())
+            {
+                modChecked.isActive = false;
+                modlist_ListObjectListView.RefreshObject(modChecked);
+                MessageBox.Show("Disabled duplicates can not be used. Make this the primary duplicate or remove all other duplicates to use this mod.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
 
             List<ModEntry> updatedMods = new List<ModEntry>();
             
@@ -803,7 +890,7 @@ namespace XCOM2Launcher.Forms
             // at the same time and mark them as updated
             if (modChecked.State.HasFlag(ModState.DuplicateID))
             {
-                foreach (var mod in Mods.All.Where(@mod => mod.ID == modChecked.ID))
+                foreach (var mod in Mods.All.Where(@mod => mod.ID == modChecked.ID && !mod.CheckModFileDisabled()))
                 {
                     mod.isActive = modChecked.isActive;
                     updatedMods.Add(mod);
@@ -874,6 +961,7 @@ namespace XCOM2Launcher.Forms
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
             var mod = ModList.GetModelObject(e.Item.Index);
+            
             ProcessModListItemCheckChanged(mod);
         }
 

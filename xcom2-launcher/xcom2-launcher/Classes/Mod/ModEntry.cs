@@ -18,6 +18,7 @@ namespace XCOM2Launcher.Mod
     public class ModEntry
     {
         [JsonIgnore] public const string DEFAULT_AUTHOR_NAME = "Unknown";
+        [JsonIgnore] public const string MODFILE_DISABLE_POSTFIX = "-disabled";
 
         [JsonIgnore] private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModEntry));
 
@@ -63,6 +64,9 @@ namespace XCOM2Launcher.Mod
 
         public string Note { get; set; } = null;
 
+        /// <summary>
+        /// Contains the workshop id's from all mods that this mod requires to run properly (as reported from workshop).
+        /// </summary>
         public List<long> Dependencies { get; set; } = new List<long>();
 
         public List<string> SteamTags { get; set; } = new List<string>();
@@ -341,16 +345,6 @@ namespace XCOM2Launcher.Mod
             Source = newSource;
         }
 
-        public void RealizeIDAndPath(string ModRoot)
-        {
-            Path = ModRoot;
-
-            var info_file = Directory.GetFiles(Path, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
-            if (info_file != null)
-            {
-				ID = FilePath.GetFileNameWithoutExtension(info_file);
-			}
-        }
         #endregion
 
 
@@ -363,9 +357,58 @@ namespace XCOM2Launcher.Mod
 	        return new string[0];
         }
 
+        public void EnableModFile()
+        {
+            string path = FilePath.Combine(Path, ID + ".XComMod" + MODFILE_DISABLE_POSTFIX);
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    File.Move(path, path.Replace(MODFILE_DISABLE_POSTFIX, ""));
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Error renaming mod info file {ex.Message}");
+                }
+            }
+        }
+
+        public void DisableModFile()
+        {
+            string path = FilePath.Combine(Path, ID + ".XComMod");
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    File.Move(path, path + MODFILE_DISABLE_POSTFIX);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Error renaming mod info file {ex.Message}");
+                }
+            }
+        }
+
+        public bool CheckModFileDisabled()
+        {
+            return File.Exists(FilePath.Combine(Path, ID + ".XComMod" + MODFILE_DISABLE_POSTFIX));
+        }
+
         internal string GetModInfoFile()
         {
-            return FilePath.Combine(Path, ID + ".XComMod");
+            string path = FilePath.Combine(Path, ID + ".XComMod");
+            
+            if (File.Exists(path))
+                return path;
+
+            path = FilePath.Combine(Path, ID + ".XComMod" + MODFILE_DISABLE_POSTFIX);
+
+            if (File.Exists(path))
+                return path;
+
+            return null;
         }
 
         public string GetReadMe()

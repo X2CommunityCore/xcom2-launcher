@@ -63,8 +63,11 @@ namespace XCOM2Launcher.Forms
                 {
                     UpdateMods(importedMods, () =>
                     {
-                        RefreshModList();
-                        modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
+                        Invoke(new Action(() => 
+                        {
+                            RefreshModList();
+                            modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
+                        }));
                     });
                 }
             };
@@ -220,10 +223,6 @@ namespace XCOM2Launcher.Forms
             // Steam Events
             Workshop.OnItemDownloaded += Resubscribe_OnItemDownloaded;
 
-#if DEBUG
-            Workshop.OnItemDownloaded += SteamWorkshop_OnItemDownloaded;
-#endif
-
             // Main Tabs
             // Export
             export_workshop_link_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
@@ -260,48 +259,13 @@ namespace XCOM2Launcher.Forms
         {
             var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
-            // review: should this be (mod.State & ModState.NotInstalled)?
-            if (mod != null && (mod.State | ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
+            if (mod != null && (mod.State & ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
             {
                 mod.RemoveState(ModState.NotInstalled);
-                RefreshModList();
+                mod.isHidden = false;
+                modlist_ListObjectListView.RefreshObject(mod);
             }
         }
-
-#if DEBUG
-        private void SteamWorkshop_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
-        {
-            if (e.Result.m_eResult != EResult.k_EResultOK)
-            {
-                MessageBox.Show($"{e.Result.m_nPublishedFileId}: {e.Result.m_eResult}", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            var m = Downloads.SingleOrDefault(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
-
-            if (m != null)
-            {
-                // Fill fields
-                m.RemoveState(ModState.NotInstalled);
-                m.RealizeIDAndPath(m.Path);
-                m.Image = null; // Use default image again
-
-                // load info
-                var info = new ModInfo(m.GetModInfoFile());
-
-                // Move mod
-                Downloads.Remove(m);
-                Mods.AddMod(info.Category, m);
-
-                // update listitem
-                //var item = modlist_listview.Items.Cast<ListViewItem>().Single(i => (i.Tag as ModEntry).SourceID == m.SourceID);
-                //UpdateModListItem(item, info.Category);
-            }
-            m = Mods.All.Single(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
-
-            MessageBox.Show($"{m.Name} finished download.", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-#endif
 
         #region Form
 
