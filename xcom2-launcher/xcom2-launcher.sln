@@ -7,13 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xcom2-launcher", "xcom2-lau
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Beta|Any CPU = Beta|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FC343C56-9BC8-483A-A254-3484B2137E24}.Beta|Any CPU.ActiveCfg = Beta|Any CPU
-		{FC343C56-9BC8-483A-A254-3484B2137E24}.Beta|Any CPU.Build.0 = Beta|Any CPU
 		{FC343C56-9BC8-483A-A254-3484B2137E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FC343C56-9BC8-483A-A254-3484B2137E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC343C56-9BC8-483A-A254-3484B2137E24}.Release|Any CPU.ActiveCfg = Release|Any CPU

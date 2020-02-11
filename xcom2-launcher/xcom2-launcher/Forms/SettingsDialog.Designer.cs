@@ -345,9 +345,9 @@
 			this.checkForPreReleaseUpdates.Location = new System.Drawing.Point(216, 3);
 			this.checkForPreReleaseUpdates.Name = "checkForPreReleaseUpdates";
 			this.checkForPreReleaseUpdates.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-			this.checkForPreReleaseUpdates.Size = new System.Drawing.Size(193, 20);
+			this.checkForPreReleaseUpdates.Size = new System.Drawing.Size(166, 20);
 			this.checkForPreReleaseUpdates.TabIndex = 18;
-			this.checkForPreReleaseUpdates.Text = "Include Pre-Release/Beta updates";
+			this.checkForPreReleaseUpdates.Text = "Include Pre-Release updates";
 			this.toolTip.SetToolTip(this.checkForPreReleaseUpdates, "Enabled this option, if you wold like to be notified about Pre-Release versions.");
 			this.checkForPreReleaseUpdates.UseVisualStyleBackColor = true;
 			// 

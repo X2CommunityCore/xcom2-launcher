@@ -62,7 +62,7 @@
 			this.changelog_textbox.Multiline = true;
 			this.changelog_textbox.Name = "changelog_textbox";
 			this.changelog_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.changelog_textbox.Size = new System.Drawing.Size(416, 143);
+			this.changelog_textbox.Size = new System.Drawing.Size(537, 168);
 			this.changelog_textbox.TabIndex = 4;
 			// 
 			// version_new_label
@@ -80,9 +80,9 @@
 			this.version_current_value_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.version_current_value_label.Location = new System.Drawing.Point(112, 12);
 			this.version_current_value_label.Name = "version_current_value_label";
-			this.version_current_value_label.Size = new System.Drawing.Size(41, 13);
+			this.version_current_value_label.Size = new System.Drawing.Size(82, 13);
 			this.version_current_value_label.TabIndex = 7;
-			this.version_current_value_label.Text = "label1";
+			this.version_current_value_label.Text = "1.2.3-alpha.2";
 			// 
 			// version_new_value_label
 			// 
@@ -90,9 +90,9 @@
 			this.version_new_value_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.version_new_value_label.Location = new System.Drawing.Point(112, 30);
 			this.version_new_value_label.Name = "version_new_value_label";
-			this.version_new_value_label.Size = new System.Drawing.Size(41, 13);
+			this.version_new_value_label.Size = new System.Drawing.Size(65, 13);
 			this.version_new_value_label.TabIndex = 7;
-			this.version_new_value_label.Text = "label1";
+			this.version_new_value_label.Text = "1.2.3-beta";
 			// 
 			// changelog_label
 			// 
@@ -106,7 +106,7 @@
 			// filesize_label
 			// 
 			this.filesize_label.AutoSize = true;
-			this.filesize_label.Location = new System.Drawing.Point(194, 12);
+			this.filesize_label.Location = new System.Drawing.Point(257, 12);
 			this.filesize_label.Name = "filesize_label";
 			this.filesize_label.Size = new System.Drawing.Size(30, 13);
 			this.filesize_label.TabIndex = 10;
@@ -115,16 +115,16 @@
 			// filesize_value_label
 			// 
 			this.filesize_value_label.AutoSize = true;
-			this.filesize_value_label.Location = new System.Drawing.Point(243, 12);
+			this.filesize_value_label.Location = new System.Drawing.Point(306, 12);
 			this.filesize_value_label.Name = "filesize_value_label";
-			this.filesize_value_label.Size = new System.Drawing.Size(35, 13);
+			this.filesize_value_label.Size = new System.Drawing.Size(135, 13);
 			this.filesize_value_label.TabIndex = 11;
-			this.filesize_value_label.Text = "label1";
+			this.filesize_value_label.Text = "No download available yet.";
 			// 
 			// date_label
 			// 
 			this.date_label.AutoSize = true;
-			this.date_label.Location = new System.Drawing.Point(194, 30);
+			this.date_label.Location = new System.Drawing.Point(257, 30);
 			this.date_label.Name = "date_label";
 			this.date_label.Size = new System.Drawing.Size(33, 13);
 			this.date_label.TabIndex = 10;
@@ -133,16 +133,16 @@
 			// date_value_label
 			// 
 			this.date_value_label.AutoSize = true;
-			this.date_value_label.Location = new System.Drawing.Point(243, 30);
+			this.date_value_label.Location = new System.Drawing.Point(306, 30);
 			this.date_value_label.Name = "date_value_label";
-			this.date_value_label.Size = new System.Drawing.Size(35, 13);
+			this.date_value_label.Size = new System.Drawing.Size(61, 13);
 			this.date_value_label.TabIndex = 11;
-			this.date_value_label.Text = "label1";
+			this.date_value_label.Text = "00.00.0000";
 			// 
 			// show_button
 			// 
 			this.show_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.show_button.Location = new System.Drawing.Point(246, 221);
+			this.show_button.Location = new System.Drawing.Point(367, 246);
 			this.show_button.Name = "show_button";
 			this.show_button.Size = new System.Drawing.Size(101, 23);
 			this.show_button.TabIndex = 10;
@@ -154,7 +154,7 @@
 			// 
 			this.close_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.close_button.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.close_button.Location = new System.Drawing.Point(353, 221);
+			this.close_button.Location = new System.Drawing.Point(474, 246);
 			this.close_button.Name = "close_button";
 			this.close_button.Size = new System.Drawing.Size(75, 23);
 			this.close_button.TabIndex = 1;
@@ -168,18 +168,18 @@
 			this.lBetaVersion.AutoSize = true;
 			this.lBetaVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.lBetaVersion.ForeColor = System.Drawing.Color.Red;
-			this.lBetaVersion.Location = new System.Drawing.Point(15, 226);
+			this.lBetaVersion.Location = new System.Drawing.Point(9, 251);
 			this.lBetaVersion.Name = "lBetaVersion";
-			this.lBetaVersion.Size = new System.Drawing.Size(213, 13);
+			this.lBetaVersion.Size = new System.Drawing.Size(346, 13);
 			this.lBetaVersion.TabIndex = 11;
-			this.lBetaVersion.Text = "This is a Pre-Release / Beta version";
+			this.lBetaVersion.Text = "This is a Pre-Release version, and thus might not be stable.";
 			// 
 			// UpdateAvailableDialog
 			// 
 			this.AcceptButton = this.show_button;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(440, 256);
+			this.ClientSize = new System.Drawing.Size(561, 281);
 			this.Controls.Add(this.date_value_label);
 			this.Controls.Add(this.filesize_value_label);
 			this.Controls.Add(this.filesize_label);
