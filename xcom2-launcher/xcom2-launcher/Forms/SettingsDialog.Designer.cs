@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.label1 = new System.Windows.Forms.Label();
@@ -43,6 +44,8 @@
 			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this.useTranslucentModListSelection = new System.Windows.Forms.CheckBox();
+			this.useDuplicateModWorkaround = new System.Windows.Forms.CheckBox();
 			this.showHiddenEntriesCheckBox = new System.Windows.Forms.CheckBox();
 			this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
 			this.ShowQuickLaunchArgumentsToggle = new System.Windows.Forms.CheckBox();
@@ -75,7 +78,7 @@
 			this.groupBox1.Controls.Add(this.tableLayoutPanel2);
 			this.groupBox1.Location = new System.Drawing.Point(12, 8);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(655, 210);
+			this.groupBox1.Size = new System.Drawing.Size(655, 229);
 			this.groupBox1.TabIndex = 9;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Game options";
@@ -103,13 +106,13 @@
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 181);
+			this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 200);
 			this.tableLayoutPanel2.TabIndex = 6;
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(4, 155);
+			this.label1.Location = new System.Drawing.Point(4, 174);
 			this.label1.Margin = new System.Windows.Forms.Padding(4, 4, 3, 0);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(57, 13);
@@ -122,7 +125,7 @@
 			this.modPathsListbox.FormattingEnabled = true;
 			this.modPathsListbox.Location = new System.Drawing.Point(103, 53);
 			this.modPathsListbox.Name = "modPathsListbox";
-			this.modPathsListbox.Size = new System.Drawing.Size(462, 95);
+			this.modPathsListbox.Size = new System.Drawing.Size(462, 114);
 			this.modPathsListbox.TabIndex = 4;
 			// 
 			// label3
@@ -161,7 +164,7 @@
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(568, 50);
 			this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 101);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 120);
 			this.flowLayoutPanel1.TabIndex = 12;
 			// 
 			// addModPathButton
@@ -197,7 +200,7 @@
 			// argumentsTextBox
 			// 
 			this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.argumentsTextBox.Location = new System.Drawing.Point(103, 154);
+			this.argumentsTextBox.Location = new System.Drawing.Point(103, 173);
 			this.argumentsTextBox.Name = "argumentsTextBox";
 			this.argumentsTextBox.Size = new System.Drawing.Size(462, 20);
 			this.argumentsTextBox.TabIndex = 15;
@@ -208,9 +211,9 @@
 			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.tableLayoutPanel3);
-			this.groupBox2.Location = new System.Drawing.Point(12, 307);
+			this.groupBox2.Location = new System.Drawing.Point(12, 326);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(655, 78);
+			this.groupBox2.Size = new System.Drawing.Size(655, 105);
 			this.groupBox2.TabIndex = 10;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Usability";
@@ -224,6 +227,8 @@
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
 			this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+			this.tableLayoutPanel3.Controls.Add(this.useTranslucentModListSelection, 0, 3);
+			this.tableLayoutPanel3.Controls.Add(this.useDuplicateModWorkaround, 2, 2);
 			this.tableLayoutPanel3.Controls.Add(this.showHiddenEntriesCheckBox, 0, 0);
 			this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 1, 0);
 			this.tableLayoutPanel3.Controls.Add(this.ShowQuickLaunchArgumentsToggle, 1, 2);
@@ -231,12 +236,38 @@
 			this.tableLayoutPanel3.Controls.Add(this.useModSpecifiedCategoriesCheckBox, 0, 2);
 			this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 20);
 			this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-			this.tableLayoutPanel3.RowCount = 3;
+			this.tableLayoutPanel3.RowCount = 4;
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 52);
+			this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel3.Size = new System.Drawing.Size(641, 79);
 			this.tableLayoutPanel3.TabIndex = 6;
+			// 
+			// useTranslucentModListSelection
+			// 
+			this.useTranslucentModListSelection.AutoSize = true;
+			this.useTranslucentModListSelection.Location = new System.Drawing.Point(3, 55);
+			this.useTranslucentModListSelection.Name = "useTranslucentModListSelection";
+			this.useTranslucentModListSelection.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useTranslucentModListSelection.Size = new System.Drawing.Size(183, 20);
+			this.useTranslucentModListSelection.TabIndex = 14;
+			this.useTranslucentModListSelection.Text = "Use translucent modlist selection";
+			this.toolTip.SetToolTip(this.useTranslucentModListSelection, "If enabled, selected items in the mod lists will be highlighted with a\r\ntransluce" +
+        "nt selection color instead of the default opaque blue.");
+			this.useTranslucentModListSelection.UseVisualStyleBackColor = true;
+			// 
+			// useDuplicateModWorkaround
+			// 
+			this.useDuplicateModWorkaround.AutoSize = true;
+			this.useDuplicateModWorkaround.Location = new System.Drawing.Point(429, 29);
+			this.useDuplicateModWorkaround.Name = "useDuplicateModWorkaround";
+			this.useDuplicateModWorkaround.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.useDuplicateModWorkaround.Size = new System.Drawing.Size(204, 20);
+			this.useDuplicateModWorkaround.TabIndex = 17;
+			this.useDuplicateModWorkaround.Text = "Enable duplicate mod ID workaround";
+			this.toolTip.SetToolTip(this.useDuplicateModWorkaround, resources.GetString("useDuplicateModWorkaround.ToolTip"));
+			this.useDuplicateModWorkaround.UseVisualStyleBackColor = true;
 			// 
 			// showHiddenEntriesCheckBox
 			// 
@@ -373,7 +404,7 @@
 			// bOK
 			// 
 			this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.bOK.Location = new System.Drawing.Point(453, 394);
+			this.bOK.Location = new System.Drawing.Point(453, 442);
 			this.bOK.Name = "bOK";
 			this.bOK.Size = new System.Drawing.Size(104, 24);
 			this.bOK.TabIndex = 12;
@@ -385,7 +416,7 @@
 			// 
 			this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.bCancel.Location = new System.Drawing.Point(563, 394);
+			this.bCancel.Location = new System.Drawing.Point(563, 442);
 			this.bCancel.Name = "bCancel";
 			this.bCancel.Size = new System.Drawing.Size(104, 24);
 			this.bCancel.TabIndex = 11;
@@ -397,7 +428,7 @@
 			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox3.Controls.Add(this.tableLayoutPanel1);
-			this.groupBox3.Location = new System.Drawing.Point(12, 224);
+			this.groupBox3.Location = new System.Drawing.Point(12, 243);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(655, 77);
 			this.groupBox3.TabIndex = 13;
@@ -431,7 +462,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(679, 430);
+			this.ClientSize = new System.Drawing.Size(679, 478);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.bOK);
 			this.Controls.Add(this.bCancel);
@@ -492,5 +523,7 @@
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.CheckBox allowMutipleInstances;
+		private System.Windows.Forms.CheckBox useDuplicateModWorkaround;
+		private System.Windows.Forms.CheckBox useTranslucentModListSelection;
 	}
 }

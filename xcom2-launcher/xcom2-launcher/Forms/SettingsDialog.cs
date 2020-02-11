@@ -34,6 +34,8 @@ namespace XCOM2Launcher.Forms
             useSentry.Checked = GlobalSettings.Instance.IsSentryEnabled;
             allowMutipleInstances.Checked = settings.AllowMultipleInstances;
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
+            useDuplicateModWorkaround.Checked = settings.EnableDuplicateModIdWorkaround;
+            useTranslucentModListSelection.Checked = settings.UseTranslucentModListSelection;
 
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
@@ -135,6 +137,8 @@ namespace XCOM2Launcher.Forms
             Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
             GlobalSettings.Instance.IsSentryEnabled = useSentry.Checked;
             Settings.AllowMultipleInstances = allowMutipleInstances.Checked;
+            Settings.EnableDuplicateModIdWorkaround = useDuplicateModWorkaround.Checked;
+            Settings.UseTranslucentModListSelection = useTranslucentModListSelection.Checked;
             Settings.GamePath = gamePathTextBox.Text;
             Settings.ModPaths = newModPaths;
 

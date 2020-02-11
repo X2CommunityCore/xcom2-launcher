@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Classes.Mod
@@ -65,7 +62,7 @@ namespace XCOM2Launcher.Classes.Mod
                 {
                     modEntry.Name = "";
                     modEntry.ManualName = false;
-                    Settings.Instance.Mods.UpdateMod(modEntry, Settings.Instance);
+                    Settings.Instance.Mods.UpdateModAsync(modEntry, Settings.Instance);
                     PropertyChangedEventArgs e = new PropertyChangedEventArgs("Name");
                     PropertyChanged?.Invoke(this, e);
                 }

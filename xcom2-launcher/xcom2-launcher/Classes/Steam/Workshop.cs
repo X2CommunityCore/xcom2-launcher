@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
@@ -7,6 +8,11 @@ namespace XCOM2Launcher.Steam
 {
     public static class Workshop
     {
+        /// <summary>
+        /// According to Steamworks API constant kNumUGCResultsPerPage.
+        /// The maximum number of results that you'll receive for a query result.
+        /// </summary>
+        public const int MAX_UGC_RESULTS = 50; // according to 
 
         public static ulong[] GetSubscribedItems()
         {
@@ -35,13 +41,41 @@ namespace XCOM2Launcher.Steam
 
         public static SteamUGCDetails_t GetDetails(ulong id, bool GetDesc = false)
         {
-            var request = new ItemDetailsRequest(id, GetDesc);
-
-            request.Send().WaitForResult();
-
-            return request.Result;
+            var result = GetDetails(new List<ulong> {id}, GetDesc);
+            return result.FirstOrDefault();
         }
 
+        public static List<SteamUGCDetails_t> GetDetails(List<ulong> identifiers, bool GetDesc = false)
+        {
+            if (identifiers == null)
+                throw new ArgumentNullException(nameof(identifiers));
+
+            if (identifiers.Count > MAX_UGC_RESULTS)
+                throw new ArgumentException($"Max allowed number of identifiers is {MAX_UGC_RESULTS}.");
+
+            var request = new ItemDetailsRequest(identifiers, GetDesc);
+            request.Send().WaitForResult();
+
+            return request.Success ? request.Result : null;
+        }
+
+        public static List<ulong> GetDependencies(ulong workShopId, uint dependencyCount)
+        {
+            if (dependencyCount <= 0)
+            {
+                return new List<ulong>();
+            }
+
+            QueryUGCChildren request = new QueryUGCChildren(workShopId, dependencyCount);
+            request.Send().WaitForResult();
+            
+            return request.Success ? request.Result : null;
+        }
+
+        public static List<ulong> GetDependencies(SteamUGCDetails_t details)
+        {
+            return GetDependencies(details.m_nPublishedFileId.m_PublishedFileId, details.m_unNumChildren);
+        }
 
         public static EItemState GetDownloadStatus(ulong id)
         {

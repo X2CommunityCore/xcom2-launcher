@@ -2,10 +2,8 @@
 {
     public enum ModSource
     {
-        Unknown,
-        SteamWorkshop,
-        Nexus,
-        ModBuddy,
-        Manual
+        Unknown = 0,
+        SteamWorkshop = 1,
+        Manual = 4
     }
 }

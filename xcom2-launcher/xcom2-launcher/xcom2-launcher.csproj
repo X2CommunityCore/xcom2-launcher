@@ -88,7 +88,7 @@
     <Reference Include="Sentry.Protocol, Version=1.0.6.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Protocol.1.0.6\lib\net46\Sentry.Protocol.dll</HintPath>
     </Reference>
-    <Reference Include="Steamworks.NET, Version=12.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Steamworks.NET, Version=13.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Steamworks.NET.dll</HintPath>
     </Reference>
@@ -129,6 +129,7 @@
     <Compile Include="Classes\Mod\ModInfo.cs" />
     <Compile Include="Classes\Mod\ModList.cs" />
     <Compile Include="Classes\Mod\ModClassOverride.cs" />
+    <Compile Include="Classes\Mod\ModListFilter.cs" />
     <Compile Include="Classes\Mod\ModProperty.cs" />
     <Compile Include="Classes\Mod\ModSettingsEntry.cs" />
     <Compile Include="Classes\Mod\ModState.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Classes\Serialization\ModListConverter.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\Steam\DownloadItemRequest.cs" />
+    <Compile Include="Classes\Steam\QueryUGCChildren.cs" />
     <Compile Include="Classes\Steam\ItemDetailsRequest.cs" />
     <Compile Include="Classes\Steam\SteamAPIWrapper.cs" />
     <Compile Include="Classes\Steam\SteamManager.cs" />

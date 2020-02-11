@@ -84,6 +84,14 @@ namespace XCOM2Launcher
 
         public bool ShowHiddenElements { get; set; } = false;
 
+        public bool ShowStateFilter { get; set; } = true;
+
+        public bool UseTranslucentModListSelection { get; set; } = true;
+
+        public bool ShowPrimaryDuplicateAsDependency { get; set; } = true;
+        
+        public bool ShowModListGroups { get; set; } = true;
+
         public bool CloseAfterLaunch { get; set; } = false;
 
         public bool AutoNumberIndexes { get; set; } = true;
@@ -97,6 +105,8 @@ namespace XCOM2Launcher
         public bool NeverImportTags { get; set; } = false;
 
         public bool AllowMultipleInstances { get; set; } = false;
+
+        public bool EnableDuplicateModIdWorkaround { get; set; } = false;
 
         public ModList Mods { get; set; } = new ModList();
 
@@ -117,9 +127,9 @@ namespace XCOM2Launcher
             _argumentList.Add("-noRedscreens");
         }
 
-        internal void ImportMods()
+        internal List<ModEntry> ImportMods()
         {
-            Mods.ImportMods(ModPaths);
+            return Mods.ImportMods(ModPaths);
         }
 
         public string GetWorkshopPath()

@@ -314,6 +314,8 @@ namespace XCOM2Launcher
 
             if (settings.Mods.Entries.Count > 0)
             {
+                settings.Mods.MarkDuplicates();
+
                 // Verify categories
                 var index = settings.Mods.Entries.Values.Max(c => c.Index);
                 foreach (var cat in settings.Mods.Entries.Values.Where(c => c.Index == -1))
@@ -349,6 +351,14 @@ namespace XCOM2Launcher
 
                     // tags clean up
                     mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
+
+                    // If the duplicate mod workaround is disabled, make sure that all mod info files are enabled.
+                    if (!settings.EnableDuplicateModIdWorkaround)
+                    {
+                        mod.EnableModFile();
+                    }
+
+                    settings.Mods.UpdatedModDependencyState(mod);
                 }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();

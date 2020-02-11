@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Steamworks;
+using BrightIdeasSoftware;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
-using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
 
@@ -16,8 +18,10 @@ namespace XCOM2Launcher.Forms
     public partial class MainForm
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(MainForm));
-        private const string StatusBarIdleString = "Ready.";
         private const string ExclamationIconKey = "Exclamation";
+        
+        private Task ModUpdateTask;
+        private bool IsModUpdateTaskRunning => (ModUpdateTask != null && !ModUpdateTask.IsCompleted);
 
         public Settings Settings { get; set; }
 
@@ -33,6 +37,13 @@ namespace XCOM2Launcher.Forms
 
             // Restore states 
             showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
+            cShowStateFilter.Checked = settings.ShowStateFilter;
+            cEnableGrouping.Checked = settings.ShowModListGroups;
+            cShowPrimaryDuplicates.Checked = Settings.ShowPrimaryDuplicateAsDependency;
+            cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
+            modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+            olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+            olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
 
             // Hide WotC and Challenge Mode buttons if necessary
             if (settings.GamePath != "")
@@ -44,27 +55,33 @@ namespace XCOM2Launcher.Forms
             }
 
             // Init interface
-            InitObjectListView();
+            InitModListView();
+            InitDependencyListViews();
             UpdateInterface();
             RegisterEvents();
 
-            //Other intialization
+            // Other intialization
             InitializeTabImages();
 
             // Init the argument checkboxes
             UpdateQuickArgumentsMenu();
 
 #if !DEBUG
-			// Check for Updates
-			CheckSteamForUpdates();
-#endif
+			// Update mod information
+            var mods = Settings.Mods.All.ToList();
 
+            UpdateMods(mods, () =>
+            {
+                modlist_ListObjectListView.RefreshObjects(mods);
+            });
+#endif
             // Run callbacks
             var t1 = new Timer();
             t1.Tick += (sender, e) => { SteamAPIWrapper.RunCallbacks(); };
             t1.Interval = 10;
             t1.Start();
 
+/*
             // Check for running downloads
 #if DEBUG
             if (Settings.GetWorkshopPath() != null)
@@ -77,6 +94,7 @@ namespace XCOM2Launcher.Forms
                 t2.Start();
             }
 #endif
+*/
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -89,9 +107,11 @@ namespace XCOM2Launcher.Forms
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
         }
 
+/*
+        // This was only called for DEBUG builds, but currently isn't required (maybe part of an abandoned feature?)
         private void CheckSteamForNewMods()
         {
-            status_toolstrip_label.Text = "Checking for new mods...";
+            SetStatus("Checking for new mods...");
 
             ulong[] subscribedIDs;
             try
@@ -103,7 +123,7 @@ namespace XCOM2Launcher.Forms
                 // Steamworks not initialized?
                 // Game taking over?
                 Log.Error("Error checking for new mods", ex);
-                status_toolstrip_label.Text = "Error checking for new mods.";
+                SetStatus("Error checking for new mods.");
                 return;
             }
 
@@ -122,7 +142,7 @@ namespace XCOM2Launcher.Forms
 
                 // Get info
                 var detailsRequest = new ItemDetailsRequest(id).Send().WaitForResult();
-                var details = detailsRequest.Result;
+                var details = detailsRequest.Result[0];
                 var link = detailsRequest.GetPreviewURL();
 
                 var downloadMod = new ModEntry
@@ -134,6 +154,7 @@ namespace XCOM2Launcher.Forms
                     Image = link,
                     WorkshopID = (int) id
                 };
+
                 downloadMod.SetSource(ModSource.SteamWorkshop);
                 downloadMod.AddState(ModState.New | ModState.NotInstalled);
 
@@ -147,16 +168,35 @@ namespace XCOM2Launcher.Forms
             if (change)
                 RefreshModList();
 
-            status_toolstrip_label.Text = StatusBarIdleString;
+            SetStatusIdle();
+        }
+*/
+        #region GUI
+
+        private void SetStatus(string text)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => SetStatus(text)));
+                return;
+            }
+
+            status_toolstrip_label.Text = text;
         }
 
-        private void CheckSteamForUpdates()
+        private void SetStatusIdle()
         {
-            progress_toolstrip_progressbar.Value = 0;
-            progress_toolstrip_progressbar.Maximum = Mods.All.Count();
-            progress_toolstrip_progressbar.Visible = true;
-            _updateWorker.RunWorkerAsync();
+            if (InvokeRequired)
+            {
+                Invoke(new Action(SetStatusIdle));
+                return;
+            }
+
+            status_toolstrip_label.Text = "Ready.";
+            progress_toolstrip_progressbar.Visible = false;
         }
+
+        #endregion
 
 		#region Export
 
@@ -230,17 +270,15 @@ namespace XCOM2Launcher.Forms
 
         private void Reset()
         {
-            _updateWorker.CancelAsync();
-            // let's hope it cancels fast enough...
+            if (IsModUpdateTaskRunning)
+            {
+                ShowModUpdateRunningMessageBox();
+                return;
+            }
 
             modlist_ListObjectListView.Clear();
-
             Settings = Program.InitializeSettings();
-
-            InitObjectListView();
-
-            //UpdateWorker.RunWorkerAsync();
-            //RefreshModList();
+            InitModListView();
         }
 
         private void Save(bool WotC)
@@ -259,11 +297,18 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void RunGame()
+        private void ShowModUpdateRunningMessageBox()
         {
-            _updateWorker.CancelAsync();
-            Settings.Instance.LastLaunchedWotC = false;
-            ChallengeMode = false;
+            MessageBox.Show("Mod update in progress, please wait for it to finish.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void RunVanilla()
+        {
+            if (IsModUpdateTaskRunning)
+            {
+                ShowModUpdateRunningMessageBox();
+                return;
+            }
 
             // Check for WOTC only mods
             if (Settings.Mods.Active.Count(e => e.BuiltForWOTC) > 0)
@@ -274,17 +319,15 @@ namespace XCOM2Launcher.Forms
                                             "You are trying to launch vanilla game with mods built for WOTC", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     Log.Warn("User chose to run Vanilla XCOM with WotC mods");
-                    RunVanilla();
+                }
+                else
+                {
+                    return;
                 }
             }
-            else
-            {
-                RunVanilla();
-            }
-        }
-        
-        private void RunVanilla()
-        { 
+            
+            Settings.Instance.LastLaunchedWotC = false;
+            ChallengeMode = false;
             Save(false);
 
             XCOM2.RunGame(Settings.GamePath, Settings.GetArgumentString());
@@ -292,10 +335,15 @@ namespace XCOM2Launcher.Forms
             if (Settings.CloseAfterLaunch)
                 Close();
         }
-
+        
         private void RunWotC()
         {
-            _updateWorker.CancelAsync();
+            if (IsModUpdateTaskRunning)
+            {
+                ShowModUpdateRunningMessageBox();
+                return;
+            }
+
             Settings.Instance.LastLaunchedWotC = true;
             ChallengeMode = false;
             Save(true);
@@ -310,7 +358,12 @@ namespace XCOM2Launcher.Forms
         
         private void RunChallengeMode()
         {
-            _updateWorker.CancelAsync();
+            if (IsModUpdateTaskRunning)
+            {
+                ShowModUpdateRunningMessageBox();
+                return;
+            }
+
             Settings.Instance.LastLaunchedWotC = true;
             ChallengeMode = true;
             Save(true);
@@ -330,16 +383,10 @@ namespace XCOM2Launcher.Forms
         {
             error_provider.Clear();
 
-            // Incompability warnings and overwrites grid
-            UpdateConflicts();
-
-            // ModEntry list
-            // RefreshModList();
-
-            // ModEntry details
+            UpdateConflictInfo();
             UpdateModInfo(modlist_ListObjectListView.SelectedObject as ModEntry);
-
             UpdateLabels();
+            UpdateStateFilterLabels();
         }
 
         private void UpdateLabels()
@@ -351,9 +398,27 @@ namespace XCOM2Launcher.Forms
             conflicts_tab.ImageKey = hasConflicts ? ExclamationIconKey : null;
         }
 
+        /// <summary>
+        /// Updates labels from filter controls with number of currently matching mods.
+        /// </summary>
+        private void UpdateStateFilterLabels()
+        {
+            var allMods = Mods.All.ToList();
+            cFilterConflicted.Text = $"Conflicts ({allMods.Count(m => m.State.HasFlag(ModState.ModConflict))})";
+            cFilterDuplicate.Text = $"Duplicates ({allMods.Count(m => m.State.HasFlag(ModState.DuplicateID))})";
+            cFilterNew.Text = $"New ({allMods.Count(m => m.State.HasFlag(ModState.New))})";
+            cFilterNotInstalled.Text = $"Not installed ({allMods.Count(m => m.State.HasFlag(ModState.NotInstalled))})";
+            cFilterNotLoaded.Text = $"Not loaded ({allMods.Count(m => m.State.HasFlag(ModState.NotLoaded))})";
+            cFilterMissingDependency.Text = $"Missing dependencies ({allMods.Count(m => m.isActive && m.State.HasFlag(ModState.MissingDependencies))})";
+            cFilterHidden.Text = $"Hidden ({allMods.Count(m => m.isHidden)})";
+        }
+
         public int NumConflicts;
 
-        private void UpdateConflicts()
+        /// <summary>
+        /// Update incompatibility warnings and overrides grid.
+        /// </summary>
+        private void UpdateConflictInfo()
         {
             // Incremented later in GetDuplicatesString() and GetOverridesString()
             NumConflicts = 0;
@@ -425,21 +490,31 @@ namespace XCOM2Launcher.Forms
 
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
-
-            // Update interface
-            modlist_ListObjectListView.UpdateObjects(mods);
-            UpdateLabels();
         }
 
         private string GetDuplicatesString()
         {
             var str = new StringBuilder();
 
-            var duplicates = Mods.GetDuplicates().ToList();
+            var duplicates = Mods.GetDuplicates().Where(delegate(IGrouping<string, ModEntry> entries)
+            {
+                // Only show duplicate-groups that have not been resolved (ModState.DuplicateDisabled / ModState.DuplicatePrimary)
+                return entries?.All(m => m.State.HasFlag(ModState.DuplicateID)) == true;
+            }).ToList();
+
+
             if (duplicates.Any())
             {
-                str.AppendLine("Mods with colliding package ids found!");
-                str.AppendLine("These can only be (de-)activated together.");
+                str.AppendLine("Mods with identical package ids found!");
+                if (Settings.EnableDuplicateModIdWorkaround)
+                {
+                    str.AppendLine("You can set a preferred duplicate from the mod list context menu to resolve this.");
+                }
+                else
+                {
+                    str.AppendLine("These can only be (de-)activated together.");
+                }
+
                 str.AppendLine();
 
                 foreach (var grouping in duplicates)
@@ -470,8 +545,8 @@ namespace XCOM2Launcher.Forms
 
             var str = new StringBuilder();
 
-            str.AppendLine("Mods with colliding overrides found!");
-            str.AppendLine("These mods will not (fully) work when run together.");
+            str.AppendLine("Mods with conflicting overrides found!");
+            str.AppendLine("These mods will probably not work as intended, or cause instabilities when run together.");
             str.AppendLine();
 
             foreach (var conflict in conflicts)
@@ -526,6 +601,22 @@ namespace XCOM2Launcher.Forms
             btnDescUndo.Enabled = false;
         }
 
+        private void UpdateDependencyInformation(ModEntry m)
+        {
+            if (m == null)
+                return;
+
+            // update dependency information
+            olvRequiredMods.ClearObjects();
+            olvRequiredMods.AddObjects(Mods.GetRequiredMods(m, cShowPrimaryDuplicates.Checked));
+            olvDependentMods.ClearObjects();
+            olvDependentMods.AddObjects(Mods.GetDependentMods(m, false));
+        }
+
+        /// <summary>
+        /// Update mod information panel with data from specified mod.
+        /// </summary>
+        /// <param name="m"></param>
         private void UpdateModInfo(ModEntry m)
         {
             if (m == null)
@@ -542,6 +633,8 @@ namespace XCOM2Launcher.Forms
                 modinfo_config_LoadButton.Enabled = false;
                 modinfo_config_RemoveButton.Enabled = false;
                 modinfo_ConfigFCTB.Clear();
+                olvRequiredMods.ClearObjects();
+                olvDependentMods.ClearObjects();
                 return;
             }
 
@@ -553,12 +646,12 @@ namespace XCOM2Launcher.Forms
             modinfo_info_AuthorTextBox.Text = m.Author;
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
-
             UpdateModDescription(m);
-
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
+            UpdateDependencyInformation(m);
 
+            // Init handler for property changes
             var sel_obj = m.GetProperty();
             
             sel_obj.PropertyChanged += (sender, e) =>
@@ -601,6 +694,61 @@ namespace XCOM2Launcher.Forms
             foreach (ToolStripMenuItem item in quickLaunchToolstripButton.DropDownItems) {
                 item.Checked = Settings.ArgumentList.Any(arg => arg.Equals(item.Text, StringComparison.OrdinalIgnoreCase));
             }
+        }
+
+        #endregion
+
+        #region Dependency ObjectListViews
+
+        private void InitDependencyListViews()
+        {
+            olvColReqModsState.AspectGetter = StateAspectGetter;
+            olvColDepModsState.AspectGetter = StateAspectGetter;
+
+            olvRequiredMods.BooleanCheckStatePutter = BooleanCheckStatePutter;
+            olvDependentMods.BooleanCheckStatePutter = BooleanCheckStatePutter;
+        }
+
+        private bool BooleanCheckStatePutter(object rowobject, bool newValue)
+        {
+            var mod = rowobject as ModEntry;
+
+            Debug.WriteLine("olvRequiredMods_ItemCheck: " + mod.isActive + " -> " + newValue);
+            newValue = ProcessNewModState(mod, newValue);
+            Debug.WriteLine("olvRequiredMods_ItemCheck: " + mod.isActive + " -> " + newValue);
+
+            // change check state for the mod in main list accordingly
+            if (newValue)
+            {
+                modlist_ListObjectListView.CheckObject(mod);
+            }
+            else
+            {
+                modlist_ListObjectListView.UncheckObject(mod);
+            }
+
+            return newValue;
+        }
+
+        private void olvDependencyMods_ItemActivate(object sender, EventArgs e)
+        {
+            if (sender is ObjectListView olv)
+            {
+                // view mod in main mod list on double-click
+                if (ModList.Objects.Contains(olv.SelectedObject))
+                {
+                    modlist_ListObjectListView.SelectedObject = olv.SelectedObject;
+                    modlist_ListObjectListView.EnsureModelVisible(olv.SelectedObject);
+                }
+            }
+        }
+
+        private void olvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
+        {
+            var mod = e.Model as ModEntry;
+            Contract.Assume(mod != null);
+
+            SetModListItemColor(e.Item, mod);
         }
 
         #endregion
