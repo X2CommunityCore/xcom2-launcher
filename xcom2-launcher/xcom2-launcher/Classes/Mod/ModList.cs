@@ -310,7 +310,7 @@ namespace XCOM2Launcher.Mod
                 
                 getDetailsTasks.Add(Task.Run(() =>
                 {
-                    var details = Workshop.GetDetails(batchQueryModList.ConvertAll(mod => (ulong) mod.WorkshopID));
+                    var details = Workshop.GetDetails(batchQueryModList.ConvertAll(mod => (ulong) mod.WorkshopID), true);
 
                     if (details == null)
                     {
@@ -574,7 +574,7 @@ namespace XCOM2Launcher.Mod
         public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true)
         {
             List<ModEntry> requiredMods = new List<ModEntry>();
-            var installedSteamMods = All.Where(m => m.WorkshopID != 0 && m.Source == ModSource.SteamWorkshop).ToList();
+            var installedSteamMods = All.Where(m => m.WorkshopID != 0).ToList();
             
             foreach (var id in mod.Dependencies)
             {

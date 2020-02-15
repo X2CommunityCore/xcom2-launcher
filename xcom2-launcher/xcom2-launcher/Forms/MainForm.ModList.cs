@@ -152,10 +152,13 @@ namespace XCOM2Launcher.Forms
             var mod = (ModEntry) rowobject;
 
             if (mod.State.HasFlag(ModState.NotLoaded))
-                return "Not Loaded";
+                return "Not loaded";
 
             if (mod.State.HasFlag(ModState.NotInstalled))
-                return "Not Installed";
+                return "Not installed";
+
+            if (mod.State.HasFlag(ModState.MissingDependencies) && mod.isActive)
+                return "Missing dep";
 
             if (mod.State.HasFlag(ModState.ModConflict))
                 return "Conflict";
@@ -167,7 +170,7 @@ namespace XCOM2Launcher.Forms
                 return "New";
 
             if (mod.State.HasFlag(ModState.UpdateAvailable))
-                return "Update Available";
+                return "Update available";
 
             if (mod.State.HasFlag(ModState.DuplicateDisabled))
                 return "Duplicate (disabled)";
