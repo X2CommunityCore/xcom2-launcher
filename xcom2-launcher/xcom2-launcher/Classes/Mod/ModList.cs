@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Management;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
@@ -26,7 +25,7 @@ namespace XCOM2Launcher.Mod
         public IEnumerable<ModEntry> All => Entries.SelectMany(c => c.Value.Entries);
 
         [JsonIgnore]
-        public IEnumerable<string> Categories => Entries.OrderBy(c => c.Value.Index).ThenBy(c => c.Key).Select(c => c.Key);
+        public IEnumerable<string> CategoryNames => Entries.OrderBy(c => c.Value.Index).ThenBy(c => c.Key).Select(c => c.Key);
 
         [JsonIgnore]
         public IEnumerable<ModEntry> Active => All.Where(m => m.isActive);
@@ -42,11 +41,23 @@ namespace XCOM2Launcher.Mod
 
                 if (cat == null)
                 {
-                    cat = new ModCategory();
+                    cat = new ModCategory(Entries.Max(entry => entry.Value.Index) + 1);
                     Entries.Add(category, cat);
                 }
 
                 return cat;
+            }
+        }
+
+        /// <summary>
+        /// Make sure category indices are numbered from 0..n without gaps.
+        /// </summary>
+        public void InitCategoryIndices()
+        {
+            var newIndex = 0;
+            foreach (var entry in Entries.OrderBy(entry => entry.Value.Index))
+            {
+                entry.Value.Index = newIndex++;
             }
         }
 

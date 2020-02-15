@@ -43,6 +43,21 @@ namespace XCOM2Launcher.Forms
                 parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string) a.Key].Index.CompareTo(Mods.Entries[(string) b.Key].Index));
             });
 
+            modlist_ListObjectListView.GroupStateChanged += delegate(object o, GroupStateChangedEventArgs args)
+            {
+                // Remember group expanded/collapsed state when grouping by category (name or id column)
+                if (modlist_ListObjectListView.PrimarySortColumn == olvcName || modlist_ListObjectListView.PrimarySortColumn == olvcID)
+                {
+                    if (args.Group.Key is string key)
+                    {
+                        if (Mods.Entries.ContainsKey(key))
+                        {
+                            Mods.Entries[key].Collapsed = args.Group.Collapsed;
+                        }
+                    }
+                }
+            };
+
             olvcActive.GroupKeyGetter = categoryGroupingDelegate;
             olvcActive.GroupFormatter = categoryFormatterDelegate;
 
@@ -230,27 +245,6 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void ModListKeyUp(object sender, KeyEventArgs e)
-        {
-        }
-
-        private void ModListGroupExpandingCollapsing(object sender, GroupExpandingCollapsingEventArgs e)
-        {
-            // only handle if grouped by name or id
-            if (modlist_ListObjectListView.PrimarySortColumn.AspectName != "Name" &&
-                modlist_ListObjectListView.PrimarySortColumn.AspectName != "ID")
-                return;
-
-            if (e.Group.Key == null)
-                return;
-
-            var key = e.Group.Key as string;
-            Contract.Assume(key != null);
-
-            if (Mods.Entries.ContainsKey(key))
-                Mods.Entries[key].Collapsed = !e.IsExpanding;
-        }
-
         /// <summary>
         /// Adjust fore- and backgroundcolor of the OLVListItem, depending on the state of the given ModEntry.
         /// </summary>
@@ -424,12 +418,20 @@ namespace XCOM2Launcher.Forms
         private void MoveSelectedModsToCategory(string category)
         {
             modlist_ListObjectListView.BeginUpdate();
+            
+            // Remember collapsed groups to restore them later, because all groups
+            // are expanded when updating a mod from a collapsed group.
+            var collapsedGroups = modlist_ListObjectListView.CollapsedGroups.ToList();
+            
             foreach (var mod in ModList.SelectedObjects)
             {
                 Mods.RemoveMod(mod);
                 Mods.AddMod(category, mod);
                 modlist_ListObjectListView.UpdateObject(mod);
             }
+            
+            // Restore previously collapsed groups
+            collapsedGroups.ForEach(g => g.Collapsed = true);
             modlist_ListObjectListView.EndUpdate();
         }
 
@@ -761,7 +763,7 @@ namespace XCOM2Launcher.Forms
             moveToCategoryItem.MenuItems.Add("-");
 
             // ... existing category
-            foreach (var category in Settings.Mods.Categories.OrderBy(c => c))
+            foreach (var category in Settings.Mods.CategoryNames.OrderBy(c => c))
             {
                 if (category == Mods.GetCategory(m))
                     continue;
