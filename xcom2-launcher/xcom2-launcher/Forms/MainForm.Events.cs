@@ -260,7 +260,12 @@ namespace XCOM2Launcher.Forms
 
             if (result == DialogResult.OK)
             {
-                RefreshModList();
+                var collapsedGroups = modlist_ListObjectListView.CollapsedGroups.ToList();
+                modlist_ListObjectListView.BeginUpdate();
+                modlist_ListObjectListView.BuildGroups();
+                // Restore previously collapsed groups
+                collapsedGroups.ForEach(g => g.Collapsed = true);
+                modlist_ListObjectListView.EndUpdate();
             }
         }
 

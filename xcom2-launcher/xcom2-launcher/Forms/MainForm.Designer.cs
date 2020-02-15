@@ -634,11 +634,9 @@
             this.modlist_ListObjectListView.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.ModListCellRightClick);
             this.modlist_ListObjectListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModListCellToolTipShowing);
             this.modlist_ListObjectListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModListFormatRow);
-            this.modlist_ListObjectListView.GroupExpandingCollapsing += new System.EventHandler<BrightIdeasSoftware.GroupExpandingCollapsingEventArgs>(this.ModListGroupExpandingCollapsing);
             this.modlist_ListObjectListView.SelectionChanged += new System.EventHandler(this.ModListSelectionChanged);
             this.modlist_ListObjectListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ModListItemChecked);
             this.modlist_ListObjectListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ModListKeyDown);
-            this.modlist_ListObjectListView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ModListKeyUp);
             // 
             // olvcActive
             // 

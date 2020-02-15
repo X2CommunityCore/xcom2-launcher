@@ -315,11 +315,7 @@ namespace XCOM2Launcher
             if (settings.Mods.Entries.Count > 0)
             {
                 settings.Mods.MarkDuplicates();
-
-                // Verify categories
-                var index = settings.Mods.Entries.Values.Max(c => c.Index);
-                foreach (var cat in settings.Mods.Entries.Values.Where(c => c.Index == -1))
-                    cat.Index = ++index;
+                settings.Mods.InitCategoryIndices();
 
                 // Verify Mods 
                 foreach (var mod in settings.Mods.All)
