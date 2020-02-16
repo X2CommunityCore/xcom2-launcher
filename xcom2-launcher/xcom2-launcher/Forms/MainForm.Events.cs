@@ -238,6 +238,15 @@ namespace XCOM2Launcher.Forms
             export_group_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
             export_save_button.Click += ExportSaveButtonClick;
             export_load_button.Click += ExportLoadButtonClick;
+
+            horizontal_splitcontainer.Paint += (sender, args) =>
+            {
+                if (sender is SplitContainer s)
+                {
+                    // Make the "splitter" from the SplitContainer slightly visible.
+                    args.Graphics.FillRectangle(new SolidBrush(SystemColors.Control), s.SplitterRectangle);
+                }
+            };
         }
 
         private void QuickArgumentItemClick(object sender, EventArgs e) {

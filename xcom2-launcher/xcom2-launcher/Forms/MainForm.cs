@@ -707,15 +707,53 @@ namespace XCOM2Launcher.Forms
 
             olvRequiredMods.BooleanCheckStatePutter = BooleanCheckStatePutter;
             olvDependentMods.BooleanCheckStatePutter = BooleanCheckStatePutter;
+            
+            olvColReqModsIgnore.AspectGetter += rowObject =>
+            {
+                if (CurrentMod == null || !(rowObject is ModEntry mod))
+                    return false;
+
+                return CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID);
+            };
+
+            olvColReqModsIgnore.AspectPutter += (rowObject, value) =>
+            {
+                if (CurrentMod == null || !(rowObject is ModEntry mod) || !(value is bool checkState))
+                    return;
+
+                // Add the mod id to or remove it from the IgnoredDependencies list.
+                if (checkState)
+                {
+                    if (!CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID))
+                    {
+                        CurrentMod.IgnoredDependencies.Add(mod.WorkshopID);
+                    }
+                }
+                else
+                {
+                    if (CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID))
+                    {
+                        CurrentMod.IgnoredDependencies.Remove(mod.WorkshopID);
+                    }
+                }
+
+                Mods.UpdatedModDependencyState(CurrentMod);
+                modlist_ListObjectListView.RefreshObject(CurrentMod);
+            };
+
+            olvRequiredMods.SubItemChecking += (sender, args) =>
+            {
+                if (CurrentMod == null && !(args.RowObject is ModEntry))
+                {
+                    args.NewValue = args.CurrentValue;
+                }
+            };
         }
 
         private bool BooleanCheckStatePutter(object rowobject, bool newValue)
         {
             var mod = rowobject as ModEntry;
-
-            Debug.WriteLine("olvRequiredMods_ItemCheck: " + mod.isActive + " -> " + newValue);
             newValue = ProcessNewModState(mod, newValue);
-            Debug.WriteLine("olvRequiredMods_ItemCheck: " + mod.isActive + " -> " + newValue);
 
             // change check state for the mod in main list accordingly
             if (newValue)

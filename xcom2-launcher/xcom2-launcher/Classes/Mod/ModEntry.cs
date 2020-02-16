@@ -65,10 +65,18 @@ namespace XCOM2Launcher.Mod
         public string Note { get; set; } = null;
 
         /// <summary>
-        /// Contains the workshop id's from all mods that this mod requires to run properly (as reported from workshop).
+        /// Contains workshop id's from all mods, that this mod requires to run properly (as reported from workshop).
         /// </summary>
         public List<long> Dependencies { get; set; } = new List<long>();
 
+        /// <summary>
+        /// Contains workshop id's from mods, that the should be ignored during dependency checks (optional).
+        /// </summary>
+        public List<long> IgnoredDependencies { get; set; } = new List<long>();
+
+        /// <summary>
+        /// Contains the tags that were downloaded from steam.
+        /// </summary>
         public List<string> SteamTags { get; set; } = new List<string>();
 
 		[JsonIgnore]

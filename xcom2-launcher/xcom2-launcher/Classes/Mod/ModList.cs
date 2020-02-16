@@ -111,7 +111,7 @@ namespace XCOM2Launcher.Mod
         /// <returns></returns>
         public void UpdatedModDependencyState(ModEntry mod)
         {
-            var requiredMods = GetRequiredMods(mod);
+            var requiredMods = GetRequiredMods(mod, true, true);
             var allRequiredModsAvailable = requiredMods.All(m => m.WorkshopID != 0 && m.isActive && !m.State.HasFlag(ModState.NotInstalled) && !m.State.HasFlag(ModState.NotLoaded));
             
             if (allRequiredModsAvailable)
@@ -570,13 +570,21 @@ namespace XCOM2Launcher.Mod
         /// </summary>
         /// <param name="mod">Mod to check required mods for</param>
         /// <param name="substituteDuplicates">If set to true, the primary duplicate will be returned if the real dependency is a disabled duplicate.</param>
+        /// <param name="checkIgnoredDependencies">If set to true, dependencies that have been set to be ignored are not returned.</param>
         /// <returns></returns>
-        public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true)
+        public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true, bool checkIgnoredDependencies = false)
         {
             List<ModEntry> requiredMods = new List<ModEntry>();
             var installedSteamMods = All.Where(m => m.WorkshopID != 0).ToList();
-            
-            foreach (var id in mod.Dependencies)
+
+            var dependecies = mod.Dependencies;
+
+            if (checkIgnoredDependencies)
+            {
+                dependecies = dependecies.Except(mod.IgnoredDependencies).ToList();
+            }
+
+            foreach (var id in dependecies)
             {
                 // Check if required mod is already installed and use it if available.
                 var result = installedSteamMods.FirstOrDefault(m => m.WorkshopID == id);
