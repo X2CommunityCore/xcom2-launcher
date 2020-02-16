@@ -1,96 +1,43 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace XCOM2Launcher.XCOM
 {
-    public class Arguments
+    public class Argument
     {
-        [DisplayName("-review")]
-        [Description("Final main menu? \r\nDefault: true")]
-        [DefaultValue(true)]
-        public bool review { get; set; } = true;
+        public string Name { get; }
+        public string Parameter { get; }
+        public string Description { get; }
+        public bool IsEnabledByDefault { get; }
+        public bool IsDefaultQuickArg { get; }
 
-        [DisplayName("-noRedScreens")]
-        [Description("Hide error popups?\r\nDefault: true")]
-        [DefaultValue(true)]
-        public bool noRedScreens { get; set; } = true;
+        public static List<Argument> DefaultArguments;
 
-        [DisplayName("-log")]
-        [Description("Show log console?\r\nDefault: false")]
-        [DefaultValue(false)]
-        public bool log { get; set; } = false;
-
-        [DisplayName("-crashDumpWatcher")]
-        [Description("No idea.\r\nDefault: true")]
-        [DefaultValue(true)]
-        public bool crashDumpWatcher { get; set; } = true;
-
-        [DisplayName("-noStartUpMovies")]
-        [Description("Skip intro movies?\r\nDefault: false")]
-        [DefaultValue(false)]
-        public bool noStartupMovies { get; set; } = false;
-
-        [DisplayName("-language=")]
-        [Description("Force language\r\nDefault: empty")]
-        [DefaultValue("")]
-        public string Language { get; set; } = "";
-
-
-        [DisplayName("-allowConsole")]
-        [Description("Allow cheat console?\r\nDefault: false")]
-        [DefaultValue(false)]
-        public bool allowConsole { get; set; } = false;
-
-        [DisplayName("-autoDebug")]
-        [Description("No idea.\r\nDefault: false")]
-        [DefaultValue(false)]
-        public bool autoDebug { get; set; } = false;
-
-	    [DisplayName("-noSeekFreeLoading")]
-	    [Description("No idea\r\nDefault: false")]
-	    [DefaultValue(false)]
-	    public bool noSeekFreeLoading { get; set; } = false;
-
-        [DisplayName("Additional arguments")]
-        [Description("Add something extra")]
-        [DefaultValue(null)]
-        public string Custom { get; set; } = null;
-
-        public override string ToString()
+        static Argument()
         {
-            string args = "-fromLauncher";
+            DefaultArguments = new List<Argument>
+            {
+                new Argument("Review", "-review", "Show final main menu", true, true),
+                new Argument("No Red Screens", "-noRedScreens", "Hides error popups", true, true),
+                new Argument("Show log console", "-log", "Show log console", false, false),
+                new Argument("Crash Dump Watcher", "-crashDumpWatcher", "", false, false),
+                new Argument("Skip startup movies", "-noStartUpMovies", "Skip intro movies", false, true),
+                new Argument("Set language", "-language=", "Force language", false, false),
+                new Argument("Enable console", "-allowConsole", "Enables the debug console", false, true),
+                new Argument("Autodebug", "-autoDebug", "", false, false),
+                new Argument("No seek free loading ", "-noSeekFreeLoading", "", false, false),
+                new Argument("Regenerate ini files", "-regenerateinis", "", false, true)
+            };
+        }
 
-            if (log)
-                args += " -log";
-
-            if (review)
-                args += " -review";
-
-            if (Language.Length > 0)
-                args += " -language=" + Language;
-
-            if (noRedScreens)
-                args += " -noRedScreens";
-
-            if (noStartupMovies)
-                args += " -noStartupMovies";
-
-            if (crashDumpWatcher)
-                args += " -CrashDumpWatcher";
-
-            if (allowConsole)
-                args += " -allowConsole";
-
-            if (autoDebug)
-                args += " -autoDebug";
-
-	        if (noSeekFreeLoading)
-		        args += "-noseekfreeloading";
-
-			if (!string.IsNullOrEmpty(Custom))
-                args += " " + Custom;
-
-
-            return args;
+        public Argument(string name, string parameter, string description = "", bool isEnabledByDefault = false, bool isDefaultQuickArg = false)
+        {
+            Name = name;
+            Parameter = parameter;
+            Description = description;
+            IsEnabledByDefault = isEnabledByDefault;
+            IsDefaultQuickArg = isDefaultQuickArg;
         }
     }
 }

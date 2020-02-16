@@ -30,6 +30,7 @@ namespace XCOM2Launcher.Forms
             InitializeComponent();
 
             appRestartPendingLabel.Visible = false;
+            aboutToolStripMenuItem.DropDownDirection = ToolStripDropDownDirection.BelowLeft;
 
             // Settings
             SteamAPIWrapper.Init();
@@ -64,7 +65,7 @@ namespace XCOM2Launcher.Forms
             InitializeTabImages();
 
             // Init the argument checkboxes
-            UpdateQuickArgumentsMenu();
+            InitQuickArgumentsMenu(settings);
 
 #if !DEBUG
 			// Update mod information
@@ -687,9 +688,17 @@ namespace XCOM2Launcher.Forms
         /// <summary>
         /// Updates the quick launch menu items check-states, depending on if the the respective argument is enabled in the settings.
         /// </summary>
-        private void UpdateQuickArgumentsMenu()
+        private void InitQuickArgumentsMenu(Settings settings)
         {
-            LauchOptionsPanel.Visible = Settings.ShowQuickLaunchArguments;
+            LauchOptionsPanel.Visible = settings.ShowQuickLaunchArguments && settings.QuickToggleArguments.Any();
+            
+            quickLaunchToolstripButton.DropDownItems.Clear();
+            foreach (var arg in settings.QuickToggleArguments)
+            {
+                var item = new ToolStripMenuItem(arg) {CheckOnClick = true};
+                item.Click += QuickArgumentItemClick;
+                quickLaunchToolstripButton.DropDownItems.Add(item);
+            }
 
             foreach (ToolStripMenuItem item in quickLaunchToolstripButton.DropDownItems) {
                 item.Checked = Settings.ArgumentList.Any(arg => arg.Equals(item.Text, StringComparison.OrdinalIgnoreCase));

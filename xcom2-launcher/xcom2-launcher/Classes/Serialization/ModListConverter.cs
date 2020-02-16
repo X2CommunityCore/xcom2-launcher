@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using XCOM2Launcher.Mod;
@@ -18,11 +19,11 @@ namespace XCOM2Launcher.Serialization
             // Load JObject from stream
             var jObject = JObject.Load(reader);
 
-            if (jObject["Arguments"].Type == JTokenType.Object)
+            if (jObject["Arguments"]?.Type == JTokenType.Object)
             {
                 // Transform Arguments object to string
-                var args = jObject["Arguments"].ToObject<Arguments>();
-                jObject["Arguments"] = new JValue(args.ToString());
+                var defaultEnabledArgs = Argument.DefaultArguments.Where(arg => arg.IsEnabledByDefault).Select(arg => arg.Parameter).ToList().Aggregate((a, b) => a + " " + b);
+                jObject["Arguments"] = new JValue(defaultEnabledArgs);
             }
 
             var settings = jObject.ToObject<Settings>();

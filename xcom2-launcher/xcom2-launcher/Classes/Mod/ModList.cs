@@ -41,7 +41,7 @@ namespace XCOM2Launcher.Mod
 
                 if (cat == null)
                 {
-                    cat = new ModCategory(Entries.Max(entry => entry.Value.Index) + 1);
+                    cat = new ModCategory(Entries.Any() ? Entries.Max(entry => entry.Value.Index) + 1 : 0);
                     Entries.Add(category, cat);
                 }
 

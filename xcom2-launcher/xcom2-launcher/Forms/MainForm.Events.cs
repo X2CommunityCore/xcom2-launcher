@@ -131,7 +131,7 @@ namespace XCOM2Launcher.Forms
                     olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
                     olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
                     cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
-                    UpdateQuickArgumentsMenu();
+                    InitQuickArgumentsMenu(Settings);
 
                     if (dialog.IsRestartRequired)
                     {

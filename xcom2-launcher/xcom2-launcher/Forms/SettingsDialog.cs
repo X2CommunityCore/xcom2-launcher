@@ -41,22 +41,12 @@ namespace XCOM2Launcher.Forms
                 modPathsListbox.Items.Add(modPath);
 
             argumentsTextBox.Text = string.Join(" ", settings.ArgumentList);
+            quickArgumentsTextBox.Text = string.Join(" ", settings.QuickToggleArguments);
 
             // Create autofill values for arguments box
-            List<string> arguments = new List<string>();
-            foreach (var propertyInfo in typeof(Arguments).GetProperties())
-            {
-                var attrs = propertyInfo.GetCustomAttributes(true);
-                arguments.AddRange(
-                                   from attrName in attrs.OfType<DisplayNameAttribute>()
-                                   where !propertyInfo.Name.Equals("Custom")
-                                   select attrName.DisplayName);
-            }
-
-            argumentsTextBox.Values = arguments.ToArray();
-
-
-
+            var defaultArgs = Argument.DefaultArguments.Select(arg => arg.Parameter).ToArray();
+            argumentsTextBox.Values = defaultArgs;
+            quickArgumentsTextBox.Values = defaultArgs;
         }
 
         private void BrowseGamePathButtonOnClick(object sender, EventArgs eventArgs)
@@ -144,6 +134,9 @@ namespace XCOM2Launcher.Forms
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
             Settings.ArgumentList = newArguments.AsReadOnly();
+
+            var newQuickArguments = quickArgumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+            Settings.QuickToggleArguments = newQuickArguments;
 
             // Save dimensions
             Settings.Windows["settings"] = new WindowSettings(this);

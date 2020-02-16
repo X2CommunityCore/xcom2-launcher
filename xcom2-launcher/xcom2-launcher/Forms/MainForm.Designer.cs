@@ -981,7 +981,7 @@
             this.quickLaunchToolstripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.quickLaunchToolstripButton.Name = "quickLaunchToolstripButton";
             this.quickLaunchToolstripButton.Size = new System.Drawing.Size(150, 22);
-            this.quickLaunchToolstripButton.Text = "Quick launch arguments";
+            this.quickLaunchToolstripButton.Text = "Quick toggle arguments";
             // 
             // toolStripMenuItem2
             // 
