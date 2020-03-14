@@ -217,7 +217,7 @@ namespace XCOM2Launcher.Mod
                         var newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
                         lock (overrides)
                         {
-                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener));
+                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener, line));
                         }
                     }
                 }
@@ -236,10 +236,10 @@ namespace XCOM2Launcher.Mod
             var r = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)");
 
             return from line in File.ReadLines(file)
-                select r.Match(line.Replace(" ", ""))
+                select (l: line, match: r.Match(Regex.Replace(line, "\\s+", "")))
                 into m
-                where m.Success
-                select new ModClassOverride(this, m.Groups[2].Value, m.Groups[1].Value, ModClassOverrideType.Class);
+                where m.match.Success
+                select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
         }
 
         public void ShowOnSteam()

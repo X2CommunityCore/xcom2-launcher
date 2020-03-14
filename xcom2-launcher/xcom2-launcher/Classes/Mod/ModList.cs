@@ -69,6 +69,8 @@ namespace XCOM2Launcher.Mod
                     && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
                     // If all overrides uses the same mod ID, assume there is no conflict
                     && overridesForThisClass.Any(o => o.Mod.ID != overridesForThisClass[0].Mod.ID)
+                    // If all overrides are textually identical, no conflict
+                    && overridesForThisClass.Select(m => m.TextLine).Distinct().Count() > 1
                 select new ModConflict(className, overridesForThisClass);
         }
 
