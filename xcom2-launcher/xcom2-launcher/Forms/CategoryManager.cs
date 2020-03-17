@@ -23,7 +23,7 @@ namespace XCOM2Launcher.Forms
 
             Settings = settings;
 
-            foreach (var cat in settings.Mods.Categories)
+            foreach (var cat in settings.Mods.CategoryNames)
                 categoriesListBox.Items.Add(cat);
         }
 
@@ -34,15 +34,17 @@ namespace XCOM2Launcher.Forms
             if (string.IsNullOrEmpty(newName))
                 return;
 
+            var categories = Settings.Mods.CategoryNames.ToList();
+
             // If no category with the given name exists add it, otherweise select exiting entry.
-            if (!Settings.Mods.Categories.Contains(newName))
+            if (!categories.Contains(newName))
             {
                 Log.Info($"Adding category '{newName}'");
 
                 categoriesListBox.Items.Add(newName);
                 categoriesListBox.SelectedItem = newName;
 
-                Settings.Mods.Entries.Add(newName, new ModCategory());
+                Settings.Mods.Entries.Add(newName, new ModCategory(Settings.Mods.Entries.Max(entry => entry.Value.Index) + 1));
             }
             else
             {
@@ -75,6 +77,7 @@ namespace XCOM2Launcher.Forms
                 Settings.Mods.AddMod(ModInfo.DEFAULT_CATEGORY_NAME, m);
 
             Settings.Mods.Entries.Remove(category);
+            Settings.Mods.InitCategoryIndices();
             categoriesListBox.Items.RemoveAt(index);
         }
 

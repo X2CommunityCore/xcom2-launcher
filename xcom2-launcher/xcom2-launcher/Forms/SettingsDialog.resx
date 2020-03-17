@@ -120,4 +120,10 @@
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="useDuplicateModWorkaround.ToolTip" xml:space="preserve">
+    <value>This is an EXPERIMENTAL feature, that provides some means to manage multiple
+mods that have the same ID.
+It allows you to select one of the duplicates as the primary mod and disables
+the others by renaming the XComMod file.</value>
+  </data>
 </root>

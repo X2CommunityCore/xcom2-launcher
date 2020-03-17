@@ -29,7 +29,7 @@ namespace XCOM2Launcher
                 if (_instance != null) return _instance;
                 try
                 {
-                    _instance = Settings.FromFile("settings.json");
+                    _instance = FromFile("settings.json");
                 }
                 catch (FileNotFoundException e)
                 {
@@ -57,22 +57,26 @@ namespace XCOM2Launcher
             }
         }
 
-        public string SavePath { get; set; }
-
         public List<string> ModPaths { get; set; } = new List<string>();
 
         // Only required for backwards compatibility to preserve argument list from older versions.
-        [Obsolete][JsonProperty]
-        private string Arguments { get; set; } = "";
+        [Obsolete][JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        private string Arguments { get; set; }
 
         /// <summary>
-        /// List of XCOM Comamnd line arguments that will be used when the game is started.
+        /// List of XCOM Command line arguments that will be used when the game is started.
         /// </summary>
         public ReadOnlyCollection<string> ArgumentList
         {
             get => _argumentList.AsReadOnly();
             set => _argumentList = value.ToList();
         }
+
+        /// <summary>
+        /// List of XCOM Command line arguments that will be displayed in the quick toggle drop down.
+        /// </summary>
+        [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
+        public List<string> QuickToggleArguments { get; set; } = new List<string>();
 
         public bool CheckForUpdates { get; set; } = true;
         
@@ -83,6 +87,14 @@ namespace XCOM2Launcher
         public bool ShowUpgradeWarning { get; set; } = true;
 
         public bool ShowHiddenElements { get; set; } = false;
+
+        public bool ShowStateFilter { get; set; } = true;
+
+        public bool UseTranslucentModListSelection { get; set; } = true;
+
+        public bool ShowPrimaryDuplicateAsDependency { get; set; } = true;
+        
+        public bool ShowModListGroups { get; set; } = true;
 
         public bool CloseAfterLaunch { get; set; } = false;
 
@@ -98,14 +110,11 @@ namespace XCOM2Launcher
 
         public bool AllowMultipleInstances { get; set; } = false;
 
+        public bool EnableDuplicateModIdWorkaround { get; set; } = false;
+
         public ModList Mods { get; set; } = new ModList();
 
         public Dictionary<string, ModTag> Tags { get; set; } = new Dictionary<string, ModTag>();
-
-        /// <summary>
-        /// Mod ID
-        /// </summary>
-        //public Dictionary<string, ModSettingsList> ModSettings { get; set; } = new Dictionary<string, ModSettingsList>();
 
         public Dictionary<string, WindowSettings> Windows { get; set; } = new Dictionary<string, WindowSettings>();
 
@@ -113,18 +122,13 @@ namespace XCOM2Launcher
         {
             _instance = this;
 
-            _argumentList.Add("-review");
-            _argumentList.Add("-noRedscreens");
+            _argumentList.AddRange(Argument.DefaultArguments.Where(arg => arg.IsEnabledByDefault).Select(arg => arg.Parameter));
+            QuickToggleArguments.AddRange(Argument.DefaultArguments.Where(arg => arg.IsDefaultQuickArg).Select(arg => arg.Parameter));
         }
 
-        internal void ImportMods()
+        internal List<ModEntry> ImportMods()
         {
-            Mods.ImportMods(ModPaths);
-        }
-
-        public string GetWorkshopPath()
-        {
-            return ModPaths.FirstOrDefault(modPath => modPath.IndexOf("steamapps\\workshop\\content\\268500\\", StringComparison.OrdinalIgnoreCase) != -1);
+            return Mods.ImportMods(ModPaths);
         }
 
         /// <summary>
@@ -181,7 +185,7 @@ namespace XCOM2Launcher
             if (!string.IsNullOrEmpty(settings.Arguments))
             {
                 settings._argumentList = settings.Arguments.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
-                settings.Arguments = "";
+                settings.Arguments = null;
             }
             #pragma warning restore 612
 
