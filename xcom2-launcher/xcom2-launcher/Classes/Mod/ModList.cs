@@ -81,14 +81,16 @@ namespace XCOM2Launcher.Mod
                                    .Distinct(StringComparer.InvariantCultureIgnoreCase);
 
             return from className in classesOverriden
-                   let overridesForThisClass = allOverrides.Where(o =>
-                                                                      o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
-                   where overridesForThisClass.Count > 1
-                         // If every mod uses a UIScreenListener, there is no conflict
-                         && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
-                         // If all overrides uses the same mod ID, assume there is no conflict
-                         && overridesForThisClass.Any(o => o.Mod.ID != overridesForThisClass[0].Mod.ID)
-                   select new ModConflict(className, overridesForThisClass);
+                let overridesForThisClass = allOverrides.Where(o =>
+                    o.OldClass.Equals(className, StringComparison.InvariantCultureIgnoreCase)).ToList()
+                where overridesForThisClass.Count > 1
+                    // If every mod uses a UIScreenListener, there is no conflict
+                    && overridesForThisClass.Any(o => o.OverrideType == ModClassOverrideType.Class)
+                    // If all overrides uses the same mod ID, assume there is no conflict
+                    && overridesForThisClass.Any(o => o.Mod.ID != overridesForThisClass[0].Mod.ID)
+                    // If all overrides are textually identical, no conflict
+                    && overridesForThisClass.Select(m => m.TextLine).Distinct().Count() > 1
+                select new ModConflict(className, overridesForThisClass);
         }
 
         private void UpdateModsConflictState(IEnumerable<ModConflict> activeConflicts)
