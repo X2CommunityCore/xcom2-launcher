@@ -737,6 +737,17 @@ namespace XCOM2Launcher.Forms
             RefreshModelFilter();
         }
 
+        private void bClearStateFilter_Click(object sender, EventArgs e)
+        {
+            cFilterConflicted.Checked = false;
+            cFilterDuplicate.Checked = false;
+            cFilterHidden.Checked = false;
+            cFilterMissingDependency.Checked = false;
+            cFilterNew.Checked = false;
+            cFilterNotInstalled.Checked = false;
+            cFilterNotLoaded.Checked = false;
+        }
+
         private void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
         {
             if (modlist_ListObjectListView.SelectedObject is ModEntry mod)

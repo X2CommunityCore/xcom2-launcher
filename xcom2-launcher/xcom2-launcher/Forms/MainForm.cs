@@ -622,7 +622,7 @@ namespace XCOM2Launcher.Forms
         {
             if (m == null)
             {
-                modinfo_info_TitleTextBox.Text = "No mod selected";
+                modinfo_info_TitleTextBox.Text = "No mod or multiple mods selected";
                 modinfo_info_AuthorTextBox.Clear();
                 modinfo_info_DateCreatedTextBox.Clear();
                 modinfo_info_InstalledTextBox.Clear();

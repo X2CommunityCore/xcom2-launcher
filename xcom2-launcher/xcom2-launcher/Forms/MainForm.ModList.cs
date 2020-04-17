@@ -91,6 +91,25 @@ namespace XCOM2Launcher.Forms
 
             olvcPath.GroupKeyGetter = o => Path.GetDirectoryName((o as ModEntry)?.Path);
 
+            olvcSource.AspectGetter = rowObject =>
+            {
+                if (rowObject is ModEntry mod)
+                {
+                    switch (mod.Source)
+                    {
+                        case ModSource.Unknown:
+                            return "Unknown";
+                        case ModSource.SteamWorkshop:
+                            return "Steam";
+                        case ModSource.Manual:
+                            return "Local";
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(mod.Source), "Unhandled ModSource");
+                    }
+                }
+
+                return "";
+            };
 
             // size groupies
             var columns = modlist_ListObjectListView.AllColumns.ToArray();
@@ -1057,18 +1076,7 @@ namespace XCOM2Launcher.Forms
 
         private void ModListSelectionChanged(object sender, EventArgs e)
         {
-            if (modlist_ListObjectListView.SelectedObjects.Count > 1)
-            {
-                CurrentMod = null;
-                return;
-            }
-
-            var selected = modlist_ListObjectListView.SelectedObject as ModEntry;
-
-            if (CurrentMod == selected) 
-                return;
-
-            CurrentMod = selected;
+            CurrentMod = ModList.SelectedObjects.Count != 1 ? null : ModList.SelectedObject;
 
             UpdateModInfo(CurrentMod);
             CheckAndUpdateChangeLog(modinfo_tabcontrol.SelectedTab, CurrentMod);
