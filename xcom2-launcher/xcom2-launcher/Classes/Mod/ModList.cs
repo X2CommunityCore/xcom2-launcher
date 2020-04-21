@@ -201,9 +201,9 @@ namespace XCOM2Launcher.Mod
                 }
                 else
                 {
-                    Log.Error($"Unable to parse WorkShop-Id ({s}) from Steam mod directory " + modDir);
-                    MessageBox.Show("A mod could not be loaded because the workshop ID failed to parse." +
-                                    $"\nPlease check that the following directory conforms to valid workshop numbering.\n\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Log.Warn($"Unable to parse WorkShop-Id ({s}) from Steam mod directory " + modDir);
+                    MessageBox.Show("A mod could not be loaded, because the workshop mod folder does not correspond to a valid workshop ID." +
+                                    $"\n\nPlease check the following directory:\n{modDir}", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return null;
                 }
             }
@@ -237,7 +237,7 @@ namespace XCOM2Launcher.Mod
             }
             catch (InvalidOperationException)
             {
-                Log.Error("Multiple XComMod files in folder " + modDir);
+                Log.Warn("Multiple XComMod files in folder " + modDir);
                 MessageBox.Show(
                                 $"A mod could not be loaded since it contains multiple .XComMod files\r\n\r\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
@@ -247,6 +247,12 @@ namespace XCOM2Launcher.Mod
                 // the user probably added a system folder or a root directory as mod folder
                 // where AML has no access rights to all or some of the sub-folders
                 Log.Error("Unauthorized access to directory " + modDir);
+                return null;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // Handle if directory/mod was removed between enumerating all directories and later accessing it here.
+                Log.Error("Mod directory no longer available " + modDir);
                 return null;
             }
 

@@ -41,25 +41,40 @@ namespace XCOM2Launcher.XCOM
         /// <returns></returns>
         public static string DetectGameDir()
         {
-            // try steam
-            if (SteamApps.GetAppInstallDir((AppId_t) APPID, out var gamedir, 100) > 0 && Directory.Exists(gamedir))
+            // This works even if the application is not installed, based on where the game
+            // would be installed with the default Steam library location.
+            // Use 260 as max path length as this is the default windows limit.
+            if (SteamApps.GetAppInstallDir((AppId_t)APPID, out var gamedir, 260) > 0)
             {
-                Log.Info("Game directory detected using Steam " + gamedir);
-                _gameDir = gamedir;
-                return gamedir;
+                // Check if game is really available/installed
+                if (Directory.Exists(gamedir))
+                {
+                    Log.Info("Game directory detected using Steam " + gamedir);
+                    _gameDir = gamedir;
+                    return gamedir;
+                }
+
+                Log.Warn("Steam returned the (default) installation directory, but the game is probably not installed.");
             }
 
-            // try modding dirs
+            Log.Error("Steam API failed to detect game directory.");
+            
+            // Try to deduce game path from available mod directories
             var dirs = DetectModDirs();
             foreach (var dir in dirs.Where(dir => dir.ToLower().Contains("\\steamapps\\")))
             {
-                _gameDir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
-                Log.Warn("Game directory detected from fallback method " + _gameDir);
-                return _gameDir;
+                // Assume steamapps folder to have \workshop\content\268500 subfolders
+                gamedir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
+
+                if (Directory.Exists(gamedir))
+                {
+                    Log.Warn("Game directory detected from modding directory " + _gameDir);
+                    _gameDir = gamedir;
+                    return gamedir;
+                }
             }
 
             Log.Error("Unable to detect game directory");
-            // abandon hope
             return "";
         }
 

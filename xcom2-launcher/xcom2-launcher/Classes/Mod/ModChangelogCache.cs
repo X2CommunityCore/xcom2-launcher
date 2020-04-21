@@ -47,7 +47,7 @@ namespace XCOM2Launcher.Mod
             }
             catch (WebException ex)
             {
-                Log.Error($"Error loading changelog for Workshop Id: {workshopID}", ex);
+                Log.Warn($"Error loading changelog for Workshop Id: {workshopID}", ex);
                 return "An error occurred while loading the changelog.";
             }
         }
