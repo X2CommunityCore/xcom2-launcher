@@ -423,11 +423,12 @@ namespace XCOM2Launcher.Mod
         {
             try
             {
-                return File.ReadAllText(FilePath.Combine(Path, "ReadMe.txt"));
+                var readmePath = FilePath.Combine(Path, "ReadMe.txt");
+                return File.Exists(readmePath) ? File.ReadAllText(readmePath) : "No ReadMe found.";
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                return "No ReadMe found.";
+                return "Unable to access ReadMe.txt - " + ex.Message;
             }
         }
 

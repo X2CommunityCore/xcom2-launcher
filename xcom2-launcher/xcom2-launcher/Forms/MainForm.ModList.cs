@@ -1079,8 +1079,7 @@ namespace XCOM2Launcher.Forms
             CurrentMod = ModList.SelectedObjects.Count != 1 ? null : ModList.SelectedObject;
 
             UpdateModInfo(CurrentMod);
-            CheckAndUpdateChangeLog(modinfo_tabcontrol.SelectedTab, CurrentMod);
-
+            
             if (CurrentMod != null)
             {
                 CurrentMod.RemoveState(ModState.New);

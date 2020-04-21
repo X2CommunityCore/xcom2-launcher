@@ -627,6 +627,7 @@ namespace XCOM2Launcher.Forms
                 modinfo_info_DateCreatedTextBox.Clear();
                 modinfo_info_InstalledTextBox.Clear();
                 modinfo_readme_RichTextBox.Clear();
+                modinfo_changelog_richtextbox.Clear();
                 UpdateModDescription(null);
                 modinfo_image_picturebox.ImageLocation = null;
                 modinfo_inspect_propertygrid.SelectedObject = null;
@@ -648,6 +649,7 @@ namespace XCOM2Launcher.Forms
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
             UpdateModDescription(m);
+            UpdateModChangeLog(m);
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
             UpdateDependencyInformation(m);

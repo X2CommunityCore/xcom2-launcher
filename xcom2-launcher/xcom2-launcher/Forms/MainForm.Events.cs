@@ -501,12 +501,12 @@ namespace XCOM2Launcher.Forms
 
         private void ModInfoTabSelected(object sender, TabControlEventArgs e)
         {
-            CheckAndUpdateChangeLog(e.TabPage, modlist_ListObjectListView.SelectedObject as ModEntry);
+            UpdateModChangeLog(ModList.SelectedObject);
         }
 
-        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
+        private async void UpdateModChangeLog(ModEntry m)
         {
-            if (tab != modinfo_changelog_tab || m == null)
+            if (modinfo_tabcontrol.SelectedTab != modinfo_changelog_tab || m == null)
                 return;
 
             modinfo_changelog_richtextbox.Text = "Loading...";
