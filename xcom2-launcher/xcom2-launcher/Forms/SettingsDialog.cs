@@ -9,7 +9,7 @@ using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
 {
-    public partial class SettingsDialog : Form
+    partial class SettingsDialog : Form
     {
         protected Settings Settings { get; set; }
 
@@ -53,11 +53,20 @@ namespace XCOM2Launcher.Forms
         {
             var dialog = new OpenFileDialog
             {
-                FileName = "XCom2.exe",
-                Filter = @"XCOM 2 Executable|XCom2.exe",
                 RestoreDirectory = true,
                 InitialDirectory = gamePathTextBox.Text
             };
+
+            if (Program.XEnv.Game == GameId.X2)
+            {
+                dialog.FileName = "XCom2.exe";
+                dialog.Filter = @"XCOM 2 Executable|XCom2.exe";
+            }
+            else
+            {
+                dialog.FileName = "XCom.exe";
+                dialog.Filter = @"XCOM CS Executable|XCom.exe";
+            }
 
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;

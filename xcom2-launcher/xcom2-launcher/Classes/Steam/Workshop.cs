@@ -8,6 +8,8 @@ namespace XCOM2Launcher.Steam
 {
     public static class Workshop
     {
+        public const string APPID_FILENAME = "steam_appid.txt";
+
         /// <summary>
         /// According to Steamworks API constant kNumUGCResultsPerPage.
         /// The maximum number of results that you'll receive for a query result.

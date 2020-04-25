@@ -53,6 +53,7 @@
             this.importActiveModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFromXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importFromWotCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importFromChimeraSquadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resubscribeToModsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runXCOM2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,6 +66,7 @@
             this.openHomepageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.amlWikiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openDiscordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runChimeraSquadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.error_provider = new System.Windows.Forms.ErrorProvider(this.components);
             this.main_tabcontrol = new System.Windows.Forms.TabControl();
             this.modlist_tab = new System.Windows.Forms.TabPage();
@@ -73,8 +75,8 @@
             this.olvcActive = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvAuthor = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvcID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcCategory = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvcID = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcState = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcSource = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvcOrder = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -115,6 +117,7 @@
             this.modlist_toggleGroupsButton = new System.Windows.Forms.Button();
             this.panel3 = new System.Windows.Forms.Panel();
             this.modlist_filterClearButton = new System.Windows.Forms.Button();
+            this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
             this.modinfo_groupbox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.modinfo_tabcontrol = new System.Windows.Forms.TabControl();
@@ -138,6 +141,7 @@
             this.modinfo_config_tab = new System.Windows.Forms.TabPage();
             this.modinfo_config_TableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.modinfo_ConfigFCTB = new FastColoredTextBoxNS.FastColoredTextBox();
+            this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
             this.modinfo_config_buttonsTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.modinfo_config_ExpandButton = new System.Windows.Forms.Button();
             this.modinfo_config_CompareButton = new System.Windows.Forms.Button();
@@ -192,8 +196,6 @@
             this.olvcSavedIni = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.fillPanel = new System.Windows.Forms.Panel();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.modlist_FilterCueTextBox = new XCOM2Launcher.UserElements.CueTextBox();
-            this.modinfo_config_FileSelectCueComboBox = new XCOM2Launcher.UserElements.CueComboBox();
             this.main_statusstrip.SuspendLayout();
             this.main_menustrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.error_provider)).BeginInit();
@@ -289,7 +291,8 @@
             this.runXCOM2ToolStripMenuItem,
             this.runWarOfTheChosenToolStripMenuItem,
             this.runChallengeModeToolStripMenuItem,
-            this.aboutToolStripMenuItem});
+            this.aboutToolStripMenuItem,
+            this.runChimeraSquadToolStripMenuItem});
             this.main_menustrip.Location = new System.Drawing.Point(0, 0);
             this.main_menustrip.Name = "main_menustrip";
             this.main_menustrip.ShowItemToolTips = true;
@@ -410,7 +413,8 @@
             // 
             this.importActiveModsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.importFromXCOM2ToolStripMenuItem,
-            this.importFromWotCToolStripMenuItem});
+            this.importFromWotCToolStripMenuItem,
+            this.importFromChimeraSquadToolStripMenuItem});
             this.importActiveModsToolStripMenuItem.Name = "importActiveModsToolStripMenuItem";
             this.importActiveModsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.importActiveModsToolStripMenuItem.Text = "Import active mods";
@@ -418,18 +422,26 @@
             // importFromXCOM2ToolStripMenuItem
             // 
             this.importFromXCOM2ToolStripMenuItem.Name = "importFromXCOM2ToolStripMenuItem";
-            this.importFromXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
-            this.importFromXCOM2ToolStripMenuItem.Text = "XCOM 2";
+            this.importFromXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.importFromXCOM2ToolStripMenuItem.Text = "From XCOM 2 config";
             this.importFromXCOM2ToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the X" +
     "COM 2 basegame config file.";
             // 
             // importFromWotCToolStripMenuItem
             // 
             this.importFromWotCToolStripMenuItem.Name = "importFromWotCToolStripMenuItem";
-            this.importFromWotCToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
-            this.importFromWotCToolStripMenuItem.Text = "WotC";
+            this.importFromWotCToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.importFromWotCToolStripMenuItem.Text = "From WotC config";
             this.importFromWotCToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the W" +
     "otC config file.";
+            // 
+            // importFromChimeraSquadToolStripMenuItem
+            // 
+            this.importFromChimeraSquadToolStripMenuItem.Name = "importFromChimeraSquadToolStripMenuItem";
+            this.importFromChimeraSquadToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.importFromChimeraSquadToolStripMenuItem.Text = "From Chimera Squad config";
+            this.importFromChimeraSquadToolStripMenuItem.ToolTipText = "Enables all mods in the mods list, that are currently listed \r\nas active in the C" +
+    "himera Squad config file.";
             // 
             // cleanModsToolStripMenuItem
             // 
@@ -452,6 +464,7 @@
             this.runXCOM2ToolStripMenuItem.Name = "runXCOM2ToolStripMenuItem";
             this.runXCOM2ToolStripMenuItem.Size = new System.Drawing.Size(103, 20);
             this.runXCOM2ToolStripMenuItem.Text = "Run &XCOM 2";
+            this.runXCOM2ToolStripMenuItem.ToolTipText = "Start XCOM 2 with selected mods";
             // 
             // runWarOfTheChosenToolStripMenuItem
             // 
@@ -460,6 +473,7 @@
             this.runWarOfTheChosenToolStripMenuItem.Name = "runWarOfTheChosenToolStripMenuItem";
             this.runWarOfTheChosenToolStripMenuItem.Size = new System.Drawing.Size(157, 20);
             this.runWarOfTheChosenToolStripMenuItem.Text = "Run War of the Chosen";
+            this.runWarOfTheChosenToolStripMenuItem.ToolTipText = "Start WotC with selected mods";
             // 
             // runChallengeModeToolStripMenuItem
             // 
@@ -467,6 +481,7 @@
             this.runChallengeModeToolStripMenuItem.Name = "runChallengeModeToolStripMenuItem";
             this.runChallengeModeToolStripMenuItem.Size = new System.Drawing.Size(146, 20);
             this.runChallengeModeToolStripMenuItem.Text = "Run Challenge Mode";
+            this.runChallengeModeToolStripMenuItem.ToolTipText = "Start WotC with no mods enabled";
             // 
             // aboutToolStripMenuItem
             // 
@@ -518,6 +533,14 @@
             this.openDiscordToolStripMenuItem.Text = "AML Discord Channel";
             this.openDiscordToolStripMenuItem.ToolTipText = "Opens a Discord invite link to our channel \r\non the XCOM 2 Modding server.";
             // 
+            // runChimeraSquadToolStripMenuItem
+            // 
+            this.runChimeraSquadToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("runChimeraSquadToolStripMenuItem.Image")));
+            this.runChimeraSquadToolStripMenuItem.Name = "runChimeraSquadToolStripMenuItem";
+            this.runChimeraSquadToolStripMenuItem.Size = new System.Drawing.Size(178, 20);
+            this.runChimeraSquadToolStripMenuItem.Text = "Run XCOM Chimera Squad";
+            this.runChimeraSquadToolStripMenuItem.ToolTipText = "Start XCOM Chimera Squad with selected mods";
+            // 
             // error_provider
             // 
             this.error_provider.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink;
@@ -568,7 +591,7 @@
             // 
             this.horizontal_splitcontainer.Panel2.Controls.Add(this.modinfo_groupbox);
             this.horizontal_splitcontainer.Size = new System.Drawing.Size(970, 656);
-            this.horizontal_splitcontainer.SplitterDistance = 405;
+            this.horizontal_splitcontainer.SplitterDistance = 398;
             this.horizontal_splitcontainer.SplitterWidth = 5;
             this.horizontal_splitcontainer.TabIndex = 5;
             // 
@@ -577,8 +600,8 @@
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcActive);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcName);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvAuthor);
-            this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcCategory);
+            this.modlist_ListObjectListView.AllColumns.Add(this.olvcID);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcState);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcSource);
             this.modlist_ListObjectListView.AllColumns.Add(this.olvcOrder);
@@ -603,16 +626,13 @@
             this.olvcActive,
             this.olvcName,
             this.olvAuthor,
-            this.olvcID,
             this.olvcCategory,
+            this.olvcID,
             this.olvcState,
-            this.olvcOrder,
             this.olvcSize,
             this.olvcLastUpdated,
-            this.olvcHasBackup,
-            this.olvcHidden,
+            this.olvcDateAdded,
             this.olvcTags,
-            this.olvSteamLink,
             this.olvForWOTC});
             this.modlist_ListObjectListView.Cursor = System.Windows.Forms.Cursors.Default;
             this.modlist_ListObjectListView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -625,7 +645,7 @@
             this.modlist_ListObjectListView.Location = new System.Drawing.Point(0, 33);
             this.modlist_ListObjectListView.Name = "modlist_ListObjectListView";
             this.modlist_ListObjectListView.ShowItemCountOnGroups = true;
-            this.modlist_ListObjectListView.Size = new System.Drawing.Size(970, 341);
+            this.modlist_ListObjectListView.Size = new System.Drawing.Size(970, 334);
             this.modlist_ListObjectListView.SortGroupItemsByPrimaryColumn = false;
             this.modlist_ListObjectListView.SpaceBetweenGroups = 10;
             this.modlist_ListObjectListView.TabIndex = 0;
@@ -656,30 +676,32 @@
             this.olvcName.AspectName = "Name";
             this.olvcName.Hideable = false;
             this.olvcName.Text = "Name";
-            this.olvcName.Width = 350;
+            this.olvcName.Width = 300;
             // 
             // olvAuthor
             // 
             this.olvAuthor.AspectName = "Author";
             this.olvAuthor.Text = "Author";
+            this.olvAuthor.Width = 100;
+            // 
+            // olvcCategory
+            // 
+            this.olvcCategory.AspectName = "Category";
+            this.olvcCategory.Text = "Category";
+            this.olvcCategory.Width = 80;
             // 
             // olvcID
             // 
             this.olvcID.AspectName = "ID";
             this.olvcID.IsEditable = false;
             this.olvcID.Text = "ID";
-            this.olvcID.Width = 200;
-            // 
-            // olvcCategory
-            // 
-            this.olvcCategory.AspectName = "Category";
-            this.olvcCategory.Text = "Category";
+            this.olvcID.Width = 120;
             // 
             // olvcState
             // 
             this.olvcState.IsEditable = false;
             this.olvcState.Text = "State";
-            this.olvcState.Width = 40;
+            this.olvcState.Width = 80;
             // 
             // olvcSource
             // 
@@ -691,7 +713,9 @@
             // 
             this.olvcOrder.AspectName = "Index";
             this.olvcOrder.CellEditUseWholeCell = true;
+            this.olvcOrder.DisplayIndex = 6;
             this.olvcOrder.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvcOrder.IsVisible = false;
             this.olvcOrder.MinimumWidth = 40;
             this.olvcOrder.Text = "Order";
             this.olvcOrder.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -703,7 +727,6 @@
             this.olvcSize.Searchable = false;
             this.olvcSize.Text = "Size";
             this.olvcSize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.olvcSize.Width = 100;
             // 
             // olvcLastUpdated
             // 
@@ -718,7 +741,6 @@
             // 
             this.olvcDateAdded.AspectName = "DateAdded";
             this.olvcDateAdded.IsEditable = false;
-            this.olvcDateAdded.IsVisible = false;
             this.olvcDateAdded.Searchable = false;
             this.olvcDateAdded.Text = "Date Added";
             this.olvcDateAdded.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -745,6 +767,8 @@
             // olvcHasBackup
             // 
             this.olvcHasBackup.AspectName = "HasBackedUpSettings";
+            this.olvcHasBackup.DisplayIndex = 9;
+            this.olvcHasBackup.IsVisible = false;
             this.olvcHasBackup.Text = "Has Backups";
             // 
             // olvcWorkshopID
@@ -757,6 +781,8 @@
             // olvcHidden
             // 
             this.olvcHidden.AspectName = "isHidden";
+            this.olvcHidden.DisplayIndex = 10;
+            this.olvcHidden.IsVisible = false;
             this.olvcHidden.Text = "Hidden";
             // 
             // olvcTags
@@ -771,8 +797,10 @@
             // olvSteamLink
             // 
             this.olvSteamLink.AspectName = "GetSteamLink";
+            this.olvSteamLink.DisplayIndex = 12;
             this.olvSteamLink.Hyperlink = true;
             this.olvSteamLink.IsEditable = false;
+            this.olvSteamLink.IsVisible = false;
             this.olvSteamLink.Searchable = false;
             this.olvSteamLink.Text = "Steam Link";
             this.olvSteamLink.Width = 225;
@@ -806,7 +834,7 @@
             this.pModsLegend.Controls.Add(this.cFilterNotLoaded);
             this.pModsLegend.Controls.Add(this.cFilterDuplicate);
             this.pModsLegend.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pModsLegend.Location = new System.Drawing.Point(0, 374);
+            this.pModsLegend.Location = new System.Drawing.Point(0, 367);
             this.pModsLegend.Name = "pModsLegend";
             this.pModsLegend.Size = new System.Drawing.Size(970, 31);
             this.pModsLegend.TabIndex = 5;
@@ -1123,6 +1151,16 @@
             this.modlist_filterClearButton.UseVisualStyleBackColor = true;
             this.modlist_filterClearButton.Click += new System.EventHandler(this.modlist_filterClearButton_Click);
             // 
+            // modlist_FilterCueTextBox
+            // 
+            this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.modlist_FilterCueTextBox.CueText = "Filter Mods";
+            this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
+            this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
+            this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
+            this.modlist_FilterCueTextBox.TabIndex = 1;
+            this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
+            // 
             // modinfo_groupbox
             // 
             this.modinfo_groupbox.Controls.Add(this.tableLayoutPanel3);
@@ -1131,7 +1169,7 @@
             this.modinfo_groupbox.Margin = new System.Windows.Forms.Padding(0);
             this.modinfo_groupbox.Name = "modinfo_groupbox";
             this.modinfo_groupbox.Padding = new System.Windows.Forms.Padding(0);
-            this.modinfo_groupbox.Size = new System.Drawing.Size(970, 246);
+            this.modinfo_groupbox.Size = new System.Drawing.Size(970, 253);
             this.modinfo_groupbox.TabIndex = 3;
             this.modinfo_groupbox.TabStop = false;
             this.modinfo_groupbox.Text = "Mod Info";
@@ -1149,7 +1187,7 @@
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(970, 233);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(970, 240);
             this.tableLayoutPanel3.TabIndex = 10;
             // 
             // modinfo_tabcontrol
@@ -1167,7 +1205,7 @@
             this.modinfo_tabcontrol.Margin = new System.Windows.Forms.Padding(0, 0, 2, 2);
             this.modinfo_tabcontrol.Name = "modinfo_tabcontrol";
             this.modinfo_tabcontrol.SelectedIndex = 0;
-            this.modinfo_tabcontrol.Size = new System.Drawing.Size(768, 231);
+            this.modinfo_tabcontrol.Size = new System.Drawing.Size(768, 238);
             this.modinfo_tabcontrol.TabIndex = 9;
             this.modinfo_tabcontrol.Selected += new System.Windows.Forms.TabControlEventHandler(this.ModInfoTabSelected);
             // 
@@ -1188,7 +1226,7 @@
             this.modinfo_details_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_details_tab.Name = "modinfo_details_tab";
             this.modinfo_details_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_details_tab.Size = new System.Drawing.Size(760, 205);
+            this.modinfo_details_tab.Size = new System.Drawing.Size(760, 212);
             this.modinfo_details_tab.TabIndex = 0;
             this.modinfo_details_tab.Text = "Info";
             this.modinfo_details_tab.UseVisualStyleBackColor = true;
@@ -1299,7 +1337,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.modinfo_info_DescriptionRichTextBox.Location = new System.Drawing.Point(96, 58);
             this.modinfo_info_DescriptionRichTextBox.Name = "modinfo_info_DescriptionRichTextBox";
-            this.modinfo_info_DescriptionRichTextBox.Size = new System.Drawing.Size(661, 144);
+            this.modinfo_info_DescriptionRichTextBox.Size = new System.Drawing.Size(661, 151);
             this.modinfo_info_DescriptionRichTextBox.TabIndex = 8;
             this.modinfo_info_DescriptionRichTextBox.Text = "";
             this.modinfo_info_DescriptionRichTextBox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
@@ -1311,7 +1349,7 @@
             this.modinfo_readme_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_readme_tab.Name = "modinfo_readme_tab";
             this.modinfo_readme_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_readme_tab.Size = new System.Drawing.Size(760, 205);
+            this.modinfo_readme_tab.Size = new System.Drawing.Size(760, 212);
             this.modinfo_readme_tab.TabIndex = 1;
             this.modinfo_readme_tab.Text = "ReadMe";
             this.modinfo_readme_tab.UseVisualStyleBackColor = true;
@@ -1336,7 +1374,7 @@
             this.modinfo_inspect_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_inspect_tab.Name = "modinfo_inspect_tab";
             this.modinfo_inspect_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_inspect_tab.Size = new System.Drawing.Size(760, 205);
+            this.modinfo_inspect_tab.Size = new System.Drawing.Size(760, 212);
             this.modinfo_inspect_tab.TabIndex = 2;
             this.modinfo_inspect_tab.Text = "Inspect";
             this.modinfo_inspect_tab.UseVisualStyleBackColor = true;
@@ -1348,7 +1386,7 @@
             this.modinfo_inspect_propertygrid.LineColor = System.Drawing.SystemColors.ControlDark;
             this.modinfo_inspect_propertygrid.Location = new System.Drawing.Point(3, 3);
             this.modinfo_inspect_propertygrid.Name = "modinfo_inspect_propertygrid";
-            this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(754, 199);
+            this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(754, 206);
             this.modinfo_inspect_propertygrid.TabIndex = 9;
             this.modinfo_inspect_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_inspect_propertygrid_Layout);
             // 
@@ -1358,7 +1396,7 @@
             this.modinfo_config_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_config_tab.Name = "modinfo_config_tab";
             this.modinfo_config_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_config_tab.Size = new System.Drawing.Size(760, 205);
+            this.modinfo_config_tab.Size = new System.Drawing.Size(760, 212);
             this.modinfo_config_tab.TabIndex = 3;
             this.modinfo_config_tab.Text = "Config";
             this.modinfo_config_tab.UseVisualStyleBackColor = true;
@@ -1381,7 +1419,7 @@
             this.modinfo_config_TableLayoutPanel.RowCount = 2;
             this.modinfo_config_TableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.modinfo_config_TableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.modinfo_config_TableLayoutPanel.Size = new System.Drawing.Size(754, 199);
+            this.modinfo_config_TableLayoutPanel.Size = new System.Drawing.Size(754, 206);
             this.modinfo_config_TableLayoutPanel.TabIndex = 13;
             // 
             // modinfo_ConfigFCTB
@@ -1409,6 +1447,7 @@
             this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.modinfo_ConfigFCTB.IsReplaceMode = false;
             this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
             this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1416,11 +1455,24 @@
             this.modinfo_ConfigFCTB.Paddings = new System.Windows.Forms.Padding(0);
             this.modinfo_ConfigFCTB.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.modinfo_ConfigFCTB.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("modinfo_ConfigFCTB.ServiceColors")));
-            this.modinfo_ConfigFCTB.Size = new System.Drawing.Size(750, 167);
+            this.modinfo_ConfigFCTB.Size = new System.Drawing.Size(750, 174);
             this.modinfo_ConfigFCTB.TabIndex = 11;
             this.modinfo_ConfigFCTB.WordWrap = true;
             this.modinfo_ConfigFCTB.Zoom = 100;
             this.modinfo_ConfigFCTB.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.modinfo_ConfigFCTB_TextChanged);
+            // 
+            // modinfo_config_FileSelectCueComboBox
+            // 
+            this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
+            this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
+            this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
+            this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
+            this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
+            this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
+            this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
+            this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
+            this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
             // 
             // modinfo_config_buttonsTableLayoutPanel
             // 
@@ -1513,7 +1565,7 @@
             this.modinfo_changelog_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_changelog_tab.Name = "modinfo_changelog_tab";
             this.modinfo_changelog_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_changelog_tab.Size = new System.Drawing.Size(760, 205);
+            this.modinfo_changelog_tab.Size = new System.Drawing.Size(760, 212);
             this.modinfo_changelog_tab.TabIndex = 4;
             this.modinfo_changelog_tab.Text = "Changelog";
             this.modinfo_changelog_tab.UseVisualStyleBackColor = true;
@@ -1525,7 +1577,7 @@
             this.modinfo_changelog_richtextbox.Location = new System.Drawing.Point(3, 3);
             this.modinfo_changelog_richtextbox.Name = "modinfo_changelog_richtextbox";
             this.modinfo_changelog_richtextbox.ReadOnly = true;
-            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(754, 199);
+            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(754, 206);
             this.modinfo_changelog_richtextbox.TabIndex = 0;
             this.modinfo_changelog_richtextbox.Text = "";
             this.modinfo_changelog_richtextbox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
@@ -1536,7 +1588,7 @@
             this.modinfo_dependencies_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_dependencies_tab.Name = "modinfo_dependencies_tab";
             this.modinfo_dependencies_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_dependencies_tab.Size = new System.Drawing.Size(760, 205);
+            this.modinfo_dependencies_tab.Size = new System.Drawing.Size(760, 212);
             this.modinfo_dependencies_tab.TabIndex = 5;
             this.modinfo_dependencies_tab.Text = "Dependencies";
             this.modinfo_dependencies_tab.UseVisualStyleBackColor = true;
@@ -1553,7 +1605,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(754, 199);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(754, 206);
             this.tableLayoutPanel1.TabIndex = 4;
             // 
             // panel4
@@ -1563,7 +1615,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(3, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(748, 93);
+            this.panel4.Size = new System.Drawing.Size(748, 97);
             this.panel4.TabIndex = 1;
             // 
             // olvRequiredMods
@@ -1596,7 +1648,7 @@
             this.olvRequiredMods.Name = "olvRequiredMods";
             this.olvRequiredMods.ShowGroups = false;
             this.olvRequiredMods.ShowItemCountOnGroups = true;
-            this.olvRequiredMods.Size = new System.Drawing.Size(748, 71);
+            this.olvRequiredMods.Size = new System.Drawing.Size(748, 75);
             this.olvRequiredMods.SortGroupItemsByPrimaryColumn = false;
             this.olvRequiredMods.TabIndex = 1;
             this.olvRequiredMods.TintSortColumn = true;
@@ -1693,9 +1745,9 @@
             this.panel5.Controls.Add(this.olvDependentMods);
             this.panel5.Controls.Add(this.label6);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel5.Location = new System.Drawing.Point(3, 102);
+            this.panel5.Location = new System.Drawing.Point(3, 106);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(748, 94);
+            this.panel5.Size = new System.Drawing.Size(748, 97);
             this.panel5.TabIndex = 3;
             // 
             // olvDependentMods
@@ -1726,7 +1778,7 @@
             this.olvDependentMods.Name = "olvDependentMods";
             this.olvDependentMods.ShowGroups = false;
             this.olvDependentMods.ShowItemCountOnGroups = true;
-            this.olvDependentMods.Size = new System.Drawing.Size(748, 76);
+            this.olvDependentMods.Size = new System.Drawing.Size(748, 79);
             this.olvDependentMods.SortGroupItemsByPrimaryColumn = false;
             this.olvDependentMods.TabIndex = 2;
             this.olvDependentMods.TintSortColumn = true;
@@ -1807,7 +1859,7 @@
             this.modinfo_image_picturebox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.modinfo_image_picturebox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.modinfo_image_picturebox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.modinfo_image_picturebox.Location = new System.Drawing.Point(4, 20);
+            this.modinfo_image_picturebox.Location = new System.Drawing.Point(4, 24);
             this.modinfo_image_picturebox.Name = "modinfo_image_picturebox";
             this.modinfo_image_picturebox.Size = new System.Drawing.Size(192, 192);
             this.modinfo_image_picturebox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -2037,29 +2089,6 @@
             this.fillPanel.TabIndex = 6;
             this.fillPanel.Visible = false;
             // 
-            // modlist_FilterCueTextBox
-            // 
-            this.modlist_FilterCueTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.modlist_FilterCueTextBox.CueText = "Filter Mods";
-            this.modlist_FilterCueTextBox.Location = new System.Drawing.Point(3, 5);
-            this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
-            this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
-            this.modlist_FilterCueTextBox.TabIndex = 1;
-            this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
-            // 
-            // modinfo_config_FileSelectCueComboBox
-            // 
-            this.modinfo_config_FileSelectCueComboBox.CueText = "Select INI to edit";
-            this.modinfo_config_FileSelectCueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.modinfo_config_FileSelectCueComboBox.FormattingEnabled = true;
-            this.modinfo_config_FileSelectCueComboBox.Location = new System.Drawing.Point(3, 3);
-            this.modinfo_config_FileSelectCueComboBox.Name = "modinfo_config_FileSelectCueComboBox";
-            this.modinfo_config_FileSelectCueComboBox.Size = new System.Drawing.Size(194, 21);
-            this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
-            this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
-            this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-            this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2073,7 +2102,7 @@
             this.MainMenuStrip = this.main_menustrip;
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "MainForm";
-            this.Text = "XCOM 2 Alternative Mod Launcher";
+            this.Text = "XCOM Alternative Mod Launcher";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
@@ -2299,5 +2328,7 @@
         private BrightIdeasSoftware.OLVColumn olvColReqModsIgnore;
         private BrightIdeasSoftware.OLVColumn olvcSource;
         private System.Windows.Forms.Button bClearStateFilter;
-    }
+        private System.Windows.Forms.ToolStripMenuItem runChimeraSquadToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem importFromChimeraSquadToolStripMenuItem;
+	}
 }

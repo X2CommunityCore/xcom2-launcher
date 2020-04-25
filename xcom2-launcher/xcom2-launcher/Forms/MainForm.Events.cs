@@ -25,6 +25,7 @@ namespace XCOM2Launcher.Forms
             runXCOM2ToolStripMenuItem.Click += (a, b) => { RunVanilla(); };
             runWarOfTheChosenToolStripMenuItem.Click += (a, b) => { RunWotC(); };
             runChallengeModeToolStripMenuItem.Click += (a, b) => { RunChallengeMode(); };
+            runChimeraSquadToolStripMenuItem.Click += (sender, args) => RunChimeraSquad();
 
             #region Menu->File
 
@@ -152,16 +153,34 @@ namespace XCOM2Launcher.Forms
 
             importFromXCOM2ToolStripMenuItem.Click += delegate
             {
-                Log.Info("Menu->Tools->Import vanilla");
-                XCOM2.ImportActiveMods(Settings, false);
-                RefreshModList();
+                if (Program.XEnv is Xcom2Env x2Env)
+                {
+                    x2Env.UseWotC = false;
+                    Log.Info("Menu->Tools->Import vanilla");
+                    Program.XEnv.ImportActiveMods(Settings);
+                    RefreshModList();
+                }
             };
 
             importFromWotCToolStripMenuItem.Click += delegate
             {
-                Log.Info("Menu->Tools->Import WotC");
-                XCOM2.ImportActiveMods(Settings, true);
-                RefreshModList();
+                if (Program.XEnv is Xcom2Env x2Env)
+                {
+                    x2Env.UseWotC = true;
+                    Log.Info("Menu->Tools->Import WotC");
+                    Program.XEnv.ImportActiveMods(Settings);
+                    RefreshModList();
+                }
+            };
+
+            importFromChimeraSquadToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv.Game == GameId.ChimeraSquad)
+                {
+                    Log.Info("Menu->Tools->Import Chimera Squad");
+                    Program.XEnv.ImportActiveMods(Settings);
+                    RefreshModList();
+                }
             };
 
             resubscribeToModsToolStripMenuItem.Click += delegate
@@ -186,7 +205,7 @@ namespace XCOM2Launcher.Forms
                         Workshop.DownloadItem((ulong) m.WorkshopID);
                     }
 
-                    MessageBox.Show("Launch XCOM 2 after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Launch XCOM after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             };
 

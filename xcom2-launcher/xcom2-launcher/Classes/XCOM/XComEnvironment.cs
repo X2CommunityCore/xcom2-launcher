@@ -1,50 +1,51 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using Steamworks;
-using XCOM2Launcher.Classes.Steam;
 
 namespace XCOM2Launcher.XCOM
 {
-    public static class XCOM2
+    public enum GameId
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(XCOM2));
+        X2 = 268500,
+        ChimeraSquad = 882100
+    }
 
-        public const uint APPID = 268500;
+    abstract class XcomEnvironment
+    {
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(XcomEnvironment));
 
-        private static string _gameDir;
+        public GameId Game { get; }
+        public uint SteamAppId => (uint)Game;
+        private string _gameDir;
 
-        public static string GameDir
+        public string GameDir
         {
             get { return _gameDir ?? (_gameDir = DetectGameDir()); }
             set { _gameDir = value; }
         }
 
-        public static string UserConfigDir
-            => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM2\XComGame\Config";
+        protected XcomEnvironment(GameId game)
+        {
+            Game = game;
+        }
 
-        public static string WotCUserConfigDir
-            => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
-            @"\my games\XCOM2 War of the Chosen\XComGame\Config";
+        public abstract string DefaultConfigDir { get; }
 
-        public static string DefaultConfigDir => Path.Combine(GameDir, @"XComGame\Config");
-
-        public static string WotCDefaultConfigDir => Path.Combine(GameDir, @"XCom2-WarOfTheChosen\XComGame\Config");
+        protected abstract DefaultConfigFile GetConfigFile(string file, bool load = true);
 
         /// <summary>
         /// Tries to find the directory of the game and the mod folders, both workshop and default
         /// </summary>
         /// <returns></returns>
-        public static string DetectGameDir()
+        public string DetectGameDir()
         {
             // This works even if the application is not installed, based on where the game
             // would be installed with the default Steam library location.
             // Use 260 as max path length as this is the default windows limit.
-            if (SteamApps.GetAppInstallDir((AppId_t)APPID, out var gamedir, 260) > 0)
+            if (SteamApps.GetAppInstallDir((AppId_t)SteamAppId, out var gamedir, 260) > 0)
             {
                 // Check if game is really available/installed
                 if (Directory.Exists(gamedir))
@@ -61,7 +62,7 @@ namespace XCOM2Launcher.XCOM
             
             // Try to deduce game path from available mod directories
             var dirs = DetectModDirs();
-            foreach (var dir in dirs.Where(dir => dir.ToLower().Contains("\\steamapps\\")))
+            foreach (var dir in Enumerable.Where<string>(dirs, dir => dir.ToLower().Contains("\\steamapps\\")))
             {
                 // Assume steamapps folder to have \workshop\content\268500 subfolders
                 gamedir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
@@ -83,74 +84,11 @@ namespace XCOM2Launcher.XCOM
         /// </summary>
         /// <param name="gameDir"></param>
         /// <param name="args"></param>
-        public static void RunGame(string gameDir, string args)
+        public abstract void RunGame(string gameDir, string args);
+
+        internal void ImportActiveMods(Settings settings)
         {
-            Log.Info("Starting XCOM 2 (vanilla)");
-
-            if (!SteamAPIWrapper.Init())
-                MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-            var p = new Process
-            {
-                StartInfo =
-                {
-                    Arguments = args,
-                    FileName = gameDir + @"\Binaries\Win64\XCom2.exe",
-                    WorkingDirectory = gameDir
-                }
-            };
-
-            try
-            {
-                p.Start();
-            }
-            catch (Win32Exception ex)
-            {
-                Log.Warn("Failed to start game process", ex);
-                MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            SteamAPIWrapper.Shutdown();
-        }
-
-        /// <summary>
-        /// Runs War of the Chosen with the selected arguments
-        /// </summary>
-        /// <param name="gameDir"></param>
-        /// <param name="args"></param>
-        public static void RunWotC(string gameDir, string args)
-        {
-            Log.Info("Starting WotC");
-
-            if (!SteamAPIWrapper.Init())
-                MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-            var p = new Process
-            {
-                StartInfo =
-                {
-                    Arguments = args,
-                    FileName = gameDir + @"\XCom2-WarOfTheChosen\Binaries\Win64\XCom2.exe",
-                    WorkingDirectory = gameDir + @"\XCom2-WarOfTheChosen"
-                }
-            };
-
-            try
-            {
-                p.Start();
-            }
-            catch (Win32Exception ex)
-            {
-                Log.Warn("Failed to start game process", ex);
-                MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            SteamAPIWrapper.Shutdown();
-        }
-
-        internal static void ImportActiveMods(Settings settings, bool wotc)
-        {
-            var activeMods = GetActiveMods(wotc);
+            var activeMods = GetActiveMods();
 
             // load active mods
             foreach (var internalName in activeMods)
@@ -162,7 +100,7 @@ namespace XCOM2Launcher.XCOM
         /// Reads the mod directories from the XComEngine.ini file.
         /// </summary>
         /// <returns>List of mod directories. NULL if the ini file is missing or couldn't be accessed.</returns>
-        public static IEnumerable<string> DetectModDirs()
+        public IEnumerable<string> DetectModDirs()
         {
             // Prevent stack overflow (Issue #19)
             if (_gameDir == null)
@@ -173,7 +111,7 @@ namespace XCOM2Launcher.XCOM
 
             try
             {
-                currentModDirs = new DefaultConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
+                currentModDirs = GetConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
             }
             catch (IOException ex)
             {
@@ -186,9 +124,13 @@ namespace XCOM2Launcher.XCOM
                 return null;
             }
           
-            if (currentModDirs == null) {
-                Log.Warn("No mod directories found in XComEngine.ini");
-                return new string[0];
+            // Add default Steam Workshop mod path if it is missing.
+            var appId = SteamAppId.ToString();
+            if (!currentModDirs.Any(dir => dir.EndsWith(appId) || dir.EndsWith(appId + "\\")))
+            {
+                var workShopModPath = Path.GetFullPath(Path.Combine(_gameDir, "../..", "workshop", "content", appId));
+                currentModDirs.Add(workShopModPath);
+                Log.Info("Added default Steam Workshop mod directory: " + workShopModPath);
             }
 
             foreach (var modDir in currentModDirs)
@@ -221,14 +163,26 @@ namespace XCOM2Launcher.XCOM
         }
 
         /// <summary>
-        /// Returns all mods, that are currently listed as "ActiveMods" from the XComModOptions.ini file.
+        /// Returns all mods, that are currently listed as "ActiveMods" in the XComModOptions.ini and the DefaultModOptions.ini files.
         /// </summary>
         /// <returns></returns>
-        public static string[] GetActiveMods(bool wotc)
+        public string[] GetActiveMods()
         {
             try
             {
-                return new DefaultConfigFile("ModOptions", wotc).Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0];
+                // Retrieve entires from XComModOptions
+                var configFile = GetConfigFile("ModOptions");
+                var mods = configFile.Get("Engine.XComModOptions", "ActiveMods") ?? new List<string>();
+                
+                // Retrieve entires from DefaultModOptions
+                configFile.Entries.Clear();
+                configFile.CreateFromDefault("ModOptions");
+                mods.AddRange(configFile.Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0]);
+                
+                // Prepare result
+                mods = mods.Distinct().ToList();
+                mods = mods.ConvertAll(x => x.TrimStart('"').TrimEnd('"'));     // default config may contain entries encapsulated in ""
+                return mods.ToArray();
             }
             catch (IOException ex)
             {
@@ -245,10 +199,10 @@ namespace XCOM2Launcher.XCOM
         /// <param name="settings"></param>
         /// <param name="WotC"></param>
         /// <param name="disableMods"></param>
-        public static void SaveChanges(Settings settings, bool WotC, bool disableMods)
+        public void SaveChanges(Settings settings, bool disableMods)
         {
             // XComModOptions
-            var modOptions = new DefaultConfigFile("ModOptions", WotC, false);
+            var modOptions = GetConfigFile("ModOptions", false);
 
             if (!disableMods)
             {
@@ -259,7 +213,7 @@ namespace XCOM2Launcher.XCOM
             modOptions.Save();
 
             // XComEngine
-            var engine = new DefaultConfigFile("Engine", WotC);
+            var engine = GetConfigFile("Engine", false);
 
             // Remove old ModClassOverrides
             engine.Remove("Engine.Engine", "ModClassOverrides");

@@ -46,13 +46,34 @@ namespace XCOM2Launcher.Forms
             olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
             olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
 
-            // Hide WotC and Challenge Mode buttons if necessary
-            if (settings.GamePath != "")
+            // Set visibility of some controls depending on game type
+            var wotcAvailable = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+            runXCOM2ToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            runWarOfTheChosenToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
+            runChallengeModeToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
+            importFromWotCToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
+            importFromXCOM2ToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            runChimeraSquadToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+            importFromChimeraSquadToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+
+            if (Program.XEnv.Game != GameId.X2)
             {
-                var wotcAvailable = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
-                runWarOfTheChosenToolStripMenuItem.Visible = wotcAvailable;
-                runChallengeModeToolStripMenuItem.Visible = wotcAvailable;
-                importFromWotCToolStripMenuItem.Visible = wotcAvailable;
+                modlist_ListObjectListView.AllColumns.Remove(olvForWOTC);
+                modlist_ListObjectListView.RebuildColumns();
+                olvDependentMods.AllColumns.Remove(olvColDepModsWotc);
+                olvDependentMods.RebuildColumns();
+                olvRequiredMods.AllColumns.Remove(olvColReqModsWotc);
+                olvRequiredMods.RebuildColumns();
+            }
+
+            // If game path is not configured, hide several function/options.
+            if (string.IsNullOrEmpty(settings.GamePath))
+            {
+                runWarOfTheChosenToolStripMenuItem.Enabled = false;
+                runChallengeModeToolStripMenuItem.Enabled = false;
+                importFromWotCToolStripMenuItem.Enabled = false;
+                importFromXCOM2ToolStripMenuItem.Enabled = false;
+                importFromChimeraSquadToolStripMenuItem.Enabled = false;
             }
 
             // Init interface
@@ -282,11 +303,16 @@ namespace XCOM2Launcher.Forms
             InitModListView();
         }
 
-        private void Save(bool WotC)
+        private void Save(bool WotC = false)
         {
             try
             {
-                XCOM2.SaveChanges(Settings, WotC, ChallengeMode);
+                if (Program.XEnv is Xcom2Env x2Env)
+                {
+                    x2Env.UseWotC = WotC;
+                }
+
+                Program.XEnv.SaveChanges(Settings, ChallengeMode);
                 Settings.SaveFile("settings.json");
             }
             catch (Exception ex)
@@ -301,6 +327,22 @@ namespace XCOM2Launcher.Forms
         private void ShowModUpdateRunningMessageBox()
         {
             MessageBox.Show("Mod update in progress, please wait for it to finish.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void RunChimeraSquad()
+        {
+            if (IsModUpdateTaskRunning)
+            {
+                ShowModUpdateRunningMessageBox();
+                return;
+            }
+
+            Save();
+
+            Program.XEnv.RunGame(Settings.GamePath, Settings.GetArgumentString());
+
+            if (Settings.CloseAfterLaunch)
+                Close();
         }
 
         private void RunVanilla()
@@ -329,9 +371,14 @@ namespace XCOM2Launcher.Forms
             
             Settings.Instance.LastLaunchedWotC = false;
             ChallengeMode = false;
-            Save(false);
+            Save();
 
-            XCOM2.RunGame(Settings.GamePath, Settings.GetArgumentString());
+            if (Program.XEnv is Xcom2Env x2Env)
+            {
+                x2Env.UseWotC = false;
+                Program.XEnv.RunGame(Settings.GamePath, Settings.GetArgumentString());
+            }
+
 
             if (Settings.CloseAfterLaunch)
                 Close();
@@ -349,7 +396,11 @@ namespace XCOM2Launcher.Forms
             ChallengeMode = false;
             Save(true);
 
-            XCOM2.RunWotC(Settings.GamePath, Settings.GetArgumentString());
+            if (Program.XEnv is Xcom2Env x2Env)
+            {
+                x2Env.UseWotC = true;
+                Program.XEnv.RunGame(Settings.GamePath, Settings.GetArgumentString());
+            }
 
             if (Settings.CloseAfterLaunch)
                 Close();
@@ -369,7 +420,11 @@ namespace XCOM2Launcher.Forms
             ChallengeMode = true;
             Save(true);
 
-            XCOM2.RunWotC(Settings.GamePath, Settings.GetArgumentString().ToLower().Replace("-allowconsole", ""));
+            if (Program.XEnv is Xcom2Env x2Env)
+            {
+                x2Env.UseWotC = true;
+                Program.XEnv.RunGame(Settings.GamePath, Settings.GetArgumentString().ToLower().Replace("-allowconsole", ""));
+            }
 
             if (Settings.CloseAfterLaunch)
                 Close();

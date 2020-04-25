@@ -53,9 +53,11 @@ namespace XCOM2Launcher
             set
             {
                 _gamePath = value;
-                XCOM2.GameDir = value;
+                Program.XEnv.GameDir = value;
             }
         }
+
+        public GameId Game = GameId.X2;
 
         public List<string> ModPaths { get; set; } = new List<string>();
 
