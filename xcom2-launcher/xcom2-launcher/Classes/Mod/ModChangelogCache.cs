@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,14 +9,16 @@ namespace XCOM2Launcher.Mod
     public static class ModChangelogCache
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModChangelogCache));
-        private static readonly Dictionary<long, string> Cache = new Dictionary<long, string>();
+        private static readonly ConcurrentDictionary<long, string> Cache = new ConcurrentDictionary<long, string>();
 
         private static readonly Regex Regexp = new Regex(@"<div class=""detailBox workshopAnnouncement noFooter"">\s*<div class=""changelog headline"">\s*(.*)\s*</div>\s*<p id=""[0-9]+"">(.*)</p>", RegexOptions.Compiled);
 
         public static async Task<string> GetChangeLogAsync(long workshopID)
         {
-            if (Cache.ContainsKey(workshopID))
-                return Cache[workshopID];
+            if (Cache.TryGetValue(workshopID, out var changelog))
+            {
+                return changelog;
+            }
 
             try
             {
@@ -40,14 +42,14 @@ namespace XCOM2Launcher.Mod
                         output.AppendLine();
                     }
 
-                    Cache.Add(workshopID, output.ToString());
+                    Cache.TryAdd(workshopID, output.ToString());
 
                     return output.ToString();
                 }
             }
             catch (WebException ex)
             {
-                Log.Error($"Error loading changelog for Workshop Id: {workshopID}", ex);
+                Log.Warn($"Error loading changelog for Workshop Id: {workshopID}", ex);
                 return "An error occurred while loading the changelog.";
             }
         }

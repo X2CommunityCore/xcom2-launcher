@@ -7,12 +7,16 @@
         public string OldClass { get; private set; }
         public ModClassOverrideType OverrideType { get; private set; }
 
-        public ModClassOverride(ModEntry mod, string newClass, string oldClass, ModClassOverrideType overrideType)
+        // The original text line in unprocessed form, to avoid false positives (#102)
+        public string TextLine { get; private set; }
+
+        public ModClassOverride(ModEntry mod, string newClass, string oldClass, ModClassOverrideType overrideType, string textLine)
         {
             Mod = mod;
             NewClass = newClass;
             OldClass = oldClass;
             OverrideType = overrideType;
+            TextLine = textLine;
         }
     }
 

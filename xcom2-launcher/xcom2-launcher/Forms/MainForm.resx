@@ -263,27 +263,54 @@
         d4aQvZ40xteBBBeo3B9e+aQzftVYbkYp/wM6IehWIeUpDgAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="runChimeraSquadToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        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
+        aj1WsW8AAAAASUVORK5CYII=
+</value>
+  </data>
   <metadata name="error_provider.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>296, 17</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>70</value>
   </metadata>
-  <data name="modlist_filterClearButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAABl0RVh0U29m
-        dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFxSURBVDhPpY29S0JhFMbPX2Dc8gaRSUHWJgjl5ig4
-        CA4OLWIlgavcQfeCWmqopaCgL/oggpagaGiKpjdoCApao6GlNRo6Pc/t3pvmdaiEny/nPL/zXFHVfxG6
-        /A3u376IHIAjkRwwfDnveoRlvPlZwMBoo6F8OTcVuNlbrRZkLQWeaD7qdb3L5/XdcZQzYAkxL5WKmz2V
-        Sn72XbCNAeS2ELxWq3qZTutzuaycyX2h4O5usll3R5c3LQUIZAPBOoTHYlHPkkm9zmT0IpXSTdvWw3hc
-        mdGhG1oAQdYgrEI8TSR0x7Jc9qJR5Y4ZnbaCeQwLYAksQ1qBfIKvHuPYhztmdOjypq1g8Usw5zgIgxmd
-        TgUMzBVEH84ddrmWglkMwNxC8OE8B5GEZbwJCuIYJiA6CB4g8OU8iD0Jy3gTFOAXAyNjIjOTEMZFpjEP
-        gwHQD4bSIlPM6GAeBbHmggjoAX0evaAbdAFmFrCBn0dBJCj4Oyqfyz6oBaObEn8AAAAASUVORK5CYII=
-</value>
-  </data>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>546, 17</value>
   </metadata>
+  <data name="cFilterHidden.ToolTip" xml:space="preserve">
+    <value>A mod will be automatically hidden, when it is no longer available ("Not installed" or "Not loaded").
+Mods can manually be (un-)hidden using the mod lists context menu.
+Hidden mods can be shown by activating "Options -&gt; Show hidden mods".</value>
+  </data>
+  <data name="cFilterNew.ToolTip" xml:space="preserve">
+    <value>Mods are flagged as "New", when they were added during the last mod import/update process.
+The "New" flag for all mods will be removed after AML has been restarted.
+The "New" flag for a single mod will be removed when it is selected.</value>
+  </data>
   <metadata name="modTabToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>636, 17</value>
   </metadata>
@@ -300,6 +327,18 @@
         mDEo5mNjuweFGvjWg2EBhCbpkW78htSHHwRyNdmgAFzPEee2iFkzayy2OLXzT4gr6UdUnlXrullsxxQ+
         kx0g8BTA3aZlButjSTyjODq/WcQcW/B/Je4OQhLvKQDnzN1mp0nnkvAhR8VuMzNrpm1mpjgkoVwB/v8D
         TgDQASA1MVpwzwAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="modlist_filterClearButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAABl0RVh0U29m
+        dHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFxSURBVDhPpY29S0JhFMbPX2Dc8gaRSUHWJgjl5ig4
+        CA4OLWIlgavcQfeCWmqopaCgL/oggpagaGiKpjdoCApao6GlNRo6Pc/t3pvmdaiEny/nPL/zXFHVfxG6
+        /A3u376IHIAjkRwwfDnveoRlvPlZwMBoo6F8OTcVuNlbrRZkLQWeaD7qdb3L5/XdcZQzYAkxL5WKmz2V
+        Sn72XbCNAeS2ELxWq3qZTutzuaycyX2h4O5usll3R5c3LQUIZAPBOoTHYlHPkkm9zmT0IpXSTdvWw3hc
+        mdGhG1oAQdYgrEI8TSR0x7Jc9qJR5Y4ZnbaCeQwLYAksQ1qBfIKvHuPYhztmdOjypq1g8Usw5zgIgxmd
+        TgUMzBVEH84ddrmWglkMwNxC8OE8B5GEZbwJCuIYJiA6CB4g8OU8iD0Jy3gTFOAXAyNjIjOTEMZFpjEP
+        gwHQD4bSIlPM6GAeBbHmggjoAX0evaAbdAFmFrCBn0dBJCj4Oyqfyz6oBaObEn8AAAAASUVORK5CYII=
 </value>
   </data>
   <data name="modinfo_ConfigFCTB.ServiceColors" mimetype="application/x-microsoft.net.object.binary.base64">

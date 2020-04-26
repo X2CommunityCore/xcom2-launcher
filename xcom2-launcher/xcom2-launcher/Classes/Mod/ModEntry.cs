@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Steamworks;
 using XCOM2Launcher.Helper;
 using FilePath = System.IO.Path;
 
@@ -16,6 +17,9 @@ namespace XCOM2Launcher.Mod
 {
     public class ModEntry
     {
+        [JsonIgnore] public const string DEFAULT_AUTHOR_NAME = "Unknown";
+        [JsonIgnore] public const string MODFILE_DISABLE_POSTFIX = "-disabled";
+
         [JsonIgnore] private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModEntry));
 
         [JsonIgnore] private string _image;
@@ -35,7 +39,7 @@ namespace XCOM2Launcher.Mod
         public string Name { get; set; }
         public bool ManualName { get; set; } = false;
 
-        public string Author { get; set; } = "Unknown";
+        public string Author { get; set; } = DEFAULT_AUTHOR_NAME;
 	    public string Description { get; set; } = "";
 
 	    public string Path { get; set; } = "";
@@ -60,6 +64,21 @@ namespace XCOM2Launcher.Mod
 
         public string Note { get; set; } = null;
 
+        /// <summary>
+        /// Contains workshop id's from all mods, that this mod requires to run properly (as reported from workshop).
+        /// </summary>
+        public List<long> Dependencies { get; set; } = new List<long>();
+
+        /// <summary>
+        /// Contains workshop id's from mods, that the should be ignored during dependency checks (optional).
+        /// </summary>
+        public List<long> IgnoredDependencies { get; set; } = new List<long>();
+
+        /// <summary>
+        /// Contains the tags that were downloaded from steam.
+        /// </summary>
+        public List<string> SteamTags { get; set; } = new List<string>();
+
 		[JsonIgnore]
 	    public bool HasBackedUpSettings => Settings.Count > 0;
 
@@ -77,11 +96,27 @@ namespace XCOM2Launcher.Mod
 
 	    [JsonIgnore]
 	    public string BrowserLink => GetWorkshopLink();
-        
+
         [Browsable(false)]
         public IList<string> Tags { get; set; } = new List<string>();
 
         public bool BuiltForWOTC { get; set; } = false;
+
+        public ModEntry() {}
+
+        public ModEntry(SteamUGCDetails_t workshopDetails)
+        {
+            if (workshopDetails.m_eResult != EResult.k_EResultOK)
+            {
+                return;
+            }
+
+            State = ModState.NotInstalled;
+            WorkshopID = (long)workshopDetails.m_nPublishedFileId.m_PublishedFileId;
+            Source = ModSource.SteamWorkshop;
+            Name = workshopDetails.m_rgchTitle;
+            Description = workshopDetails.m_rgchDescription;
+        }
 
         public Classes.Mod.ModProperty GetProperty()
         {
@@ -217,7 +252,7 @@ namespace XCOM2Launcher.Mod
                         var newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
                         lock (overrides)
                         {
-                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener));
+                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener, line));
                         }
                     }
                 }
@@ -236,10 +271,10 @@ namespace XCOM2Launcher.Mod
             var r = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)");
 
             return from line in File.ReadLines(file)
-                select r.Match(line.Replace(" ", ""))
+                select (l: line, match: r.Match(Regex.Replace(line, "\\s+", "")))
                 into m
-                where m.Success
-                select new ModClassOverride(this, m.Groups[2].Value, m.Groups[1].Value, ModClassOverrideType.Class);
+                where m.match.Success
+                select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
         }
 
         public void ShowOnSteam()
@@ -274,16 +309,6 @@ namespace XCOM2Launcher.Mod
             }
             return "";
 	    }
-
-        public String[] GetSteamTags()
-        {
-            if (WorkshopID > 0)
-            {
-                var details = Steam.Workshop.GetDetails((ulong) WorkshopID);
-                return details.m_rgchTags.Split(',').Select(s => s.TrimStart(' ').TrimEnd(' ')).Where(s => !String.IsNullOrWhiteSpace(s)).ToArray();
-            }
-            return new String[0];
-        }
 
         public override string ToString()
         {
@@ -328,16 +353,6 @@ namespace XCOM2Launcher.Mod
             Source = newSource;
         }
 
-        public void RealizeIDAndPath(string ModRoot)
-        {
-            Path = ModRoot;
-
-            var info_file = Directory.GetFiles(Path, "*.XComMod", SearchOption.TopDirectoryOnly).SingleOrDefault();
-            if (info_file != null)
-            {
-				ID = FilePath.GetFileNameWithoutExtension(info_file);
-			}
-        }
         #endregion
 
 
@@ -350,20 +365,70 @@ namespace XCOM2Launcher.Mod
 	        return new string[0];
         }
 
+        public void EnableModFile()
+        {
+            string path = FilePath.Combine(Path, ID + ".XComMod" + MODFILE_DISABLE_POSTFIX);
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    File.Move(path, path.Replace(MODFILE_DISABLE_POSTFIX, ""));
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Error renaming mod info file {ex.Message}");
+                }
+            }
+        }
+
+        public void DisableModFile()
+        {
+            string path = FilePath.Combine(Path, ID + ".XComMod");
+
+            if (File.Exists(path))
+            {
+                try
+                {
+                    File.Move(path, path + MODFILE_DISABLE_POSTFIX);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warn($"Error renaming mod info file {ex.Message}");
+                }
+            }
+        }
+
+        public bool CheckModFileDisabled()
+        {
+            return File.Exists(FilePath.Combine(Path, ID + ".XComMod" + MODFILE_DISABLE_POSTFIX));
+        }
+
         internal string GetModInfoFile()
         {
-            return FilePath.Combine(Path, ID + ".XComMod");
+            string path = FilePath.Combine(Path, ID + ".XComMod");
+            
+            if (File.Exists(path))
+                return path;
+
+            path = FilePath.Combine(Path, ID + ".XComMod" + MODFILE_DISABLE_POSTFIX);
+
+            if (File.Exists(path))
+                return path;
+
+            return null;
         }
 
         public string GetReadMe()
         {
             try
             {
-                return File.ReadAllText(FilePath.Combine(Path, "ReadMe.txt"));
+                var readmePath = FilePath.Combine(Path, "ReadMe.txt");
+                return File.Exists(readmePath) ? File.ReadAllText(readmePath) : "No ReadMe found.";
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                return "No ReadMe found.";
+                return "Unable to access ReadMe.txt - " + ex.Message;
             }
         }
 

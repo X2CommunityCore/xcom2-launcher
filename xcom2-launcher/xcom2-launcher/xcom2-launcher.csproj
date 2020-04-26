@@ -88,7 +88,7 @@
     <Reference Include="Sentry.Protocol, Version=1.0.6.0, Culture=neutral, PublicKeyToken=fba2ec45388e2af0, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Protocol.1.0.6\lib\net46\Sentry.Protocol.dll</HintPath>
     </Reference>
-    <Reference Include="Steamworks.NET, Version=12.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Steamworks.NET, Version=13.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Steamworks.NET.dll</HintPath>
     </Reference>
@@ -129,6 +129,7 @@
     <Compile Include="Classes\Mod\ModInfo.cs" />
     <Compile Include="Classes\Mod\ModList.cs" />
     <Compile Include="Classes\Mod\ModClassOverride.cs" />
+    <Compile Include="Classes\Mod\ModListFilter.cs" />
     <Compile Include="Classes\Mod\ModProperty.cs" />
     <Compile Include="Classes\Mod\ModSettingsEntry.cs" />
     <Compile Include="Classes\Mod\ModState.cs" />
@@ -141,16 +142,18 @@
     <Compile Include="Classes\Serialization\ModListConverter.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\Steam\DownloadItemRequest.cs" />
+    <Compile Include="Classes\Steam\QueryUGCChildren.cs" />
     <Compile Include="Classes\Steam\ItemDetailsRequest.cs" />
     <Compile Include="Classes\Steam\SteamAPIWrapper.cs" />
-    <Compile Include="Classes\Steam\SteamManager.cs" />
     <Compile Include="Classes\Steam\Workshop.cs" />
     <Compile Include="Classes\WindowSetting.cs" />
+    <Compile Include="Classes\XCOM\Xcom2Env.cs" />
+    <Compile Include="Classes\XCOM\XComChimeraSquadEnv.cs" />
     <Compile Include="Classes\XCOM\Arguments.cs" />
     <Compile Include="Classes\XCOM\IniFile.cs" />
     <Compile Include="Classes\XCOM\IniLanguage.cs" />
-    <Compile Include="Classes\XCOM\XCOM2.cs" />
     <Compile Include="Classes\XCOM\DefaultConfigFile.cs" />
+    <Compile Include="Classes\XCOM\XComEnvironment.cs" />
     <Compile Include="Forms\AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -300,9 +303,6 @@
     </Content>
     <Content Include="steam_api64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="steam_appid.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\xcom.ico" />
   </ItemGroup>

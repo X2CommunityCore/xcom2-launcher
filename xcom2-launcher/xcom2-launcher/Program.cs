@@ -17,6 +17,7 @@ using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
+using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher
@@ -25,6 +26,7 @@ namespace XCOM2Launcher
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Program));
         public static readonly bool IsDebugBuild;
+        public static XcomEnvironment XEnv;
 
         static Program()
         {
@@ -107,11 +109,11 @@ namespace XCOM2Launcher
                 }
 
                 // clean up old files
-                if (File.Exists(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
+                if (File.Exists(Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
                 {
                     // Restore backup
-                    File.Copy(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini", true);
-                    File.Delete(XCOM2.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
+                    File.Copy(Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak", Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini", true);
+                    File.Delete(Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
                 }
 
                 Application.Run(new MainForm(settings));
@@ -205,20 +207,68 @@ namespace XCOM2Launcher
         /// Used for all settings that we want to persist, even if the user decides to delete the
         /// json settings file or starts AML from different folders.
         /// </summary>
-        private static void InitAppSettings() {
+        private static void InitAppSettings()
+        {
             var appSettings = GlobalSettings.Instance;
             var currentVersion = new Version(GitVersionInfo.MajorMinorPatch);
 
-            if (appSettings.MaxVersion < currentVersion) {
-                Log.Info($"AML was upgraded from '{appSettings.MaxVersion}' to '{currentVersion}'.");
+            if (appSettings.MaxVersion < currentVersion)
+            {
+                appSettings.MaxVersion = currentVersion;
+            }
 
+            // AML will either be used for XCOM2 or Chimera Squad
+            // Create Steam application id file if it does not exist (depending on game choice of the user)
+            if (!File.Exists(Workshop.APPID_FILENAME))
+            {
                 // Show Welcome Dialog and ask user to opt-in for Sentry error reporting.
                 WelcomeDialog dlg = new WelcomeDialog();
                 dlg.ShowDialog();
                 appSettings.IsSentryEnabled = dlg.UseSentry;
 
-                appSettings.MaxVersion = currentVersion;
+                try
+                {
+                    using (var file = File.CreateText(Workshop.APPID_FILENAME))
+                    {
+                        file.WriteLine((uint)dlg.Game);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to create {Workshop.APPID_FILENAME}. {Environment.NewLine} {ex.Message} ");
+                    return;
+                }
             }
+
+            // Use Steam Application id file to determine which game this AML installation is used for.
+            string appIdStr;
+
+            try
+            {
+                appIdStr = File.ReadAllText(Workshop.APPID_FILENAME);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to access {Workshop.APPID_FILENAME}. {Environment.NewLine} {ex.Message} ");
+                return;
+            }
+
+            if (uint.TryParse(appIdStr, out uint appId))
+            {
+                switch ((GameId)appId)
+                {
+                    case GameId.X2:
+                        XEnv = new Xcom2Env();
+                        break;
+                    case GameId.ChimeraSquad:
+                        XEnv = new XComChimeraSquadEnv();
+                        break;
+                    default:
+                        MessageBox.Show($"The {Workshop.APPID_FILENAME} file contains an unexpected application id: {appId}.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                }
+            }
+
 
             appSettings.Save();
         }
@@ -272,16 +322,34 @@ namespace XCOM2Launcher
                 MessageBoxManager.Unregister();
             }
 
+            if (!firstRun)
+            {
+                // Check if settings file matches target game
+                if (settings.Game != XEnv.Game)
+                {
+                    var targetGame = settings.Game == GameId.X2 ? "XCOM 2" : "XCOM Chimera Squad";
+                    var activeGame = XEnv.Game == GameId.X2 ? "XCOM 2" : "XCOM Chimera Squad";
+                    MessageBox.Show($"The current settings were created for '{targetGame}', but this copy of AML was configured to run '{activeGame}'. " +
+                                    "To resolve this close AML and:\n\n" + 
+                                    "a) delete the file 'settings.json' to reset the settings\n\n" +
+                                    "    OR\n\n" +
+                                    $"b) delete the file 'steam_appid.txt' and select '{targetGame}' on startup", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+
+                    Environment.Exit(0);
+                }
+            }
+
+            settings.Game = XEnv.Game;
             settings.ShowUpgradeWarning = false;
 
             // Verify Game Path
             if (!Directory.Exists(settings.GamePath))
-                settings.GamePath = XCOM2.DetectGameDir();
+                settings.GamePath = Program.XEnv.DetectGameDir();
 
             if (settings.GamePath == "")
             {
-                Log.Warn("Unable to detect XCOM 2 installation path");
-                MessageBox.Show(@"Could not find XCOM 2 installation path. Please fill it manually in the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.Warn("Unable to detect installation path");
+                MessageBox.Show(@"Could not detect path to installation directory. Please select it manually from the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             // Make sure, that all mod paths have a trailing backslash
@@ -292,11 +360,11 @@ namespace XCOM2Launcher
             }
 
             // Check and potentially add new mod paths from XCOM ini file.
-            var modPathsFromIni = XCOM2.DetectModDirs();
+            var modDirs = XEnv.DetectModDirs();
 
-            if (modPathsFromIni != null)
+            if (modDirs != null)
             {
-                settings.ModPaths.AddRange(modPathsFromIni.Where(modPath => !settings.ModPaths.Contains(modPath)));
+                settings.ModPaths.AddRange(modDirs.Where(modPath => !settings.ModPaths.Contains(modPath)));
             }
             else
             {
@@ -308,16 +376,14 @@ namespace XCOM2Launcher
 
             if (settings.ModPaths.Count == 0)
             {
-                Log.Warn("No XCOM 2 mod directories configured");
-                MessageBox.Show(@"Could not find XCOM 2 mod directories. Please fill them in manually in the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.Warn("No mod directories configured");
+                MessageBox.Show(@"Unable to detect mod directories. Please select them manually from the settings dialog.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             if (settings.Mods.Entries.Count > 0)
             {
-                // Verify categories
-                var index = settings.Mods.Entries.Values.Max(c => c.Index);
-                foreach (var cat in settings.Mods.Entries.Values.Where(c => c.Index == -1))
-                    cat.Index = ++index;
+                settings.Mods.MarkDuplicates();
+                settings.Mods.InitCategoryIndices();
 
                 // Verify Mods 
                 foreach (var mod in settings.Mods.All)
@@ -349,6 +415,14 @@ namespace XCOM2Launcher
 
                     // tags clean up
                     mod.Tags = mod.Tags.Where(t => settings.Tags.ContainsKey(t.ToLower())).ToList();
+
+                    // If the duplicate mod workaround is disabled, make sure that all mod info files are enabled.
+                    if (!settings.EnableDuplicateModIdWorkaround)
+                    {
+                        mod.EnableModFile();
+                    }
+
+                    settings.Mods.UpdatedModDependencyState(mod);
                 }
 
                 var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();

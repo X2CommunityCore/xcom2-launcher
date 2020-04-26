@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
 using Steamworks;
@@ -26,9 +22,10 @@ namespace XCOM2Launcher.Forms
         {
             // Register Events
             // run buttons
-            runXCOM2ToolStripMenuItem.Click += (a, b) => { RunGame(); };
+            runXCOM2ToolStripMenuItem.Click += (a, b) => { RunVanilla(); };
             runWarOfTheChosenToolStripMenuItem.Click += (a, b) => { RunWotC(); };
             runChallengeModeToolStripMenuItem.Click += (a, b) => { RunChallengeMode(); };
+            runChimeraSquadToolStripMenuItem.Click += (sender, args) => RunChimeraSquad();
 
             #region Menu->File
 
@@ -48,19 +45,46 @@ namespace XCOM2Launcher.Forms
 
                 Reset();
             };
+            
             searchForModsToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->File->Search for new mods");
-                Settings.ImportMods();
+
+                if (IsModUpdateTaskRunning)
+                {
+                    ShowModUpdateRunningMessageBox();
+                    return;
+                }
+                
+                var importedMods = Settings.ImportMods();
+                
+                if (importedMods.Any())
+                {
+                    UpdateMods(importedMods, () =>
+                    {
+                        Invoke(new Action(() => 
+                        {
+                            RefreshModList();
+                            modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
+                        }));
+                    });
+                }
             };
 
             updateEntriesToolStripMenuItem.Click += delegate
             {
-                if (_updateWorker.IsBusy)
-                    return;
-
                 Log.Info("Menu->File->Update mod info");
-                CheckSteamForUpdates();
+                
+                if (IsModUpdateTaskRunning)
+                {
+                    ShowModUpdateRunningMessageBox();
+                    return;
+                }
+                
+                SetStatus("Updating all mods...");
+
+                var mods = Settings.Mods.All.ToList();
+                UpdateMods(mods);
             };
 
             exitToolStripMenuItem.Click += (sender, e) =>
@@ -90,10 +114,25 @@ namespace XCOM2Launcher.Forms
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
+                    // If the duplicate mod workaround is disabled, make sure that all mod info files are enabled.
+                    if (!Settings.EnableDuplicateModIdWorkaround)
+                    {
+                        foreach (var mod in Mods.All)
+                        {
+                            mod.EnableModFile();
+                        }
+
+                        Mods.MarkDuplicates();
+                    }
+
                     // refresh/update settings dependent functions
                     RefreshModList();
                     showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
-                    UpdateQuickArgumentsMenu();
+                    modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+                    olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+                    olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
+                    cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
+                    InitQuickArgumentsMenu(Settings);
 
                     if (dialog.IsRestartRequired)
                     {
@@ -114,16 +153,34 @@ namespace XCOM2Launcher.Forms
 
             importFromXCOM2ToolStripMenuItem.Click += delegate
             {
-                Log.Info("Menu->Tools->Import vanilla");
-                XCOM2.ImportActiveMods(Settings, false);
-                RefreshModList();
+                if (Program.XEnv is Xcom2Env x2Env)
+                {
+                    x2Env.UseWotC = false;
+                    Log.Info("Menu->Tools->Import vanilla");
+                    Program.XEnv.ImportActiveMods(Settings);
+                    RefreshModList();
+                }
             };
 
             importFromWotCToolStripMenuItem.Click += delegate
             {
-                Log.Info("Menu->Tools->Import WotC");
-                XCOM2.ImportActiveMods(Settings, true);
-                RefreshModList();
+                if (Program.XEnv is Xcom2Env x2Env)
+                {
+                    x2Env.UseWotC = true;
+                    Log.Info("Menu->Tools->Import WotC");
+                    Program.XEnv.ImportActiveMods(Settings);
+                    RefreshModList();
+                }
+            };
+
+            importFromChimeraSquadToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv.Game == GameId.ChimeraSquad)
+                {
+                    Log.Info("Menu->Tools->Import Chimera Squad");
+                    Program.XEnv.ImportActiveMods(Settings);
+                    RefreshModList();
+                }
             };
 
             resubscribeToModsToolStripMenuItem.Click += delegate
@@ -148,7 +205,7 @@ namespace XCOM2Launcher.Forms
                         Workshop.DownloadItem((ulong) m.WorkshopID);
                     }
 
-                    MessageBox.Show("Launch XCOM 2 after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Launch XCOM after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             };
 
@@ -191,17 +248,8 @@ namespace XCOM2Launcher.Forms
             //main_tabcontrol.Selected += MainTabSelected;
             //modinfo_tabcontrol.Selected += ModInfoTabSelected;
 
-            // Mod Updater
-            _updateWorker.DoWork += Updater_DoWork;
-            _updateWorker.ProgressChanged += Updater_ProgressChanged;
-            _updateWorker.RunWorkerCompleted += Updater_RunWorkerCompleted;
-
             // Steam Events
             Workshop.OnItemDownloaded += Resubscribe_OnItemDownloaded;
-
-#if DEBUG
-            Workshop.OnItemDownloaded += SteamWorkshop_OnItemDownloaded;
-#endif
 
             // Main Tabs
             // Export
@@ -209,11 +257,18 @@ namespace XCOM2Launcher.Forms
             export_group_checkbox.CheckedChanged += ExportCheckboxCheckedChanged;
             export_save_button.Click += ExportSaveButtonClick;
             export_load_button.Click += ExportLoadButtonClick;
+
+            horizontal_splitcontainer.Paint += (sender, args) =>
+            {
+                if (sender is SplitContainer s)
+                {
+                    // Make the "splitter" from the SplitContainer slightly visible.
+                    args.Graphics.FillRectangle(new SolidBrush(SystemColors.Control), s.SplitterRectangle);
+                }
+            };
         }
 
         private void QuickArgumentItemClick(object sender, EventArgs e) {
-            Debug.Assert(sender is ToolStripMenuItem);
-
             // Add or remove the respective argument from the argument list, depending on its check-state.
             if (sender is ToolStripMenuItem item)
             {
@@ -233,7 +288,12 @@ namespace XCOM2Launcher.Forms
 
             if (result == DialogResult.OK)
             {
-                RefreshModList();
+                var collapsedGroups = modlist_ListObjectListView.CollapsedGroups.ToList();
+                modlist_ListObjectListView.BeginUpdate();
+                modlist_ListObjectListView.BuildGroups();
+                // Restore previously collapsed groups
+                collapsedGroups.ForEach(g => g.Collapsed = true);
+                modlist_ListObjectListView.EndUpdate();
             }
         }
 
@@ -241,48 +301,13 @@ namespace XCOM2Launcher.Forms
         {
             var mod = Mods.All.SingleOrDefault(m => m.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
 
-            // review: should this be (mod.State & ModState.NotInstalled)?
-            if ((mod.State | ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
+            if (mod != null && (mod.State & ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
             {
                 mod.RemoveState(ModState.NotInstalled);
-                RefreshModList();
+                mod.isHidden = false;
+                modlist_ListObjectListView.RefreshObject(mod);
             }
         }
-
-#if DEBUG
-        private void SteamWorkshop_OnItemDownloaded(object sender, Workshop.DownloadItemEventArgs e)
-        {
-            if (e.Result.m_eResult != EResult.k_EResultOK)
-            {
-                MessageBox.Show($"{e.Result.m_nPublishedFileId}: {e.Result.m_eResult}", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            var m = Downloads.SingleOrDefault(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
-
-            if (m != null)
-            {
-                // Fill fields
-                m.RemoveState(ModState.NotInstalled);
-                m.RealizeIDAndPath(m.Path);
-                m.Image = null; // Use default image again
-
-                // load info
-                var info = new ModInfo(m.GetModInfoFile());
-
-                // Move mod
-                Downloads.Remove(m);
-                Mods.AddMod(info.Category, m);
-
-                // update listitem
-                //var item = modlist_listview.Items.Cast<ListViewItem>().Single(i => (i.Tag as ModEntry).SourceID == m.SourceID);
-                //UpdateModListItem(item, info.Category);
-            }
-            m = Mods.All.Single(x => x.WorkshopID == (long)e.Result.m_nPublishedFileId.m_PublishedFileId);
-
-            MessageBox.Show($"{m.Name} finished download.", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-#endif
 
         #region Form
 
@@ -299,10 +324,11 @@ namespace XCOM2Launcher.Forms
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _updateWorker.CancelAsync();
-
             // Save dimensions
             Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_ListObjectListView.SaveState() };
+            Settings.ShowStateFilter = cShowStateFilter.Checked;
+            Settings.ShowModListGroups = cEnableGrouping.Checked;
+            Settings.ShowPrimaryDuplicateAsDependency = cShowPrimaryDuplicates.Checked;
 
             Save(Settings.Instance.LastLaunchedWotC);
         }
@@ -311,98 +337,6 @@ namespace XCOM2Launcher.Forms
         private void modinfo_inspect_propertygrid_Layout(object sender, LayoutEventArgs e)
         {
             modinfo_inspect_propertygrid.SetLabelColumnWidth(100);
-        }
-
-        #endregion
-
-        #region Mod Updater
-
-        private readonly BackgroundWorker _updateWorker = new BackgroundWorker
-        {
-            WorkerReportsProgress = true,
-            WorkerSupportsCancellation = true
-        };
-
-        private void Updater_DoWork(object sender, DoWorkEventArgs e)
-        {
-            _updateWorker.ReportProgress(0);
-            var numCompletedMods = 0;
-
-            Parallel.ForEach(Mods.All.ToList(), mod =>
-            {
-                if (_updateWorker.CancellationPending || Disposing || IsDisposed)
-                {
-                    Log.Info("Mod update BackgroundWorker cancelled");
-                    e.Cancel = true;
-                    return;
-                }
-
-                try
-                {
-                    Mods.UpdateMod(mod, Settings);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"Error updating mod {mod.ID}", ex);
-                    Debug.Fail(ex.Message + "\r\n" + ex.StackTrace);
-                }
-
-                lock (_updateWorker)
-                {
-                    numCompletedMods++;
-                    _updateWorker.ReportProgress(numCompletedMods, mod);
-                }
-            });
-        }
-
-        private void Updater_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            if (((BackgroundWorker)sender).CancellationPending)
-                return;
-
-            progress_toolstrip_progressbar.Value = e.ProgressPercentage;
-            status_toolstrip_label.Text = $"Updating Mods... ({e.ProgressPercentage} / {progress_toolstrip_progressbar.Maximum})";
-        }
-
-        private void Updater_SingleUpdateProgress(object sender, ProgressChangedEventArgs e)
-        {
-            if (modlist_ListObjectListView.SelectedObjects.Count == 1)
-            {
-                var selected = modlist_ListObjectListView.SelectedObject as ModEntry;
-
-                if (e.UserState as ModEntry == selected)
-                {
-                    UpdateModInfo(CurrentMod);
-                }
-            }
-        }
-
-        private void Updater_SingleUpdateCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (modlist_ListObjectListView.SelectedObjects.Count == 1)
-            {
-                var selected = modlist_ListObjectListView.SelectedObject as ModEntry;
-
-                if (CurrentMod == selected)
-                {
-                    UpdateModInfo(CurrentMod);
-                }
-            }
-        }
-
-        private void Updater_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Cancelled)
-            {
-                status_toolstrip_label.Text = "Cancelled.";
-                return;
-            }
-
-            Log.Info("Mod update BackgroundWorker finished");
-            progress_toolstrip_progressbar.Visible = false;
-            status_toolstrip_label.Text = StatusBarIdleString;
-            RefreshModList();
-            Updater_SingleUpdateCompleted(sender, e);
         }
 
         #endregion
@@ -478,7 +412,7 @@ namespace XCOM2Launcher.Forms
 
                 if (OverrideTags)
                 {
-                    var tags = modMatch.Groups["tags"].Value.Split(';').Where(t => !string.IsNullOrWhiteSpace(t));
+                    var tags = modMatch.Groups["tags"].Value.Split(';').Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
 
                     foreach (var tag in tags)
                     {
@@ -490,7 +424,7 @@ namespace XCOM2Launcher.Forms
 
                     foreach (var modEntry in entries)
                     {
-                        modEntry.Tags = tags.ToList();
+                        modEntry.Tags = tags;
                         Mods.RemoveMod(modEntry);
                         Mods.AddMod(categoryName, modEntry);
                     }
@@ -562,7 +496,7 @@ namespace XCOM2Launcher.Forms
 			foreach (var mod in activeMods)
 				mod.isActive = true;
 
-			modlist_ListObjectListView.UpdateObjects(mods);
+			modlist_ListObjectListView.RefreshObjects(mods);
 
             UpdateExport();
             UpdateLabels();
@@ -586,12 +520,12 @@ namespace XCOM2Launcher.Forms
 
         private void ModInfoTabSelected(object sender, TabControlEventArgs e)
         {
-            CheckAndUpdateChangeLog(e.TabPage, modlist_ListObjectListView.SelectedObject as ModEntry);
+            UpdateModChangeLog(ModList.SelectedObject);
         }
 
-        private async void CheckAndUpdateChangeLog(TabPage tab, ModEntry m)
+        private async void UpdateModChangeLog(ModEntry m)
         {
-            if (tab != modinfo_changelog_tab || m == null)
+            if (modinfo_tabcontrol.SelectedTab != modinfo_changelog_tab || m == null)
                 return;
 
             modinfo_changelog_richtextbox.Text = "Loading...";
@@ -603,35 +537,10 @@ namespace XCOM2Launcher.Forms
             Tools.StartProcess(e.LinkText);
         }
 
-		private void filterMods_TextChanged(object sender, EventArgs e)
-		{
-			TextMatchFilter filter = null;
-			int matchKind = 0;
-			string txt = ((TextBox) sender).Text;
-			if (!String.IsNullOrEmpty(txt))
-			{
-				switch (matchKind)
-				{
-					case 0:
-					default:
-						filter = TextMatchFilter.Contains(modlist_ListObjectListView, txt);
-						break;
-					case 1:
-						filter = TextMatchFilter.Prefix(modlist_ListObjectListView, txt);
-						break;
-					case 2:
-						filter = TextMatchFilter.Regex(modlist_ListObjectListView, txt);
-						break;
-				}
-			}
-
-			// Text highlighting requires at least a default renderer
-			if (modlist_ListObjectListView.DefaultRenderer == null)
-				modlist_ListObjectListView.DefaultRenderer = new HighlightTextRenderer(filter);
-
-			modlist_ListObjectListView.AdditionalFilter = filter;
-
-		}
+        private void filterMods_TextChanged(object sender, EventArgs e)
+        {
+            RefreshModelFilter();
+        }
 
         private void cEnableGrouping_CheckedChanged(object sender, EventArgs e)
         {
@@ -640,11 +549,15 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.BuildGroups();
         }
 
+        private void cShowLegend_CheckedChanged(object sender, EventArgs e)
+        {
+            pModsLegend.Visible = cShowStateFilter.Checked;
+        }
+
 		private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
 		{
 			var senderComboBox = (ComboBox)sender;
 			int width = senderComboBox.DropDownWidth;
-			Graphics g = senderComboBox.CreateGraphics();
 			Font font = senderComboBox.Font;
 
 			int vertScrollBarWidth = (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
@@ -655,7 +568,7 @@ namespace XCOM2Launcher.Forms
 			foreach (string s in itemsList)
 			{
 				int newWidth;
-				using (g = senderComboBox.CreateGraphics())
+				using (Graphics g = senderComboBox.CreateGraphics())
 				{
 					newWidth = (int)g.MeasureString(s, font).Width + vertScrollBarWidth;
 				}
@@ -826,6 +739,40 @@ namespace XCOM2Launcher.Forms
         private void modlist_filterClearButton_Click(object sender, EventArgs e)
         {
             modlist_FilterCueTextBox.Text = "";
+        }
+
+        private void cStateFilter_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                checkBox.Font = checkBox.Checked ? new Font(checkBox.Font, FontStyle.Bold) : new Font(checkBox.Font, FontStyle.Regular);
+            }
+
+            RefreshModelFilter();
+        }
+
+        private void bRefreshStateFilter_Click(object sender, EventArgs e)
+        {
+            RefreshModelFilter();
+        }
+
+        private void bClearStateFilter_Click(object sender, EventArgs e)
+        {
+            cFilterConflicted.Checked = false;
+            cFilterDuplicate.Checked = false;
+            cFilterHidden.Checked = false;
+            cFilterMissingDependency.Checked = false;
+            cFilterNew.Checked = false;
+            cFilterNotInstalled.Checked = false;
+            cFilterNotLoaded.Checked = false;
+        }
+
+        private void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
+        {
+            if (modlist_ListObjectListView.SelectedObject is ModEntry mod)
+            {
+                UpdateDependencyInformation(mod);
+            }
         }
 
         #endregion

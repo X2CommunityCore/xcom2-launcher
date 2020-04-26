@@ -9,7 +9,7 @@ using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
 {
-    public partial class SettingsDialog : Form
+    partial class SettingsDialog : Form
     {
         protected Settings Settings { get; set; }
 
@@ -34,38 +34,39 @@ namespace XCOM2Launcher.Forms
             useSentry.Checked = GlobalSettings.Instance.IsSentryEnabled;
             allowMutipleInstances.Checked = settings.AllowMultipleInstances;
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
+            useDuplicateModWorkaround.Checked = settings.EnableDuplicateModIdWorkaround;
+            useTranslucentModListSelection.Checked = settings.UseTranslucentModListSelection;
 
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
 
             argumentsTextBox.Text = string.Join(" ", settings.ArgumentList);
+            quickArgumentsTextBox.Text = string.Join(" ", settings.QuickToggleArguments);
 
             // Create autofill values for arguments box
-            List<string> arguments = new List<string>();
-            foreach (var propertyInfo in typeof(Arguments).GetProperties())
-            {
-                var attrs = propertyInfo.GetCustomAttributes(true);
-                arguments.AddRange(
-                                   from attrName in attrs.OfType<DisplayNameAttribute>()
-                                   where !propertyInfo.Name.Equals("Custom")
-                                   select attrName.DisplayName);
-            }
-
-            argumentsTextBox.Values = arguments.ToArray();
-
-
-
+            var defaultArgs = Argument.DefaultArguments.Select(arg => arg.Parameter).ToArray();
+            argumentsTextBox.Values = defaultArgs;
+            quickArgumentsTextBox.Values = defaultArgs;
         }
 
         private void BrowseGamePathButtonOnClick(object sender, EventArgs eventArgs)
         {
             var dialog = new OpenFileDialog
             {
-                FileName = "XCom2.exe",
-                Filter = @"XCOM 2 Executable|XCom2.exe",
                 RestoreDirectory = true,
                 InitialDirectory = gamePathTextBox.Text
             };
+
+            if (Program.XEnv.Game == GameId.X2)
+            {
+                dialog.FileName = "XCom2.exe";
+                dialog.Filter = @"XCOM 2 Executable|XCom2.exe";
+            }
+            else
+            {
+                dialog.FileName = "XCom.exe";
+                dialog.Filter = @"XCOM CS Executable|XCom.exe";
+            }
 
             if (dialog.ShowDialog() != DialogResult.OK)
                 return;
@@ -135,11 +136,16 @@ namespace XCOM2Launcher.Forms
             Settings.CheckForPreReleaseUpdates = checkForPreReleaseUpdates.Checked;
             GlobalSettings.Instance.IsSentryEnabled = useSentry.Checked;
             Settings.AllowMultipleInstances = allowMutipleInstances.Checked;
+            Settings.EnableDuplicateModIdWorkaround = useDuplicateModWorkaround.Checked;
+            Settings.UseTranslucentModListSelection = useTranslucentModListSelection.Checked;
             Settings.GamePath = gamePathTextBox.Text;
             Settings.ModPaths = newModPaths;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
             Settings.ArgumentList = newArguments.AsReadOnly();
+
+            var newQuickArguments = quickArgumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
+            Settings.QuickToggleArguments = newQuickArguments;
 
             // Save dimensions
             Settings.Windows["settings"] = new WindowSettings(this);

@@ -7,16 +7,15 @@ namespace XCOM2Launcher.XCOM
 {
     public class DefaultConfigFile : IniFile
     {
-        public DefaultConfigFile(string filename, bool WotC = false, bool load = true) : base((WotC ? XCOM2.WotCUserConfigDir : XCOM2.UserConfigDir) + $"/XCom{filename}.ini", false)
+        public DefaultConfigFile(string filename, string configDir, string defaultConfigDir, bool load = true) : base(configDir + $"/XCom{filename}.ini", false)
         {
             FileName = filename;
-            if (WotC)
-                DefaultFile = $"{XCOM2.WotCDefaultConfigDir}/Default{FileName}.ini";
-            else
-                DefaultFile = $"{XCOM2.DefaultConfigDir}/Default{FileName}.ini";
+            DefaultFile = $"{defaultConfigDir}/Default{FileName}.ini";
 
             if (load)
+            {
                 Load();
+            }
         }
 
         public string FileName { get; }
@@ -76,7 +75,7 @@ namespace XCOM2Launcher.XCOM
             var baseFile = Get("Configuration", "BasedOn").First();
             Remove("Configuration", "BasedOn");
 
-            var file = System.IO.Path.GetFullPath(System.IO.Path.Combine(XCOM2.GameDir, "XComGame", baseFile));
+            var file = System.IO.Path.GetFullPath(System.IO.Path.Combine(Program.XEnv.GameDir, "XComGame", baseFile));
 
             // Create config from base baseFile
             var baseConfig = new IniFile(file, true);
