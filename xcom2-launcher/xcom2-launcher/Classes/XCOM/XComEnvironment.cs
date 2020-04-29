@@ -62,7 +62,7 @@ namespace XCOM2Launcher.XCOM
             
             // Try to deduce game path from available mod directories
             var dirs = DetectModDirs();
-            foreach (var dir in Enumerable.Where<string>(dirs, dir => dir.ToLower().Contains("\\steamapps\\")))
+            foreach (var dir in dirs.Where<string>(dir => dir.ToLower().Contains("\\steamapps\\")))
             {
                 // Assume steamapps folder to have \workshop\content\268500 subfolders
                 gamedir = Path.GetFullPath(Path.Combine(dir, "../../..", "common", "XCOM 2"));
@@ -111,7 +111,7 @@ namespace XCOM2Launcher.XCOM
 
             try
             {
-                currentModDirs = GetConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs");
+                currentModDirs = GetConfigFile("Engine").Get("Engine.DownloadableContentEnumerator", "ModRootDirs") ?? new List<string>();
             }
             catch (IOException ex)
             {
@@ -180,8 +180,8 @@ namespace XCOM2Launcher.XCOM
                 mods.AddRange(configFile.Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0]);
                 
                 // Prepare result
-                mods = mods.Distinct().ToList();
                 mods = mods.ConvertAll(x => x.TrimStart('"').TrimEnd('"'));     // default config may contain entries encapsulated in ""
+                mods = mods.Distinct().ToList();
                 return mods.ToArray();
             }
             catch (IOException ex)
@@ -213,7 +213,7 @@ namespace XCOM2Launcher.XCOM
             modOptions.Save();
 
             // XComEngine
-            var engine = GetConfigFile("Engine", false);
+            var engine = GetConfigFile("Engine");
 
             // Remove old ModClassOverrides
             engine.Remove("Engine.Engine", "ModClassOverrides");

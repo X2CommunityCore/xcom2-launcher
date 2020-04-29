@@ -823,7 +823,7 @@ namespace XCOM2Launcher.Forms
 
             if (selectedMods.Any(mod => mod.WorkshopID > 0))
             {
-                List<ModEntry> modsToUpdate = new List<ModEntry>(selectedMods.Where(mod => mod.Source == ModSource.SteamWorkshop));
+                List<ModEntry> modsToUpdate = new List<ModEntry>(selectedMods.Where(mod => mod.WorkshopID > 0));
 
                 fetchWorkshopTagsItem = new MenuItem("Use workshop tags");
                 fetchWorkshopTagsItem.Click += delegate
