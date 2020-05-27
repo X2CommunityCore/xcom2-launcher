@@ -690,6 +690,7 @@ namespace XCOM2Launcher.Forms
                 modinfo_config_LoadButton.Enabled = false;
                 modinfo_config_RemoveButton.Enabled = false;
                 modinfo_ConfigFCTB.Clear();
+                modinfo_ConfigFCTB.ReadOnly = true;
                 olvRequiredMods.ClearObjects();
                 olvDependentMods.ClearObjects();
                 return;

@@ -324,6 +324,8 @@ namespace XCOM2Launcher.Forms
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Log.Info("MainForm is about to close");
+
             // Save dimensions
             Settings.Windows["main"] = new WindowSettings(this) { Data = modlist_ListObjectListView.SaveState() };
             Settings.ShowStateFilter = cShowStateFilter.Checked;
@@ -380,19 +382,19 @@ namespace XCOM2Launcher.Forms
             }
             // parse file
 
-			var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
+            var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
             var modEntryRegex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)([ ]*\t(?<tags>.*?))?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
             var mods = Mods.All.ToList();
             var activeMods = new List<ModEntry>();
             var missingMods = new List<Match>();
-	        var categoryName = "";
+            var categoryName = "";
 
             foreach (var line in File.ReadAllLines(dialog.FileName))
             {
-	            var categoryMatch = categoryRegex.Match(line);
-	            if (categoryMatch.Success)
-		            categoryName = categoryMatch.Groups["category"].Value;
+                var categoryMatch = categoryRegex.Match(line);
+                if (categoryMatch.Success)
+                    categoryName = categoryMatch.Groups["category"].Value;
 
                 var modMatch = modEntryRegex.Match(line);
                 if (!modMatch.Success)
@@ -440,7 +442,7 @@ namespace XCOM2Launcher.Forms
 
             // Check missing
             if (missingMods.Count > 0)
-			{
+            {
                 var steamMissingMods = missingMods.Where(match => match.Groups["sourceID"].Value != "Unknown").ToList();
 
                 var text = $"This profile contains {missingMods.Count} mod(s) that are not currently installed:\r\n\r\n";
@@ -493,10 +495,10 @@ namespace XCOM2Launcher.Forms
             foreach (var mod in mods)
                 mod.isActive = false;
 
-			foreach (var mod in activeMods)
-				mod.isActive = true;
+            foreach (var mod in activeMods)
+                mod.isActive = true;
 
-			modlist_ListObjectListView.RefreshObjects(mods);
+            modlist_ListObjectListView.RefreshObjects(mods);
 
             UpdateExport();
             UpdateLabels();
@@ -554,146 +556,162 @@ namespace XCOM2Launcher.Forms
             pModsLegend.Visible = cShowStateFilter.Checked;
         }
 
-		private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
-		{
-			var senderComboBox = (ComboBox)sender;
-			int width = senderComboBox.DropDownWidth;
-			Font font = senderComboBox.Font;
+        private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
+        {
+            var senderComboBox = (ComboBox)sender;
+            int width = senderComboBox.DropDownWidth;
+            Font font = senderComboBox.Font;
 
-			int vertScrollBarWidth = (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
-					? SystemInformation.VerticalScrollBarWidth : 0;
+            int vertScrollBarWidth = (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
+                ? SystemInformation.VerticalScrollBarWidth
+                : 0;
 
-			var itemsList = senderComboBox.Items.Cast<object>().Select(item => item.ToString());
+            var itemsList = senderComboBox.Items.Cast<object>().Select(item => item.ToString());
 
-			foreach (string s in itemsList)
-			{
-				int newWidth;
-				using (Graphics g = senderComboBox.CreateGraphics())
-				{
-					newWidth = (int)g.MeasureString(s, font).Width + vertScrollBarWidth;
-				}
+            foreach (string s in itemsList)
+            {
+                int newWidth;
+                using (Graphics g = senderComboBox.CreateGraphics())
+                {
+                    newWidth = (int)g.MeasureString(s, font).Width + vertScrollBarWidth;
+                }
 
-				if (width >= newWidth) continue;
-				width = newWidth;
-			}
+                if (width >= newWidth) continue;
+                width = newWidth;
+            }
 
-			senderComboBox.DropDownWidth = width;
-		}
+            senderComboBox.DropDownWidth = width;
+        }
 
 
-		private void modinfo_config_FileSelectCueComboBox_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (CurrentMod == null) return;
+        private void modinfo_config_FileSelectCueComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CurrentMod == null)
+                return;
 
-			// Invalid selection, somehow
-			if (modinfo_config_FileSelectCueComboBox.SelectedIndex <= -1) return;
+            // Invalid selection, somehow
+            if (modinfo_config_FileSelectCueComboBox.SelectedIndex <= -1)
+                return;
 
-			string filePath = modinfo_config_FileSelectCueComboBox.Text;
+            string filePath = modinfo_config_FileSelectCueComboBox.Text;
+            bool exists = false;
 
-			using (var sr = new StreamReader(CurrentMod.GetPathFull(filePath)))
-			{
-				modinfo_ConfigFCTB.Text = sr.ReadToEnd();
-			}
+            try
+            {
+                using (var sr = new StreamReader(CurrentMod.GetPathFull(filePath)))
+                {
+                    modinfo_ConfigFCTB.Text = sr.ReadToEnd();
+                }
 
-			// Check if this file has values saved, and enable/disable load button
-			bool exists = CurrentMod.GetSetting(filePath) != null;
-			modinfo_config_LoadButton.Enabled = exists;
-			modinfo_config_RemoveButton.Enabled = exists;
-			modinfo_config_CompareButton.Enabled = exists;
-		}
+                // Check if this file has values saved, and enable/disable load button
+                exists = CurrentMod.GetSetting(filePath) != null;
+                modinfo_ConfigFCTB.ReadOnly = false;
+            }
+            catch (Exception ex)
+            {
+                Log.Warn("Failed to read selected ini file", ex);
+                modinfo_ConfigFCTB.Text = ex.Message;
+                modinfo_ConfigFCTB.ReadOnly = true;
+            }
 
-		private void modinfo_config_SaveButton_Click(object sender, EventArgs e)
-		{
-			// Get necessary data
-			if (CurrentMod == null) return;
-			
-			string contents = modinfo_ConfigFCTB.Text;
+            modinfo_config_LoadButton.Enabled = exists;
+            modinfo_config_RemoveButton.Enabled = exists;
+            modinfo_config_CompareButton.Enabled = exists;
+        }
 
-			// If the data is invalid, just do nothing
-			if (string.IsNullOrEmpty(contents)) return;
-			
-			if (CurrentMod.AddSetting(modinfo_config_FileSelectCueComboBox.Text, contents))
-			{
-				// For consistency enable the button
-				modinfo_config_LoadButton.Enabled = true;
-				modinfo_config_RemoveButton.Enabled = true;
-				modinfo_config_CompareButton.Enabled = true;
-			}
-		}
+        private void modinfo_config_SaveButton_Click(object sender, EventArgs e)
+        {
+            // Get necessary data
+            if (CurrentMod == null)
+                return;
 
-		private void modinfo_config_LoadButton_Click(object sender, EventArgs e)
-		{
-			// Get necessary data
-			if (CurrentMod == null) return;
-			
-			// If data is not valid
-			var setting = CurrentMod.GetSetting(modinfo_config_FileSelectCueComboBox.Text);
-			if (setting == null) return;
+            string contents = modinfo_ConfigFCTB.Text;
 
-			modinfo_ConfigFCTB.Text = setting.Contents;
-		}
+            // If the data is invalid, just do nothing
+            if (string.IsNullOrEmpty(contents))
+                return;
 
-		private void modinfo_config_RemoveButton_Click(object sender, EventArgs e)
-		{
-			// Get necessary data
-			if (CurrentMod == null) return;
-			
-			if (CurrentMod.RemoveSetting(modinfo_config_FileSelectCueComboBox.Text))
-			{
-				// For consistency enable the button
-				modinfo_config_LoadButton.Enabled = false;
-				modinfo_config_RemoveButton.Enabled = false;
-				modinfo_config_CompareButton.Enabled = false;
-			}
-		}
+            if (CurrentMod.AddSetting(modinfo_config_FileSelectCueComboBox.Text, contents))
+            {
+                // For consistency enable the button
+                modinfo_config_LoadButton.Enabled = true;
+                modinfo_config_RemoveButton.Enabled = true;
+                modinfo_config_CompareButton.Enabled = true;
+            }
+        }
 
-		private void modinfo_config_ExpandButton_Click(object sender, EventArgs e)
-		{
-			var layout = modinfo_config_TableLayoutPanel;
-			if (layout.Parent == modinfo_config_tab)
-			{
-				layout.Parent = fillPanel;
-				fillPanel.Visible = true;
-				fillPanel.BringToFront();
-				layout.Dock = DockStyle.Fill;
-				modinfo_config_ExpandButton.Text = "Collapse";
-				toolTip.SetToolTip(modinfo_config_ExpandButton, "Collapse the INI editor to normal size");
-			}
-			else
-			{
-				layout.Parent = modinfo_config_tab;
-				layout.Dock = DockStyle.Fill;
-				layout.BringToFront();
-				fillPanel.Visible = false;
-				fillPanel.SendToBack();
-				modinfo_config_ExpandButton.Text = "Expand";
-				toolTip.SetToolTip(modinfo_config_ExpandButton, "Expand the INI editor to fill the window");
+        private void modinfo_config_LoadButton_Click(object sender, EventArgs e)
+        {
+            // Get necessary data
+            if (CurrentMod == null) return;
 
-			}
-		}
+            // If data is not valid
+            var setting = CurrentMod.GetSetting(modinfo_config_FileSelectCueComboBox.Text);
+            if (setting == null) return;
 
-		private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			IniLanguage.Process(e);
-		}
+            modinfo_ConfigFCTB.Text = setting.Contents;
+        }
 
-		private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
-		{
-			string filepath = modinfo_config_FileSelectCueComboBox.Text;
-			try
-			{
-				ConfigDiff.Instance.CompareStrings(CurrentMod.GetSetting(filepath).Contents, modinfo_ConfigFCTB.Text);
-				ConfigDiff.Instance.Show();
-			}
-			catch (Exception configerror)
-			{
-				FlexibleMessageBox.Show("An exception occured. See error.log for additional details.");
-				File.WriteAllText("error.log", configerror.Message + "\r\nStack:\r\n" + configerror.StackTrace);
-			}
-		}
+        private void modinfo_config_RemoveButton_Click(object sender, EventArgs e)
+        {
+            // Get necessary data
+            if (CurrentMod == null) return;
 
-		private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
-		{
+            if (CurrentMod.RemoveSetting(modinfo_config_FileSelectCueComboBox.Text))
+            {
+                // For consistency enable the button
+                modinfo_config_LoadButton.Enabled = false;
+                modinfo_config_RemoveButton.Enabled = false;
+                modinfo_config_CompareButton.Enabled = false;
+            }
+        }
+
+        private void modinfo_config_ExpandButton_Click(object sender, EventArgs e)
+        {
+            var layout = modinfo_config_TableLayoutPanel;
+            if (layout.Parent == modinfo_config_tab)
+            {
+                layout.Parent = fillPanel;
+                fillPanel.Visible = true;
+                fillPanel.BringToFront();
+                layout.Dock = DockStyle.Fill;
+                modinfo_config_ExpandButton.Text = "Collapse";
+                toolTip.SetToolTip(modinfo_config_ExpandButton, "Collapse the INI editor to normal size");
+            }
+            else
+            {
+                layout.Parent = modinfo_config_tab;
+                layout.Dock = DockStyle.Fill;
+                layout.BringToFront();
+                fillPanel.Visible = false;
+                fillPanel.SendToBack();
+                modinfo_config_ExpandButton.Text = "Expand";
+                toolTip.SetToolTip(modinfo_config_ExpandButton, "Expand the INI editor to fill the window");
+            }
+        }
+
+        private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            IniLanguage.Process(e);
+        }
+
+        private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
+        {
+            string filepath = modinfo_config_FileSelectCueComboBox.Text;
+            try
+            {
+                ConfigDiff.Instance.CompareStrings(CurrentMod.GetSetting(filepath).Contents, modinfo_ConfigFCTB.Text);
+                ConfigDiff.Instance.Show();
+            }
+            catch (Exception configerror)
+            {
+                FlexibleMessageBox.Show("An exception occured. See error.log for additional details.");
+                File.WriteAllText("error.log", configerror.Message + "\r\nStack:\r\n" + configerror.StackTrace);
+            }
+        }
+
+        private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
+        {
             //var contents = modinfo_info_DescriptionRichTextBox.Text;
             //if (!CurrentMod.Description.Equals(contents))
             //    CurrentMod.Description = contents;
