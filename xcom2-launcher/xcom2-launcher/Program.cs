@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using JR.Utils.GUI.Forms;
+using Newtonsoft.Json;
 using Semver;
 using Sentry;
 using Sentry.Protocol;
@@ -132,7 +133,12 @@ namespace XCOM2Launcher
         static void HandleUnhandledException(Exception e, string source)
         {
             Log.Fatal("Unhandled exception", e);
-            File.WriteAllText("error.log", $"Sentry GUID: {GlobalSettings.Instance.Guid}\nSource: {source}\nMessage: {e.Message}\n\nStack:\n{e.StackTrace}");
+            File.WriteAllText("error.log", $"Version: {GetCurrentVersionString(true)}\n" +
+                                           $"Sentry GUID: {GlobalSettings.Instance.Guid}\n" +
+                                           $"Source: {source}\n" +
+                                           $"Message: {e.Message}\n\n" +
+                                           $"Stack:\n{e.StackTrace}");
+            
             var dlg = new UnhandledExceptionDialog(e);
             dlg.ShowDialog();
             Application.Exit();
@@ -454,7 +460,7 @@ namespace XCOM2Launcher
                 {
                     client.Headers.Add("User-Agent: Other");
                     GitHub.Release release;
-                    
+
                     if (Settings.Instance.CheckForPreReleaseUpdates)
                     {
                         Log.Info("Pre-Release updates enabled");
@@ -469,7 +475,7 @@ namespace XCOM2Launcher
                         var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
                         release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
                     }
-                    
+
                     if (release == null)
                     {
                         Log.Warn("No release information found");
@@ -504,7 +510,10 @@ namespace XCOM2Launcher
             catch (System.Net.WebException ex)
             {
                 Log.Warn("Web request failed", ex);
-                Debug.WriteLine(nameof(CheckForUpdate) + ": " + ex.Message);
+            }
+            catch (JsonReaderException ex)
+            {
+                Log.Warn("Failed to parse version information from Github", ex);
             }
 
             return false;

@@ -50,15 +50,15 @@ namespace XCOM2Launcher.XCOM
                 // Check if game is really available/installed
                 if (Directory.Exists(gamedir))
                 {
-                    Log.Info("Game directory detected using Steam " + gamedir);
+                    Log.Info("Game directory detected using Steam API: " + gamedir);
                     _gameDir = gamedir;
                     return gamedir;
                 }
 
-                Log.Warn("Steam returned the (default) installation directory, but the game is probably not installed.");
+                Log.Warn("Steam returned game directory that does not exist: " + gamedir);
             }
 
-            Log.Error("Steam API failed to detect game directory.");
+            Log.Error("Steam API failed to detect a valid game directory.");
             
             // Try to deduce game path from available mod directories
             var dirs = DetectModDirs();
@@ -129,8 +129,12 @@ namespace XCOM2Launcher.XCOM
             if (!currentModDirs.Any(dir => dir.EndsWith(appId) || dir.EndsWith(appId + "\\")))
             {
                 var workShopModPath = Path.GetFullPath(Path.Combine(_gameDir, "../..", "workshop", "content", appId));
-                currentModDirs.Add(workShopModPath);
-                Log.Info("Added default Steam Workshop mod directory: " + workShopModPath);
+
+                if (Directory.Exists(workShopModPath))
+                {
+                    currentModDirs.Add(workShopModPath);
+                    Log.Info("Added default Steam Workshop mod directory: " + workShopModPath);
+                }
             }
 
             foreach (var modDir in currentModDirs)

@@ -472,7 +472,7 @@ namespace XCOM2Launcher.Mod
 			var fullpath = GetPathFull(path);
 			if (!File.Exists(fullpath))
 			{
-				MessageBox.Show(@"Error!\nThe file " + path + @" does not belong to mod " + Name + @".\nNothing was saved.", @"Error", MessageBoxButtons.OK);
+				MessageBox.Show($"Error!\nThe file {path} does not belong to mod {Name}.\nNothing was saved.", @"Error", MessageBoxButtons.OK);
 				return false;
 			}
 

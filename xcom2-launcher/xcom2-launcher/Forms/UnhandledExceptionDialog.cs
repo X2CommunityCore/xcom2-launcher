@@ -16,8 +16,9 @@ namespace XCOM2Launcher.Forms {
         {
             InitializeComponent();
             
+            tException.AppendText($"AML version: {Program.GetCurrentVersionString(true)}" + Environment.NewLine);
             tException.AppendText($"Sentry GUID: {GlobalSettings.Instance.Guid}" + Environment.NewLine);
-            tException.AppendText($"Message: {ex.Message}" + Environment.NewLine);
+            tException.AppendText($"Message: {ex.Message}" + Environment.NewLine + Environment.NewLine);
             tException.AppendText($"Stack: {Environment.NewLine} {ex.StackTrace}");
         }
 

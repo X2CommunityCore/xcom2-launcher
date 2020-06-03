@@ -238,27 +238,26 @@ namespace XCOM2Launcher.Mod
             catch (InvalidOperationException)
             {
                 Log.Warn("Multiple XComMod files in folder " + modDir);
-                MessageBox.Show(
-                                $"A mod could not be loaded since it contains multiple .XComMod files\r\n\r\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"A mod could not be loaded since it contains multiple .XComMod files\r\n\r\nPath: {modDir}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
             }
             catch (UnauthorizedAccessException)
             {
                 // the user probably added a system folder or a root directory as mod folder
                 // where AML has no access rights to all or some of the sub-folders
-                Log.Error("Unauthorized access to directory " + modDir);
+                Log.Warn("Unauthorized access to directory " + modDir);
                 return null;
             }
             catch (DirectoryNotFoundException)
             {
                 // Handle if directory/mod was removed between enumerating all directories and later accessing it here.
-                Log.Error("Mod directory no longer available " + modDir);
+                Log.Warn("Mod directory no longer available " + modDir);
                 return null;
             }
 
             return infoFile;
         }
-
+    
         public void AddMod(string category, ModEntry mod)
         {
             if (mod.Index == -1)

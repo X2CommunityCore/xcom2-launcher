@@ -106,7 +106,7 @@ namespace XCOM2Launcher.Mod
             }
             else
             {
-                Log.Warn("Key 'publishedfileid' in '{filepath}' is missing or value is empty.");
+                Log.Warn($"Key 'publishedfileid' in '{filepath}' is missing or value is empty.");
                 PublishedFileID = -1;
             }
 
