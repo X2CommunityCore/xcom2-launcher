@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
@@ -324,6 +325,35 @@ namespace XCOM2Launcher.Forms
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // If the mod update task is still running we cancel it and prevent the form from getting closed immediately
+            // to prevent disposed resources getting accessed asynchronously (task cancellation does not happen instantly).
+            if (IsModUpdateTaskRunning)
+            {
+                UseWaitCursor = true;
+                Log.Info("Cancelled FormClosing because ModUpdateTask is still running");
+
+                ModUpdateCancelSource?.Cancel();
+                
+                // We asynchronously wait (can't block UI thread at this point) for the ModUpdateTask to complete
+                var waitForUpdateTaskToComplete = Task.Run(async () =>
+                {
+                    await ModUpdateTask;
+                });
+                
+                // Close the form as soon as the ModUpdateTask finished
+                waitForUpdateTaskToComplete.ContinueWith((x) =>
+                {
+                    Log.Info("Closing form (mod update task completed)");
+                    Close();
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+
+                // Prevent the user from any further interactions while waiting to close
+                main_tabcontrol.Enabled = false;
+                main_menustrip.Enabled = false;
+                e.Cancel = true;
+                return;
+            }
+            
             Log.Info("MainForm is about to close");
 
             // Save dimensions

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
@@ -352,7 +353,7 @@ namespace XCOM2Launcher.Forms
             {
                 return;
             }
-
+            
             Log.Info($"Updating {mods.Count} mods...");
             SetStatus($"Updating {mods.Count} mods...");
             progress_toolstrip_progressbar.Visible = true;
@@ -361,22 +362,72 @@ namespace XCOM2Launcher.Forms
             reporter.ProgressChanged += delegate(object sender, ModUpdateProgress progress)
             {
                 Debug.WriteLine("Progress: " + progress.Message);
-                progress_toolstrip_progressbar.Maximum = progress.Max;
-                progress_toolstrip_progressbar.Value = progress.Current;
-                status_toolstrip_label.Text = progress.Message;
+                try
+                {
+                    progress_toolstrip_progressbar.Maximum = progress.Max;
+                    progress_toolstrip_progressbar.Value = progress.Current;
+                    status_toolstrip_label.Text = progress.Message;
+                }
+                catch (Exception ex) when (ex is ObjectDisposedException || ex is NullReferenceException)
+                {
+                    // This can happen, when the main form is closed and the wrapped progress bar control of
+                    // the ToolStripProgressBar has already been disposed while the mod update task is still reporting progress.
+                }
             };
 
-            ModUpdateTask = Settings.Mods.UpdateModsAsync(mods, Settings, reporter).ContinueWith(e =>
+            ModUpdateCancelSource = new CancellationTokenSource();
+            ModUpdateTask = Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token);
+                                    
+            ModUpdateTask.ContinueWith(e =>
             {
-                // After an update refresh all mods that depend on this one
+                switch (e.Status)
+                {
+                    case TaskStatus.RanToCompletion:
+                        Log.Info("ModUpdateTask completed");
+                        PostProcessModUpdateTask();
+                        break;
+                    case TaskStatus.Canceled:
+                        Log.Info("ModUpdateTask was cancelled");
+                        SetStatus("Mod updating aborted");
+                        break;
+                    case TaskStatus.Faulted:
+                        Log.Warn("ModUpdateTask faulted");
+
+                        var aggregateException = e.Exception;
+
+                        if (e.Exception?.InnerException is AggregateException)
+                            aggregateException = e.Exception?.GetBaseException() as AggregateException;
+
+
+                        Log.Error("At least one mod failed to update", aggregateException);
+                        SetStatus("At least one mod failed to update");
+                        
+                        PostProcessModUpdateTask();
+
+                        MessageBox.Show("At least one mod failed to update: " + 
+                                        Environment.NewLine + Environment.NewLine +
+                                        aggregateException?.InnerException?.Message +
+                                        Environment.NewLine + Environment.NewLine +
+                                        "See AML.log for details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+
+            void PostProcessModUpdateTask()
+            {
                 Cursor.Current = Cursors.WaitCursor;
+                // After an update refresh all mods that depend on this one
                 mods.ForEach(updatedMod => Mods.GetDependentMods(updatedMod).ForEach(dependentMod => Mods.UpdatedModDependencyState(dependentMod)));
                 modlist_ListObjectListView.RefreshObjects(mods);
                 afterUpdateAction?.Invoke();
-                Log.Info("ModUpdateTask completed");
+                
                 Cursor.Current = Cursors.Default;
                 SetStatusIdle();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+                Log.Info("ModUpdateTask post processing completed");
+            }
         }
 
         private void DeleteMods()

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
@@ -12,6 +12,7 @@ using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
+using Timer = System.Windows.Forms.Timer;
 
 namespace XCOM2Launcher.Forms
 {
@@ -21,6 +22,7 @@ namespace XCOM2Launcher.Forms
         private const string ExclamationIconKey = "Exclamation";
         
         private Task ModUpdateTask;
+        private CancellationTokenSource ModUpdateCancelSource;
         private bool IsModUpdateTaskRunning => (ModUpdateTask != null && !ModUpdateTask.IsCompleted);
 
         public Settings Settings { get; set; }
@@ -30,6 +32,7 @@ namespace XCOM2Launcher.Forms
             InitializeComponent();
 
             appRestartPendingLabel.Visible = false;
+            progress_toolstrip_progressbar.Visible = false;
             aboutToolStripMenuItem.DropDownDirection = ToolStripDropDownDirection.BelowLeft;
 
             // Settings

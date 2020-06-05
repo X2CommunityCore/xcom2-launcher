@@ -281,7 +281,7 @@ namespace XCOM2Launcher.Mod
             await UpdateModsAsync(new List<ModEntry> { m }, settings);
         }
 
-        public async Task<List<ModEntry>> UpdateModsAsync(List<ModEntry> mods, Settings settings, IProgress<ModUpdateProgress> progress = null)
+        public async Task<List<ModEntry>> UpdateModsAsync(List<ModEntry> mods, Settings settings, IProgress<ModUpdateProgress> progress = null, CancellationToken cancelToken = default(CancellationToken))
         {
             Log.Info($"Updating {mods.Count} mods...");
 
@@ -322,16 +322,30 @@ namespace XCOM2Launcher.Mod
                     if (details == null)
                     {
                         Log.Warn("GetDetails() request returned NULL");
-                        return new List<SteamUGCDetails_t>();
+                        return null;
                     }
 
                     var updateTasks = new List<Task>();
 
                     foreach (var workshopDetails in details)
                     {
+                        if (cancelToken.IsCancellationRequested)
+                        {
+                            Log.Debug("Task cancelled before processing workshopDetails");
+                            cancelToken.ThrowIfCancellationRequested();
+                            return null;
+                        }
+
                         updateTasks.Add(Task.Run(() =>
                         {
-                            var m = steamMods.Find(mod => (ulong) mod.WorkshopID == workshopDetails.m_nPublishedFileId.m_PublishedFileId);
+                            var m = steamMods.Find(mod => (ulong)mod.WorkshopID == workshopDetails.m_nPublishedFileId.m_PublishedFileId);
+
+                            if (cancelToken.IsCancellationRequested)
+                            {
+                                Log.Debug("Update mod task cancelled");
+                                cancelToken.ThrowIfCancellationRequested();
+                                return;
+                            }
 
                             lock (_ModUpdateLock)
                             {
@@ -339,18 +353,33 @@ namespace XCOM2Launcher.Mod
                                 Interlocked.Increment(ref steamProgress);
                             }
 
-                            //Log.Debug($"Start update {m.ID}");
-                            UpdateSteamMod(m, workshopDetails);
-                            //Log.Debug($"Finished {m.ID}");
-
-                        }));
+                            try
+                            {
+                                UpdateSteamMod(m, workshopDetails);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log Exception and throw it to indicate that the Task failed
+                                Log.Warn($"Error while updating Steam mod '{m.Name}'", ex);
+                                throw;
+                            }
+                        }, cancelToken));
                     }
 
-                    Log.Debug($"Waiting for {updateTasks.Count} UpdateSteamMod tasks to complete.");
-                    Task.WhenAll(updateTasks).Wait();
+                    try
+                    {
+                        Log.Debug($"Waiting for {updateTasks.Count} UpdateSteamMod tasks to complete.");
+                        Task.WaitAll(updateTasks.ToArray(), cancelToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Log.Debug("UpdateSteamMod batch task cancelled.");
+                        throw;
+                    }
+
                     Log.Debug("UpdateSteamMod tasks completed.");
                     return details;
-                }));
+                }, cancelToken));
             }
 
             Log.Debug($"Waiting for {getDetailsTasks.Count} GetDetails tasks to complete.");
@@ -363,6 +392,12 @@ namespace XCOM2Launcher.Mod
 
             foreach (var localMod in localMods)
             {
+                if (cancelToken.IsCancellationRequested)
+                {
+                    Log.Debug("UpdateModsAsync cancelled while updating local mods.");
+                    cancelToken.ThrowIfCancellationRequested();
+                }
+
                 progress?.Report(new ModUpdateProgress($"Updating mods {totalProgress}/{totalModCount}...", totalProgress, totalModCount));
                 totalProgress++;
                 
