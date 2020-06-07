@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Serialization;
 using XCOM2Launcher.XCOM;
@@ -202,7 +203,7 @@ namespace XCOM2Launcher
                 Converters = new List<JsonConverter> {new ModListConverter()}
             };
 
-            File.WriteAllText(file, JsonConvert.SerializeObject(this, Formatting.Indented, settings));
+            Tools.WriteTextToFileSave(file, JsonConvert.SerializeObject(this, Formatting.Indented, settings));
         }
 
         #endregion

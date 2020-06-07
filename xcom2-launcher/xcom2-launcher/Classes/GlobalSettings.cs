@@ -4,6 +4,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Sentry;
+using XCOM2Launcher.Helper;
 
 namespace XCOM2Launcher.Classes {
     [JsonObject(MemberSerialization.OptIn)]
@@ -116,7 +117,7 @@ namespace XCOM2Launcher.Classes {
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            File.WriteAllText(fileLocation, JsonConvert.SerializeObject(this, Formatting.Indented, settings));
+            Tools.WriteTextToFileSave(fileLocation, JsonConvert.SerializeObject(this, Formatting.Indented, settings));
         }
     }
 }

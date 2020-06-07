@@ -55,6 +55,13 @@ namespace XCOM2Launcher.Mod
                         {
                             // probably right
                             currentKey = newKey;
+
+                            // Value may be missing when the current line was expected to contain an equal sign but didn't
+                            if (keyValPair.Length < 2)
+                            {
+                                continue;
+                            }
+
                             var currentValue = keyValPair[1];
 
                             // A multi-line value should be indicated by a trailing '\' (source?) but most of the time isn't !?
