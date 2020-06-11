@@ -188,26 +188,14 @@ namespace XCOM2Launcher.Forms
             {
                 Log.Info("Menu->Tools->Resubscribe");
                 var modsToDownload = Mods.All.Where(m => m.State.HasFlag(ModState.NotInstalled) && m.Source == ModSource.SteamWorkshop).ToList();
-                var choice = false;
 
                 if (modsToDownload.Count == 0)
-                    MessageBox.Show("No uninstalled workshop mods were found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                else if (modsToDownload.Count == 1)
-                    choice = MessageBox.Show($"Are you sure you want to download the mod {modsToDownload[0].Name}?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
-                else
-                    choice = MessageBox.Show($"Are you sure you want to download {modsToDownload.Count} mods?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
-
-                if (choice)
                 {
-                    foreach (var m in modsToDownload)
-                    {
-                        Log.Info("Subscribe and download " + m.ID);
-                        Workshop.Subscribe((ulong) m.WorkshopID);
-                        Workshop.DownloadItem((ulong) m.WorkshopID);
-                    }
-
-                    MessageBox.Show("Launch XCOM after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("No uninstalled workshop mods were found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
+
+                ResubscribeToMods(modsToDownload);
             };
 
             #endregion Menu->Tools
@@ -304,7 +292,7 @@ namespace XCOM2Launcher.Forms
 
             if (mod != null && (mod.State & ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
             {
-                mod.RemoveState(ModState.NotInstalled);
+                mod.RemoveState(ModState.NotInstalled | ModState.Downloading);
                 mod.isHidden = false;
                 modlist_ListObjectListView.RefreshObject(mod);
             }

@@ -8,7 +8,7 @@ namespace XCOM2Launcher.Mod
         None = 0,
         New = 1,
         UpdateAvailable = 2,
-        // obsolete state 4
+        Downloading = 4,
         ModConflict = 8,
         DuplicateID = 16,
         NotLoaded = 32,

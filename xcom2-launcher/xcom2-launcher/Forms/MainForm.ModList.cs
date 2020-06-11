@@ -174,6 +174,9 @@ namespace XCOM2Launcher.Forms
             if (mod.State.HasFlag(ModState.NotLoaded))
                 return "Not loaded";
 
+            if (mod.State.HasFlag(ModState.Downloading))
+                return "Downloading";
+
             if (mod.State.HasFlag(ModState.NotInstalled))
                 return "Not installed";
 
@@ -430,24 +433,12 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void DeleteMods()
+        void DeleteMods(List<ModEntry> mods, bool keepEntries)
         {
-            // Confirmation dialog
-            var text = modlist_ListObjectListView.SelectedObjects.Count == 1
-                ? $"Are you sure you want to delete '{ModList.SelectedObjects[0]?.Name}'?"
-                : $"Are you sure you want to delete {modlist_ListObjectListView.SelectedObjects.Count} mods?";
-
-            text += "\r\nThis can not be undone.";
-
-            var r = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-            if (r != DialogResult.OK)
-                return;
-
-            // Delete
-            var mods = ModList.SelectedObjects.ToList();
+            // Delete / unsubscribe
             foreach (var mod in mods)
             {
-                Log.Info("Deleting/unsubscribing mod " + mod.ID);
+                Log.Info("Deleting mod " + mod.ID);
 
                 // Set State for all mods that depend on this one to MissingDependencies
                 var dependentMods = Mods.GetDependentMods(mod);
@@ -459,11 +450,18 @@ namespace XCOM2Launcher.Forms
 
                 // unsubscribe
                 if (mod.Source == ModSource.SteamWorkshop)
-                    Workshop.Unsubscribe((ulong) mod.WorkshopID);
+                    Workshop.Unsubscribe((ulong)mod.WorkshopID);
 
-                // delete model
-                modlist_ListObjectListView.RemoveObject(mod);
-                Mods.RemoveMod(mod);
+                if (!keepEntries)
+                { 
+                    // delete model
+                    modlist_ListObjectListView.RemoveObject(mod);
+                    Mods.RemoveMod(mod);
+                }
+                else
+                {
+                    mod.AddState(ModState.NotInstalled);
+                }
 
                 // delete files
                 try
@@ -486,6 +484,86 @@ namespace XCOM2Launcher.Forms
 
             RefreshModList();
             UpdateConflictInfo();
+        }
+
+        private void ResubscribeToMods(List<ModEntry> mods)
+        {
+            if (mods == null || !mods.Any())
+            {
+                return;
+            }
+
+            // Confirmation dialog
+            var text = mods.Count == 1
+                ? $"Are you sure you want to resubscribe and download the Workshop mod '{mods[0]?.Name}'?"
+                : $"Are you sure you want to resubscribe and download {mods.Count} Workshop mods?";
+
+            var result = MessageBox.Show(text, "Confirm download", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            
+            if (result != DialogResult.OK)
+                return;
+
+            foreach (var mod in mods)
+            {
+                if (mod.Source == ModSource.SteamWorkshop && mod.State.HasFlag(ModState.NotInstalled)) {
+                    Log.Info("Resubscribing to mod " + mod.ID);
+                    mod.AddState(ModState.Downloading);
+                    modlist_ListObjectListView.RefreshObject(mod);
+                    Workshop.Subscribe((ulong) mod.WorkshopID);
+                    Workshop.DownloadItem((ulong) mod.WorkshopID);
+                }
+            }
+
+            string plural = (mods.Count == 1 ? "" : "s");
+            MessageBox.Show($"You will have to wait for the download{plural} to finish in order to use the mod{plural}.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ConfirmDeleteMods(List<ModEntry> mods)
+        {
+            if (mods == null || !mods.Any())
+            {
+                return;
+            }
+
+            // Confirmation dialog
+            var text = mods.Count == 1
+                ? $"Are you sure you want to delete '{mods[0]?.Name}'?"
+                : $"Are you sure you want to delete {mods.Count} mods?";
+
+            var result = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            
+            if (result != DialogResult.OK)
+                return;
+
+            DeleteMods(mods, false);
+        }
+
+        private void ConfirmUnsubscribeMods(List<ModEntry> mods)
+        {
+            if (mods == null || !mods.Any())
+            {
+                return;
+            }
+
+            mods = mods.Where(mod => mod.Source == ModSource.SteamWorkshop && !mod.State.HasFlag(ModState.NotInstalled)).ToList();
+            
+            if (!mods.Any())
+            {
+                MessageBox.Show("No subscribed Workshop mods selected.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Confirmation dialog
+            var text = mods.Count == 1
+                ? $"Are you sure you want to unsubscribe from the Workshop mod '{mods[0]?.Name}'?"
+                : $"Are you sure you want to unsubscribe from {mods.Count} Workshop mods?";
+
+            var result = MessageBox.Show(text, "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            
+            if (result != DialogResult.OK)
+                return;
+
+            DeleteMods(mods, true);
         }
 
         private void MoveSelectedModsToCategory(string category)
@@ -723,6 +801,8 @@ namespace XCOM2Launcher.Forms
             MenuItem disableAllItem = null;
             MenuItem disableDuplicates = null;
             MenuItem restoreDuplicates = null;
+            MenuItem resubscribeItem = null;
+            MenuItem unsubscribeItem = null;
 
             // create items that appear only when a single mod is selected
             if (selectedMods.Count == 1)
@@ -730,16 +810,15 @@ namespace XCOM2Launcher.Forms
                 renameItem = new MenuItem("Rename");
                 renameItem.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
 
-                showInExplorerItem = new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); });
-                menu.MenuItems.Add(showInExplorerItem);
+                if (!m.State.HasFlag(ModState.NotInstalled))
+                {
+                    showInExplorerItem = new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); });
+                }
 
                 if (m.WorkshopID > 0)
                 {
                     showOnSteamItem = new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); });
-                    menu.MenuItems.Add(showOnSteamItem);
-
                     showInBrowser = new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); });
-                    menu.MenuItems.Add(showInBrowser);
                 }
 
                 var duplicateMods = Mods.All.Where(mod => mod.ID == m.ID && mod != m).ToList();
@@ -908,6 +987,22 @@ namespace XCOM2Launcher.Forms
                 };
             }
 
+            var workShopMods = selectedMods.Where(mod => mod.Source == ModSource.SteamWorkshop).ToList();
+            if (workShopMods.Any())
+            {
+                var nonInstalledWorkShopMods = workShopMods.Where(mod => mod.State.HasFlag(ModState.NotInstalled)).ToList();
+                if (nonInstalledWorkShopMods.Any())
+                {
+                    resubscribeItem = new MenuItem("Resubscribe", delegate { ResubscribeToMods(nonInstalledWorkShopMods); });
+                }
+
+                var installedWorkShopMods = workShopMods.Where(mod => !mod.State.HasFlag(ModState.NotInstalled)).ToList();
+                if (installedWorkShopMods.Any())
+                {
+                    unsubscribeItem = new MenuItem("Unsubscribe", delegate { ConfirmUnsubscribeMods(installedWorkShopMods); });
+                }
+            }
+
             if (selectedMods.Any(mod => !mod.isActive))
             {
                 enableAllItem = new MenuItem("Enable");
@@ -936,7 +1031,7 @@ namespace XCOM2Launcher.Forms
                 };
             }
 
-            var deleteItem = new MenuItem("Delete / Unsubscribe", delegate { DeleteMods(); });
+            var deleteItem = new MenuItem("Delete", delegate { ConfirmDeleteMods(selectedMods); });
 
             // create menu structure
             if (enableAllItem != null)
@@ -972,6 +1067,13 @@ namespace XCOM2Launcher.Forms
                 menu.MenuItems.Add("-");
 
             menu.MenuItems.Add(toggleVisibility);
+
+            if (resubscribeItem != null)
+                menu.MenuItems.Add(resubscribeItem);
+
+            if (unsubscribeItem != null)
+                menu.MenuItems.Add(unsubscribeItem);
+
             menu.MenuItems.Add(deleteItem);
 
             if (Settings.EnableDuplicateModIdWorkaround)
