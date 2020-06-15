@@ -338,31 +338,36 @@ namespace XCOM2Launcher.Mod
 
                         updateTasks.Add(Task.Run(() =>
                         {
-                            var m = steamMods.Find(mod => (ulong)mod.WorkshopID == workshopDetails.m_nPublishedFileId.m_PublishedFileId);
+                            // A requested workshop detail may match more than one mod (having the same mod installed from Steam and locally for example).
+                            var matchingMods = batchQueryModList.FindAll(mod => (ulong)mod.WorkshopID == workshopDetails.m_nPublishedFileId.m_PublishedFileId);
 
-                            if (cancelToken.IsCancellationRequested)
+                            foreach (var m in matchingMods)
                             {
-                                Log.Debug("Update mod task cancelled");
-                                cancelToken.ThrowIfCancellationRequested();
-                                return;
+                                if (cancelToken.IsCancellationRequested)
+                                {
+                                    Log.Debug("Update mod task cancelled");
+                                    cancelToken.ThrowIfCancellationRequested();
+                                    return;
+                                }
+
+                                lock (_ModUpdateLock)
+                                {
+                                    progress?.Report(new ModUpdateProgress($"Updating mods {steamProgress}/{totalModCount}...", steamProgress, totalModCount));
+                                    Interlocked.Increment(ref steamProgress);
+                                }
+
+                                try
+                                {
+                                    UpdateSteamMod(m, workshopDetails);
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Log Exception and throw it to indicate that the Task failed
+                                    Log.Warn($"Error while updating Steam mod '{m.Name}'", ex);
+                                    throw;
+                                }
                             }
 
-                            lock (_ModUpdateLock)
-                            {
-                                progress?.Report(new ModUpdateProgress($"Updating mods {steamProgress}/{totalModCount}...", steamProgress, totalModCount));
-                                Interlocked.Increment(ref steamProgress);
-                            }
-
-                            try
-                            {
-                                UpdateSteamMod(m, workshopDetails);
-                            }
-                            catch (Exception ex)
-                            {
-                                // Log Exception and throw it to indicate that the Task failed
-                                Log.Warn($"Error while updating Steam mod '{m.Name}'", ex);
-                                throw;
-                            }
                         }, cancelToken));
                     }
 

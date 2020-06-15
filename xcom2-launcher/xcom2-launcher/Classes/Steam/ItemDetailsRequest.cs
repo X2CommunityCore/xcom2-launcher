@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using Microsoft.VisualBasic.Logging;
+using Newtonsoft.Json;
 using Steamworks;
 using XCOM2Launcher.Classes.Steam;
 
@@ -7,6 +10,9 @@ namespace XCOM2Launcher.Steam
 {
     public class ItemDetailsRequest
     {
+        [JsonIgnore]
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ItemDetailsRequest));
+
         private CallResult<SteamUGCQueryCompleted_t> _onQueryCompleted;
         private UGCQueryHandle_t _queryHandle;
 
@@ -22,8 +28,9 @@ namespace XCOM2Launcher.Steam
 
         public ItemDetailsRequest(List<ulong> identifiers, bool GetDesc = false)
         {
+            // Only pass distinct entries so that Identifiers.Count matches the number of returned queries when processing the result.
             Identifiers = new List<ulong>();
-            Identifiers.AddRange(identifiers);
+            Identifiers.AddRange(identifiers.Distinct());
             GetFullDescription = GetDesc;
         }
 
@@ -68,8 +75,10 @@ namespace XCOM2Launcher.Steam
             for (uint i = 0; i < Identifiers.Count; i++)
             {
                 // Retrieve Value
-                Success = SteamUGC.GetQueryUGCResult(_queryHandle, i, out var result);
-                Result.Add(result);
+                if (SteamUGC.GetQueryUGCResult(_queryHandle, i, out var result))
+                {
+                    Result.Add(result);
+                }
             }
 
             SteamUGC.ReleaseQueryUGCRequest(_queryHandle);
@@ -87,6 +96,13 @@ namespace XCOM2Launcher.Steam
 
         private void QueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
         {
+            Success = pCallback.m_eResult == EResult.k_EResultOK;
+            
+            if (!Success)
+            {
+                Log.Warn("SendQueryUGCRequest result was " + pCallback.m_eResult);
+            }
+
             Finished = true;
         }
     }
