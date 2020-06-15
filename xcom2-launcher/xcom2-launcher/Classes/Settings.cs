@@ -197,6 +197,9 @@ namespace XCOM2Launcher
 
         public void SaveFile(string file)
         {
+            // Remember current state for next session.
+            Mods?.All?.ToList().ForEach(mod => mod.PreviousState = mod.State);
+
             var settings = new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Ignore,

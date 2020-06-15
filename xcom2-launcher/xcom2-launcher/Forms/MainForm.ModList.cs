@@ -171,14 +171,14 @@ namespace XCOM2Launcher.Forms
         {
             var mod = (ModEntry) rowobject;
 
-            if (mod.State.HasFlag(ModState.NotLoaded))
-                return "Not loaded";
-
             if (mod.State.HasFlag(ModState.Downloading))
                 return "Downloading";
 
             if (mod.State.HasFlag(ModState.NotInstalled))
                 return "Not installed";
+
+            if (mod.State.HasFlag(ModState.NotLoaded))
+                return "Not loaded";
 
             if (mod.State.HasFlag(ModState.MissingDependencies) && mod.isActive)
                 return "Missing dep";
@@ -461,6 +461,7 @@ namespace XCOM2Launcher.Forms
                 else
                 {
                     mod.AddState(ModState.NotInstalled);
+                    modlist_ListObjectListView.RefreshObject(mod);
                 }
 
                 // delete files
@@ -482,7 +483,7 @@ namespace XCOM2Launcher.Forms
                 }
             }
 
-            RefreshModList();
+            //RefreshModList();
             UpdateConflictInfo();
         }
 
