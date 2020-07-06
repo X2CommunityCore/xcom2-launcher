@@ -17,7 +17,7 @@ namespace XCOM2Launcher.Mod
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModInfo));
         public const string DEFAULT_CATEGORY_NAME = "Unsorted";
 
-        public int PublishedFileID { get; set; } = -1;
+        public long PublishedFileID { get; set; } = -1;
         public string Title { get; set; }
         public string Category { get; set; } = DEFAULT_CATEGORY_NAME;
         public string Description { get; set; } = "";
@@ -100,7 +100,7 @@ namespace XCOM2Launcher.Mod
 
             if (keyValPairs.ContainsKey("publishedfileid") && !string.IsNullOrEmpty(keyValPairs["publishedfileid"]))
             {
-                if (int.TryParse(keyValPairs["publishedfileid"], out var publishId))
+                if (long.TryParse(keyValPairs["publishedfileid"], out var publishId))
                 {
                     PublishedFileID = publishId;
                 }
