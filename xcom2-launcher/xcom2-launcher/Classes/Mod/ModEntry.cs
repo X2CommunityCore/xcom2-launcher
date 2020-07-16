@@ -423,27 +423,23 @@ namespace XCOM2Launcher.Mod
         {
             try
             {
+                var readmePathTxt = FilePath.Combine(Path, "ReadMe.txt");
+                var readmePathMd = FilePath.Combine(Path, "ReadMe.md");
+
+                if (File.Exists(readmePathTxt))
+                {
+                    return File.ReadAllText(readmePathTxt);
+                }
                 
-		var readmePathTXT = FilePath.Combine(Path, "ReadMe.txt");
-		var readmePathMD = FilePath.Combine(Path, "ReadMe.md");
+                if (File.Exists(readmePathMd))
+                {
+                    return File.ReadAllText(readmePathMd);
+                }
 
-		if (File.Exists(readmePathTXT)) {
-
-                	return File.ReadAllText(readmePathTXT);
-
-		} else if (File.Exists(readmePathMD)) {
-
-			return File.ReadAllText(readmePathMD);
-
-		} else {
-
-			return "No ReadMe found.";
-		}
-		    
-            }
+                return "No ReadMe found.";            }
             catch (Exception ex)
             {
-                return "Unable to access ReadMe.txt - " + ex.Message;
+                return "Unable to access ReadMe file - " + ex.Message;
             }
         }
 
