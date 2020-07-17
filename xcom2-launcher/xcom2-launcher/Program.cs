@@ -431,16 +431,29 @@ namespace XCOM2Launcher
                     settings.Mods.UpdatedModDependencyState(mod);
                 }
 
-                var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();
-                if (newlyBrokenMods.Count > 0)
-                {
-                    if (newlyBrokenMods.Count == 1)
-                        FlexibleMessageBox.Show($"The mod '{newlyBrokenMods[0].Name}' no longer exists and has been hidden.");
-                    else
-                        FlexibleMessageBox.Show($"{newlyBrokenMods.Count} mods no longer exist and have been hidden:\r\n\r\n" + string.Join("\r\n", newlyBrokenMods.Select(m => m.Name)));
+                var newMissingMods = settings.Mods.All.Where(m => (m.State.HasFlag(ModState.NotLoaded) || m.State.HasFlag(ModState.NotInstalled)) &&
+                                                               (!m.PreviousState.HasFlag(ModState.NotLoaded) && !m.PreviousState.HasFlag(ModState.NotInstalled))).ToList();
 
-                    foreach (var m in newlyBrokenMods)
-                        m.isHidden = true;
+                // Ask if newly missing mods should be hidden
+                if (newMissingMods.Any(m => !m.isHidden))
+                {
+                    string message;
+                    
+                    if (newMissingMods.Count == 1)
+                    {
+                        message = $"The mod '{newMissingMods.FirstOrDefault()?.Name}' no longer exists.\n\nDo you want to hide this mod from the mod list?";
+                    }
+                    else
+                    {
+                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- " + string.Join("\n- ", newMissingMods.Select(m => m.Name)) + "\n\nDo you want to hide these mods from the mod list?";
+                    }
+
+                    var result = MessageBox.Show(message, "Missing mods", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        newMissingMods.ForEach(m => m.isHidden = true);
+                    }
                 }
             }
 

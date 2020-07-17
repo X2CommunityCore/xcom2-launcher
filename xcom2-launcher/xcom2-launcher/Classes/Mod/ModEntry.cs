@@ -32,8 +32,17 @@ namespace XCOM2Launcher.Mod
         [DefaultValue(-1)]
         public int Index { get; set; } = -1;
 
+        /// <summary>
+        /// This state is re-evaluated on each application start.
+        /// </summary>
         [JsonIgnore]
         public ModState State { get; private set; } = ModState.None;
+        
+        /// <summary>
+        /// The value of <see cref="State"/> is copied to this property when the settings are saved.
+        /// This can be used to compare the re-evaluated mod state against its previous state on application start.
+        /// </summary>
+        public ModState PreviousState { get; set; } = ModState.None;
 
         public string ID { get; set; }
         public string Name { get; set; }
