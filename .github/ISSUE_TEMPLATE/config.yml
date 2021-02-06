@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Wiki
+    url: https://github.com/X2CommunityCore/xcom2-launcher/wiki
+    about: If you need help getting started or about using AML in general, please check the Wiki.
+  - name: Forum / Discussions
+    url: https://github.com/X2CommunityCore/xcom2-launcher/discussions
+    about: Consider starting a discussion instead of creating a new issue, if you do not have a concrete bug to report or a specific feature request to propose.
+  - name: Discord Chat - XCOM 2 Modding Community
+    url: https://discord.gg/QHSVGRn
+    about: If you need help with AML, with troubleshooting your mod setup or just want to chat with like-minded people, consider joining the XCOM 2 Modding Discord server.
