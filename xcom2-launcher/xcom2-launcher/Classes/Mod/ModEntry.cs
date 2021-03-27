@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using HeyRed.MarkdownSharp;
 using Newtonsoft.Json;
 using Steamworks;
 using XCOM2Launcher.Helper;
@@ -437,15 +436,30 @@ namespace XCOM2Launcher.Mod
 
                 if (File.Exists(readmePathTxt))
                 {
-                    return File.ReadAllText(readmePathTxt);
+                    string readmeText = File.ReadAllText(readmePathTxt);
+
+                    if (readmeText.Contains("You created an XCOM 2 Mod Project!"))
+                    {
+                        return "The mod author did not provide additional information.";
+                    }
+
+                    return readmeText;
                 }
                 
                 if (File.Exists(readmePathMd))
                 {
-                    return File.ReadAllText(readmePathMd);
+                    string readmeText = File.ReadAllText(readmePathMd);
+
+                    if (readmeText.Contains("Describe specific features of your mod."))
+                    {
+                        return "The mod author did not provide additional information.";
+                    }
+
+                    return readmeText;
                 }
 
-                return "No ReadMe found.";            }
+                return "No ReadMe found.";
+            }
             catch (Exception ex)
             {
                 return "Unable to access ReadMe file - " + ex.Message;

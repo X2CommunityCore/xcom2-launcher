@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace XCOM2Launcher.Helper {
     internal static class Tools {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Tools));
-
+        
         public static void StartProcess(string fileName, string arguments = "")
         {
             try
@@ -31,6 +27,24 @@ namespace XCOM2Launcher.Helper {
             }
 
         }
+
+        public static void HandleNavigateWebBrowserControl(object sender, WebBrowserNavigatingEventArgs args)
+        {
+            string url = args.Url.ToString();
+
+            if (url.Equals("about:blank", System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                return;
+            }
+                
+            //cancel the current event
+            args.Cancel = true;
+
+            // open URLs in the user's default browser
+            //Process.Start(e.Url.ToString());
+            StartProcess(args.Url.ToString());
+        }
+
 
         /// <summary>
         /// Writes the text <paramref name="content"/> to the file specified in <paramref name="path"/>.
