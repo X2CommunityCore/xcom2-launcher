@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -143,9 +144,7 @@ namespace XCOM2Launcher.Mod
 
             if (CleanBBCode)
             {
-                dsc = dsc.Replace(@"\", @"\'5c");
-                dsc = dsc.Replace(@"{", @"\'7b");
-                dsc = dsc.Replace(@"}", @"\'7d");
+                dsc = Tools.GetRtfEscapedString(dsc);
                 Regex Regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
                 dsc = Regexp.Replace(dsc, RTFEvaluator);
                 Regex replace_linebreaks = new Regex(@"[\r\n]{1,2}");

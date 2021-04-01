@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -83,5 +84,31 @@ namespace XCOM2Launcher.Helper {
                 File.Move(tempFileName, path);
             }
         }
+
+        public static string GetRtfEscapedString(string s)
+        {
+            var sb = new StringBuilder();
+            
+            foreach (var c in s)
+            {
+                if(c == '\\' || c == '{' || c == '}')
+                {
+                    // \, { and } are RTF control chars and need to be escaped
+                    sb.Append(@"\" + c);
+                }
+                else if (c <= 0x7f)
+                {
+                    sb.Append(c);
+                }
+                else
+                {
+                    // In RTF, everything char above 7-bit ASCII needs to be escaped
+                    sb.Append("\\u" + Convert.ToUInt32(c) + "?");
+                }
+            }
+
+            return sb.ToString();
+        }
+
     }
 }
