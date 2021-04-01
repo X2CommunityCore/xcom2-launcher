@@ -7,11 +7,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using JR.Utils.GUI.Forms;
 using Newtonsoft.Json;
 using Semver;
 using Sentry;
-using Sentry.Protocol;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Classes.Steam;
@@ -171,7 +169,7 @@ namespace XCOM2Launcher
 
                 sentrySdkInstance = SentrySdk.Init(o =>
                 {
-                    o.Dsn = new Dsn("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084");
+                    o.Dsn = "https://3864ad83bed947a2bc16d88602ac0d87@o269373.ingest.sentry.io/1478084";
                     o.Release = "AML@" + GitVersionInfo.SemVer;     // prefix because releases are global per organization
                     o.Debug = false;
                     o.Environment = environment;
