@@ -48,9 +48,12 @@ namespace XCOM2Launcher
             }
         }
 
+        /// <summary>
+        /// Path to installation directory (i.e. ...\steamapps\common\XCOM 2)
+        /// </summary>
         public string GamePath
         {
-            get { return _gamePath; }
+            get => _gamePath;
             set
             {
                 _gamePath = value;
