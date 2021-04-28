@@ -164,7 +164,6 @@
     <Compile Include="Classes\GlobalSettings.cs" />
     <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
     <Compile Include="Classes\Helper\GitVersionInfo.cs" />
-    <Compile Include="Classes\Helper\MessageBoxManager.cs" />
     <Compile Include="Classes\Helper\Tools.cs" />
     <Compile Include="Classes\Log4Net\AssemblyExtensions.cs" />
     <Compile Include="Classes\Log4Net\Constants.cs" />

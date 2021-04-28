@@ -299,32 +299,7 @@ namespace XCOM2Launcher
         public static Settings InitializeSettings()
         {
             var firstRun = !File.Exists("settings.json");
-
             var settings = firstRun ? new Settings() : Settings.Instance;
-
-            // Logic behind this:
-            // If the field ShowUpgradeWarning doesn't exists in the loaded settings file; it will be initialized to its default value "true".
-            // In that case, an old incompatible settings version is assumed and we report a warning.
-            if (settings.ShowUpgradeWarning && !firstRun)
-            {
-                Log.Warn("Incompatible settings.json");
-
-                MessageBoxManager.Cancel = "Exit";
-                MessageBoxManager.OK = "Continue";
-                MessageBoxManager.Register();
-                var choice = MessageBox.Show("This launcher version is NOT COMPATIBLE with the old 'settings.json' file.\n" +
-                                             "Stop NOW and launch the old version to export a profile of your mods INCLUDING GROUPS!\n" +
-                                             "Once that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\n" +
-                                             "After loading, import the profile you saved to recover groups.\n\n" +
-                                             "If you are not ready to do this, click 'Exit' to leave with no changes.",
-                                             "WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
-
-                if (choice == DialogResult.Cancel)
-                    Environment.Exit(0);
-
-                Log.Warn("User ignored incompatibility");
-                MessageBoxManager.Unregister();
-            }
 
             if (!firstRun)
             {
@@ -344,7 +319,6 @@ namespace XCOM2Launcher
             }
 
             settings.Game = XEnv.Game;
-            settings.ShowUpgradeWarning = false;
 
             // Verify Game Path
             if (!Directory.Exists(settings.GamePath))

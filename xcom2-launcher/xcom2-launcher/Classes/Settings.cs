@@ -90,8 +90,6 @@ namespace XCOM2Launcher
         
         public bool IncludeAlphaVersions { get; set; } = false;
 
-        public bool ShowUpgradeWarning { get; set; } = true;
-
         public bool ShowHiddenElements { get; set; } = false;
 
         public bool ShowStateFilter { get; set; } = true;
