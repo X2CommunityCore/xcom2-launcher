@@ -664,12 +664,16 @@ namespace XCOM2Launcher.Mod
                     else
                     {
                         var details = Workshop.GetDetails((ulong)id);
-
-                        if (details.m_nPublishedFileId.m_PublishedFileId != 0)
+                        
+                        if (details.m_eResult == EResult.k_EResultOK)
                         {
                             var newMod = new ModEntry(details);
                             requiredMods.Add(newMod);
                             _DependencyCache.Add(newMod);
+                        }
+                        else
+                        {
+                            Log.Warn($"Workshop request for WorkshopId={id} failed with result '{details.m_eResult}'");
                         }
                     }
                 }
