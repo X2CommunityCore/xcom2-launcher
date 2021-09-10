@@ -110,5 +110,23 @@ namespace XCOM2Launcher.Helper {
             return sb.ToString();
         }
 
+        public static bool CompareDirectories(string dir1, string dir2)
+        {
+            if (dir1 == null || dir2 == null)
+            {
+                return false;
+            }
+
+            // Trim/ignore trailing directory separators for the comparison
+            dir1 = dir1.TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar);
+            dir2 = dir2.TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar);
+
+            // Create DirectoryInfo to get a consistent directory style for comparison
+            var dirInfo1 = new DirectoryInfo(dir1);
+            var dirInfo2 = new DirectoryInfo(dir2);
+            var result = string.Compare(dirInfo1.FullName, dirInfo2.FullName, StringComparison.InvariantCultureIgnoreCase);
+
+            return result == 0;
+        }
     }
 }

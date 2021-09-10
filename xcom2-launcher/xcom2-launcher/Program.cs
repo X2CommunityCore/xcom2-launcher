@@ -36,6 +36,25 @@ namespace XCOM2Launcher
             #endif
 
             Log.Info($"Application started (AML {GitVersionInfo.FullSemVer} {GitVersionInfo.Sha})");
+            Log.Info($"Executable location: '{Application.ExecutablePath}'");
+
+            // If AML stores files to the "working directory", we actually want them to end up in the executable folder.
+            // So if the working directory does not match the executable path, we change it manually.
+            try
+            {
+                var exeDir = Path.GetDirectoryName(Application.ExecutablePath);
+                var workingDir = Directory.GetCurrentDirectory();
+
+                if (!Tools.CompareDirectories(exeDir, workingDir))
+                {
+                    Log.Info($"Changing current working directory from '{workingDir}' to executable path '{exeDir}'");
+                    Directory.SetCurrentDirectory(exeDir!);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed changing working directory", ex);
+            }
         }
 
         /// <summary>
@@ -329,6 +348,9 @@ namespace XCOM2Launcher
                 Log.Warn("Unable to detect installation path");
                 MessageBox.Show(@"Could not detect path to installation directory. Please select it manually from the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            Log.Info($"Game: {settings.Game}");
+            Log.Info($"GamePath: {settings.GamePath}");
 
             // Make sure, that all mod paths have a trailing backslash
             var pathsWithMissingTrailingBackSlash = settings.ModPaths.Where(m => !m.EndsWith(@"\")).ToList();
