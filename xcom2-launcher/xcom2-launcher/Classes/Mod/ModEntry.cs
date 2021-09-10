@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using HeyRed.MarkdownSharp;
 using Newtonsoft.Json;
 using Steamworks;
 using XCOM2Launcher.Helper;
@@ -468,19 +466,14 @@ namespace XCOM2Launcher.Mod
 		/// <summary>
 		/// Returns a relative path to this mod's folder.
 		/// </summary>
-		/// <param name="relativeTo"></param>
+		/// <param name="target"></param>
 		/// <returns></returns>
-		public string GetPathRelative(string relativeTo)
+		public string GetPathRelative(string target)
 		{
-			Uri modPath = new Uri(relativeTo);
-			Uri filePath = new Uri(Path);
-			var relativePath = filePath.MakeRelativeUri(modPath).ToString();
-
-			// Trim off the mod ID number, it's not useful here
-			int i = relativePath.IndexOf("Config", StringComparison.Ordinal);
-			relativePath = relativePath.Substring(i);
-
-			return Uri.UnescapeDataString(relativePath);
+			var targetUri = new Uri(target);
+			var modUri = new Uri(Path.TrimEnd(FilePath.DirectorySeparatorChar, FilePath.AltDirectorySeparatorChar) + FilePath.DirectorySeparatorChar);
+			var relativeUri = modUri.MakeRelativeUri(targetUri).ToString();
+            return Uri.UnescapeDataString(relativeUri);
 		}
 
 		/// <summary>
