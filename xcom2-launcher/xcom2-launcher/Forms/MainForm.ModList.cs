@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -804,6 +805,43 @@ namespace XCOM2Launcher.Forms
             MenuItem restoreDuplicates = null;
             MenuItem resubscribeItem = null;
             MenuItem unsubscribeItem = null;
+            MenuItem copyToClipboard = new MenuItem("Copy to clipboard");
+
+            copyToClipboard.MenuItems.Add("Name", delegate
+            {
+                StringBuilder sb = new StringBuilder();
+                selectedMods.Aggregate(sb, (result, item) => sb.Append(item.Name + Environment.NewLine));
+                Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
+            });
+
+            copyToClipboard.MenuItems.Add("Path", delegate
+            {
+                StringBuilder sb = new StringBuilder();
+                selectedMods.Aggregate(sb, (result, item) => sb.Append(item.Path + Environment.NewLine));
+                Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
+            });
+
+            copyToClipboard.MenuItems.Add("Steam URL", delegate
+            {
+                StringBuilder sb = new StringBuilder();
+                selectedMods.ForEach(mod =>
+                {
+                    sb.Append(mod.WorkshopID > 0 ? mod.GetSteamLink() : "N/A");
+                    sb.Append(Environment.NewLine);
+                });
+                Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
+            });
+        
+            copyToClipboard.MenuItems.Add("Browser URL", delegate
+            {
+                StringBuilder sb = new StringBuilder();
+                selectedMods.ForEach(mod =>
+                {
+                    sb.Append(mod.WorkshopID > 0 ? mod.GetWorkshopLink() : "N/A");
+                    sb.Append(Environment.NewLine);
+                });
+                Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
+            });
 
             // create items that appear only when a single mod is selected
             if (selectedMods.Count == 1)
@@ -901,7 +939,7 @@ namespace XCOM2Launcher.Forms
             };
 
             // Move to ...
-            var moveToCategoryItem = new MenuItem("Move to category...");
+            var moveToCategoryItem = new MenuItem("Move to category");
             // ... new category
             moveToCategoryItem.MenuItems.Add("New category", delegate
             {
@@ -1093,6 +1131,15 @@ namespace XCOM2Launcher.Forms
 
                     menu.MenuItems.Add(restoreDuplicates);
                 }
+            }
+
+            if (copyToClipboard.MenuItems.Count > 0)
+            {
+                // prevent double separator
+                if (menu.MenuItems[menu.MenuItems.Count - 1].Text != @"-")
+                    menu.MenuItems.Add("-");
+
+                menu.MenuItems.Add(copyToClipboard);
             }
 
             return menu;
