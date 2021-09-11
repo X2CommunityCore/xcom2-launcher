@@ -215,11 +215,7 @@ namespace XCOM2Launcher.Forms
 
                     // refresh/update settings dependent functions
                     RefreshModList();
-                    showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
-                    modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-                    olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-                    olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-                    cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
+                    InitMainGui(Settings);
                     InitQuickArgumentsMenu(Settings);
 
                     if (dialog.IsRestartRequired)

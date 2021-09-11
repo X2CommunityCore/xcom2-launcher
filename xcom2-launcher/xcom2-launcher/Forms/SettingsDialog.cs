@@ -37,6 +37,8 @@ namespace XCOM2Launcher.Forms
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
             useDuplicateModWorkaround.Checked = settings.EnableDuplicateModIdWorkaround;
             useTranslucentModListSelection.Checked = settings.UseTranslucentModListSelection;
+            hideChallengeModeButton.Checked = Settings.HideChallengeModeButton;
+            hideRunX2Button.Checked = Settings.HideXcom2Button;
 
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
@@ -154,6 +156,8 @@ namespace XCOM2Launcher.Forms
             Settings.UseTranslucentModListSelection = useTranslucentModListSelection.Checked;
             Settings.GamePath = gamePathTextBox.Text;
             Settings.ModPaths = newModPaths;
+            Settings.HideChallengeModeButton = hideChallengeModeButton.Checked;
+            Settings.HideXcom2Button = hideRunX2Button.Checked;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
             Settings.ArgumentList = newArguments.AsReadOnly();
