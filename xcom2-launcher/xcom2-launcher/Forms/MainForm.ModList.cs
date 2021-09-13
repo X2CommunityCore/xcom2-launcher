@@ -694,16 +694,16 @@ namespace XCOM2Launcher.Forms
             }
         }
         
-        private ContextMenu CreateModListContextMenu(ModEntry m, ModTag tag)
+        private ContextMenuStrip CreateModListContextMenu(ModEntry m, ModTag tag)
         {
-            var menu = new ContextMenu();
+            var menu = new ContextMenuStrip();
             if (m?.ID == null || tag == null)
                 return menu;
             
             // change color
-            var changeColorItem = new MenuItem("Change color");
+            var changeColorItem = new ToolStripMenuItem("Change color");
 
-            var editColor = new MenuItem("Edit");
+            var editColor = new ToolStripMenuItem("Edit");
 
             editColor.Click += (sender, e) =>
             {
@@ -719,50 +719,50 @@ namespace XCOM2Launcher.Forms
                     tag.Color = colorPicker.Color;
             };
 
-            changeColorItem.MenuItems.Add(editColor);
+            changeColorItem.DropDownItems.Add(editColor);
 
-            var makePastelItem = new MenuItem("Make pastel");
+            var makePastelItem = new ToolStripMenuItem("Make pastel");
 
             makePastelItem.Click += (sender, e) => tag.Color = tag.Color.GetPastelShade();
 
-            changeColorItem.MenuItems.Add(makePastelItem);
+            changeColorItem.DropDownItems.Add(makePastelItem);
 
-            var changeShadeItem = new MenuItem("Random shade");
+            var changeShadeItem = new ToolStripMenuItem("Random shade");
 
             changeShadeItem.Click += (sender, e) => tag.Color = tag.Color.GetRandomShade(0.33, 1.0);
 
-            changeColorItem.MenuItems.Add(changeShadeItem);
+            changeColorItem.DropDownItems.Add(changeShadeItem);
 
-            var randomColorItem = new MenuItem("Random color");
+            var randomColorItem = new ToolStripMenuItem("Random color");
 
             randomColorItem.Click += (sender, e) => tag.Color = ModTag.RandomColor();
 
-            changeColorItem.MenuItems.Add(randomColorItem);
-            menu.MenuItems.Add(changeColorItem);
+            changeColorItem.DropDownItems.Add(randomColorItem);
+            menu.Items.Add(changeColorItem);
 
-            menu.MenuItems.Add("-");
+            menu.Items.Add("-");
 
             // renaming tags
-            var renameTagItem = new MenuItem($"Rename '{tag.Label}'");
+            var renameTagItem = new ToolStripMenuItem($"Rename '{tag.Label}'");
 
             renameTagItem.Click += (sender, e) => RenameTagPrompt(m, tag, false);
 
-            menu.MenuItems.Add(renameTagItem);
+            menu.Items.Add(renameTagItem);
 
-            var renameAllTagItem = new MenuItem($"Rename all '{tag.Label}'");
+            var renameAllTagItem = new ToolStripMenuItem($"Rename all '{tag.Label}'");
 
             renameAllTagItem.Click += (sender, e) => RenameTagPrompt(m, tag, true);
-            menu.MenuItems.Add(renameAllTagItem);
+            menu.Items.Add(renameAllTagItem);
 
-            menu.MenuItems.Add("-");
+            menu.Items.Add("-");
 
             // removing tags
-            var removeTagItem = new MenuItem($"Remove '{tag.Label}'");
+            var removeTagItem = new ToolStripMenuItem($"Remove '{tag.Label}'");
 
             removeTagItem.Click += (sender, args) => m.Tags.Remove(tag.Label);
-            menu.MenuItems.Add(removeTagItem);
+            menu.Items.Add(removeTagItem);
             
-            var removeAllTagItem = new MenuItem($"Remove all '{tag.Label}'");
+            var removeAllTagItem = new ToolStripMenuItem($"Remove all '{tag.Label}'");
 
             removeAllTagItem.Click += (sender, args) =>
             {
@@ -781,48 +781,48 @@ namespace XCOM2Launcher.Forms
                     }
                 }
             };
-            menu.MenuItems.Add(removeAllTagItem);
+            menu.Items.Add(removeAllTagItem);
 
             return menu;
         }
 
-        private ContextMenu CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
+        private ContextMenuStrip CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
         {
-            var menu = new ContextMenu();
-
+            var menu = new ContextMenuStrip();
+            
             if (m?.ID == null)
                 return menu;
 
             var selectedMods = ModList.SelectedObjects.ToList();
 
-            MenuItem renameItem = null;
-            MenuItem showInExplorerItem = null;
-            MenuItem showOnSteamItem = null;
-            MenuItem showInBrowser = null;
-            MenuItem fetchWorkshopTagsItem = null;
-            MenuItem enableAllItem = null;
-            MenuItem disableAllItem = null;
-            MenuItem disableDuplicates = null;
-            MenuItem restoreDuplicates = null;
-            MenuItem resubscribeItem = null;
-            MenuItem unsubscribeItem = null;
-            MenuItem copyToClipboard = new MenuItem("Copy to clipboard");
+            ToolStripMenuItem renameItem = null;
+            ToolStripMenuItem showInExplorerItem = null;
+            ToolStripMenuItem showOnSteamItem = null;
+            ToolStripMenuItem showInBrowser = null;
+            ToolStripMenuItem fetchWorkshopTagsItem = null;
+            ToolStripMenuItem enableAllItem = null;
+            ToolStripMenuItem disableAllItem = null;
+            ToolStripMenuItem disableDuplicates = null;
+            ToolStripMenuItem restoreDuplicates = null;
+            ToolStripMenuItem resubscribeItem = null;
+            ToolStripMenuItem unsubscribeItem = null;
+            ToolStripMenuItem copyToClipboard = new ToolStripMenuItem("Copy to clipboard");
 
-            copyToClipboard.MenuItems.Add("Name", delegate
+            copyToClipboard.DropDownItems.Add("Name", null, delegate
             {
                 StringBuilder sb = new StringBuilder();
                 selectedMods.Aggregate(sb, (result, item) => sb.Append(item.Name + Environment.NewLine));
                 Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
             });
 
-            copyToClipboard.MenuItems.Add("Path", delegate
+            copyToClipboard.DropDownItems.Add("Path", null, delegate
             {
                 StringBuilder sb = new StringBuilder();
                 selectedMods.Aggregate(sb, (result, item) => sb.Append(item.Path + Environment.NewLine));
                 Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
             });
 
-            copyToClipboard.MenuItems.Add("Steam URL", delegate
+            copyToClipboard.DropDownItems.Add("Steam URL", null, delegate
             {
                 StringBuilder sb = new StringBuilder();
                 selectedMods.ForEach(mod =>
@@ -833,7 +833,7 @@ namespace XCOM2Launcher.Forms
                 Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
             });
         
-            copyToClipboard.MenuItems.Add("Browser URL", delegate
+            copyToClipboard.DropDownItems.Add("Browser URL", null, delegate
             {
                 StringBuilder sb = new StringBuilder();
                 selectedMods.ForEach(mod =>
@@ -847,18 +847,18 @@ namespace XCOM2Launcher.Forms
             // create items that appear only when a single mod is selected
             if (selectedMods.Count == 1)
             {
-                renameItem = new MenuItem("Rename");
+                renameItem = new ToolStripMenuItem("Rename");
                 renameItem.Click += (a, b) => { modlist_ListObjectListView.EditSubItem(currentItem, olvcName.Index); };
 
                 if (!m.State.HasFlag(ModState.NotInstalled))
                 {
-                    showInExplorerItem = new MenuItem("Show in Explorer", delegate { m.ShowInExplorer(); });
+                    showInExplorerItem = new ToolStripMenuItem("Show in Explorer", null, delegate { m.ShowInExplorer(); });
                 }
 
                 if (m.WorkshopID > 0)
                 {
-                    showOnSteamItem = new MenuItem("Show on Steam", delegate { m.ShowOnSteam(); });
-                    showInBrowser = new MenuItem("Show in Browser", delegate { m.ShowInBrowser(); });
+                    showOnSteamItem = new ToolStripMenuItem("Show on Steam", null, delegate { m.ShowOnSteam(); });
+                    showInBrowser = new ToolStripMenuItem("Show in Browser", null, delegate { m.ShowInBrowser(); });
                 }
 
                 var duplicateMods = Mods.All.Where(mod => mod.ID == m.ID && mod != m).ToList();
@@ -866,7 +866,7 @@ namespace XCOM2Launcher.Forms
                 {
                     if (!m.State.HasFlag(ModState.DuplicatePrimary))
                     {
-                        disableDuplicates = new MenuItem("Prefer this duplicate");
+                        disableDuplicates = new ToolStripMenuItem("Prefer this duplicate");
                         disableDuplicates.Click += delegate
                         {
                             // disable all other duplicates
@@ -893,7 +893,7 @@ namespace XCOM2Launcher.Forms
 
                     if (m.State.HasFlag(ModState.DuplicatePrimary) || m.State.HasFlag(ModState.DuplicateDisabled))
                     {
-                        restoreDuplicates = new MenuItem("Restore duplicates");
+                        restoreDuplicates = new ToolStripMenuItem("Restore duplicates");
                         restoreDuplicates.Click += delegate
                         {
                             // restore normal duplicate state
@@ -920,7 +920,7 @@ namespace XCOM2Launcher.Forms
                 }
             }
 
-            MenuItem addTagItem = new MenuItem("Add tag(s)...");
+            var addTagItem = new ToolStripMenuItem("Add tag(s)...");
             addTagItem.Click += (sender, args) =>
             {
                 var newTag = Interaction.InputBox($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedMods.Count} selected mod(s).", "Add tag(s)");
@@ -940,9 +940,9 @@ namespace XCOM2Launcher.Forms
             };
 
             // Move to ...
-            var moveToCategoryItem = new MenuItem("Move to category");
+            var moveToCategoryItem = new ToolStripMenuItem("Move to category");
             // ... new category
-            moveToCategoryItem.MenuItems.Add("New category", delegate
+            moveToCategoryItem.DropDownItems.Add("New category", null, delegate
             {
                 var category = Interaction.InputBox("Please enter the name of the new category", "Create category", "New category");
 
@@ -952,7 +952,7 @@ namespace XCOM2Launcher.Forms
                 MoveSelectedModsToCategory(category);
             });
 
-            moveToCategoryItem.MenuItems.Add("-");
+            moveToCategoryItem.DropDownItems.Add("-");
 
             // ... existing category
             foreach (var category in Settings.Mods.CategoryNames.OrderBy(c => c))
@@ -960,11 +960,11 @@ namespace XCOM2Launcher.Forms
                 if (category == Mods.GetCategory(m))
                     continue;
 
-                moveToCategoryItem.MenuItems.Add(category, delegate { MoveSelectedModsToCategory(category); });
+                moveToCategoryItem.DropDownItems.Add(category, null, delegate { MoveSelectedModsToCategory(category); });
             }
 
             // Hide/unhide
-            var toggleVisibility = new MenuItem {Text = m.isHidden ? "Unhide" : "Hide"};
+            var toggleVisibility = new ToolStripMenuItem {Text = m.isHidden ? "Unhide" : "Hide"};
             toggleVisibility.Click += delegate
             {
                 // save as new list so we can remove mods if they are being hidden
@@ -980,7 +980,7 @@ namespace XCOM2Launcher.Forms
             };
 
             // Update mods
-            var updateItem = new MenuItem("Update", delegate
+            var updateItem = new ToolStripMenuItem("Update", null, delegate
             {
                 if (IsModUpdateTaskRunning)
                 {
@@ -995,7 +995,7 @@ namespace XCOM2Launcher.Forms
             {
                 List<ModEntry> modsToUpdate = new List<ModEntry>(selectedMods.Where(mod => mod.WorkshopID > 0));
 
-                fetchWorkshopTagsItem = new MenuItem("Use workshop tags");
+                fetchWorkshopTagsItem = new ToolStripMenuItem("Use workshop tags");
                 fetchWorkshopTagsItem.Click += delegate
                 {
                     if (modsToUpdate.Count > 1)
@@ -1033,20 +1033,22 @@ namespace XCOM2Launcher.Forms
                 var nonInstalledWorkShopMods = workShopMods.Where(mod => mod.State.HasFlag(ModState.NotInstalled)).ToList();
                 if (nonInstalledWorkShopMods.Any())
                 {
-                    resubscribeItem = new MenuItem("Resubscribe", delegate { ResubscribeToMods(nonInstalledWorkShopMods); });
+                    resubscribeItem = new ToolStripMenuItem("Resubscribe", null, delegate { ResubscribeToMods(nonInstalledWorkShopMods); });
+                    resubscribeItem.ToolTipText = "Re-subscribes to the selected the mod(s) in the Workshop and starts downloading.";
                 }
 
                 var installedWorkShopMods = workShopMods.Where(mod => !mod.State.HasFlag(ModState.NotInstalled)).ToList();
                 if (installedWorkShopMods.Any())
                 {
-                    unsubscribeItem = new MenuItem("Unsubscribe", delegate { ConfirmUnsubscribeMods(installedWorkShopMods); });
+                    unsubscribeItem = new ToolStripMenuItem("Unsubscribe", null, delegate { ConfirmUnsubscribeMods(installedWorkShopMods); });
+                    unsubscribeItem.ToolTipText = "Unsubscribes the selected the mod(s) from the Workshop, but keeps the mod(s) listed in AML, so you can re-subscribe later.";
                 }
             }
 
             var modsNotActive = selectedMods.Where(mod => !mod.isActive).ToList();
             if (modsNotActive.Any())
             {
-                enableAllItem = new MenuItem("Enable");
+                enableAllItem = new ToolStripMenuItem("Enable");
                 enableAllItem.Click += delegate
                 {
                     // If mods get enabled with OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
@@ -1090,7 +1092,7 @@ namespace XCOM2Launcher.Forms
             var modsActive = selectedMods.Where(mod => mod.isActive).ToList();
             if (modsActive.Any())
             {
-                disableAllItem = new MenuItem("Disable");
+                disableAllItem = new ToolStripMenuItem("Disable");
                 disableAllItem.Click += delegate
                 {
                     Cursor.Current = Cursors.WaitCursor;
@@ -1103,76 +1105,77 @@ namespace XCOM2Launcher.Forms
                 };
             }
 
-            var deleteItem = new MenuItem("Delete", delegate { ConfirmDeleteMods(selectedMods); });
+            var deleteItem = new ToolStripMenuItem("Delete", null, delegate { ConfirmDeleteMods(selectedMods); });
+            deleteItem.ToolTipText = "Unsubscribes the selected mod(s) from the Workshop, deletes the mod folder(s) and removes the mod(s) from AML.";
 
             // create menu structure
             if (enableAllItem != null)
-                menu.MenuItems.Add(enableAllItem);
+                menu.Items.Add(enableAllItem);
 
             if (disableAllItem != null)
-                menu.MenuItems.Add(disableAllItem);
+                menu.Items.Add(disableAllItem);
 
             if (renameItem != null)
-                menu.MenuItems.Add(renameItem);
+                menu.Items.Add(renameItem);
 
-            menu.MenuItems.Add(updateItem);
-            menu.MenuItems.Add("-");
-            menu.MenuItems.Add(addTagItem);
+            menu.Items.Add(updateItem);
+            menu.Items.Add("-");
+            menu.Items.Add(addTagItem);
 
             if (fetchWorkshopTagsItem != null)
-                menu.MenuItems.Add(fetchWorkshopTagsItem);
+                menu.Items.Add(fetchWorkshopTagsItem);
 
-            menu.MenuItems.Add(moveToCategoryItem);
-            menu.MenuItems.Add("-");
+            menu.Items.Add(moveToCategoryItem);
+            menu.Items.Add("-");
 
             if (showInExplorerItem != null)
-                menu.MenuItems.Add(showInExplorerItem);
+                menu.Items.Add(showInExplorerItem);
 
             if (showOnSteamItem != null)
-                menu.MenuItems.Add(showOnSteamItem);
+                menu.Items.Add(showOnSteamItem);
 
             if (showInBrowser != null)
-                menu.MenuItems.Add(showInBrowser);
+                menu.Items.Add(showInBrowser);
 
             // prevent double separator
-            if (menu.MenuItems[menu.MenuItems.Count - 1].Text != @"-")
-                menu.MenuItems.Add("-");
+            if (menu.Items[menu.Items.Count - 1].Text != @"-")
+                menu.Items.Add("-");
 
-            menu.MenuItems.Add(toggleVisibility);
+            menu.Items.Add(toggleVisibility);
 
             if (resubscribeItem != null)
-                menu.MenuItems.Add(resubscribeItem);
+                menu.Items.Add(resubscribeItem);
 
             if (unsubscribeItem != null)
-                menu.MenuItems.Add(unsubscribeItem);
+                menu.Items.Add(unsubscribeItem);
 
-            menu.MenuItems.Add(deleteItem);
+            menu.Items.Add(deleteItem);
 
             if (Settings.EnableDuplicateModIdWorkaround)
             {
                 if (disableDuplicates != null)
                 {
-                    menu.MenuItems.Add("-");
-                    menu.MenuItems.Add(disableDuplicates);
+                    menu.Items.Add("-");
+                    menu.Items.Add(disableDuplicates);
                 }
 
                 if (restoreDuplicates != null)
                 {
                     // prevent double separator
-                    if (menu.MenuItems[menu.MenuItems.Count - 1] != disableDuplicates)
-                        menu.MenuItems.Add("-");
+                    if (menu.Items[menu.Items.Count - 1] != disableDuplicates)
+                        menu.Items.Add("-");
 
-                    menu.MenuItems.Add(restoreDuplicates);
+                    menu.Items.Add(restoreDuplicates);
                 }
             }
 
-            if (copyToClipboard.MenuItems.Count > 0)
+            if (copyToClipboard.DropDownItems.Count > 0)
             {
                 // prevent double separator
-                if (menu.MenuItems[menu.MenuItems.Count - 1].Text != @"-")
-                    menu.MenuItems.Add("-");
+                if (menu.Items[menu.Items.Count - 1].Text != @"-")
+                    menu.Items.Add("-");
 
-                menu.MenuItems.Add(copyToClipboard);
+                menu.Items.Add(copyToClipboard);
             }
 
             return menu;
