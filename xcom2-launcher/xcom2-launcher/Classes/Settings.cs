@@ -85,41 +85,26 @@ namespace XCOM2Launcher
         public List<string> QuickToggleArguments { get; set; } = new List<string>();
 
         public bool CheckForUpdates { get; set; } = true;
-        
-        public bool CheckForPreReleaseUpdates { get; set; } = false;
-        
-        public bool IncludeAlphaVersions { get; set; } = false;
-
-        public bool ShowHiddenElements { get; set; } = false;
-
+        public bool CheckForPreReleaseUpdates { get; set; }
+        public bool IncludeAlphaVersions { get; set; }
+        public bool ShowHiddenElements { get; set; }
         public bool ShowStateFilter { get; set; } = true;
-
         public bool UseTranslucentModListSelection { get; set; } = true;
-
         public bool ShowPrimaryDuplicateAsDependency { get; set; } = true;
-        
         public bool ShowModListGroups { get; set; } = true;
-
-        public bool CloseAfterLaunch { get; set; } = false;
-
+        public bool CloseAfterLaunch { get; set; }
         public bool AutoNumberIndexes { get; set; } = true;
-
         public bool UseSpecifiedCategories { get; set; } = true;
-
         public bool ShowQuickLaunchArguments { get; set; }
-
-        public bool LastLaunchedWotC { get; set; } = false;
-
-        public bool NeverImportTags { get; set; } = false;
-
-        public bool AllowMultipleInstances { get; set; } = false;
-
-        public bool EnableDuplicateModIdWorkaround { get; set; } = false;
-
+        public bool LastLaunchedWotC { get; set; }
+        public bool NeverImportTags { get; set; }
+        public bool AllowMultipleInstances { get; set; }
+        public bool EnableDuplicateModIdWorkaround { get; set; }
+        public bool HideXcom2Button { get; set; } = true;
+        public bool HideChallengeModeButton { get; set; } = true;
+        public bool OnlyUpdateEnabledOrNewModsOnStartup { get; set; }
         public ModList Mods { get; set; } = new ModList();
-
         public Dictionary<string, ModTag> Tags { get; set; } = new Dictionary<string, ModTag>();
-
         public Dictionary<string, WindowSettings> Windows { get; set; } = new Dictionary<string, WindowSettings>();
 
         public Settings()

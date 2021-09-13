@@ -62,7 +62,7 @@ namespace XCOM2Launcher.Classes.Mod
                 {
                     modEntry.Name = "";
                     modEntry.ManualName = false;
-                    Settings.Instance.Mods.UpdateModAsync(modEntry, Settings.Instance);
+                    _ = Settings.Instance.Mods.UpdateModAsync(modEntry, Settings.Instance);
                     PropertyChangedEventArgs e = new PropertyChangedEventArgs("Name");
                     PropertyChanged?.Invoke(this, e);
                 }

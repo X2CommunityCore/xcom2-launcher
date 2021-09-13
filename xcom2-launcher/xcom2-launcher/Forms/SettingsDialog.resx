@@ -126,4 +126,10 @@ mods that have the same ID.
 It allows you to select one of the duplicates as the primary mod and disables
 the others by renaming the XComMod file.</value>
   </data>
+  <data name="onlyUpdateEnabledAndNew.ToolTip" xml:space="preserve">
+    <value>If you enable this option, only mods that are either enabled or new, will be automatically
+updated when AML is starting. 
+If you have many mods, that you are not actively using, this can greatly reduce the time
+until AML is ready to launch the game.</value>
+  </data>
 </root>

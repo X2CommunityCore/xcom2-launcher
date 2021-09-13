@@ -12,7 +12,9 @@ namespace XCOM2Launcher.Classes
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Xcom2Env));
         
-        private string UserConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM Chimera Squad\XComGame\Config";
+        public string DataDir => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM Chimera Squad";
+        public string LogFilePath => DataDir + @"\XComGame\Logs\Launch.log";
+        private string UserConfigDir => DataDir + @"\XComGame\Config";
         public override string DefaultConfigDir => Path.Combine(GameDir, @"XComGame\Config");
 
         public XComChimeraSquadEnv() : base(GameId.ChimeraSquad)

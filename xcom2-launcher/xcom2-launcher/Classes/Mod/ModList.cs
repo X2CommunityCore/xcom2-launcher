@@ -276,9 +276,9 @@ namespace XCOM2Launcher.Mod
             Log.Info($"Mod '{mod.ID}' removed from category '{category}'");
         }
 
-        public async void UpdateModAsync(ModEntry m, Settings settings)
+        public async Task<List<ModEntry>> UpdateModAsync(ModEntry m, Settings settings)
         {
-            await UpdateModsAsync(new List<ModEntry> { m }, settings);
+            return await UpdateModsAsync(new List<ModEntry> {m}, settings);
         }
 
         public async Task<List<ModEntry>> UpdateModsAsync(List<ModEntry> mods, Settings settings, IProgress<ModUpdateProgress> progress = null, CancellationToken cancelToken = default(CancellationToken))
