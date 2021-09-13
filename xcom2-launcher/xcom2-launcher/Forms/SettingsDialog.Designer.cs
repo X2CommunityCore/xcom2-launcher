@@ -65,6 +65,7 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.hideRunX2Button = new System.Windows.Forms.CheckBox();
             this.hideChallengeModeButton = new System.Windows.Forms.CheckBox();
+            this.onlyUpdateEnabledAndNew = new System.Windows.Forms.CheckBox();
             this.quickArgumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
             this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
             this.groupBox1.SuspendLayout();
@@ -257,6 +258,7 @@
             this.tableLayoutPanel3.Controls.Add(this.autoNumberModIndexesCheckBox, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.neverAdoptTagsAndCatFromprofile, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.useDuplicateModWorkaround, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.onlyUpdateEnabledAndNew, 1, 1);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 20);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 2;
@@ -526,6 +528,19 @@
             this.hideChallengeModeButton.Text = "Hide \"Run Challenge Mode\" button";
             this.hideChallengeModeButton.UseVisualStyleBackColor = true;
             // 
+            // onlyUpdateEnabledAndNew
+            // 
+            this.onlyUpdateEnabledAndNew.AutoSize = true;
+            this.tableLayoutPanel3.SetColumnSpan(this.onlyUpdateEnabledAndNew, 2);
+            this.onlyUpdateEnabledAndNew.Location = new System.Drawing.Point(216, 29);
+            this.onlyUpdateEnabledAndNew.Name = "onlyUpdateEnabledAndNew";
+            this.onlyUpdateEnabledAndNew.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+            this.onlyUpdateEnabledAndNew.Size = new System.Drawing.Size(240, 20);
+            this.onlyUpdateEnabledAndNew.TabIndex = 18;
+            this.onlyUpdateEnabledAndNew.Text = "Only update enabled or new mods on startup";
+            this.toolTip.SetToolTip(this.onlyUpdateEnabledAndNew, resources.GetString("onlyUpdateEnabledAndNew.ToolTip"));
+            this.onlyUpdateEnabledAndNew.UseVisualStyleBackColor = true;
+            // 
             // quickArgumentsTextBox
             // 
             this.quickArgumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -621,5 +636,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.CheckBox hideRunX2Button;
         private System.Windows.Forms.CheckBox hideChallengeModeButton;
+        private System.Windows.Forms.CheckBox onlyUpdateEnabledAndNew;
     }
 }

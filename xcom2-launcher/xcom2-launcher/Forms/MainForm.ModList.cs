@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -23,10 +24,10 @@ namespace XCOM2Launcher.Forms
     {
         public ModList Mods => Settings.Mods;
         public Dictionary<string, ModTag> AvailableTags => Settings.Tags;
-
         public TypedObjectListView<ModEntry> ModList { get; private set; }
-
         public ModEntry CurrentMod;
+
+        private bool _CheckTriggeredFromContextMenu;
 
         public void InitModListView()
         {
@@ -1042,28 +1043,60 @@ namespace XCOM2Launcher.Forms
                 }
             }
 
-            if (selectedMods.Any(mod => !mod.isActive))
+            var modsNotActive = selectedMods.Where(mod => !mod.isActive).ToList();
+            if (modsNotActive.Any())
             {
                 enableAllItem = new MenuItem("Enable");
                 enableAllItem.Click += delegate
                 {
-                    Cursor.Current = Cursors.WaitCursor;
-                    foreach (var mod in selectedMods)
+                    // If mods get enabled with OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
+                    if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
                     {
-                        modlist_ListObjectListView.CheckObject(mod);
+                        if (IsModUpdateTaskRunning)
+                        {
+                            ShowModUpdateRunningMessageBox();
+                            return;
+                        }
+
+                        Log.Info($"Updating selected mods before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
+                        Cursor.Current = Cursors.WaitCursor;
+                        UpdateMods(modsNotActive, () =>
+                        {
+                            Invoke(new Action(() => 
+                            {
+                                EnabledModsInModList(modsNotActive);
+                                Cursor.Current = Cursors.Default;
+                            }));
+                        });
                     }
-                    Cursor.Current = Cursors.Default;
+                    else
+                    {
+                        EnabledModsInModList(modsNotActive);
+                    }
+
+                    void EnabledModsInModList(List<ModEntry> mods)
+                    {
+                        Cursor.Current = Cursors.WaitCursor;
+                        foreach (var mod in mods)
+                        {
+                            _CheckTriggeredFromContextMenu = true;
+                            modlist_ListObjectListView.CheckObject(mod);
+                        }
+                        Cursor.Current = Cursors.Default;
+                    }
                 };
             }
-
-            if (selectedMods.Any(mod => mod.isActive))
+            
+            var modsActive = selectedMods.Where(mod => mod.isActive).ToList();
+            if (modsActive.Any())
             {
                 disableAllItem = new MenuItem("Disable");
                 disableAllItem.Click += delegate
                 {
                     Cursor.Current = Cursors.WaitCursor;
-                    foreach (var mod in selectedMods)
+                    foreach (var mod in modsActive)
                     {
+                        _CheckTriggeredFromContextMenu = true;
                         modlist_ListObjectListView.UncheckObject(mod);
                     }
                     Cursor.Current = Cursors.Default;
@@ -1145,16 +1178,24 @@ namespace XCOM2Launcher.Forms
             return menu;
         }
 
+        /// <summary>
+        /// Check if the specified <param name="mod"></param> is eligible to switch its "enabled" state to <param name="newState"></param>.
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="newState"></param>
+        /// <returns></returns>
         bool ProcessNewModState(ModEntry mod, bool newState)
         {
             if (newState)
             {
+                // Mod can not be enabled if it is a disabled duplicate
                 if (mod.State.HasFlag(ModState.DuplicateDisabled))
                 {
                     MessageBox.Show("Disabled duplicates can not be used. Make this the primary duplicate or remove all other duplicates to use this mod.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return false;
                 }
 
+                // Mod can not be enabled if it is not installed
                 if (mod.State.HasFlag(ModState.NotInstalled))
                 {
                     return false;
@@ -1166,7 +1207,16 @@ namespace XCOM2Launcher.Forms
 
         void ProcessModListItemCheckChanged(ModEntry modChecked)
         {
-            Debug.WriteLine("ProcessModListItemCheckChanged " + modChecked.Name);
+            //Debug.WriteLine("ProcessModListItemCheckChanged " + modChecked.Name);
+
+            // If a mod gets enabled with OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
+            if (modChecked.isActive && Settings.OnlyUpdateEnabledOrNewModsOnStartup && !_CheckTriggeredFromContextMenu)
+            {
+                Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
+                Task.Run(() => Mods.UpdateModAsync(modChecked, Settings)).Wait();
+            }
+
+            _CheckTriggeredFromContextMenu = false;
 
             List<ModEntry> checkedMods = new List<ModEntry>();
             
@@ -1253,7 +1303,7 @@ namespace XCOM2Launcher.Forms
         {
             if (!(rowobject is ModEntry mod)) 
                 return !newValue;
-            
+
             newValue = ProcessNewModState(mod, newValue);
             mod.isActive = newValue;
 
@@ -1261,7 +1311,6 @@ namespace XCOM2Launcher.Forms
             // will not fire and we have to process the new state manually
             if (!ModList.Objects.Contains(mod))
             {
-                Debug.WriteLine("Manual check processing: " + mod.isActive);
                 ProcessModListItemCheckChanged(mod);
             }
 
@@ -1271,8 +1320,27 @@ namespace XCOM2Launcher.Forms
         private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
             var mod = ModList.GetModelObject(e.Item.Index);
-            
             ProcessModListItemCheckChanged(mod);
+        }
+
+        private void ModListItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+            {
+                // With OnlyUpdateEnabledOrNewModsOnStartup enabled, we prevent multiple mods from getting enabled
+                // by multiselecting and clicking on the check box. This would cause every checked mod to get updated individually,
+                // which is really slow in comparison to batch requests.
+                if (e.NewValue == CheckState.Checked && modlist_ListObjectListView.SelectedObjects.Count > 1 && !_CheckTriggeredFromContextMenu)
+                {
+                    MessageBox.Show("Use 'enable' from the right click menu to enable multiple mods at once.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Deselect all mods except this one to prevent multiple check changes
+                    modlist_ListObjectListView.SelectedIndex = e.Index;
+
+                    // Do not change the check state
+                    e.NewValue = e.CurrentValue;
+                }
+            }
         }
 
         private void ModListSelectionChanged(object sender, EventArgs e)
@@ -1303,7 +1371,7 @@ namespace XCOM2Launcher.Forms
 
                     if (!mod.ManualName)
                         // Restore name
-                        Mods.UpdateModAsync(mod, Settings);
+                        _ = Mods.UpdateModAsync(mod, Settings);
 
                     break;
                     

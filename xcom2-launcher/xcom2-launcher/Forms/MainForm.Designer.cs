@@ -696,7 +696,7 @@
             // 
             this.horizontal_splitcontainer.Panel2.Controls.Add(this.modinfo_groupbox);
             this.horizontal_splitcontainer.Size = new System.Drawing.Size(970, 656);
-            this.horizontal_splitcontainer.SplitterDistance = 393;
+            this.horizontal_splitcontainer.SplitterDistance = 392;
             this.horizontal_splitcontainer.SplitterWidth = 5;
             this.horizontal_splitcontainer.TabIndex = 5;
             // 
@@ -750,7 +750,7 @@
             this.modlist_ListObjectListView.Location = new System.Drawing.Point(0, 33);
             this.modlist_ListObjectListView.Name = "modlist_ListObjectListView";
             this.modlist_ListObjectListView.ShowItemCountOnGroups = true;
-            this.modlist_ListObjectListView.Size = new System.Drawing.Size(970, 329);
+            this.modlist_ListObjectListView.Size = new System.Drawing.Size(970, 328);
             this.modlist_ListObjectListView.SortGroupItemsByPrimaryColumn = false;
             this.modlist_ListObjectListView.SpaceBetweenGroups = 10;
             this.modlist_ListObjectListView.TabIndex = 0;
@@ -766,6 +766,7 @@
             this.modlist_ListObjectListView.CellToolTipShowing += new System.EventHandler<BrightIdeasSoftware.ToolTipShowingEventArgs>(this.ModListCellToolTipShowing);
             this.modlist_ListObjectListView.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.ModListFormatRow);
             this.modlist_ListObjectListView.SelectionChanged += new System.EventHandler(this.ModListSelectionChanged);
+            this.modlist_ListObjectListView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModListItemCheck);
             this.modlist_ListObjectListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.ModListItemChecked);
             this.modlist_ListObjectListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ModListKeyDown);
             // 
@@ -939,7 +940,7 @@
             this.pModsLegend.Controls.Add(this.cFilterNotLoaded);
             this.pModsLegend.Controls.Add(this.cFilterDuplicate);
             this.pModsLegend.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pModsLegend.Location = new System.Drawing.Point(0, 362);
+            this.pModsLegend.Location = new System.Drawing.Point(0, 361);
             this.pModsLegend.Name = "pModsLegend";
             this.pModsLegend.Size = new System.Drawing.Size(970, 31);
             this.pModsLegend.TabIndex = 5;
@@ -1274,7 +1275,7 @@
             this.modinfo_groupbox.Margin = new System.Windows.Forms.Padding(0);
             this.modinfo_groupbox.Name = "modinfo_groupbox";
             this.modinfo_groupbox.Padding = new System.Windows.Forms.Padding(0);
-            this.modinfo_groupbox.Size = new System.Drawing.Size(970, 258);
+            this.modinfo_groupbox.Size = new System.Drawing.Size(970, 259);
             this.modinfo_groupbox.TabIndex = 3;
             this.modinfo_groupbox.TabStop = false;
             this.modinfo_groupbox.Text = "Mod Info";
@@ -1292,7 +1293,7 @@
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(970, 245);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(970, 246);
             this.tableLayoutPanel3.TabIndex = 10;
             // 
             // modinfo_tabcontrol
@@ -1310,7 +1311,7 @@
             this.modinfo_tabcontrol.Margin = new System.Windows.Forms.Padding(0, 0, 2, 2);
             this.modinfo_tabcontrol.Name = "modinfo_tabcontrol";
             this.modinfo_tabcontrol.SelectedIndex = 0;
-            this.modinfo_tabcontrol.Size = new System.Drawing.Size(768, 243);
+            this.modinfo_tabcontrol.Size = new System.Drawing.Size(768, 244);
             this.modinfo_tabcontrol.TabIndex = 9;
             this.modinfo_tabcontrol.Selected += new System.Windows.Forms.TabControlEventHandler(this.ModInfoTabSelected);
             // 
@@ -1331,7 +1332,7 @@
             this.modinfo_details_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_details_tab.Name = "modinfo_details_tab";
             this.modinfo_details_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_details_tab.Size = new System.Drawing.Size(760, 217);
+            this.modinfo_details_tab.Size = new System.Drawing.Size(760, 218);
             this.modinfo_details_tab.TabIndex = 0;
             this.modinfo_details_tab.Text = "Info";
             this.modinfo_details_tab.UseVisualStyleBackColor = true;
@@ -1442,7 +1443,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.modinfo_info_DescriptionRichTextBox.Location = new System.Drawing.Point(96, 58);
             this.modinfo_info_DescriptionRichTextBox.Name = "modinfo_info_DescriptionRichTextBox";
-            this.modinfo_info_DescriptionRichTextBox.Size = new System.Drawing.Size(661, 156);
+            this.modinfo_info_DescriptionRichTextBox.Size = new System.Drawing.Size(661, 157);
             this.modinfo_info_DescriptionRichTextBox.TabIndex = 8;
             this.modinfo_info_DescriptionRichTextBox.Text = "";
             this.modinfo_info_DescriptionRichTextBox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
@@ -1454,7 +1455,7 @@
             this.modinfo_readme_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_readme_tab.Name = "modinfo_readme_tab";
             this.modinfo_readme_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_readme_tab.Size = new System.Drawing.Size(760, 217);
+            this.modinfo_readme_tab.Size = new System.Drawing.Size(760, 218);
             this.modinfo_readme_tab.TabIndex = 1;
             this.modinfo_readme_tab.Text = "ReadMe";
             this.modinfo_readme_tab.UseVisualStyleBackColor = true;
@@ -1479,7 +1480,7 @@
             this.modinfo_inspect_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_inspect_tab.Name = "modinfo_inspect_tab";
             this.modinfo_inspect_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_inspect_tab.Size = new System.Drawing.Size(760, 217);
+            this.modinfo_inspect_tab.Size = new System.Drawing.Size(760, 218);
             this.modinfo_inspect_tab.TabIndex = 2;
             this.modinfo_inspect_tab.Text = "Inspect";
             this.modinfo_inspect_tab.UseVisualStyleBackColor = true;
@@ -1491,7 +1492,7 @@
             this.modinfo_inspect_propertygrid.LineColor = System.Drawing.SystemColors.ControlDark;
             this.modinfo_inspect_propertygrid.Location = new System.Drawing.Point(3, 3);
             this.modinfo_inspect_propertygrid.Name = "modinfo_inspect_propertygrid";
-            this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(754, 211);
+            this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(754, 212);
             this.modinfo_inspect_propertygrid.TabIndex = 9;
             this.modinfo_inspect_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_inspect_propertygrid_Layout);
             // 
@@ -1501,7 +1502,7 @@
             this.modinfo_config_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_config_tab.Name = "modinfo_config_tab";
             this.modinfo_config_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_config_tab.Size = new System.Drawing.Size(760, 217);
+            this.modinfo_config_tab.Size = new System.Drawing.Size(760, 218);
             this.modinfo_config_tab.TabIndex = 3;
             this.modinfo_config_tab.Text = "Config";
             this.modinfo_config_tab.UseVisualStyleBackColor = true;
@@ -1524,7 +1525,7 @@
             this.modinfo_config_TableLayoutPanel.RowCount = 2;
             this.modinfo_config_TableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.modinfo_config_TableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.modinfo_config_TableLayoutPanel.Size = new System.Drawing.Size(754, 211);
+            this.modinfo_config_TableLayoutPanel.Size = new System.Drawing.Size(754, 212);
             this.modinfo_config_TableLayoutPanel.TabIndex = 13;
             // 
             // modinfo_ConfigFCTB
@@ -1552,6 +1553,7 @@
             this.modinfo_ConfigFCTB.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.modinfo_ConfigFCTB.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.modinfo_ConfigFCTB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.modinfo_ConfigFCTB.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.modinfo_ConfigFCTB.IsReplaceMode = false;
             this.modinfo_ConfigFCTB.Location = new System.Drawing.Point(2, 30);
             this.modinfo_ConfigFCTB.Margin = new System.Windows.Forms.Padding(2, 0, 2, 2);
@@ -1559,7 +1561,7 @@
             this.modinfo_ConfigFCTB.Paddings = new System.Windows.Forms.Padding(0);
             this.modinfo_ConfigFCTB.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.modinfo_ConfigFCTB.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("modinfo_ConfigFCTB.ServiceColors")));
-            this.modinfo_ConfigFCTB.Size = new System.Drawing.Size(750, 179);
+            this.modinfo_ConfigFCTB.Size = new System.Drawing.Size(750, 180);
             this.modinfo_ConfigFCTB.TabIndex = 11;
             this.modinfo_ConfigFCTB.WordWrap = true;
             this.modinfo_ConfigFCTB.Zoom = 100;
@@ -1669,7 +1671,7 @@
             this.modinfo_changelog_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_changelog_tab.Name = "modinfo_changelog_tab";
             this.modinfo_changelog_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_changelog_tab.Size = new System.Drawing.Size(760, 217);
+            this.modinfo_changelog_tab.Size = new System.Drawing.Size(760, 218);
             this.modinfo_changelog_tab.TabIndex = 4;
             this.modinfo_changelog_tab.Text = "Changelog";
             this.modinfo_changelog_tab.UseVisualStyleBackColor = true;
@@ -1681,7 +1683,7 @@
             this.modinfo_changelog_richtextbox.Location = new System.Drawing.Point(3, 3);
             this.modinfo_changelog_richtextbox.Name = "modinfo_changelog_richtextbox";
             this.modinfo_changelog_richtextbox.ReadOnly = true;
-            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(754, 211);
+            this.modinfo_changelog_richtextbox.Size = new System.Drawing.Size(754, 212);
             this.modinfo_changelog_richtextbox.TabIndex = 0;
             this.modinfo_changelog_richtextbox.Text = "";
             this.modinfo_changelog_richtextbox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.ControlLinkClicked);
@@ -1692,7 +1694,7 @@
             this.modinfo_dependencies_tab.Location = new System.Drawing.Point(4, 22);
             this.modinfo_dependencies_tab.Name = "modinfo_dependencies_tab";
             this.modinfo_dependencies_tab.Padding = new System.Windows.Forms.Padding(3);
-            this.modinfo_dependencies_tab.Size = new System.Drawing.Size(760, 217);
+            this.modinfo_dependencies_tab.Size = new System.Drawing.Size(760, 218);
             this.modinfo_dependencies_tab.TabIndex = 5;
             this.modinfo_dependencies_tab.Text = "Dependencies";
             this.modinfo_dependencies_tab.UseVisualStyleBackColor = true;
@@ -1709,7 +1711,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(754, 211);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(754, 212);
             this.tableLayoutPanel1.TabIndex = 4;
             // 
             // panel4
@@ -1719,7 +1721,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel4.Location = new System.Drawing.Point(3, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(748, 99);
+            this.panel4.Size = new System.Drawing.Size(748, 100);
             this.panel4.TabIndex = 1;
             // 
             // olvRequiredMods
@@ -1752,7 +1754,7 @@
             this.olvRequiredMods.Name = "olvRequiredMods";
             this.olvRequiredMods.ShowGroups = false;
             this.olvRequiredMods.ShowItemCountOnGroups = true;
-            this.olvRequiredMods.Size = new System.Drawing.Size(748, 77);
+            this.olvRequiredMods.Size = new System.Drawing.Size(748, 78);
             this.olvRequiredMods.SortGroupItemsByPrimaryColumn = false;
             this.olvRequiredMods.TabIndex = 1;
             this.olvRequiredMods.TintSortColumn = true;
@@ -1849,7 +1851,7 @@
             this.panel5.Controls.Add(this.olvDependentMods);
             this.panel5.Controls.Add(this.label6);
             this.panel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel5.Location = new System.Drawing.Point(3, 108);
+            this.panel5.Location = new System.Drawing.Point(3, 109);
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(748, 100);
             this.panel5.TabIndex = 3;
@@ -1963,7 +1965,7 @@
             this.modinfo_image_picturebox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.modinfo_image_picturebox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.modinfo_image_picturebox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.modinfo_image_picturebox.Location = new System.Drawing.Point(4, 26);
+            this.modinfo_image_picturebox.Location = new System.Drawing.Point(4, 27);
             this.modinfo_image_picturebox.Name = "modinfo_image_picturebox";
             this.modinfo_image_picturebox.Size = new System.Drawing.Size(192, 192);
             this.modinfo_image_picturebox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;

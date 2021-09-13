@@ -54,15 +54,21 @@ namespace XCOM2Launcher.Forms
             // Init the argument checkboxes
             InitQuickArgumentsMenu(settings);
 
-#if !DEBUG
-			// Update mod information
+            #if !DEBUG
+            // Update mod information
             var mods = Settings.Mods.All.ToList();
+
+            if (settings.OnlyUpdateEnabledOrNewModsOnStartup)
+            {
+                mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
+            }
 
             UpdateMods(mods, () =>
             {
                 modlist_ListObjectListView.RefreshObjects(mods);
             });
-#endif
+            #endif
+
             // Run callbacks
             var t1 = new Timer();
             t1.Tick += (sender, e) => { SteamAPIWrapper.RunCallbacks(); };
