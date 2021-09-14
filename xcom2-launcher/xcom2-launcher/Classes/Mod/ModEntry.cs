@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -32,8 +30,17 @@ namespace XCOM2Launcher.Mod
         [DefaultValue(-1)]
         public int Index { get; set; } = -1;
 
+        /// <summary>
+        /// This state is re-evaluated on each application start.
+        /// </summary>
         [JsonIgnore]
         public ModState State { get; private set; } = ModState.None;
+        
+        /// <summary>
+        /// The value of <see cref="State"/> is copied to this property when the settings are saved.
+        /// This can be used to compare the re-evaluated mod state against its previous state on application start.
+        /// </summary>
+        public ModState PreviousState { get; set; } = ModState.None;
 
         public string ID { get; set; }
         public string Name { get; set; }
@@ -135,9 +142,7 @@ namespace XCOM2Launcher.Mod
 
             if (CleanBBCode)
             {
-                dsc = dsc.Replace(@"\", @"\'5c");
-                dsc = dsc.Replace(@"{", @"\'7b");
-                dsc = dsc.Replace(@"}", @"\'7d");
+                dsc = Tools.GetRtfEscapedString(dsc);
                 Regex Regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
                 dsc = Regexp.Replace(dsc, RTFEvaluator);
                 Regex replace_linebreaks = new Regex(@"[\r\n]{1,2}");
@@ -423,31 +428,52 @@ namespace XCOM2Launcher.Mod
         {
             try
             {
-                var readmePath = FilePath.Combine(Path, "ReadMe.txt");
-                return File.Exists(readmePath) ? File.ReadAllText(readmePath) : "No ReadMe found.";
+                var readmePathTxt = FilePath.Combine(Path, "ReadMe.txt");
+                var readmePathMd = FilePath.Combine(Path, "ReadMe.md");
+
+                if (File.Exists(readmePathTxt))
+                {
+                    string readmeText = File.ReadAllText(readmePathTxt);
+
+                    if (readmeText.Contains("You created an XCOM 2 Mod Project!"))
+                    {
+                        return "The mod author did not provide additional information.";
+                    }
+
+                    return readmeText;
+                }
+                
+                if (File.Exists(readmePathMd))
+                {
+                    string readmeText = File.ReadAllText(readmePathMd);
+
+                    if (readmeText.Contains("Describe specific features of your mod."))
+                    {
+                        return "The mod author did not provide additional information.";
+                    }
+
+                    return readmeText;
+                }
+
+                return "No ReadMe found.";
             }
             catch (Exception ex)
             {
-                return "Unable to access ReadMe.txt - " + ex.Message;
+                return "Unable to access ReadMe file - " + ex.Message;
             }
         }
 
 		/// <summary>
 		/// Returns a relative path to this mod's folder.
 		/// </summary>
-		/// <param name="relativeTo"></param>
+		/// <param name="target"></param>
 		/// <returns></returns>
-		public string GetPathRelative(string relativeTo)
+		public string GetPathRelative(string target)
 		{
-			Uri modPath = new Uri(relativeTo);
-			Uri filePath = new Uri(Path);
-			var relativePath = filePath.MakeRelativeUri(modPath).ToString();
-
-			// Trim off the mod ID number, it's not useful here
-			int i = relativePath.IndexOf("Config", StringComparison.Ordinal);
-			relativePath = relativePath.Substring(i);
-
-			return Uri.UnescapeDataString(relativePath);
+			var targetUri = new Uri(target);
+			var modUri = new Uri(Path.TrimEnd(FilePath.DirectorySeparatorChar, FilePath.AltDirectorySeparatorChar) + FilePath.DirectorySeparatorChar);
+			var relativeUri = modUri.MakeRelativeUri(targetUri).ToString();
+            return Uri.UnescapeDataString(relativeUri);
 		}
 
 		/// <summary>

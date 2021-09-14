@@ -7,11 +7,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using JR.Utils.GUI.Forms;
 using Newtonsoft.Json;
 using Semver;
 using Sentry;
-using Sentry.Protocol;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Classes.Steam;
@@ -38,6 +36,25 @@ namespace XCOM2Launcher
             #endif
 
             Log.Info($"Application started (AML {GitVersionInfo.FullSemVer} {GitVersionInfo.Sha})");
+            Log.Info($"Executable location: '{Application.ExecutablePath}'");
+
+            // If AML stores files to the "working directory", we actually want them to end up in the executable folder.
+            // So if the working directory does not match the executable path, we change it manually.
+            try
+            {
+                var exeDir = Path.GetDirectoryName(Application.ExecutablePath);
+                var workingDir = Directory.GetCurrentDirectory();
+
+                if (!Tools.CompareDirectories(exeDir, workingDir))
+                {
+                    Log.Info($"Changing current working directory from '{workingDir}' to executable path '{exeDir}'");
+                    Directory.SetCurrentDirectory(exeDir!);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed changing working directory", ex);
+            }
         }
 
         /// <summary>
@@ -171,7 +188,7 @@ namespace XCOM2Launcher
 
                 sentrySdkInstance = SentrySdk.Init(o =>
                 {
-                    o.Dsn = new Dsn("https://3864ad83bed947a2bc16d88602ac0d87@sentry.io/1478084");
+                    o.Dsn = "https://3864ad83bed947a2bc16d88602ac0d87@o269373.ingest.sentry.io/1478084";
                     o.Release = "AML@" + GitVersionInfo.SemVer;     // prefix because releases are global per organization
                     o.Debug = false;
                     o.Environment = environment;
@@ -301,32 +318,7 @@ namespace XCOM2Launcher
         public static Settings InitializeSettings()
         {
             var firstRun = !File.Exists("settings.json");
-
             var settings = firstRun ? new Settings() : Settings.Instance;
-
-            // Logic behind this:
-            // If the field ShowUpgradeWarning doesn't exists in the loaded settings file; it will be initialized to its default value "true".
-            // In that case, an old incompatible settings version is assumed and we report a warning.
-            if (settings.ShowUpgradeWarning && !firstRun)
-            {
-                Log.Warn("Incompatible settings.json");
-
-                MessageBoxManager.Cancel = "Exit";
-                MessageBoxManager.OK = "Continue";
-                MessageBoxManager.Register();
-                var choice = MessageBox.Show("This launcher version is NOT COMPATIBLE with the old 'settings.json' file.\n" +
-                                             "Stop NOW and launch the old version to export a profile of your mods INCLUDING GROUPS!\n" +
-                                             "Once that is done, move the old 'settings.json' file to a SAFE PLACE and then proceed.\n" +
-                                             "After loading, import the profile you saved to recover groups.\n\n" +
-                                             "If you are not ready to do this, click 'Exit' to leave with no changes.",
-                                             "WARNING!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
-
-                if (choice == DialogResult.Cancel)
-                    Environment.Exit(0);
-
-                Log.Warn("User ignored incompatibility");
-                MessageBoxManager.Unregister();
-            }
 
             if (!firstRun)
             {
@@ -346,7 +338,6 @@ namespace XCOM2Launcher
             }
 
             settings.Game = XEnv.Game;
-            settings.ShowUpgradeWarning = false;
 
             // Verify Game Path
             if (!Directory.Exists(settings.GamePath))
@@ -357,6 +348,9 @@ namespace XCOM2Launcher
                 Log.Warn("Unable to detect installation path");
                 MessageBox.Show(@"Could not detect path to installation directory. Please select it manually from the settings.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            Log.Info($"Game: {settings.Game}");
+            Log.Info($"GamePath: {settings.GamePath}");
 
             // Make sure, that all mod paths have a trailing backslash
             var pathsWithMissingTrailingBackSlash = settings.ModPaths.Where(m => !m.EndsWith(@"\")).ToList();
@@ -431,16 +425,29 @@ namespace XCOM2Launcher
                     settings.Mods.UpdatedModDependencyState(mod);
                 }
 
-                var newlyBrokenMods = settings.Mods.All.Where(m => (m.State == ModState.NotLoaded || m.State == ModState.NotInstalled) && !m.isHidden).ToList();
-                if (newlyBrokenMods.Count > 0)
-                {
-                    if (newlyBrokenMods.Count == 1)
-                        FlexibleMessageBox.Show($"The mod '{newlyBrokenMods[0].Name}' no longer exists and has been hidden.");
-                    else
-                        FlexibleMessageBox.Show($"{newlyBrokenMods.Count} mods no longer exist and have been hidden:\r\n\r\n" + string.Join("\r\n", newlyBrokenMods.Select(m => m.Name)));
+                var newMissingMods = settings.Mods.All.Where(m => (m.State.HasFlag(ModState.NotLoaded) || m.State.HasFlag(ModState.NotInstalled)) &&
+                                                               (!m.PreviousState.HasFlag(ModState.NotLoaded) && !m.PreviousState.HasFlag(ModState.NotInstalled))).ToList();
 
-                    foreach (var m in newlyBrokenMods)
-                        m.isHidden = true;
+                // Ask if newly missing mods should be hidden
+                if (newMissingMods.Any(m => !m.isHidden))
+                {
+                    string message;
+                    
+                    if (newMissingMods.Count == 1)
+                    {
+                        message = $"The mod '{newMissingMods.FirstOrDefault()?.Name}' no longer exists.\n\nDo you want to hide this mod from the mod list?";
+                    }
+                    else
+                    {
+                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- " + string.Join("\n- ", newMissingMods.Select(m => m.Name)) + "\n\nDo you want to hide these mods from the mod list?";
+                    }
+
+                    var result = MessageBox.Show(message, "Missing mods", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        newMissingMods.ForEach(m => m.isHidden = true);
+                    }
                 }
             }
 

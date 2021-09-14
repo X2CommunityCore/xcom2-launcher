@@ -276,9 +276,9 @@ namespace XCOM2Launcher.Mod
             Log.Info($"Mod '{mod.ID}' removed from category '{category}'");
         }
 
-        public async void UpdateModAsync(ModEntry m, Settings settings)
+        public async Task<List<ModEntry>> UpdateModAsync(ModEntry m, Settings settings)
         {
-            await UpdateModsAsync(new List<ModEntry> { m }, settings);
+            return await UpdateModsAsync(new List<ModEntry> {m}, settings);
         }
 
         public async Task<List<ModEntry>> UpdateModsAsync(List<ModEntry> mods, Settings settings, IProgress<ModUpdateProgress> progress = null, CancellationToken cancelToken = default(CancellationToken))
@@ -664,12 +664,16 @@ namespace XCOM2Launcher.Mod
                     else
                     {
                         var details = Workshop.GetDetails((ulong)id);
-
-                        if (details.m_nPublishedFileId.m_PublishedFileId != 0)
+                        
+                        if (details.m_eResult == EResult.k_EResultOK)
                         {
                             var newMod = new ModEntry(details);
                             requiredMods.Add(newMod);
                             _DependencyCache.Add(newMod);
+                        }
+                        else
+                        {
+                            Log.Warn($"Workshop request for WorkshopId={id} failed with result '{details.m_eResult}'");
                         }
                     }
                 }

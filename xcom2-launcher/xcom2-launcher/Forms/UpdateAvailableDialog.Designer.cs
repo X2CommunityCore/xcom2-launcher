@@ -30,7 +30,6 @@
         {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UpdateAvailableDialog));
 			this.version_current_label = new System.Windows.Forms.Label();
-			this.changelog_textbox = new System.Windows.Forms.TextBox();
 			this.version_new_label = new System.Windows.Forms.Label();
 			this.version_current_value_label = new System.Windows.Forms.Label();
 			this.version_new_value_label = new System.Windows.Forms.Label();
@@ -42,6 +41,9 @@
 			this.show_button = new System.Windows.Forms.Button();
 			this.close_button = new System.Windows.Forms.Button();
 			this.lBetaVersion = new System.Windows.Forms.Label();
+			this.releaseNoteBrowser = new System.Windows.Forms.WebBrowser();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// version_current_label
@@ -52,18 +54,6 @@
 			this.version_current_label.Size = new System.Drawing.Size(81, 13);
 			this.version_current_label.TabIndex = 2;
 			this.version_current_label.Text = "Current version:";
-			// 
-			// changelog_textbox
-			// 
-			this.changelog_textbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.changelog_textbox.Location = new System.Drawing.Point(12, 72);
-			this.changelog_textbox.Multiline = true;
-			this.changelog_textbox.Name = "changelog_textbox";
-			this.changelog_textbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.changelog_textbox.Size = new System.Drawing.Size(537, 168);
-			this.changelog_textbox.TabIndex = 4;
 			// 
 			// version_new_label
 			// 
@@ -97,11 +87,12 @@
 			// changelog_label
 			// 
 			this.changelog_label.AutoSize = true;
-			this.changelog_label.Location = new System.Drawing.Point(9, 53);
+			this.changelog_label.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.changelog_label.Location = new System.Drawing.Point(9, 55);
 			this.changelog_label.Name = "changelog_label";
-			this.changelog_label.Size = new System.Drawing.Size(78, 13);
+			this.changelog_label.Size = new System.Drawing.Size(164, 20);
 			this.changelog_label.TabIndex = 8;
-			this.changelog_label.Text = "Release notes:";
+			this.changelog_label.Text = "Release 1.2.3 Final";
 			// 
 			// filesize_label
 			// 
@@ -174,12 +165,35 @@
 			this.lBetaVersion.TabIndex = 11;
 			this.lBetaVersion.Text = "This is a Pre-Release version, and thus might not be stable.";
 			// 
+			// releaseNoteBrowser
+			// 
+			this.releaseNoteBrowser.AllowWebBrowserDrop = false;
+			this.releaseNoteBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.releaseNoteBrowser.Location = new System.Drawing.Point(0, 0);
+			this.releaseNoteBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+			this.releaseNoteBrowser.Name = "releaseNoteBrowser";
+			this.releaseNoteBrowser.Size = new System.Drawing.Size(534, 158);
+			this.releaseNoteBrowser.TabIndex = 12;
+			// 
+			// panel1
+			// 
+			this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Controls.Add(this.releaseNoteBrowser);
+			this.panel1.Location = new System.Drawing.Point(13, 80);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(536, 160);
+			this.panel1.TabIndex = 13;
+			// 
 			// UpdateAvailableDialog
 			// 
 			this.AcceptButton = this.show_button;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(561, 281);
+			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.date_value_label);
 			this.Controls.Add(this.filesize_value_label);
 			this.Controls.Add(this.filesize_label);
@@ -190,12 +204,12 @@
 			this.Controls.Add(this.version_new_label);
 			this.Controls.Add(this.show_button);
 			this.Controls.Add(this.changelog_label);
-			this.Controls.Add(this.changelog_textbox);
 			this.Controls.Add(this.close_button);
 			this.Controls.Add(this.lBetaVersion);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "UpdateAvailableDialog";
 			this.Text = "Update available!";
+			this.panel1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -206,7 +220,6 @@
         private System.Windows.Forms.Label version_new_label;
         private System.Windows.Forms.Label version_current_value_label;
         private System.Windows.Forms.Label version_new_value_label;
-        private System.Windows.Forms.TextBox changelog_textbox;
         private System.Windows.Forms.Label changelog_label;
         private System.Windows.Forms.Label filesize_label;
         private System.Windows.Forms.Label filesize_value_label;
@@ -215,5 +228,7 @@
         private System.Windows.Forms.Label date_value_label;
         private System.Windows.Forms.Button close_button;
 		private System.Windows.Forms.Label lBetaVersion;
-	}
+		private System.Windows.Forms.WebBrowser releaseNoteBrowser;
+        private System.Windows.Forms.Panel panel1;
+    }
 }

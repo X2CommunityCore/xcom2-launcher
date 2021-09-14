@@ -6,7 +6,6 @@ using log4net.Appender;
 using log4net.Core;
 using Sentry;
 using Sentry.Extensibility;
-using Sentry.Protocol;
 
 namespace XCOM2Launcher.Log4Net
 {
@@ -104,7 +103,7 @@ namespace XCOM2Launcher.Log4Net
                     Level = loggingEvent.ToSentryLevel()
                 };
 
-                evt.Sdk.AddPackage(ProtocolPackageName, NameAndVersion.Version);
+                evt.Sdk.AddPackage(ProtocolPackageName, NameAndVersion.Version ?? string.Empty);
 
                 if (!string.IsNullOrWhiteSpace(loggingEvent.RenderedMessage))
                 {

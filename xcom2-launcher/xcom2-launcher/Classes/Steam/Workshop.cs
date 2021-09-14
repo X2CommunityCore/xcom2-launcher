@@ -41,13 +41,25 @@ namespace XCOM2Launcher.Steam
             SteamUGC.UnsubscribeItem(id.ToPublishedFileID());
         }
 
-        public static SteamUGCDetails_t GetDetails(ulong id, bool GetDesc = false)
+        /// <summary>
+        /// Returns the UGC Details for the specified workshop id.
+        /// </summary>
+        /// <param name="id">Workshop id</param>
+        /// <param name="getFullDescription">Sets whether to return the full description for the item. If set to false, the description is truncated at 255 bytes.</param>
+        /// <returns>The requested data or the default struct (check for m_eResult == EResultNone), if the request failed.</returns>
+        public static SteamUGCDetails_t GetDetails(ulong id, bool getFullDescription = false)
         {
-            var result = GetDetails(new List<ulong> {id}, GetDesc);
-            return result.FirstOrDefault();
+            var result = GetDetails(new List<ulong> {id}, getFullDescription);
+            return result?.FirstOrDefault() ?? new SteamUGCDetails_t();
         }
 
-        public static List<SteamUGCDetails_t> GetDetails(List<ulong> identifiers, bool GetDesc = false)
+        /// <summary>
+        /// Returns a list of UGC Details for the specified workshop id's.
+        /// </summary>
+        /// <param name="identifiers">Workshop id's</param>
+        /// <param name="getFullDescription">Sets whether to return the full description for the item. If set to false, the description is truncated at 255 bytes.</param>
+        /// <returns>The requested data or null, if the request failed.</returns>
+        public static List<SteamUGCDetails_t> GetDetails(List<ulong> identifiers, bool getFullDescription = false)
         {
             if (identifiers == null)
                 throw new ArgumentNullException(nameof(identifiers));
@@ -55,7 +67,7 @@ namespace XCOM2Launcher.Steam
             if (identifiers.Count > MAX_UGC_RESULTS)
                 throw new ArgumentException($"Max allowed number of identifiers is {MAX_UGC_RESULTS}.");
 
-            var request = new ItemDetailsRequest(identifiers, GetDesc);
+            var request = new ItemDetailsRequest(identifiers, getFullDescription);
             request.Send().WaitForResult();
 
             return request.Success ? request.Result : null;

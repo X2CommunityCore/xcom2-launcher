@@ -40,44 +40,7 @@ namespace XCOM2Launcher.Forms
             Settings = settings;
 
             // Restore states 
-            showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
-            cShowStateFilter.Checked = settings.ShowStateFilter;
-            cEnableGrouping.Checked = settings.ShowModListGroups;
-            cShowPrimaryDuplicates.Checked = Settings.ShowPrimaryDuplicateAsDependency;
-            cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
-            modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-            olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-            olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-
-            // Set visibility of some controls depending on game type
-            var wotcAvailable = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
-            runXCOM2ToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
-            runWarOfTheChosenToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
-            runChallengeModeToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
-            importFromWotCToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
-            importFromXCOM2ToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
-            runChimeraSquadToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
-            importFromChimeraSquadToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
-
-            if (Program.XEnv.Game != GameId.X2)
-            {
-                modlist_ListObjectListView.AllColumns.Remove(olvForWOTC);
-                modlist_ListObjectListView.RebuildColumns();
-                olvDependentMods.AllColumns.Remove(olvColDepModsWotc);
-                olvDependentMods.RebuildColumns();
-                olvRequiredMods.AllColumns.Remove(olvColReqModsWotc);
-                olvRequiredMods.RebuildColumns();
-            }
-
-            // If game path is not configured, hide several function/options.
-            if (string.IsNullOrEmpty(settings.GamePath))
-            {
-                runWarOfTheChosenToolStripMenuItem.Enabled = false;
-                runChallengeModeToolStripMenuItem.Enabled = false;
-                importFromWotCToolStripMenuItem.Enabled = false;
-                importFromXCOM2ToolStripMenuItem.Enabled = false;
-                importFromChimeraSquadToolStripMenuItem.Enabled = false;
-            }
+            InitMainGui(settings);
 
             // Init interface
             InitModListView();
@@ -91,15 +54,21 @@ namespace XCOM2Launcher.Forms
             // Init the argument checkboxes
             InitQuickArgumentsMenu(settings);
 
-#if !DEBUG
-			// Update mod information
+            #if !DEBUG
+            // Update mod information
             var mods = Settings.Mods.All.ToList();
+
+            if (settings.OnlyUpdateEnabledOrNewModsOnStartup)
+            {
+                mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
+            }
 
             UpdateMods(mods, () =>
             {
                 modlist_ListObjectListView.RefreshObjects(mods);
             });
-#endif
+            #endif
+
             // Run callbacks
             var t1 = new Timer();
             t1.Tick += (sender, e) => { SteamAPIWrapper.RunCallbacks(); };
@@ -197,6 +166,52 @@ namespace XCOM2Launcher.Forms
         }
 */
         #region GUI
+
+        /// <summary>
+        /// Initializes GUI elements that depend on current settings and selected game type.
+        /// </summary>
+        /// <param name="settings"></param>
+        private void InitMainGui(Settings settings)
+        {
+            showHiddenModsToolStripMenuItem.Checked = settings.ShowHiddenElements;
+            cShowStateFilter.Checked = settings.ShowStateFilter;
+            cEnableGrouping.Checked = settings.ShowModListGroups;
+            cShowPrimaryDuplicates.Checked = settings.ShowPrimaryDuplicateAsDependency;
+            cShowPrimaryDuplicates.Visible = settings.EnableDuplicateModIdWorkaround;
+            modlist_ListObjectListView.UseTranslucentSelection = settings.UseTranslucentModListSelection;
+            olvRequiredMods.UseTranslucentSelection = settings.UseTranslucentModListSelection;
+            olvDependentMods.UseTranslucentSelection = settings.UseTranslucentModListSelection;
+
+            // Set visibility of some controls depending on game type
+            var wotcAvailable = Directory.Exists(settings.GamePath + @"\XCom2-WarOfTheChosen");
+            runXCOM2ToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2 && (!settings.HideXcom2Button || !wotcAvailable);
+            runWarOfTheChosenToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
+            runChallengeModeToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2 && !settings.HideChallengeModeButton;
+            importFromWotCToolStripMenuItem.Visible = wotcAvailable && Program.XEnv.Game == GameId.X2;
+            importFromXCOM2ToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            runChimeraSquadToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+            importFromChimeraSquadToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+
+            if (Program.XEnv.Game != GameId.X2)
+            {
+                modlist_ListObjectListView.AllColumns.Remove(olvForWOTC);
+                modlist_ListObjectListView.RebuildColumns();
+                olvDependentMods.AllColumns.Remove(olvColDepModsWotc);
+                olvDependentMods.RebuildColumns();
+                olvRequiredMods.AllColumns.Remove(olvColReqModsWotc);
+                olvRequiredMods.RebuildColumns();
+            }
+
+            // If game path is not configured, hide several function/options.
+            if (string.IsNullOrEmpty(settings.GamePath))
+            {
+                runWarOfTheChosenToolStripMenuItem.Enabled = false;
+                runChallengeModeToolStripMenuItem.Enabled = false;
+                importFromWotCToolStripMenuItem.Enabled = false;
+                importFromXCOM2ToolStripMenuItem.Enabled = false;
+                importFromChimeraSquadToolStripMenuItem.Enabled = false;
+            }
+        }
 
         private void SetStatus(string text)
         {

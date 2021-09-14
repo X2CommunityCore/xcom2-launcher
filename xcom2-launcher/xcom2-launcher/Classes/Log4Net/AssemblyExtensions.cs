@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
-using Sentry.Protocol;
+using Sentry;
 
 namespace XCOM2Launcher.Log4Net
 {

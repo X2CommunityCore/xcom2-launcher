@@ -1,5 +1,5 @@
 using log4net.Core;
-using Sentry.Protocol;
+using Sentry;
 
 namespace XCOM2Launcher.Log4Net
 {

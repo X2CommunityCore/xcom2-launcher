@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
 using Steamworks;
+using XCOM2Launcher.Classes;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.PropertyGrid;
@@ -94,6 +95,92 @@ namespace XCOM2Launcher.Forms
                 Close();
             };
 
+            #region Menu->File->Open Log
+            amlLogFileToolStripMenuItem1.Click += delegate
+            {
+                Tools.StartProcess(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty, "AML.log"));
+            };
+
+            x2LogFileToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            x2LogFileToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is Xcom2Env env) {
+                    Tools.StartProcess(env.LogFilePath);
+                }
+            };
+
+            wotcLogFileToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            wotcLogFileToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is Xcom2Env env) {
+                    Tools.StartProcess(env.LogFilePathWotC);
+                }
+            };
+
+            chimeraLogFileToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+            chimeraLogFileToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is XComChimeraSquadEnv env) {
+                    Tools.StartProcess(env.LogFilePath);
+                }
+            };
+
+            #endregion
+
+            #region Menu->File->Open Folder
+
+            folderToAmlToolStripMenuItem.Click += delegate
+            {
+                Tools.StartProcess("explorer", Path.GetDirectoryName(Application.ExecutablePath));
+            };
+
+            folderToX2InstallToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            folderToX2InstallToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is Xcom2Env env)
+                {
+                    Tools.StartProcess("explorer", env.GameDir);
+                }
+            };
+
+            folderToX2DataToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            folderToX2DataToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is Xcom2Env env)
+                {
+                    Tools.StartProcess("explorer", env.DataDir);
+                }
+            };
+
+            folderToWotcDataToolStripMenuItem.Visible = Program.XEnv.Game == GameId.X2;
+            folderToWotcDataToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is Xcom2Env env)
+                {
+                    Tools.StartProcess("explorer", env.DataDirWotC);
+                }
+            };
+
+            folderToChimeraInstallToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+            folderToChimeraInstallToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is XComChimeraSquadEnv env)
+                {
+                    Tools.StartProcess("explorer", env.GameDir);
+                }
+            };
+
+            folderToChimeraDataToolStripMenuItem.Visible = Program.XEnv.Game == GameId.ChimeraSquad;
+            folderToChimeraDataToolStripMenuItem.Click += delegate
+            {
+                if (Program.XEnv is XComChimeraSquadEnv env)
+                {
+                    Tools.StartProcess("explorer", env.DataDir);
+                }
+            };
+
+            #endregion
+
             #endregion Menu->File
 
             #region Menu->Options
@@ -128,11 +215,7 @@ namespace XCOM2Launcher.Forms
 
                     // refresh/update settings dependent functions
                     RefreshModList();
-                    showHiddenModsToolStripMenuItem.Checked = Settings.ShowHiddenElements;
-                    modlist_ListObjectListView.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-                    olvRequiredMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-                    olvDependentMods.UseTranslucentSelection = Settings.UseTranslucentModListSelection;
-                    cShowPrimaryDuplicates.Visible = Settings.EnableDuplicateModIdWorkaround;
+                    InitMainGui(Settings);
                     InitQuickArgumentsMenu(Settings);
 
                     if (dialog.IsRestartRequired)
@@ -188,26 +271,14 @@ namespace XCOM2Launcher.Forms
             {
                 Log.Info("Menu->Tools->Resubscribe");
                 var modsToDownload = Mods.All.Where(m => m.State.HasFlag(ModState.NotInstalled) && m.Source == ModSource.SteamWorkshop).ToList();
-                var choice = false;
 
                 if (modsToDownload.Count == 0)
-                    MessageBox.Show("No uninstalled workshop mods were found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                else if (modsToDownload.Count == 1)
-                    choice = MessageBox.Show($"Are you sure you want to download the mod {modsToDownload[0].Name}?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
-                else
-                    choice = MessageBox.Show($"Are you sure you want to download {modsToDownload.Count} mods?", "Confirm Download", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.OK;
-
-                if (choice)
                 {
-                    foreach (var m in modsToDownload)
-                    {
-                        Log.Info("Subscribe and download " + m.ID);
-                        Workshop.Subscribe((ulong) m.WorkshopID);
-                        Workshop.DownloadItem((ulong) m.WorkshopID);
-                    }
-
-                    MessageBox.Show("Launch XCOM after the download is finished in order to use the mod" + (modsToDownload.Count == 1 ? "." : "s."), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("No uninstalled workshop mods were found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
                 }
+
+                ResubscribeToMods(modsToDownload);
             };
 
             #endregion Menu->Tools
@@ -304,7 +375,7 @@ namespace XCOM2Launcher.Forms
 
             if (mod != null && (mod.State & ModState.NotInstalled) != ModState.None && e.Result.m_eResult == EResult.k_EResultOK)
             {
-                mod.RemoveState(ModState.NotInstalled);
+                mod.RemoveState(ModState.NotInstalled | ModState.Downloading);
                 mod.isHidden = false;
                 modlist_ListObjectListView.RefreshObject(mod);
             }

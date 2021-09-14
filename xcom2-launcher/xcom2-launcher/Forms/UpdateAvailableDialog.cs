@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using HeyRed.MarkdownSharp;
 using Semver;
 using XCOM2Launcher.GitHub;
 using XCOM2Launcher.Helper;
@@ -18,6 +19,9 @@ namespace XCOM2Launcher.Forms
         public UpdateAvailableDialog(Release release, SemVersion currentVersion, SemVersion newVersion)
         {
             InitializeComponent();
+            
+            releaseNoteBrowser.Navigating += Tools.HandleNavigateWebBrowserControl;
+
             CurrentVersion = currentVersion.ToString();
             NewVersion = newVersion.ToString();
             Release = release;
@@ -29,8 +33,12 @@ namespace XCOM2Launcher.Forms
         {
             version_current_value_label.Text = CurrentVersion;
             version_new_value_label.Text = NewVersion;
-            changelog_textbox.AppendText(Release.name + Environment.NewLine + Environment.NewLine);
-            changelog_textbox.AppendText(Release.body);
+            
+            Markdown markdown = new Markdown();
+            var body = markdown.Transform(Release.body);
+            changelog_label.Text = Release.name;
+            releaseNoteBrowser.DocumentText = body;
+
             date_value_label.Text = Release.published_at.ToString(CultureInfo.CurrentCulture);
 
             lBetaVersion.Visible = Release.prerelease;
