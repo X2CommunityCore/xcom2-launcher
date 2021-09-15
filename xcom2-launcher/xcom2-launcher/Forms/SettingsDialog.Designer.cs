@@ -49,6 +49,7 @@
             this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
             this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
             this.useDuplicateModWorkaround = new System.Windows.Forms.CheckBox();
+            this.onlyUpdateEnabledAndNew = new System.Windows.Forms.CheckBox();
             this.showHiddenEntriesCheckBox = new System.Windows.Forms.CheckBox();
             this.useTranslucentModListSelection = new System.Windows.Forms.CheckBox();
             this.useSentry = new System.Windows.Forms.CheckBox();
@@ -65,7 +66,6 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.hideRunX2Button = new System.Windows.Forms.CheckBox();
             this.hideChallengeModeButton = new System.Windows.Forms.CheckBox();
-            this.onlyUpdateEnabledAndNew = new System.Windows.Forms.CheckBox();
             this.quickArgumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
             this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
             this.groupBox1.SuspendLayout();
@@ -87,7 +87,7 @@
             this.groupBox1.Controls.Add(this.tableLayoutPanel2);
             this.groupBox1.Location = new System.Drawing.Point(12, 8);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(655, 158);
+            this.groupBox1.Size = new System.Drawing.Size(655, 200);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Game options";
@@ -119,13 +119,13 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 162);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(641, 175);
             this.tableLayoutPanel2.TabIndex = 6;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(4, 143);
+            this.label2.Location = new System.Drawing.Point(4, 156);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 6, 3, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(119, 13);
@@ -135,7 +135,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(4, 118);
+            this.label1.Location = new System.Drawing.Point(4, 131);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 6, 3, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(89, 13);
@@ -148,13 +148,13 @@
             this.modPathsListbox.FormattingEnabled = true;
             this.modPathsListbox.Location = new System.Drawing.Point(133, 33);
             this.modPathsListbox.Name = "modPathsListbox";
-            this.modPathsListbox.Size = new System.Drawing.Size(432, 76);
+            this.modPathsListbox.Size = new System.Drawing.Size(432, 89);
             this.modPathsListbox.TabIndex = 4;
             // 
             // ShowQuickLaunchArgumentsToggle
             // 
             this.ShowQuickLaunchArgumentsToggle.AutoSize = true;
-            this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(571, 140);
+            this.ShowQuickLaunchArgumentsToggle.Location = new System.Drawing.Point(571, 153);
             this.ShowQuickLaunchArgumentsToggle.Name = "ShowQuickLaunchArgumentsToggle";
             this.ShowQuickLaunchArgumentsToggle.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
             this.ShowQuickLaunchArgumentsToggle.Size = new System.Drawing.Size(62, 19);
@@ -200,7 +200,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(568, 30);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 82);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(73, 95);
             this.flowLayoutPanel1.TabIndex = 12;
             // 
             // addModPathButton
@@ -238,7 +238,7 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.tableLayoutPanel3);
-            this.groupBox2.Location = new System.Drawing.Point(12, 278);
+            this.groupBox2.Location = new System.Drawing.Point(12, 297);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(655, 82);
             this.groupBox2.TabIndex = 10;
@@ -317,6 +317,19 @@
             this.useDuplicateModWorkaround.Text = "Enable duplicate mod ID workaround";
             this.toolTip.SetToolTip(this.useDuplicateModWorkaround, resources.GetString("useDuplicateModWorkaround.ToolTip"));
             this.useDuplicateModWorkaround.UseVisualStyleBackColor = true;
+            // 
+            // onlyUpdateEnabledAndNew
+            // 
+            this.onlyUpdateEnabledAndNew.AutoSize = true;
+            this.tableLayoutPanel3.SetColumnSpan(this.onlyUpdateEnabledAndNew, 2);
+            this.onlyUpdateEnabledAndNew.Location = new System.Drawing.Point(216, 29);
+            this.onlyUpdateEnabledAndNew.Name = "onlyUpdateEnabledAndNew";
+            this.onlyUpdateEnabledAndNew.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+            this.onlyUpdateEnabledAndNew.Size = new System.Drawing.Size(240, 20);
+            this.onlyUpdateEnabledAndNew.TabIndex = 18;
+            this.onlyUpdateEnabledAndNew.Text = "Only update enabled or new mods on startup";
+            this.toolTip.SetToolTip(this.onlyUpdateEnabledAndNew, resources.GetString("onlyUpdateEnabledAndNew.ToolTip"));
+            this.onlyUpdateEnabledAndNew.UseVisualStyleBackColor = true;
             // 
             // showHiddenEntriesCheckBox
             // 
@@ -415,7 +428,7 @@
             // bOK
             // 
             this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bOK.Location = new System.Drawing.Point(453, 483);
+            this.bOK.Location = new System.Drawing.Point(453, 502);
             this.bOK.Name = "bOK";
             this.bOK.Size = new System.Drawing.Size(104, 24);
             this.bOK.TabIndex = 12;
@@ -427,7 +440,7 @@
             // 
             this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bCancel.Location = new System.Drawing.Point(563, 483);
+            this.bCancel.Location = new System.Drawing.Point(563, 502);
             this.bCancel.Name = "bCancel";
             this.bCancel.Size = new System.Drawing.Size(104, 24);
             this.bCancel.TabIndex = 11;
@@ -439,7 +452,7 @@
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox3.Location = new System.Drawing.Point(12, 195);
+            this.groupBox3.Location = new System.Drawing.Point(12, 214);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(655, 77);
             this.groupBox3.TabIndex = 13;
@@ -474,7 +487,7 @@
             this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.tableLayoutPanel4);
-            this.groupBox4.Location = new System.Drawing.Point(12, 366);
+            this.groupBox4.Location = new System.Drawing.Point(12, 385);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(655, 111);
             this.groupBox4.TabIndex = 11;
@@ -528,23 +541,10 @@
             this.hideChallengeModeButton.Text = "Hide \"Run Challenge Mode\" button";
             this.hideChallengeModeButton.UseVisualStyleBackColor = true;
             // 
-            // onlyUpdateEnabledAndNew
-            // 
-            this.onlyUpdateEnabledAndNew.AutoSize = true;
-            this.tableLayoutPanel3.SetColumnSpan(this.onlyUpdateEnabledAndNew, 2);
-            this.onlyUpdateEnabledAndNew.Location = new System.Drawing.Point(216, 29);
-            this.onlyUpdateEnabledAndNew.Name = "onlyUpdateEnabledAndNew";
-            this.onlyUpdateEnabledAndNew.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
-            this.onlyUpdateEnabledAndNew.Size = new System.Drawing.Size(240, 20);
-            this.onlyUpdateEnabledAndNew.TabIndex = 18;
-            this.onlyUpdateEnabledAndNew.Text = "Only update enabled or new mods on startup";
-            this.toolTip.SetToolTip(this.onlyUpdateEnabledAndNew, resources.GetString("onlyUpdateEnabledAndNew.ToolTip"));
-            this.onlyUpdateEnabledAndNew.UseVisualStyleBackColor = true;
-            // 
             // quickArgumentsTextBox
             // 
             this.quickArgumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.quickArgumentsTextBox.Location = new System.Drawing.Point(133, 140);
+            this.quickArgumentsTextBox.Location = new System.Drawing.Point(133, 153);
             this.quickArgumentsTextBox.Name = "quickArgumentsTextBox";
             this.quickArgumentsTextBox.Size = new System.Drawing.Size(432, 20);
             this.quickArgumentsTextBox.TabIndex = 16;
@@ -553,7 +553,7 @@
             // argumentsTextBox
             // 
             this.argumentsTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.argumentsTextBox.Location = new System.Drawing.Point(133, 115);
+            this.argumentsTextBox.Location = new System.Drawing.Point(133, 128);
             this.argumentsTextBox.Name = "argumentsTextBox";
             this.argumentsTextBox.Size = new System.Drawing.Size(432, 20);
             this.argumentsTextBox.TabIndex = 15;
@@ -563,7 +563,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(679, 519);
+            this.ClientSize = new System.Drawing.Size(679, 538);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.bOK);
