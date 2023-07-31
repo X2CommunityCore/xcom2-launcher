@@ -362,6 +362,7 @@ namespace XCOM2Launcher.Forms
             Log.Info($"Updating {mods.Count} mods...");
             SetStatus($"Updating {mods.Count} mods...");
             progress_toolstrip_progressbar.Visible = true;
+            UseWaitCursor = true;
             
             Progress<ModUpdateProgress> reporter = new Progress<ModUpdateProgress>();
             reporter.ProgressChanged += delegate(object sender, ModUpdateProgress progress)
@@ -381,7 +382,7 @@ namespace XCOM2Launcher.Forms
             };
 
             ModUpdateCancelSource = new CancellationTokenSource();
-            ModUpdateTask = Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token);
+            ModUpdateTask = Task.Run(() => Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token));
                                     
             ModUpdateTask.ContinueWith(e =>
             {
@@ -403,7 +404,6 @@ namespace XCOM2Launcher.Forms
                         if (e.Exception?.InnerException is AggregateException)
                             aggregateException = e.Exception?.GetBaseException() as AggregateException;
 
-
                         Log.Error("At least one mod failed to update", aggregateException);
                         SetStatus("At least one mod failed to update");
                         
@@ -419,13 +419,17 @@ namespace XCOM2Launcher.Forms
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                
+                UseWaitCursor = false;
+
             }, TaskScheduler.FromCurrentSynchronizationContext());
+            
+            return;
 
             void PostProcessModUpdateTask()
             {
                 Cursor.Current = Cursors.WaitCursor;
-                // After an update refresh all mods that depend on this one
-                mods.ForEach(updatedMod => Mods.GetDependentMods(updatedMod).ForEach(dependentMod => Mods.UpdatedModDependencyState(dependentMod)));
+                
                 modlist_ListObjectListView.RefreshObjects(mods);
                 afterUpdateAction?.Invoke();
                 
@@ -435,7 +439,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        void DeleteMods(List<ModEntry> mods, bool keepEntries)
+        async Task DeleteModsAsync(List<ModEntry> mods, bool keepEntries)
         {
             // Delete / unsubscribe
             foreach (var mod in mods)
@@ -443,7 +447,7 @@ namespace XCOM2Launcher.Forms
                 Log.Info("Deleting mod " + mod.ID);
 
                 // Set State for all mods that depend on this one to MissingDependencies
-                var dependentMods = Mods.GetDependentMods(mod);
+                var dependentMods = await Mods.GetDependentModsAsync(mod);
                 dependentMods.ForEach(m =>
                 {
                     m.SetState(ModState.MissingDependencies);
@@ -521,7 +525,7 @@ namespace XCOM2Launcher.Forms
             MessageBox.Show($"You will have to wait for the download{plural} to finish in order to use the mod{plural}.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void ConfirmDeleteMods(List<ModEntry> mods)
+        private async Task ConfirmDeleteMods(List<ModEntry> mods)
         {
             if (mods == null || !mods.Any())
             {
@@ -538,10 +542,10 @@ namespace XCOM2Launcher.Forms
             if (result != DialogResult.OK)
                 return;
 
-            DeleteMods(mods, false);
+            await DeleteModsAsync(mods, false);
         }
 
-        private void ConfirmUnsubscribeMods(List<ModEntry> mods)
+        private async Task ConfirmUnsubscribeModsAsync(List<ModEntry> mods)
         {
             if (mods == null || !mods.Any())
             {
@@ -566,7 +570,7 @@ namespace XCOM2Launcher.Forms
             if (result != DialogResult.OK)
                 return;
 
-            DeleteMods(mods, true);
+            await DeleteModsAsync(mods, true);
         }
 
         private void MoveSelectedModsToCategory(string category)
@@ -867,7 +871,7 @@ namespace XCOM2Launcher.Forms
                     if (!m.State.HasFlag(ModState.DuplicatePrimary))
                     {
                         disableDuplicates = new ToolStripMenuItem("Prefer this duplicate");
-                        disableDuplicates.Click += delegate
+                        disableDuplicates.Click += async delegate
                         {
                             // disable all other duplicates
                             foreach (var duplicate in duplicateMods)
@@ -887,14 +891,14 @@ namespace XCOM2Launcher.Forms
                             m.AddState(ModState.DuplicatePrimary);
                             m.isActive = true;
                             modlist_ListObjectListView.RefreshObject(m);
-                            ProcessModListItemCheckChanged(m);
+                            await ProcessModListItemCheckChangedAsync (m);
                         };
                     }
 
                     if (m.State.HasFlag(ModState.DuplicatePrimary) || m.State.HasFlag(ModState.DuplicateDisabled))
                     {
                         restoreDuplicates = new ToolStripMenuItem("Restore duplicates");
-                        restoreDuplicates.Click += delegate
+                        restoreDuplicates.Click += async delegate
                         {
                             // restore normal duplicate state
                             foreach (var duplicate in duplicateMods)
@@ -914,7 +918,7 @@ namespace XCOM2Launcher.Forms
                             m.AddState(ModState.DuplicateID);
                             m.isActive = false;
                             modlist_ListObjectListView.RefreshObject(m);
-                            ProcessModListItemCheckChanged(m);
+                            await ProcessModListItemCheckChangedAsync(m);
                         };
                     }
                 }
@@ -1040,7 +1044,7 @@ namespace XCOM2Launcher.Forms
                 var installedWorkShopMods = workShopMods.Where(mod => !mod.State.HasFlag(ModState.NotInstalled)).ToList();
                 if (installedWorkShopMods.Any())
                 {
-                    unsubscribeItem = new ToolStripMenuItem("Unsubscribe", null, delegate { ConfirmUnsubscribeMods(installedWorkShopMods); });
+                    unsubscribeItem = new ToolStripMenuItem("Unsubscribe", null, async delegate { await ConfirmUnsubscribeModsAsync(installedWorkShopMods); });
                     unsubscribeItem.ToolTipText = "Unsubscribes the selected the mod(s) from the Workshop, but keeps the mod(s) listed in AML, so you can re-subscribe later.";
                 }
             }
@@ -1105,7 +1109,7 @@ namespace XCOM2Launcher.Forms
                 };
             }
 
-            var deleteItem = new ToolStripMenuItem("Delete", null, delegate { ConfirmDeleteMods(selectedMods); });
+            var deleteItem = new ToolStripMenuItem("Delete", null, async delegate { await ConfirmDeleteMods(selectedMods); });
             deleteItem.ToolTipText = "Unsubscribes the selected mod(s) from the Workshop, deletes the mod folder(s) and removes the mod(s) from AML.";
 
             // create menu structure
@@ -1208,7 +1212,7 @@ namespace XCOM2Launcher.Forms
             return newState;
         }
 
-        void ProcessModListItemCheckChanged(ModEntry modChecked)
+        async Task ProcessModListItemCheckChangedAsync(ModEntry modChecked)
         {
             //Debug.WriteLine("ProcessModListItemCheckChanged " + modChecked.Name);
 
@@ -1216,7 +1220,8 @@ namespace XCOM2Launcher.Forms
             if (modChecked.isActive && Settings.OnlyUpdateEnabledOrNewModsOnStartup && !_CheckTriggeredFromContextMenu)
             {
                 Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
-                Task.Run(() => Mods.UpdateModAsync(modChecked, Settings)).Wait();
+                
+                await Task.Run(() => Mods.UpdateModAsync(modChecked, Settings));
             }
 
             _CheckTriggeredFromContextMenu = false;
@@ -1248,14 +1253,17 @@ namespace XCOM2Launcher.Forms
                 modlist_ListObjectListView.RefreshObject(mod);
 
                 // refresh dependent mods
-                var dependentMods = Mods.GetDependentMods(mod);
-                dependentMods.ForEach(m => Mods.UpdatedModDependencyState(m));
+                var dependentMods = await Mods.GetDependentModsAsync(mod);
+                foreach (var m in dependentMods)
+                {
+                    await Mods.UpdatedModDependencyStateAsync(m);
+                }
                 modlist_ListObjectListView.RefreshObjects(dependentMods);
             }
 
-            UpdateDependencyInformation(ModList.SelectedObject);
             UpdateStateFilterLabels();
             UpdateLabels();
+            await UpdateDependencyInformationAsync(ModList.SelectedObject);
         }
 
         #region Events
@@ -1314,16 +1322,16 @@ namespace XCOM2Launcher.Forms
             // will not fire and we have to process the new state manually
             if (!ModList.Objects.Contains(mod))
             {
-                ProcessModListItemCheckChanged(mod);
+                _ = ProcessModListItemCheckChangedAsync(mod);
             }
 
             return newValue;
         }
 
-        private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
+        private async void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
             var mod = ModList.GetModelObject(e.Item.Index);
-            ProcessModListItemCheckChanged(mod);
+            await ProcessModListItemCheckChangedAsync(mod);
         }
 
         private void ModListItemCheck(object sender, ItemCheckEventArgs e)
@@ -1346,11 +1354,11 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void ModListSelectionChanged(object sender, EventArgs e)
+        private async void ModListSelectionChanged(object sender, EventArgs e)
         {
             CurrentMod = ModList.SelectedObjects.Count != 1 ? null : ModList.SelectedObject;
 
-            UpdateModInfo(CurrentMod);
+            await UpdateModInfoAsync(CurrentMod);
             
             if (CurrentMod != null)
             {

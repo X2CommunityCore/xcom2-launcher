@@ -8,11 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
-using Timer = System.Windows.Forms.Timer;
+using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Forms
 {
@@ -36,7 +35,6 @@ namespace XCOM2Launcher.Forms
             aboutToolStripMenuItem.DropDownDirection = ToolStripDropDownDirection.BelowLeft;
 
             // Settings
-            SteamAPIWrapper.Init();
             Settings = settings;
 
             // Restore states 
@@ -45,7 +43,7 @@ namespace XCOM2Launcher.Forms
             // Init interface
             InitModListView();
             InitDependencyListViews();
-            UpdateInterface();
+            
             RegisterEvents();
 
             // Other intialization
@@ -69,12 +67,6 @@ namespace XCOM2Launcher.Forms
             });
             #endif
 
-            // Run callbacks
-            var t1 = new Timer();
-            t1.Tick += (sender, e) => { SteamAPIWrapper.RunCallbacks(); };
-            t1.Interval = 10;
-            t1.Start();
-
 /*
             // Check for running downloads
 #if DEBUG
@@ -94,6 +86,7 @@ namespace XCOM2Launcher.Forms
         private void MainForm_Load(object sender, EventArgs e)
         {
             Text += " " + Program.GetCurrentVersionString(true);
+            _ = UpdateInterfaceAsync();
         }
 
         private void InitializeTabImages()
@@ -233,6 +226,7 @@ namespace XCOM2Launcher.Forms
             }
 
             status_toolstrip_label.Text = "Ready.";
+            progress_toolstrip_progressbar.Style = ProgressBarStyle.Continuous;
             progress_toolstrip_progressbar.Visible = false;
         }
 
@@ -453,14 +447,23 @@ namespace XCOM2Launcher.Forms
 
         #region Interface updates
 
-        private void UpdateInterface()
+        private async Task UpdateInterfaceAsync()
         {
+            SetStatus("Loading mod information...");
+            progress_toolstrip_progressbar.Visible = true;
+            progress_toolstrip_progressbar.Style = ProgressBarStyle.Marquee;
+            
             error_provider.Clear();
-
+            
             UpdateConflictInfo();
-            UpdateModInfo(modlist_ListObjectListView.SelectedObject as ModEntry);
+            await UpdateModInfoAsync(modlist_ListObjectListView.SelectedObject as ModEntry);
             UpdateLabels();
             UpdateStateFilterLabels();
+
+            var updateDepsTasks = Settings.Mods.All.Select(mod => Settings.Mods.UpdatedModDependencyStateAsync(mod));
+            await Task.WhenAll(updateDepsTasks);
+            
+            SetStatusIdle();
         }
 
         private void UpdateLabels()
@@ -675,23 +678,23 @@ namespace XCOM2Launcher.Forms
             btnDescUndo.Enabled = false;
         }
 
-        private void UpdateDependencyInformation(ModEntry m)
+        private async Task UpdateDependencyInformationAsync(ModEntry m)
         {
             if (m == null)
                 return;
 
             // update dependency information
             olvRequiredMods.ClearObjects();
-            olvRequiredMods.AddObjects(Mods.GetRequiredMods(m, cShowPrimaryDuplicates.Checked));
+            olvRequiredMods.AddObjects(await Mods.GetRequiredModsAsync(m, cShowPrimaryDuplicates.Checked));
             olvDependentMods.ClearObjects();
-            olvDependentMods.AddObjects(Mods.GetDependentMods(m, false));
+            olvDependentMods.AddObjects(await Mods.GetRequiredModsAsync(m, false));
         }
 
         /// <summary>
         /// Update mod information panel with data from specified mod.
         /// </summary>
         /// <param name="m"></param>
-        private void UpdateModInfo(ModEntry m)
+        private async Task UpdateModInfoAsync(ModEntry m)
         {
             if (m == null)
             {
@@ -726,8 +729,7 @@ namespace XCOM2Launcher.Forms
             UpdateModChangeLog(m);
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
-            UpdateDependencyInformation(m);
-
+            
             // Init handler for property changes
             var sel_obj = m.GetProperty();
             
@@ -759,6 +761,8 @@ namespace XCOM2Launcher.Forms
             }
 
             #endregion
+            
+            await UpdateDependencyInformationAsync(m);
         }
 
         /// <summary>
@@ -801,7 +805,7 @@ namespace XCOM2Launcher.Forms
                 return CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID);
             };
 
-            olvColReqModsIgnore.AspectPutter += (rowObject, value) =>
+            olvColReqModsIgnore.AspectPutter += async (rowObject, value) =>
             {
                 if (CurrentMod == null || !(rowObject is ModEntry mod) || !(value is bool checkState))
                     return;
@@ -822,7 +826,7 @@ namespace XCOM2Launcher.Forms
                     }
                 }
 
-                Mods.UpdatedModDependencyState(CurrentMod);
+                await Mods.UpdatedModDependencyStateAsync(CurrentMod);
                 modlist_ListObjectListView.RefreshObject(CurrentMod);
             };
 

@@ -886,11 +886,11 @@ namespace XCOM2Launcher.Forms
             cFilterNotLoaded.Checked = false;
         }
 
-        private void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
+        private async void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
         {
             if (modlist_ListObjectListView.SelectedObject is ModEntry mod)
             {
-                UpdateDependencyInformation(mod);
+                await UpdateDependencyInformationAsync(mod);
             }
         }
 

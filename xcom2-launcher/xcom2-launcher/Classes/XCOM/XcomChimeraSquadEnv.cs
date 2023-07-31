@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
-using XCOM2Launcher.Classes.Steam;
+using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Classes
@@ -30,7 +30,7 @@ namespace XCOM2Launcher.Classes
         {
             Log.Info("Starting XCOM Chimera Squad");
 
-            if (!SteamAPIWrapper.Init())
+            if (!SteamManager.IsSteamRunning())
                 MessageBox.Show("Could not connect to steam.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             var p = new Process
@@ -52,8 +52,6 @@ namespace XCOM2Launcher.Classes
                 Log.Warn("Failed to start game process", ex);
                 MessageBox.Show("An error occured while trying to run the game. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            SteamAPIWrapper.Shutdown();
         }
 
     }
