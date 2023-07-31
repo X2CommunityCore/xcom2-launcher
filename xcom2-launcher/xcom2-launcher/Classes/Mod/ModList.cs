@@ -615,7 +615,7 @@ namespace XCOM2Launcher.Mod
                 foreach (var modEntry in All)
                 {
                     var requiredMods = await GetRequiredModsAsync(modEntry).ConfigureAwait(false);
-                    if (requiredMods.Any(x => x.ID == modEntry.ID))
+                    if (requiredMods.Any(x => x.ID == mod.ID))
                     {
                         result.Add(modEntry);
                     }

@@ -689,7 +689,7 @@ namespace XCOM2Launcher.Forms
             olvRequiredMods.ClearObjects();
             olvRequiredMods.AddObjects(await Mods.GetRequiredModsAsync(m, cShowPrimaryDuplicates.Checked));
             olvDependentMods.ClearObjects();
-            olvDependentMods.AddObjects(await Mods.GetRequiredModsAsync(m, false));
+            olvDependentMods.AddObjects(await Mods.GetDependentModsAsync(m, false));
         }
 
         /// <summary>
