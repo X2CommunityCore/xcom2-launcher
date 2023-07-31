@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,8 +15,6 @@ namespace XCOM2Launcher.Mod
 {
     public class ModList
     {
-        private readonly object _ModUpdateLock = new object();
-
         [JsonIgnore]
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModList));
 
@@ -31,7 +30,7 @@ namespace XCOM2Launcher.Mod
         public IEnumerable<ModEntry> Active => All.Where(m => m.isActive);
 
         [JsonIgnore] 
-        private readonly List<ModEntry> _DependencyCache = new List<ModEntry>();
+        private readonly ConcurrentDictionary<long, ModEntry> _dependencyCache = new ConcurrentDictionary<long, ModEntry>();
 
         public virtual ModCategory this[string category]
         {
@@ -670,9 +669,7 @@ namespace XCOM2Launcher.Mod
                 {
                     // If the required mod is not installed, we query the workshop details to be able to display some information.
                     // To prevent unnecessary queries, results are cached.
-                    result = _DependencyCache.FirstOrDefault(m => m.WorkshopID == id);
-
-                    if (result != null)
+                    if (_dependencyCache.TryGetValue(id, out result))
                     {
                         requiredMods.Add(result);
                     }
@@ -684,7 +681,7 @@ namespace XCOM2Launcher.Mod
                         {
                             var newMod = new ModEntry(details);
                             requiredMods.Add(newMod);
-                            _DependencyCache.Add(newMod);
+                            _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
                         }
                         else
                         {
