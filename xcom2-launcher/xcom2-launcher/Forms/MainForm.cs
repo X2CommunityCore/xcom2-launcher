@@ -52,21 +52,6 @@ namespace XCOM2Launcher.Forms
             // Init the argument checkboxes
             InitQuickArgumentsMenu(settings);
 
-            #if !DEBUG
-            // Update mod information
-            var mods = Settings.Mods.All.ToList();
-
-            if (settings.OnlyUpdateEnabledOrNewModsOnStartup)
-            {
-                mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
-            }
-
-            UpdateMods(mods, () =>
-            {
-                modlist_ListObjectListView.RefreshObjects(mods);
-            });
-            #endif
-
 /*
             // Check for running downloads
 #if DEBUG
@@ -83,10 +68,27 @@ namespace XCOM2Launcher.Forms
 */
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private async void MainForm_Load(object sender, EventArgs e)
         {
             Text += " " + Program.GetCurrentVersionString(true);
-            _ = UpdateInterfaceAsync();
+            
+#if !DEBUG
+            // Update mod information
+            var mods = Settings.Mods.All.ToList();
+
+            if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+            {
+                mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
+            }
+
+            UpdateMods(mods, async () =>
+            {
+                modlist_ListObjectListView.RefreshObjects(mods);
+                await UpdateInterfaceAsync();
+            });
+#else
+            await UpdateInterfaceAsync();
+#endif
         }
 
         private void InitializeTabImages()

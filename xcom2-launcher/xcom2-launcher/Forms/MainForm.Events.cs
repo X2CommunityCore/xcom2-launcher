@@ -69,6 +69,8 @@ namespace XCOM2Launcher.Forms
                             RefreshModList();
                             modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
                         }));
+                        
+                        return Task.CompletedTask;
                     });
                 }
             };

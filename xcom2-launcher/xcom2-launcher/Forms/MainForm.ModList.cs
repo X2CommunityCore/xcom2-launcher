@@ -352,7 +352,7 @@ namespace XCOM2Launcher.Forms
         /// </summary>
 		/// <param name="mods">Mods that should be updated.</param>
 		/// <param name="afterUpdateAction">This Action will be executed after the update processing completed.</param>
-        private void UpdateMods(List<ModEntry> mods, Action afterUpdateAction = null)
+        private void UpdateMods(List<ModEntry> mods, Func<Task> afterUpdateAction = null)
         {
             if (IsModUpdateTaskRunning)
             {
@@ -384,13 +384,14 @@ namespace XCOM2Launcher.Forms
             ModUpdateCancelSource = new CancellationTokenSource();
             ModUpdateTask = Task.Run(() => Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token));
                                     
-            ModUpdateTask.ContinueWith(e =>
+            ModUpdateTask.ContinueWith(async e =>
             {
                 switch (e.Status)
                 {
                     case TaskStatus.RanToCompletion:
                         Log.Info("ModUpdateTask completed");
-                        PostProcessModUpdateTask();
+                        SetStatus("Post processing mod list...");
+                        await PostProcessModUpdateTask();
                         break;
                     case TaskStatus.Canceled:
                         Log.Info("ModUpdateTask was cancelled");
@@ -407,7 +408,7 @@ namespace XCOM2Launcher.Forms
                         Log.Error("At least one mod failed to update", aggregateException);
                         SetStatus("At least one mod failed to update");
                         
-                        PostProcessModUpdateTask();
+                        await PostProcessModUpdateTask();
 
                         MessageBox.Show("At least one mod failed to update: " + 
                                         Environment.NewLine + Environment.NewLine +
@@ -419,21 +420,16 @@ namespace XCOM2Launcher.Forms
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                
-                UseWaitCursor = false;
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
             
             return;
 
-            void PostProcessModUpdateTask()
+            async Task PostProcessModUpdateTask()
             {
-                Cursor.Current = Cursors.WaitCursor;
-                
                 modlist_ListObjectListView.RefreshObjects(mods);
-                afterUpdateAction?.Invoke();
+                if (afterUpdateAction != null) await afterUpdateAction();
                 
-                Cursor.Current = Cursors.Default;
+                UseWaitCursor = false;
                 SetStatusIdle();
                 Log.Info("ModUpdateTask post processing completed");
             }
@@ -1073,6 +1069,8 @@ namespace XCOM2Launcher.Forms
                                 EnabledModsInModList(modsNotActive);
                                 Cursor.Current = Cursors.Default;
                             }));
+
+                            return Task.CompletedTask;
                         });
                     }
                     else
