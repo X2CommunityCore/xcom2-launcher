@@ -9,7 +9,7 @@ namespace XCOM2Launcher.Steam
     {
         private static bool _initialized;
         private static readonly object _initlock = new object();
-        private static readonly System.Timers.Timer _timer = new System.Timers.Timer(5);
+        private static readonly System.Timers.Timer _timer = new System.Timers.Timer(50);
 
         static SteamManager()
         {
