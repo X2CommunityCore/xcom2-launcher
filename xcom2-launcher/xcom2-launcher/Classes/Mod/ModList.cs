@@ -480,7 +480,7 @@ namespace XCOM2Launcher.Mod
 
             // Update directory size
             // slow, but necessary ?
-            m.RealizeSize(Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length));
+            m.CalculateSize();
 
             // Update Name and Description
             // look for .XComMod file
@@ -527,9 +527,11 @@ namespace XCOM2Launcher.Mod
                 m.DateAdded = DateTimeOffset.FromUnixTimeSeconds(workshopDetails.m_rtimeAddedToUserList).DateTime;
 
             // Update directory size
-            m.RealizeSize(workshopDetails.m_nFileSize);
+            m.Size = workshopDetails.m_nFileSize;
             if (m.Size < 0)
-                m.RealizeSize(Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length));
+            {
+                m.CalculateSize();
+            }
 
             if (string.IsNullOrEmpty(m.Description))
             {

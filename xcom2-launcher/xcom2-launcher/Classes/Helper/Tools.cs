@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace XCOM2Launcher.Helper {
@@ -127,6 +129,33 @@ namespace XCOM2Launcher.Helper {
             var result = string.Compare(dirInfo1.FullName, dirInfo2.FullName, StringComparison.InvariantCultureIgnoreCase);
 
             return result == 0;
+        }
+        
+        public static long CalculateDirectorySize(string path)
+        {
+            long size = 0;
+            var fileEntries = Directory.GetFiles(path);
+
+            foreach (string fileName in fileEntries)
+            {
+                Interlocked.Add(ref size, new FileInfo(fileName).Length);
+            }
+            
+            var subdirs = Directory.GetDirectories(path);
+            
+            Parallel.For<long>(0, subdirs.Length, () => 0, (i, loop, subtotal) =>
+                {
+                    if ((File.GetAttributes(subdirs[i]) & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint)
+                    {
+                        subtotal += CalculateDirectorySize(subdirs[i]);
+                        return subtotal;
+                    }
+                    return 0;
+                },
+                x => Interlocked.Add(ref size, x)
+            );
+            
+            return size;
         }
     }
 }
