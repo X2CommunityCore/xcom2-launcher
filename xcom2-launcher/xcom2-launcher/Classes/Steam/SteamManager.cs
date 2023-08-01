@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Steamworks;
 
@@ -7,9 +6,10 @@ namespace XCOM2Launcher.Steam
 {
     public static class SteamManager
     {
-        private static bool _initialized;
+        private static volatile bool _initialized;
         private static readonly object _initlock = new object();
         private static readonly System.Timers.Timer _timer = new System.Timers.Timer(50);
+        private static bool _shutdown;
 
         static SteamManager()
         {
@@ -26,16 +26,22 @@ namespace XCOM2Launcher.Steam
         
         public static bool EnsureInitialized()
         {
+            // we can avoid taking locks when _initialized is already true
+            // ReSharper disable once InconsistentlySynchronizedField
             if (_initialized) return true;
-            if (!SteamAPI.IsSteamRunning()) return false;
-
+            
             lock (_initlock)
             {
                 if (_initialized) return true;
-
-                SteamAPI.Init();
-                _timer.Start();
-                _initialized = true;
+                if (_shutdown) return false;
+                if (!SteamAPI.IsSteamRunning()) return false;
+                
+                var steamInitialized = SteamAPI.Init();
+                if (steamInitialized)
+                {
+                    _timer.Start();
+                    _initialized = true;
+                }
             }
 
             return true;
@@ -43,16 +49,16 @@ namespace XCOM2Launcher.Steam
 
         public static void Shutdown()
         {
-            if (!_initialized) return;
-            
             lock (_initlock)
             {
                 if (!_initialized) return;
+                if (_shutdown) return;
                 
                 // stop timer before shutdown to avoid exceptions from steam
                 _timer.Stop();
                 
                 SteamAPI.Shutdown();
+                _shutdown = true;
                 _initialized = false;
             }
         }
