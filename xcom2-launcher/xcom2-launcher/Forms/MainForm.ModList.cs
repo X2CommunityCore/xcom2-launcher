@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -165,6 +164,60 @@ namespace XCOM2Launcher.Forms
             // Restore State
             if (Settings.Windows.ContainsKey("main") && Settings.Windows["main"].Data != null)
                 modlist_ListObjectListView.RestoreState(Settings.Windows["main"].Data);
+
+            olvColNotes.AspectGetter += rowObject =>
+            {
+                if (!(rowObject is ModEntry mod))
+                {
+                    return "";
+                }
+
+                // Return only the first line of the note
+                if (String.IsNullOrWhiteSpace(mod.Note))
+                {
+                    return "";
+                }
+                    
+                var firstLine = new Regex("[^\r\n]*").Match(mod.Note).Value;
+                return firstLine;
+            };
+            
+            modlist_ListObjectListView.CellEditStarting += (sender, args) =>
+            {
+                if (!(args.RowObject is ModEntry mod))
+                {
+                    return;
+                }
+
+                // Use Multi-Line editor for notes
+                if (args.Column == olvColNotes)
+                {
+                    var tb = new TextBox
+                             {
+                                 Multiline = true,
+                                 ScrollBars = ScrollBars.Both,
+                                 Bounds = args.CellBounds,
+                             };
+                    
+                    tb.Height *= 4;
+                    tb.Text = mod.Note?.Replace("\n", "\r\n") ?? "";
+                    args.Control = tb;
+                }
+            };
+
+            modlist_ListObjectListView.CellEditFinished += (sender, args) =>
+            {
+                if (!(args.RowObject is ModEntry mod))
+                {
+                    return;
+                }
+
+                // Refresh info in mod overview if note was changed in OLV
+                if (args.Column == olvColNotes)
+                {
+                    modInfoNotesText.Text = mod.Note;
+                }
+            };
             
             RefreshModList();
         }
@@ -1070,7 +1123,7 @@ namespace XCOM2Launcher.Forms
                 if (installedWorkShopMods.Any())
                 {
                     unsubscribeItem = new ToolStripMenuItem("Unsubscribe", null, delegate { ConfirmUnsubscribeMods(installedWorkShopMods); });
-                    unsubscribeItem.ToolTipText = "Unsubscribes the selected the mod(s) from the Workshop, but keeps the mod(s) listed in AML, so you can re-subscribe later.";
+                    unsubscribeItem.ToolTipText = "Unsubscribes the selected mod(s) from the Workshop, but keeps the mod(s) listed in AML, so you can re-subscribe later.";
                 }
             }
 

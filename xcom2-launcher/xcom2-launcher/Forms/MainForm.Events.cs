@@ -816,34 +816,6 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
-        {
-            //var contents = modinfo_info_DescriptionRichTextBox.Text;
-            //if (!CurrentMod.Description.Equals(contents))
-            //    CurrentMod.Description = contents;
-            btnDescSave.Enabled = true;
-            btnDescUndo.Enabled = true;
-        }
-
-        private void btnDescSave_Click(object sender, EventArgs e)
-        {
-            if (CurrentMod != null)
-            {
-                var contents = modinfo_info_DescriptionRichTextBox.Text;
-
-                if (!CurrentMod.Description.Equals(contents))
-                    CurrentMod.Description = contents;
-            }
-
-            btnDescSave.Enabled = false;
-            btnDescUndo.Enabled = false;
-        }
-
-        private void btnDescUndo_Click(object sender, EventArgs e)
-        {
-            UpdateModDescription(CurrentMod);
-        }
-
         private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
         {
             if (modlist_ListObjectListView.OLVGroups == null)
@@ -896,6 +868,15 @@ namespace XCOM2Launcher.Forms
             if (modlist_ListObjectListView.SelectedObject is ModEntry mod)
             {
                 UpdateDependencyInformation(mod);
+            }
+        }
+        
+        private void modInfoNotesText_TextChanged(object sender, EventArgs e)
+        {
+            if (CurrentMod != null)
+            {
+                CurrentMod.Note = modInfoNotesText.Text;
+                modlist_ListObjectListView.RefreshObject(CurrentMod);
             }
         }
 

@@ -75,7 +75,7 @@ namespace XCOM2Launcher.Mod
         public DateTime? DateCreated { get; set; } = null;
         public DateTime? DateUpdated { get; set; } = null;
 
-        public string Note { get; set; } = null;
+        public string Note { get; set; }
 
         /// <summary>
         /// Contains workshop id's from all mods, that this mod requires to run properly (as reported from workshop).
@@ -140,24 +140,26 @@ namespace XCOM2Launcher.Mod
 
 		#region Mod
 
-		public string GetDescription(bool CleanBBCode = false)
+		public string GetDescription(bool cleanBbCode = false)
 		{
             string dsc;
+            
             if (!string.IsNullOrEmpty(Description))
                 dsc = Description;
             else
                 dsc = new ModInfo(GetModInfoFile()).Description;
 
-            if (CleanBBCode)
+            if (cleanBbCode)
             {
                 dsc = Tools.GetRtfEscapedString(dsc);
-                Regex Regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
-                dsc = Regexp.Replace(dsc, RTFEvaluator);
-                Regex replace_linebreaks = new Regex(@"[\r\n]{1,2}");
-                dsc = replace_linebreaks.Replace(dsc, @"\line ");
+                var regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
+                dsc = regexp.Replace(dsc, RTFEvaluator);
+                var replaceLinebreaks = new Regex(@"[\r\n]{1,2}");
+                dsc = replaceLinebreaks.Replace(dsc, @"\line ");
                 return @"{\rtf1\ansi " + dsc + "}";
             }
-            return Description;
+
+            return dsc;
         }
 
         private string RTFEvaluator(Match match)
