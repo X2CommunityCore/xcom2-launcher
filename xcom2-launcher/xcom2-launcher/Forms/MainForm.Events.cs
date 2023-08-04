@@ -66,7 +66,6 @@ namespace XCOM2Launcher.Forms
                     {
                         Invoke(new Action(() => 
                         {
-                            RefreshModList();
                             modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
                         }));
                         
@@ -888,11 +887,11 @@ namespace XCOM2Launcher.Forms
             cFilterNotLoaded.Checked = false;
         }
 
-        private async void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
+        private void cShowPrimaryDuplicates_CheckedChanged(object sender, EventArgs e)
         {
             if (modlist_ListObjectListView.SelectedObject is ModEntry mod)
             {
-                await UpdateDependencyInformationAsync(mod);
+                UpdateDependencyInformation(mod);
             }
         }
 

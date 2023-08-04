@@ -453,7 +453,7 @@ namespace XCOM2Launcher
 
             // import mods
             settings.ImportMods();
-
+            
             return settings;
         }
 

@@ -68,7 +68,6 @@ namespace XCOM2Launcher.Mod
         public IEnumerable<ModConflict> GetActiveConflicts()
         {
             var activeConflicts = GetActiveConflictsImplementation().ToList();
-            UpdateModsConflictState(activeConflicts);
             return activeConflicts;
         }
 
@@ -92,17 +91,30 @@ namespace XCOM2Launcher.Mod
                 select new ModConflict(className, overridesForThisClass);
         }
 
-        private void UpdateModsConflictState(IEnumerable<ModConflict> activeConflicts)
+        public List<ModEntry> UpdateModsConflictState()
         {
+            var activeConflicts = GetActiveConflicts();
+            var changedMods = new List<ModEntry>();
+            
             foreach (var mod in All)
             {
-                mod.RemoveState(ModState.ModConflict);
+                if (mod.State.HasFlag(ModState.ModConflict))
+                {
+                    mod.RemoveState(ModState.ModConflict);
+                    changedMods.Add(mod);
+                }
             }
 
             foreach (var classOverride in activeConflicts.SelectMany(conflict => conflict.Overrides))
             {
-                classOverride.Mod.AddState(ModState.ModConflict);
+                if (!classOverride.Mod.State.HasFlag(ModState.ModConflict))
+                {
+                    classOverride.Mod.AddState(ModState.ModConflict);
+                    changedMods.Add(classOverride.Mod);
+                }
             }
+
+            return changedMods;
         }
 
         /// <summary>
@@ -110,9 +122,9 @@ namespace XCOM2Launcher.Mod
         /// </summary>
         /// <param name="mod"></param>
         /// <returns></returns>
-        public async Task UpdatedModDependencyStateAsync(ModEntry mod)
+        public void UpdatedModDependencyState(ModEntry mod)
         {
-            var requiredMods = await GetRequiredModsAsync(mod, true, true).ConfigureAwait(false);
+            var requiredMods = GetRequiredMods(mod, true, true);
             var allRequiredModsAvailable = requiredMods.All(m => m.WorkshopID != 0 && m.isActive && !m.State.HasFlag(ModState.NotInstalled) && !m.State.HasFlag(ModState.NotLoaded));
             
             if (allRequiredModsAvailable)
@@ -263,7 +275,7 @@ namespace XCOM2Launcher.Mod
                 mod.Index = All.Count();
 
             this[category].Entries.Add(mod);
-
+            
             Log.Info($"Mod '{mod.ID}' added to category '{category}'");
         }
 
@@ -277,7 +289,7 @@ namespace XCOM2Launcher.Mod
 
         public async Task<List<ModEntry>> UpdateModAsync(ModEntry m, Settings settings)
         {
-            return await UpdateModsAsync(new List<ModEntry> {m}, settings);
+            return await UpdateModsAsync(new List<ModEntry> {m}, settings).ConfigureAwait(false);
         }
 
         public async Task<List<ModEntry>> UpdateModsAsync(List<ModEntry> mods, Settings settings, IProgress<ModUpdateProgress> progress = null, CancellationToken cancelToken = default(CancellationToken))
@@ -286,7 +298,9 @@ namespace XCOM2Launcher.Mod
 
             var steamMods = new List<ModEntry>();
             var localMods = new List<ModEntry>();
-                
+            
+            _dependencyCache.Clear();
+
             foreach (var mod in mods)
             {
                 if (!VerifyModState(mod, settings))
@@ -303,9 +317,9 @@ namespace XCOM2Launcher.Mod
             }
 
             var steamModsCopy = new List<ModEntry>(steamMods);
-            var getDetailsTasks = new List<Task<List<SteamUGCDetails_t>>>();
+            var getDetailsTasks = new List<Task<List<SteamUGCDetails>>>();
             var totalModCount = steamMods.Count + localMods.Count;
-            var steamProgress = 1;
+            var steamProgress = 0;
             
             while(steamModsCopy.Any())
             {    
@@ -317,7 +331,7 @@ namespace XCOM2Launcher.Mod
                 getDetailsTasks.Add(GetDetailsTask());
                 continue;
 
-                async Task<List<SteamUGCDetails_t>> GetDetailsTask()
+                async Task<List<SteamUGCDetails>> GetDetailsTask()
                 {
                     var details = await Workshop.GetDetailsAsync(batchQueryModList.ConvertAll(mod => (ulong)mod.WorkshopID), true).ConfigureAwait(false);
 
@@ -326,8 +340,6 @@ namespace XCOM2Launcher.Mod
                         Log.Warn("GetDetails() request returned NULL");
                         return null;
                     }
-
-                    var updateTasks = new List<Task>();
 
                     foreach (var workshopDetails in details)
                     {
@@ -338,58 +350,41 @@ namespace XCOM2Launcher.Mod
                             return null;
                         }
 
-                        updateTasks.Add(UpdateTask());
-                        continue;
+                        // A requested workshop detail may match more than one mod (having the same mod installed from Steam and locally for example).
+                        var matchingMods = batchQueryModList.FindAll(mod => (ulong)mod.WorkshopID == workshopDetails.Details.m_nPublishedFileId.m_PublishedFileId);
 
-                        async Task UpdateTask()
+                        foreach (var m in matchingMods)
                         {
-                            // A requested workshop detail may match more than one mod (having the same mod installed from Steam and locally for example).
-                            var matchingMods = batchQueryModList.FindAll(mod => (ulong)mod.WorkshopID == workshopDetails.m_nPublishedFileId.m_PublishedFileId);
-
-                            foreach (var m in matchingMods)
+                            if (cancelToken.IsCancellationRequested)
                             {
-                                if (cancelToken.IsCancellationRequested)
-                                {
-                                    Log.Debug("Update mod task cancelled");
-                                    cancelToken.ThrowIfCancellationRequested();
-                                    return;
-                                }
+                                Log.Debug("Update mod task cancelled");
+                                cancelToken.ThrowIfCancellationRequested();
+                                return null;
+                            }
 
-                                progress?.Report(new ModUpdateProgress($"Updating mods {steamProgress}/{totalModCount}...", steamProgress, totalModCount));
-                                Interlocked.Increment(ref steamProgress);
-
-                                try
-                                {
-                                    await UpdateSteamModAsync(m, workshopDetails).ConfigureAwait(false);
-                                }
-                                catch (Exception ex)
-                                {
-                                    // Log Exception and throw it to indicate that the Task failed
-                                    Log.Warn($"Error while updating Steam mod '{m.Name}'", ex);
-                                    throw;
-                                }
+                            var incremented = Interlocked.Increment(ref steamProgress);
+                            progress?.Report(new ModUpdateProgress($"Updating mods {incremented}/{totalModCount}...", incremented, totalModCount));
+                                
+                            try
+                            {
+                                await UpdateSteamModAsync(m, workshopDetails).ConfigureAwait(false);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log Exception and throw it to indicate that the Task failed
+                                Log.Warn($"Error while updating Steam mod '{m.Name}'", ex);
+                                throw;
                             }
                         }
                     }
-
-                    try
-                    {
-                        Log.Debug($"Waiting for {updateTasks.Count} UpdateSteamMod tasks to complete.");
-                        await Task.WhenAny(Task.WhenAll(updateTasks), Task.Delay(Timeout.Infinite, cancelToken)).ConfigureAwait(false);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Log.Debug("UpdateSteamMod batch task cancelled.");
-                        throw;
-                    }
-
+                   
                     Log.Debug("UpdateSteamMod tasks completed.");
                     return details;
                 }
             }
 
             Log.Debug($"Waiting for {getDetailsTasks.Count} GetDetails tasks to complete.");
-            await Task.WhenAll(getDetailsTasks).ConfigureAwait(false);
+            await Task.WhenAny(Task.WhenAll(getDetailsTasks), Task.Delay(Timeout.Infinite, cancelToken)).ConfigureAwait(false);
             Log.Debug("GetDetails tasks completed.");
 
             var totalProgress = steamProgress;
@@ -407,7 +402,7 @@ namespace XCOM2Launcher.Mod
                 progress?.Report(new ModUpdateProgress($"Updating mods {totalProgress}/{totalModCount}...", totalProgress, totalModCount));
                 totalProgress++;
                 
-                UpdateLocalMod(localMod);
+                await UpdateLocalModAsync(localMod);
             }
 
             List<ModEntry> updatedEntries = new List<ModEntry>();
@@ -472,7 +467,7 @@ namespace XCOM2Launcher.Mod
             return true;
         }
 
-        void UpdateLocalMod(ModEntry m)
+        async Task UpdateLocalModAsync(ModEntry m)
         {
             Log.Debug("Processing local information for " + m.ID);
 
@@ -482,6 +477,8 @@ namespace XCOM2Launcher.Mod
             // Update directory size
             // slow, but necessary ?
             m.RealizeSize(Directory.EnumerateFiles(m.Path, "*", SearchOption.AllDirectories).Sum(fileName => new FileInfo(fileName).Length));
+
+            await m.LoadOverridesAsync();
             
             // Update Name and Description
             // look for .XComMod file
@@ -504,20 +501,21 @@ namespace XCOM2Launcher.Mod
 
         }
 
-        async Task UpdateSteamModAsync(ModEntry m, SteamUGCDetails_t workshopDetails)
+        async Task UpdateSteamModAsync(ModEntry m, SteamUGCDetails workshopDetailsWrapper)
         {
             if (m == null || m.WorkshopID <= 0)
             {
                 return;
             }
 
+            var workshopDetails = workshopDetailsWrapper.Details;
             if (workshopDetails.m_eResult != EResult.k_EResultOK)
             {
                 return;
             }
 
             Log.Debug("Processing Workshop details for " + m.ID);
-
+            
             if (!m.ManualName)
                 m.Name = workshopDetails.m_rgchTitle;
 
@@ -556,20 +554,14 @@ namespace XCOM2Launcher.Mod
             // We buffer the Steam tags so we do nor require another full UGC workshop request when the user chooses to use them.
             m.SteamTags = workshopDetails.m_rgchTags.Split(',').Select(s => s.TrimStart(' ').TrimEnd(' ')).Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             
-            // If the mod has dependencies, request the workshop id's of those mods.
+            // If the mod has dependencies, update them and make sure we have the workshop information of those
             if (workshopDetails.m_unNumChildren > 0)
             {
-                var dependencies = await Workshop.GetDependenciesAsync(workshopDetails).ConfigureAwait(false);
-            
-                if (dependencies != null)
-                {
-                    m.Dependencies.Clear();
-                    m.Dependencies.AddRange(dependencies.Select(x => (long)x));
-                }
-                else
-                {
-                    Log.Warn($"Dependency request for {m.WorkshopID} failed.");
-                }
+                var dependencies = workshopDetailsWrapper.Children;
+                m.Dependencies.Clear();
+                m.Dependencies.AddRange(dependencies.Select(x => (long)x));
+
+                await LoadNotInstalledDependencies(m.Dependencies).ConfigureAwait(false);
             }
 
             // Check Workshop for updates
@@ -578,8 +570,10 @@ namespace XCOM2Launcher.Mod
                 Log.Info("Update available for " + m.ID);
                 m.AddState(ModState.UpdateAvailable);
             }
-
-            await UpdatedModDependencyStateAsync(m).ConfigureAwait(false);
+            
+            await m.LoadOverridesAsync();
+            
+            UpdatedModDependencyState(m);
             
             // Check if it is built for WOTC
             try
@@ -595,6 +589,36 @@ namespace XCOM2Launcher.Mod
             }
         }
 
+        private async Task LoadNotInstalledDependencies(List<long> requiredModIds)
+        {
+            foreach (var requiredModId in requiredModIds)
+            {
+                var result = All.FirstOrDefault(m => m.WorkshopID == requiredModId);
+                if (result != null)
+                {
+                    // dependency is already installed
+                    continue;
+                }
+
+                if (_dependencyCache.TryGetValue(requiredModId, out result) && result != null)
+                {
+                    // dependency is already known in cache
+                    continue;
+                }
+                
+                var details = await Workshop.GetDetailsAsync((ulong)requiredModId).ConfigureAwait(false);
+                if (details.Details.m_eResult == EResult.k_EResultOK)
+                {
+                    var newMod = new ModEntry(details);
+                    _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
+                }
+                else
+                {
+                    Log.Warn($"Workshop request for WorkshopId={requiredModId} failed with result '{details.Details.m_eResult}'");
+                }
+            }
+        }
+
         public string GetCategory(ModEntry mod)
         {
             return Entries.First(entry => entry.Value.Entries.Contains(mod)).Key;
@@ -606,14 +630,14 @@ namespace XCOM2Launcher.Mod
         /// <param name="mod"></param>
         /// <param name="compareModId">If set to false, dependencies are checked against the workshop ID. Otherwise, the mod ID is used which also matches for duplicates.</param>
         /// <returns></returns>
-        public async Task<List<ModEntry>> GetDependentModsAsync(ModEntry mod, bool compareModId = true)
+        public List<ModEntry> GetDependentMods(ModEntry mod, bool compareModId = true)
         {
             var result = new List<ModEntry>();
             if (compareModId)
             {
                 foreach (var modEntry in All)
                 {
-                    var requiredMods = await GetRequiredModsAsync(modEntry).ConfigureAwait(false);
+                    var requiredMods = GetRequiredMods(modEntry);
                     if (requiredMods.Any(x => x.ID == mod.ID))
                     {
                         result.Add(modEntry);
@@ -633,10 +657,10 @@ namespace XCOM2Launcher.Mod
         /// <param name="substituteDuplicates">If set to true, the primary duplicate will be returned if the real dependency is a disabled duplicate.</param>
         /// <param name="checkIgnoredDependencies">If set to true, dependencies that have been set to be ignored are not returned.</param>
         /// <returns></returns>
-        public async Task<List<ModEntry>> GetRequiredModsAsync(ModEntry mod, bool substituteDuplicates = true, bool checkIgnoredDependencies = false)
+        public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true, bool checkIgnoredDependencies = false)
         {
             List<ModEntry> requiredMods = new List<ModEntry>();
-            var installedSteamMods = All.Where(m => m.WorkshopID != 0).ToList();
+            var installedMods = All.ToList();
 
             var dependecies = mod.Dependencies;
 
@@ -648,7 +672,7 @@ namespace XCOM2Launcher.Mod
             foreach (var id in dependecies)
             {
                 // Check if required mod is already installed and use it if available.
-                var result = installedSteamMods.FirstOrDefault(m => m.WorkshopID == id);
+                var result = installedMods.FirstOrDefault(m => m.WorkshopID == id);
 
                 if (result != null)
                 {
@@ -675,18 +699,7 @@ namespace XCOM2Launcher.Mod
                     }
                     else
                     {
-                        var details = await Workshop.GetDetailsAsync((ulong)id).ConfigureAwait(false);
-                        
-                        if (details.m_eResult == EResult.k_EResultOK)
-                        {
-                            var newMod = new ModEntry(details);
-                            requiredMods.Add(newMod);
-                            _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
-                        }
-                        else
-                        {
-                            Log.Warn($"Workshop request for WorkshopId={id} failed with result '{details.m_eResult}'");
-                        }
+                        Log.Error($"Could not find {id} in _dependencyCache");
                     }
                 }
             }

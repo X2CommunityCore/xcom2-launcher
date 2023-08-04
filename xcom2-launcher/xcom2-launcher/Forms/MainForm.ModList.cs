@@ -29,7 +29,7 @@ namespace XCOM2Launcher.Forms
 
         private bool _CheckTriggeredFromContextMenu;
 
-        public void InitModListView()
+        private void InitModListView()
         {
             var categoryGroupingDelegate = new GroupKeyGetterDelegate(o => Mods.GetCategory(o as ModEntry));
 
@@ -143,7 +143,7 @@ namespace XCOM2Launcher.Forms
             };
 
             modlist_ListObjectListView.BooleanCheckStatePutter = ModListBooleanCheckStatePutter;
-
+            
             // Init DateTime columns
             foreach (var column in columns.Where(c => c.DataType == typeof (DateTime?)))
             {
@@ -156,17 +156,17 @@ namespace XCOM2Launcher.Forms
                 column.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? -1 : 1)*a.Header.CompareTo(b.Header)); };
             }
 
+            // Start out sorted by name
+            modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
+            
             // Wrapper
             ModList = new TypedObjectListView<ModEntry>(modlist_ListObjectListView);
 
             // Restore State
             if (Settings.Windows.ContainsKey("main") && Settings.Windows["main"].Data != null)
                 modlist_ListObjectListView.RestoreState(Settings.Windows["main"].Data);
-
+            
             RefreshModList();
-
-            // Start out sorted by name
-            modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
         }
 
         private object StateAspectGetter(object rowobject)
@@ -364,12 +364,16 @@ namespace XCOM2Launcher.Forms
             progress_toolstrip_progressbar.Visible = true;
             UseWaitCursor = true;
             
-            Progress<ModUpdateProgress> reporter = new Progress<ModUpdateProgress>();
-            reporter.ProgressChanged += delegate(object sender, ModUpdateProgress progress)
+            var reporter = new Progress<ModUpdateProgress>();
+            reporter.ProgressChanged += UpdateProgress;
+
+            void UpdateProgress(object sender, ModUpdateProgress progress)
             {
-                Debug.WriteLine("Progress: " + progress.Message);
+                if (InvokeRequired) Invoke(new Action(() => UpdateProgress(sender, progress)));
+                
                 try
                 {
+                    
                     progress_toolstrip_progressbar.Maximum = progress.Max;
                     progress_toolstrip_progressbar.Value = progress.Current;
                     status_toolstrip_label.Text = progress.Message;
@@ -379,10 +383,10 @@ namespace XCOM2Launcher.Forms
                     // This can happen, when the main form is closed and the wrapped progress bar control of
                     // the ToolStripProgressBar has already been disposed while the mod update task is still reporting progress.
                 }
-            };
+            }
 
             ModUpdateCancelSource = new CancellationTokenSource();
-            ModUpdateTask = Task.Run(() => Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token));
+            ModUpdateTask = Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token);
                                     
             ModUpdateTask.ContinueWith(async e =>
             {
@@ -426,16 +430,23 @@ namespace XCOM2Launcher.Forms
 
             async Task PostProcessModUpdateTask()
             {
-                modlist_ListObjectListView.RefreshObjects(mods);
+                foreach (var mod in Settings.Mods.All)
+                {
+                    Settings.Mods.UpdatedModDependencyState(mod);
+                }
+                
+                RefreshModList();
+                
                 if (afterUpdateAction != null) await afterUpdateAction();
                 
-                UseWaitCursor = false;
                 SetStatusIdle();
+                UseWaitCursor = false;
+                
                 Log.Info("ModUpdateTask post processing completed");
             }
         }
 
-        async Task DeleteModsAsync(List<ModEntry> mods, bool keepEntries)
+        void DeleteMods(List<ModEntry> mods, bool keepEntries)
         {
             // Delete / unsubscribe
             foreach (var mod in mods)
@@ -443,7 +454,7 @@ namespace XCOM2Launcher.Forms
                 Log.Info("Deleting mod " + mod.ID);
 
                 // Set State for all mods that depend on this one to MissingDependencies
-                var dependentMods = await Mods.GetDependentModsAsync(mod);
+                var dependentMods = Mods.GetDependentMods(mod);
                 dependentMods.ForEach(m =>
                 {
                     m.SetState(ModState.MissingDependencies);
@@ -485,8 +496,7 @@ namespace XCOM2Launcher.Forms
                 }
             }
 
-            //RefreshModList();
-            UpdateConflictInfo();
+            RefreshModList();
         }
 
         private void ResubscribeToMods(List<ModEntry> mods)
@@ -521,7 +531,7 @@ namespace XCOM2Launcher.Forms
             MessageBox.Show($"You will have to wait for the download{plural} to finish in order to use the mod{plural}.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private async Task ConfirmDeleteMods(List<ModEntry> mods)
+        private void ConfirmDeleteMods(List<ModEntry> mods)
         {
             if (mods == null || !mods.Any())
             {
@@ -538,10 +548,10 @@ namespace XCOM2Launcher.Forms
             if (result != DialogResult.OK)
                 return;
 
-            await DeleteModsAsync(mods, false);
+            DeleteMods(mods, false);
         }
 
-        private async Task ConfirmUnsubscribeModsAsync(List<ModEntry> mods)
+        private void ConfirmUnsubscribeMods(List<ModEntry> mods)
         {
             if (mods == null || !mods.Any())
             {
@@ -566,7 +576,7 @@ namespace XCOM2Launcher.Forms
             if (result != DialogResult.OK)
                 return;
 
-            await DeleteModsAsync(mods, true);
+            DeleteMods(mods, true);
         }
 
         private void MoveSelectedModsToCategory(string category)
@@ -632,6 +642,12 @@ namespace XCOM2Launcher.Forms
         /// <param name="rebuildColumns">Set to true if visibility for some columns was changed for example.</param>
         private void RefreshModList(bool rebuildColumns = false)
         {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => RefreshModList(rebuildColumns)));
+                return;
+            }
+            
             var selectedMod = ModList.SelectedObject;
 
             // Un-register events
@@ -649,6 +665,8 @@ namespace XCOM2Launcher.Forms
             {
                 modlist_ListObjectListView.RebuildColumns();
             }
+            
+            modlist_ListObjectListView.Sort();
 
             modlist_ListObjectListView.EndUpdate();
 
@@ -661,6 +679,8 @@ namespace XCOM2Launcher.Forms
                 modlist_ListObjectListView.SelectObject(selectedMod);
 
             UpdateStateFilterLabels();
+            
+            UpdateConflictInfo();
         }
 
         private void RenameTagPrompt(ModEntry m, ModTag tag, bool renameAll)
@@ -1040,7 +1060,7 @@ namespace XCOM2Launcher.Forms
                 var installedWorkShopMods = workShopMods.Where(mod => !mod.State.HasFlag(ModState.NotInstalled)).ToList();
                 if (installedWorkShopMods.Any())
                 {
-                    unsubscribeItem = new ToolStripMenuItem("Unsubscribe", null, async delegate { await ConfirmUnsubscribeModsAsync(installedWorkShopMods); });
+                    unsubscribeItem = new ToolStripMenuItem("Unsubscribe", null, delegate { ConfirmUnsubscribeMods(installedWorkShopMods); });
                     unsubscribeItem.ToolTipText = "Unsubscribes the selected the mod(s) from the Workshop, but keeps the mod(s) listed in AML, so you can re-subscribe later.";
                 }
             }
@@ -1067,7 +1087,6 @@ namespace XCOM2Launcher.Forms
                             Invoke(new Action(() => 
                             {
                                 EnabledModsInModList(modsNotActive);
-                                Cursor.Current = Cursors.Default;
                             }));
 
                             return Task.CompletedTask;
@@ -1107,7 +1126,7 @@ namespace XCOM2Launcher.Forms
                 };
             }
 
-            var deleteItem = new ToolStripMenuItem("Delete", null, async delegate { await ConfirmDeleteMods(selectedMods); });
+            var deleteItem = new ToolStripMenuItem("Delete", null, delegate { ConfirmDeleteMods(selectedMods); });
             deleteItem.ToolTipText = "Unsubscribes the selected mod(s) from the Workshop, deletes the mod folder(s) and removes the mod(s) from AML.";
 
             // create menu structure
@@ -1219,7 +1238,7 @@ namespace XCOM2Launcher.Forms
             {
                 Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
                 
-                await Task.Run(() => Mods.UpdateModAsync(modChecked, Settings));
+                await Mods.UpdateModAsync(modChecked, Settings);
             }
 
             _CheckTriggeredFromContextMenu = false;
@@ -1251,17 +1270,18 @@ namespace XCOM2Launcher.Forms
                 modlist_ListObjectListView.RefreshObject(mod);
 
                 // refresh dependent mods
-                var dependentMods = await Mods.GetDependentModsAsync(mod);
+                var dependentMods = Mods.GetDependentMods(mod);
                 foreach (var m in dependentMods)
                 {
-                    await Mods.UpdatedModDependencyStateAsync(m);
+                    Mods.UpdatedModDependencyState(m);
                 }
+                
                 modlist_ListObjectListView.RefreshObjects(dependentMods);
             }
 
             UpdateStateFilterLabels();
             UpdateLabels();
-            await UpdateDependencyInformationAsync(ModList.SelectedObject);
+            UpdateDependencyInformation(ModList.SelectedObject);
         }
 
         #region Events
@@ -1320,7 +1340,9 @@ namespace XCOM2Launcher.Forms
             // will not fire and we have to process the new state manually
             if (!ModList.Objects.Contains(mod))
             {
-                _ = ProcessModListItemCheckChangedAsync(mod);
+                // run on new thread and wait to not deadlock ui
+                Task.Run(() => ProcessModListItemCheckChangedAsync(mod))
+                    .GetAwaiter().GetResult();
             }
 
             return newValue;
@@ -1352,11 +1374,11 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private async void ModListSelectionChanged(object sender, EventArgs e)
+        private void ModListSelectionChanged(object sender, EventArgs e)
         {
             CurrentMod = ModList.SelectedObjects.Count != 1 ? null : ModList.SelectedObject;
 
-            await UpdateModInfoAsync(CurrentMod);
+            UpdateModInfo(CurrentMod);
             
             if (CurrentMod != null)
             {
@@ -1368,7 +1390,7 @@ namespace XCOM2Launcher.Forms
             UpdateStateFilterLabels();
         }
 
-        private void ModListEditFinished(object sender, CellEditEventArgs e)
+        private async void ModListEditFinished(object sender, CellEditEventArgs e)
         {
             var mod = e.RowObject as ModEntry;
             if (mod == null) return;
@@ -1379,11 +1401,12 @@ namespace XCOM2Launcher.Forms
                     mod.ManualName = !string.IsNullOrEmpty(e.NewValue as string);
 
                     if (!mod.ManualName)
+                    {
                         // Restore name
-                        _ = Mods.UpdateModAsync(mod, Settings);
+                        await Mods.UpdateModAsync(mod, Settings);
+                    }
 
                     break;
-                    
                 case "Index":
                     if (Settings.AutoNumberIndexes == false) break;
                     if ((int)e.NewValue == (int)e.Value) break;

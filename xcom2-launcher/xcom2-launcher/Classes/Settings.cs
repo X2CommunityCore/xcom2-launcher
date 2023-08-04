@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using XCOM2Launcher.Helper;
@@ -117,7 +118,8 @@ namespace XCOM2Launcher
 
         internal List<ModEntry> ImportMods()
         {
-            return Mods.ImportMods(ModPaths);
+            var newMods = Mods.ImportMods(ModPaths);
+            return newMods;
         }
 
         /// <summary>
@@ -177,6 +179,12 @@ namespace XCOM2Launcher
                 settings.Arguments = null;
             }
             #pragma warning restore 612
+
+            // update mod overrides
+            // run on a new thread to not deadlock main thread
+            Task.Run(() => Task.WhenAll(settings.Mods.All.Select(x => x.LoadOverridesAsync())))
+                .GetAwaiter()
+                .GetResult();
 
             return settings;
         }

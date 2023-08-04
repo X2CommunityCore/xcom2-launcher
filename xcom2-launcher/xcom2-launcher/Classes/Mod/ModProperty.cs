@@ -15,6 +15,12 @@ namespace XCOM2Launcher.Classes.Mod
         private ModEntry modEntry;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        [Browsable(false)] 
+        public ModEntry ModEntry
+        {
+            get { return modEntry; }
+        }
         
         [Category("Mod Status")]
         public int Index
@@ -62,7 +68,6 @@ namespace XCOM2Launcher.Classes.Mod
                 {
                     modEntry.Name = "";
                     modEntry.ManualName = false;
-                    _ = Settings.Instance.Mods.UpdateModAsync(modEntry, Settings.Instance);
                     PropertyChangedEventArgs e = new PropertyChangedEventArgs("Name");
                     PropertyChanged?.Invoke(this, e);
                 }

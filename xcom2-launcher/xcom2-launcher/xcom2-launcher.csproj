@@ -191,6 +191,7 @@
     <Compile Include="Classes\Serialization\ModListConverter.cs" />
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\Steam\SteamManager.cs" />
+    <Compile Include="Classes\Steam\SteamUGCDetails.cs" />
     <Compile Include="Classes\Steam\Workshop.cs" />
     <Compile Include="Classes\WindowSetting.cs" />
     <Compile Include="Classes\XCOM\Xcom2Env.cs" />

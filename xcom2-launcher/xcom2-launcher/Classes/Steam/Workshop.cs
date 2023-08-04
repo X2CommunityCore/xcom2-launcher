@@ -47,10 +47,10 @@ namespace XCOM2Launcher.Steam
         /// <param name="id">Workshop id</param>
         /// <param name="getFullDescription">Sets whether to return the full description for the item. If set to false, the description is truncated at 255 bytes.</param>
         /// <returns>The requested data or the default struct (check for m_eResult == EResultNone), if the request failed.</returns>
-        public static async Task<SteamUGCDetails_t> GetDetailsAsync(ulong id, bool getFullDescription = false)
+        public static async Task<SteamUGCDetails> GetDetailsAsync(ulong id, bool getFullDescription = false)
         {
-            var result = await GetDetailsAsync(new List<ulong> {id}, getFullDescription);
-            return result?.FirstOrDefault() ?? new SteamUGCDetails_t();
+            var result = await GetDetailsAsync(new List<ulong> {id}, getFullDescription).ConfigureAwait(false);
+            return result?.FirstOrDefault() ?? new SteamUGCDetails(new SteamUGCDetails_t(), Array.Empty<ulong>());
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace XCOM2Launcher.Steam
         /// <param name="identifiers">Workshop id's</param>
         /// <param name="getFullDescription">Sets whether to return the full description for the item. If set to false, the description is truncated at 255 bytes.</param>
         /// <returns>The requested data or null, if the request failed.</returns>
-        public static async Task<List<SteamUGCDetails_t>> GetDetailsAsync(List<ulong> identifiers, bool getFullDescription = false)
+        public static async Task<List<SteamUGCDetails>> GetDetailsAsync(List<ulong> identifiers, bool getFullDescription = false)
         {
             if (identifiers == null)
                 throw new ArgumentNullException(nameof(identifiers));
@@ -74,63 +74,42 @@ namespace XCOM2Launcher.Steam
                 .Distinct()
                 .Select(x => new PublishedFileId_t(x))
                 .ToArray();
-            if (idList.Length == 0) return new List<SteamUGCDetails_t>();
-            
-            var queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(idList, (uint)idList.Length);
-            SteamUGC.SetReturnLongDescription(queryHandle, getFullDescription);
-            SteamUGC.SetReturnChildren(queryHandle, true); // required, otherwise m_unNumChildren will always be 0
-            
-            var apiCall = SteamUGC.SendQueryUGCRequest(queryHandle);
+            if (idList.Length == 0) return new List<SteamUGCDetails>();
 
-            var results = await SteamManager.QueryResultAsync<SteamUGCQueryCompleted_t, List<SteamUGCDetails_t>>(apiCall,
-                (result, ioFailure) =>
-                {
-                    var details = new List<SteamUGCDetails_t>();
+                var queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(idList, (uint)idList.Length);
+                SteamUGC.SetReturnLongDescription(queryHandle, getFullDescription);
+                SteamUGC.SetReturnChildren(queryHandle, true); // required, otherwise m_unNumChildren will always be 0
+            
+                var apiCall = SteamUGC.SendQueryUGCRequest(queryHandle);
 
-                    for (uint i = 0; i < result.m_unNumResultsReturned; i++)
+                var results = await SteamManager.QueryResultAsync<SteamUGCQueryCompleted_t, List<SteamUGCDetails>>(apiCall,
+                    (result, ioFailure) =>
                     {
-                        // Retrieve Value
-                        if (SteamUGC.GetQueryUGCResult(queryHandle, i, out var detail))
+                        var details = new List<SteamUGCDetails>();
+
+                        for (uint i = 0; i < result.m_unNumResultsReturned; i++)
                         {
-                            details.Add(detail);
+                            // Retrieve Value
+                            if (!SteamUGC.GetQueryUGCResult(queryHandle, i, out var detail))
+                            {
+                                return new List<SteamUGCDetails>();
+                            }
+                            
+                            var childFileIds = new PublishedFileId_t[detail.m_unNumChildren];
+                            var childIds = Array.Empty<ulong>();
+                            var success = SteamUGC.GetQueryUGCChildren(queryHandle, i, childFileIds, (uint)childFileIds.Length);
+                            if (success)
+                            {
+                                childIds = childFileIds.Select(x => x.m_PublishedFileId).ToArray();
+                            }
+
+                            details.Add(new SteamUGCDetails(detail, childIds));
                         }
-                    }
 
-                    SteamUGC.ReleaseQueryUGCRequest(queryHandle);
-                    return details;
-                });
-            return results;
-        }
-
-        private static async Task<ulong[]> GetDependenciesAsync(ulong workShopId, uint dependencyCount)
-        {
-            if (dependencyCount <= 0) return Array.Empty<ulong>();
-            if (workShopId <= 0) return Array.Empty<ulong>();
-            if (!SteamManager.IsSteamRunning()) return Array.Empty<ulong>();
-
-            var queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(new[] { workShopId.ToPublishedFileID() }, 1);
-            SteamUGC.SetReturnChildren(queryHandle, true);
-            var apiCall = SteamUGC.SendQueryUGCRequest(queryHandle);
-
-            var results = await SteamManager.QueryResultAsync<SteamUGCQueryCompleted_t, ulong[]>(apiCall, (result, ioFailure) =>
-            {
-                // todo: implement paged results, max is 50, see: https://partner.steamgames.com/doc/api/ISteamUGC#kNumUGCResultsPerPage
-                var idList = new PublishedFileId_t[dependencyCount];
-                var success = SteamUGC.GetQueryUGCChildren(queryHandle, 0, idList, (uint)idList.Length);
-
-                if (!success) return Array.Empty<ulong>();
-                
-                var resultIds = idList.Select(item => item.m_PublishedFileId).ToArray();
-                return resultIds;
-
-            });
-
-            return results;
-        }
-
-        public static Task<ulong[]> GetDependenciesAsync(SteamUGCDetails_t details)
-        {
-            return GetDependenciesAsync(details.m_nPublishedFileId.m_PublishedFileId, details.m_unNumChildren);
+                        SteamUGC.ReleaseQueryUGCRequest(queryHandle);
+                        return details;
+                    }).ConfigureAwait(false);
+                return results;
         }
 
         public static EItemState GetDownloadStatus(ulong id)
@@ -169,8 +148,7 @@ namespace XCOM2Launcher.Steam
                 BytesTotal = punBytesTotal
             };
         }
-
-
+        
         #region Download Item
         public class DownloadItemEventArgs : EventArgs
         {
