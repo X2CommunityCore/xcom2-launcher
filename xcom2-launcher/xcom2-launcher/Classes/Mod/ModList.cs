@@ -699,7 +699,7 @@ namespace XCOM2Launcher.Mod
                     }
                     else
                     {
-                        var details = Workshop.GetDetailsAsync((ulong)id).GetAwaiter().GetResult();
+                        var details = Task.Run(() => Workshop.GetDetailsAsync((ulong)id)).GetAwaiter().GetResult();
                         if (details.Details.m_eResult == EResult.k_EResultOK)
                         {
                             var newMod = new ModEntry(details);

@@ -1244,7 +1244,7 @@ namespace XCOM2Launcher.Forms
             {
                 Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
                 
-                Mods.UpdateModAsync(modChecked, Settings).GetAwaiter().GetResult();
+                Task.Run(() => Mods.UpdateModAsync(modChecked, Settings)).GetAwaiter().GetResult();
             }
 
             _CheckTriggeredFromContextMenu = false;
