@@ -887,7 +887,7 @@ namespace XCOM2Launcher.Forms
                     if (!m.State.HasFlag(ModState.DuplicatePrimary))
                     {
                         disableDuplicates = new ToolStripMenuItem("Prefer this duplicate");
-                        disableDuplicates.Click += async delegate
+                        disableDuplicates.Click += delegate
                         {
                             // disable all other duplicates
                             foreach (var duplicate in duplicateMods)
@@ -907,7 +907,7 @@ namespace XCOM2Launcher.Forms
                             m.AddState(ModState.DuplicatePrimary);
                             m.isActive = true;
                             modlist_ListObjectListView.RefreshObject(m);
-                            await ProcessModListItemCheckChangedAsync (m);
+                            ProcessModListItemCheckChanged(m);
                         };
                     }
 
@@ -934,7 +934,7 @@ namespace XCOM2Launcher.Forms
                             m.AddState(ModState.DuplicateID);
                             m.isActive = false;
                             modlist_ListObjectListView.RefreshObject(m);
-                            await ProcessModListItemCheckChangedAsync(m);
+                            ProcessModListItemCheckChanged(m);
                         };
                     }
                 }
@@ -993,9 +993,15 @@ namespace XCOM2Launcher.Forms
                     mod.isHidden = !m.isHidden;
 
                     if (!Settings.ShowHiddenElements && mod.isHidden)
+                    {
                         modlist_ListObjectListView.RemoveObject(mod);
+                        RefreshModelFilter();
+                    }
                     else
+                    {
                         modlist_ListObjectListView.RefreshObject(mod);
+                        RefreshModelFilter();
+                    }
                 }
             };
 
@@ -1229,7 +1235,7 @@ namespace XCOM2Launcher.Forms
             return newState;
         }
 
-        async Task ProcessModListItemCheckChangedAsync(ModEntry modChecked)
+        void ProcessModListItemCheckChanged(ModEntry modChecked)
         {
             //Debug.WriteLine("ProcessModListItemCheckChanged " + modChecked.Name);
 
@@ -1238,7 +1244,7 @@ namespace XCOM2Launcher.Forms
             {
                 Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
                 
-                await Mods.UpdateModAsync(modChecked, Settings);
+                Mods.UpdateModAsync(modChecked, Settings).GetAwaiter().GetResult();
             }
 
             _CheckTriggeredFromContextMenu = false;
@@ -1270,7 +1276,7 @@ namespace XCOM2Launcher.Forms
                 modlist_ListObjectListView.RefreshObject(mod);
 
                 // refresh dependent mods
-                var dependentMods = Mods.GetDependentMods(mod);
+                var dependentMods = Mods.GetDependentMods(mod, false);
                 foreach (var m in dependentMods)
                 {
                     Mods.UpdatedModDependencyState(m);
@@ -1341,17 +1347,16 @@ namespace XCOM2Launcher.Forms
             if (!ModList.Objects.Contains(mod))
             {
                 // run on new thread and wait to not deadlock ui
-                Task.Run(() => ProcessModListItemCheckChangedAsync(mod))
-                    .GetAwaiter().GetResult();
+                ProcessModListItemCheckChanged(mod);
             }
 
             return newValue;
         }
 
-        private async void ModListItemChecked(object sender, ItemCheckedEventArgs e)
+        private void ModListItemChecked(object sender, ItemCheckedEventArgs e)
         {
             var mod = ModList.GetModelObject(e.Item.Index);
-            await ProcessModListItemCheckChangedAsync(mod);
+            ProcessModListItemCheckChanged(mod);
         }
 
         private void ModListItemCheck(object sender, ItemCheckEventArgs e)

@@ -699,7 +699,16 @@ namespace XCOM2Launcher.Mod
                     }
                     else
                     {
-                        Log.Error($"Could not find {id} in _dependencyCache");
+                        var details = Workshop.GetDetailsAsync((ulong)id).GetAwaiter().GetResult();
+                        if (details.Details.m_eResult == EResult.k_EResultOK)
+                        {
+                            var newMod = new ModEntry(details);
+                            _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
+                        }
+                        else
+                        {
+                            Log.Warn($"Workshop request for WorkshopId={id} failed with result '{details.Details.m_eResult}'");
+                        }
                     }
                 }
             }
