@@ -704,6 +704,7 @@ namespace XCOM2Launcher.Mod
                         {
                             var newMod = new ModEntry(details);
                             _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
+                            requiredMods.Add(newMod);
                         }
                         else
                         {

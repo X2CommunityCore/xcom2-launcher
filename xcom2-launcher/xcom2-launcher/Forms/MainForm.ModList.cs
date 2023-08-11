@@ -914,7 +914,7 @@ namespace XCOM2Launcher.Forms
                     if (m.State.HasFlag(ModState.DuplicatePrimary) || m.State.HasFlag(ModState.DuplicateDisabled))
                     {
                         restoreDuplicates = new ToolStripMenuItem("Restore duplicates");
-                        restoreDuplicates.Click += async delegate
+                        restoreDuplicates.Click += delegate
                         {
                             // restore normal duplicate state
                             foreach (var duplicate in duplicateMods)
