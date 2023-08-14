@@ -66,9 +66,10 @@ namespace XCOM2Launcher.Forms
                     {
                         Invoke(new Action(() => 
                         {
-                            RefreshModList();
                             modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
                         }));
+                        
+                        return Task.CompletedTask;
                     });
                 }
             };

@@ -6,13 +6,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Semver;
 using Sentry;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
-using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
@@ -94,7 +94,7 @@ namespace XCOM2Launcher
                     return;
                 }
 
-                if (!SteamAPIWrapper.Init()) {
+                if (!SteamManager.EnsureInitialized()) {
                     Log.Warn("Failed to detect Steam");
 
                     StringBuilder message = new StringBuilder();
@@ -107,6 +107,8 @@ namespace XCOM2Launcher
                 }
 
                 // Load settings
+                // Cannot make 'Main' async, Winforms doesn't support that well, and this code should probably run after
+                // we show the main window so we can show some progress
                 var settings = InitializeSettings();
                 if (settings == null)
                 {
@@ -135,10 +137,10 @@ namespace XCOM2Launcher
                 }
 
                 Application.Run(new MainForm(settings));
-                SteamAPIWrapper.Shutdown();
             }
             finally
             {
+                SteamManager.Shutdown();
                 Log.Info("Shutting down...");
                 sentrySdkInstance?.Dispose();
                 GlobalSettings.Instance.Save();
@@ -421,8 +423,6 @@ namespace XCOM2Launcher
                     {
                         mod.EnableModFile();
                     }
-
-                    settings.Mods.UpdatedModDependencyState(mod);
                 }
 
                 var newMissingMods = settings.Mods.All.Where(m => (m.State.HasFlag(ModState.NotLoaded) || m.State.HasFlag(ModState.NotInstalled)) &&
@@ -453,7 +453,7 @@ namespace XCOM2Launcher
 
             // import mods
             settings.ImportMods();
-
+            
             return settings;
         }
 
