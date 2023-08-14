@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -10,6 +11,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
 using XCOM2Launcher.Helper;
+using XCOM2Launcher.Steam;
 using FilePath = System.IO.Path;
 
 namespace XCOM2Launcher.Mod
@@ -24,6 +26,9 @@ namespace XCOM2Launcher.Mod
         [JsonIgnore] private string _image;
 
         [JsonIgnore] private IEnumerable<ModClassOverride> _overrides;
+        [JsonIgnore] private static readonly Regex s_classOverridesRegex = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)", RegexOptions.Compiled);
+        [JsonIgnore] private static readonly Regex s_whitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
+        [JsonIgnore] private static readonly Regex s_screenClassRegex = new Regex(@"(?i)^\s*ScreenClass\s*=\s*(?:class')?([a-z_]+)", RegexOptions.Compiled);
 
         /// <summary>
         ///     Index to determine mod load order
@@ -112,8 +117,9 @@ namespace XCOM2Launcher.Mod
 
         public ModEntry() {}
 
-        public ModEntry(SteamUGCDetails_t workshopDetails)
+        public ModEntry(SteamUGCDetails workshopDetailsWrapper)
         {
+            var workshopDetails = workshopDetailsWrapper.Details;
             if (workshopDetails.m_eResult != EResult.k_EResultOK)
             {
                 return;
@@ -124,6 +130,7 @@ namespace XCOM2Launcher.Mod
             Source = ModSource.SteamWorkshop;
             Name = workshopDetails.m_rgchTitle;
             Description = workshopDetails.m_rgchDescription;
+            Dependencies = workshopDetailsWrapper.Children.Select(x => (long)x).ToList();
         }
 
         public Classes.Mod.ModProperty GetProperty()
@@ -200,19 +207,23 @@ namespace XCOM2Launcher.Mod
             return output;
         }
 
-        public IEnumerable<ModClassOverride> GetOverrides(bool forceUpdate = false)
+        public async Task LoadOverridesAsync()
         {
-            if (_overrides == null || forceUpdate)
+            await Task.Run(() =>
             {
                 _overrides = GetUIScreenListenerOverrides().Union(GetClassOverrides()).ToList();
-            }
+            });
+        }
+        
+        public IEnumerable<ModClassOverride> GetOverrides()
+        {
             return _overrides;
         }
 
         private IEnumerable<ModClassOverride> GetUIScreenListenerOverrides()
         {
             var sourceDirectory = FilePath.Combine(Path, "Src");
-            var overrides = new List<ModClassOverride>();
+            var overrides = new ConcurrentBag<ModClassOverride>();
 
             if (!Directory.Exists(sourceDirectory))
             {
@@ -241,11 +252,9 @@ namespace XCOM2Launcher.Mod
                     return;
                 }
 
-                var screenClassRegex = new Regex(@"(?i)^\s*ScreenClass\s*=\s*(?:class')?([a-z_]+)");
-
                 foreach (var line in File.ReadLines(sourceFile))
                 {
-                    var match = screenClassRegex.Match(line);
+                    var match = s_screenClassRegex.Match(line);
                     if (match.Success)
                     {
                         var oldClass = match.Groups[1].Value;
@@ -256,10 +265,7 @@ namespace XCOM2Launcher.Mod
                         }
 
                         var newClass = FilePath.GetFileNameWithoutExtension(sourceFile);
-                        lock (overrides)
-                        {
-                            overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener, line));
-                        }
+                        overrides.Add(new ModClassOverride(this, newClass, oldClass, ModClassOverrideType.UIScreenListener, line));
                     }
                 }
             });
@@ -274,10 +280,8 @@ namespace XCOM2Launcher.Mod
             if (!File.Exists(file))
                 return new ModClassOverride[0];
 
-            var r = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)");
-
             return from line in File.ReadLines(file)
-                select (l: line, match: r.Match(Regex.Replace(line, "\\s+", "")))
+                select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
                 into m
                 where m.match.Success
                 select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
