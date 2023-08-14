@@ -1077,8 +1077,8 @@ namespace XCOM2Launcher.Forms
                 enableAllItem = new ToolStripMenuItem("Enable");
                 enableAllItem.Click += delegate
                 {
-                    // If mods get enabled with OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
-                    if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+                    // If mods get enabled with UpdateModsOnStartup disabled or OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
+                    if (!Settings.UpdateModsOnStartup || Settings.OnlyUpdateEnabledOrNewModsOnStartup)
                     {
                         if (IsModUpdateTaskRunning)
                         {
@@ -1239,8 +1239,8 @@ namespace XCOM2Launcher.Forms
         {
             //Debug.WriteLine("ProcessModListItemCheckChanged " + modChecked.Name);
 
-            // If a mod gets enabled with OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
-            if (modChecked.isActive && Settings.OnlyUpdateEnabledOrNewModsOnStartup && !_CheckTriggeredFromContextMenu)
+            // If a mod gets enabled with Settings.UpdateModsOnStartup disabled or OnlyUpdateEnabledOrNewModsOnStartup active, we perform an update because mod data could be outdated.
+            if (modChecked.isActive && (!Settings.UpdateModsOnStartup || Settings.OnlyUpdateEnabledOrNewModsOnStartup) && !_CheckTriggeredFromContextMenu)
             {
                 Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
                 
@@ -1361,7 +1361,7 @@ namespace XCOM2Launcher.Forms
 
         private void ModListItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+            if (!Settings.UpdateModsOnStartup || Settings.OnlyUpdateEnabledOrNewModsOnStartup)
             {
                 // With OnlyUpdateEnabledOrNewModsOnStartup enabled, we prevent multiple mods from getting enabled
                 // by multiselecting and clicking on the check box. This would cause every checked mod to get updated individually,

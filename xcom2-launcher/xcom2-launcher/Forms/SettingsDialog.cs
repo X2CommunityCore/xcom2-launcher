@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -39,8 +37,10 @@ namespace XCOM2Launcher.Forms
             useTranslucentModListSelection.Checked = settings.UseTranslucentModListSelection;
             hideChallengeModeButton.Checked = settings.HideChallengeModeButton;
             hideRunX2Button.Checked = settings.HideXcom2Button;
+            updateModsOnStartup.Checked = settings.UpdateModsOnStartup;
             onlyUpdateEnabledAndNew.Checked = settings.OnlyUpdateEnabledOrNewModsOnStartup;
-
+            onlyUpdateEnabledAndNew.Enabled = settings.UpdateModsOnStartup;
+            
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
 
@@ -159,6 +159,7 @@ namespace XCOM2Launcher.Forms
             Settings.ModPaths = newModPaths;
             Settings.HideChallengeModeButton = hideChallengeModeButton.Checked;
             Settings.HideXcom2Button = hideRunX2Button.Checked;
+            Settings.UpdateModsOnStartup = updateModsOnStartup.Checked;
             Settings.OnlyUpdateEnabledOrNewModsOnStartup = onlyUpdateEnabledAndNew.Checked;
 
             var newArguments = argumentsTextBox.Text.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
@@ -178,6 +179,11 @@ namespace XCOM2Launcher.Forms
         private void searchForUpdatesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             checkForPreReleaseUpdates.Enabled = searchForUpdatesCheckBox.Checked;
+        }
+
+        private void updateModsOnStartup_CheckedChanged(object sender, EventArgs e)
+        {
+            onlyUpdateEnabledAndNew.Enabled = updateModsOnStartup.Checked;
         }
     }
 }
