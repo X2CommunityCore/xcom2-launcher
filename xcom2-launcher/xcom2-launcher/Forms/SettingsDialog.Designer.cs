@@ -588,14 +588,8 @@
 	        this.ResumeLayout(false);
         }
 
-        private System.Windows.Forms.CheckBox updateModsOnStartup;
-
-        private void PropertyGrid1_Layout(object sender, System.Windows.Forms.LayoutEventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
-
         #endregion
+
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
@@ -634,5 +628,6 @@
         private System.Windows.Forms.CheckBox hideRunX2Button;
         private System.Windows.Forms.CheckBox hideChallengeModeButton;
         private System.Windows.Forms.CheckBox onlyUpdateEnabledAndNew;
+		private System.Windows.Forms.CheckBox updateModsOnStartup;
     }
 }
