@@ -120,6 +120,12 @@
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="updateModsOnStartup.ToolTip" xml:space="preserve">
+    <value>If you disable this option, mods will not be updated when AML is starting.
+If you have many mods, this can greatly reduce the time until AML is 
+ready to launch the game. But mod information might be outdated.
+(use the main menu to refresh manually).</value>
+  </data>
   <data name="useDuplicateModWorkaround.ToolTip" xml:space="preserve">
     <value>This is an EXPERIMENTAL feature, that provides some means to manage multiple
 mods that have the same ID.
