@@ -75,19 +75,26 @@ namespace XCOM2Launcher.Forms
             Text += " " + Program.GetCurrentVersionString(true);
             
 #if !DEBUG
-            // Update mod information
-            var mods = Settings.Mods.All.ToList();
-
-            if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+            if (Settings.UpdateModsOnStartup)
             {
-                mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
-            }
+                // Update mod information
+                var mods = Settings.Mods.All.ToList();
 
-            UpdateMods(mods, () =>
+                if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+                {
+                    mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
+                }
+
+                UpdateMods(mods, () =>
+                {
+                    InitializeInterface();
+                    return Task.CompletedTask;
+                });
+            }
+            else
             {
                 InitializeInterface();
-                return Task.CompletedTask;
-            });
+            }
 #else
             InitializeInterface();
 #endif
