@@ -199,7 +199,7 @@ namespace XCOM2Launcher.Forms
             editOptionsToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->Options->Settings");
-                var dialog = new SettingsDialog(Settings);
+                using var dialog = new SettingsDialog(Settings);
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
@@ -234,7 +234,11 @@ namespace XCOM2Launcher.Forms
             #region Menu->Tools
 
             // -> Tools
-            cleanModsToolStripMenuItem.Click += delegate { new CleanModsForm(Settings).ShowDialog(); };
+            cleanModsToolStripMenuItem.Click += delegate
+            {
+                using var dlg = new CleanModsForm(Settings);
+                dlg.ShowDialog();
+            };
 
             importFromXCOM2ToolStripMenuItem.Click += delegate
             {
@@ -289,7 +293,7 @@ namespace XCOM2Launcher.Forms
             infoToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->About->About");
-                AboutBox about = new AboutBox();
+                using var about = new AboutBox();
                 about.ShowDialog();
             };
 
@@ -356,7 +360,7 @@ namespace XCOM2Launcher.Forms
         {
             Log.Info("Menu->Options->Categories");
 
-            CategoryManager catManager = new CategoryManager(Settings);
+            using var catManager = new CategoryManager(Settings);
             var result = catManager.ShowDialog();
 
             if (result == DialogResult.OK)
@@ -459,7 +463,7 @@ namespace XCOM2Launcher.Forms
 
         private void ExportLoadButtonClick(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog
+            using var dialog = new OpenFileDialog
             {
                 Filter = "Text files|*.txt",
                 DefaultExt = "txt",
@@ -608,7 +612,7 @@ namespace XCOM2Launcher.Forms
 
         private void ExportSaveButtonClick(object sender, EventArgs eventArgs)
         {
-            var dialog = new SaveFileDialog
+            using var dialog = new SaveFileDialog
             {
                 Filter = "Text files|*.txt",
                 DefaultExt = "txt",

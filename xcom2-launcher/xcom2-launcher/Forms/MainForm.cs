@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -13,7 +12,6 @@ using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
 using XCOM2Launcher.Classes.Mod;
-using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Forms
 {

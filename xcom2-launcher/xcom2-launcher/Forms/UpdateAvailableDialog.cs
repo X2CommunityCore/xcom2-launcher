@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using HeyRed.MarkdownSharp;
@@ -19,7 +17,8 @@ namespace XCOM2Launcher.Forms
         public UpdateAvailableDialog(Release release, SemVersion currentVersion, SemVersion newVersion)
         {
             InitializeComponent();
-            
+
+            CancelButton = bClose;
             releaseNoteBrowser.Navigating += Tools.HandleNavigateWebBrowserControl;
 
             CurrentVersion = currentVersion.ToString();
@@ -47,11 +46,6 @@ namespace XCOM2Launcher.Forms
 
             filesize_value_label.Text = asset == null ? "No download available yet." : Helper.FileSizeFormatExtension.FormatAsFileSize(asset.size);
 
-        }
-
-        private void close_button_Click(object sender, System.EventArgs e)
-        {
-            Close();
         }
 
         private void show_button_Click(object sender, System.EventArgs e)

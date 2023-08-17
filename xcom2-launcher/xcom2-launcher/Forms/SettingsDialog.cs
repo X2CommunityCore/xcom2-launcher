@@ -18,6 +18,7 @@ namespace XCOM2Launcher.Forms
         {
             InitializeComponent();
 
+            CancelButton = bCancel;
             Settings = settings;
 
             // Init GUI and other locals
