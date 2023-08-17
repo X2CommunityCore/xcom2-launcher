@@ -274,16 +274,24 @@ namespace XCOM2Launcher.Mod
 
         private IEnumerable<ModClassOverride> GetClassOverrides()
         {
-            var file = FilePath.Combine(Path, "Config", "XComEngine.ini");
+            var result = new List<ModClassOverride>();
+            var configPath = FilePath.Combine(Path, "Config");
+            if (!Directory.Exists(configPath))
+            {
+                return Array.Empty<ModClassOverride>();
+            }
+            
+            foreach (var file in Directory.GetFiles(configPath, "XComEngine.ini", SearchOption.AllDirectories))
+            {
+                var modClassOverrides = from line in File.ReadLines(file)
+                    select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
+                    into m
+                    where m.match.Success
+                    select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
+                result.AddRange(modClassOverrides);
+            }
 
-            if (!File.Exists(file))
-                return new ModClassOverride[0];
-
-            return from line in File.ReadLines(file)
-                select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
-                into m
-                where m.match.Success
-                select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
+            return result;
         }
 
         public void ShowOnSteam()
