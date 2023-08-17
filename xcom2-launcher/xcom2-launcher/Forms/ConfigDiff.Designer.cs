@@ -96,7 +96,7 @@
             // btCompare
             // 
             this.btCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btCompare.Enabled = false;
+            this.btCompare.Enabled = true;
             this.btCompare.Location = new System.Drawing.Point(566, 410);
             this.btCompare.Name = "btCompare";
             this.btCompare.Size = new System.Drawing.Size(75, 23);
@@ -246,13 +246,14 @@
             // 
             this.bClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.bClose.Enabled = false;
+            this.bClose.Enabled = true;
             this.bClose.Location = new System.Drawing.Point(647, 410);
             this.bClose.Name = "bClose";
             this.bClose.Size = new System.Drawing.Size(75, 23);
             this.bClose.TabIndex = 29;
             this.bClose.Text = "&Close";
             this.bClose.UseVisualStyleBackColor = true;
+            this.bClose.Click += new System.EventHandler(this.bClose_Click);
             // 
             // ConfigDiff
             // 

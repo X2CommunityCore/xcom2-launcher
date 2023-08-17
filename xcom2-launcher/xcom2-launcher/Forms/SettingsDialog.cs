@@ -18,6 +18,7 @@ namespace XCOM2Launcher.Forms
         {
             InitializeComponent();
 
+            AcceptButton = bOK;
             CancelButton = bCancel;
             Settings = settings;
 

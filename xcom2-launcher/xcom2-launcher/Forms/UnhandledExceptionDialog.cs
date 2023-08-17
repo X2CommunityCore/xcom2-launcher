@@ -9,6 +9,7 @@ namespace XCOM2Launcher.Forms {
         {
             InitializeComponent();
 
+            AcceptButton = bClose;
             CancelButton = bClose;
             
             tException.AppendText($"AML version: {Program.GetCurrentVersionString(true)}" + Environment.NewLine);

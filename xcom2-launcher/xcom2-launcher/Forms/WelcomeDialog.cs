@@ -12,6 +12,7 @@ namespace XCOM2Launcher.Forms
         public WelcomeDialog()
         {
             InitializeComponent();
+            AcceptButton = bContinue;
             Game = GameId.X2;
         }
 
@@ -33,8 +34,11 @@ namespace XCOM2Launcher.Forms
 
         private void WelcomeDialog_KeyDown(object sender, KeyEventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
-            Close();
+            if (e.KeyCode == Keys.Escape)
+            {
+                DialogResult = DialogResult.Cancel;
+                Close();
+            }
         }
     }
 }

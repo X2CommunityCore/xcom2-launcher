@@ -145,7 +145,12 @@ namespace XCOM2Launcher.Forms
 		{
 			IniLanguage.Process(e);
 		}
-    }
+
+		private void bClose_Click(object sender, EventArgs e)
+		{
+			Close();
+		}
+	}
 
     #region Merge stuffs
 

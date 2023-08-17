@@ -18,6 +18,7 @@ namespace XCOM2Launcher.Forms
         {
             InitializeComponent();
 
+            AcceptButton = bClose;
             CancelButton = bClose;
             releaseNoteBrowser.Navigating += Tools.HandleNavigateWebBrowserControl;
 
