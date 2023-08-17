@@ -11,10 +11,10 @@ namespace XCOM2Launcher.Steam
         public const string APPID_FILENAME = "steam_appid.txt";
 
         /// <summary>
-        /// According to Steamworks API constant kNumUGCResultsPerPage.
+        /// According to Steamworks API constant kNumUGCResultsPerPage (https://partner.steamgames.com/doc/api/ISteamUGC#kNumUGCResultsPerPage).
         /// The maximum number of results that you'll receive for a query result.
         /// </summary>
-        public const int MAX_UGC_RESULTS = 50; // according to 
+        public const int MAX_UGC_RESULTS = 50;
 
         static Workshop()
         {
@@ -76,40 +76,40 @@ namespace XCOM2Launcher.Steam
                 .ToArray();
             if (idList.Length == 0) return new List<SteamUGCDetails>();
 
-                var queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(idList, (uint)idList.Length);
-                SteamUGC.SetReturnLongDescription(queryHandle, getFullDescription);
-                SteamUGC.SetReturnChildren(queryHandle, true); // required, otherwise m_unNumChildren will always be 0
-            
-                var apiCall = SteamUGC.SendQueryUGCRequest(queryHandle);
+            var queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(idList, (uint)idList.Length);
+            SteamUGC.SetReturnLongDescription(queryHandle, getFullDescription);
+            SteamUGC.SetReturnChildren(queryHandle, true); // required, otherwise m_unNumChildren will always be 0
+        
+            var apiCall = SteamUGC.SendQueryUGCRequest(queryHandle);
 
-                var results = await SteamManager.QueryResultAsync<SteamUGCQueryCompleted_t, List<SteamUGCDetails>>(apiCall,
-                    (result, ioFailure) =>
+            var results = await SteamManager.QueryResultAsync<SteamUGCQueryCompleted_t, List<SteamUGCDetails>>(apiCall,
+                (result, ioFailure) =>
+                {
+                    var details = new List<SteamUGCDetails>();
+
+                    for (uint i = 0; i < result.m_unNumResultsReturned; i++)
                     {
-                        var details = new List<SteamUGCDetails>();
-
-                        for (uint i = 0; i < result.m_unNumResultsReturned; i++)
+                        // Retrieve Value
+                        if (!SteamUGC.GetQueryUGCResult(queryHandle, i, out var detail))
                         {
-                            // Retrieve Value
-                            if (!SteamUGC.GetQueryUGCResult(queryHandle, i, out var detail))
-                            {
-                                return new List<SteamUGCDetails>();
-                            }
-                            
-                            var childFileIds = new PublishedFileId_t[detail.m_unNumChildren];
-                            var childIds = Array.Empty<ulong>();
-                            var success = SteamUGC.GetQueryUGCChildren(queryHandle, i, childFileIds, (uint)childFileIds.Length);
-                            if (success)
-                            {
-                                childIds = childFileIds.Select(x => x.m_PublishedFileId).ToArray();
-                            }
-
-                            details.Add(new SteamUGCDetails(detail, childIds));
+                            return new List<SteamUGCDetails>();
+                        }
+                        
+                        var childFileIds = new PublishedFileId_t[detail.m_unNumChildren];
+                        var childIds = Array.Empty<ulong>();
+                        var success = SteamUGC.GetQueryUGCChildren(queryHandle, i, childFileIds, (uint)childFileIds.Length);
+                        if (success)
+                        {
+                            childIds = childFileIds.Select(x => x.m_PublishedFileId).ToArray();
                         }
 
-                        SteamUGC.ReleaseQueryUGCRequest(queryHandle);
-                        return details;
-                    }).ConfigureAwait(false);
-                return results;
+                        details.Add(new SteamUGCDetails(detail, childIds));
+                    }
+
+                    SteamUGC.ReleaseQueryUGCRequest(queryHandle);
+                    return details;
+                }).ConfigureAwait(false);
+            return results;
         }
 
         public static EItemState GetDownloadStatus(ulong id)
@@ -171,15 +171,17 @@ namespace XCOM2Launcher.Steam
             var work_done = new System.Threading.ManualResetEventSlim(false);
             using (Callback<PersonaStateChange_t>.Create(result => { work_done.Set(); }))
             {
-                bool success = SteamFriends.RequestUserInformation(new CSteamID(steamID), true);
-                if (success)
+                // from: https://partner.steamgames.com/doc/api/ISteamFriends#RequestUserInformation
+                // true means that the data has being requested, and a PersonaStateChange_t callback will be posted when it's retrieved.
+                // false means that we already have all the details about that user, and functions that require this information can be used immediately.
+                var dataRequested = SteamFriends.RequestUserInformation(new CSteamID(steamID), true);
+                if (dataRequested)
                 {
                     work_done.Wait(5000);
                     work_done.Reset();
-                    return SteamFriends.GetFriendPersonaName(new CSteamID(steamID)) ?? string.Empty;
                 }
 
-                return string.Empty;
+                return SteamFriends.GetFriendPersonaName(new CSteamID(steamID)) ?? string.Empty;
             }
         }
     }
