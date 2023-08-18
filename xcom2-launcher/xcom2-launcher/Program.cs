@@ -79,6 +79,14 @@ namespace XCOM2Launcher
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                bool gameTypeSelected = InitialGameTypeSelection();
+
+                if (!gameTypeSelected)
+                {
+                    Log.Info("Game type selection canceled or failed.");
+                    return;
+                }
+
                 InitAppSettings();
                 sentrySdkInstance = InitSentry();
                 
@@ -158,7 +166,7 @@ namespace XCOM2Launcher
                                            $"Message: {e.Message}\n\n" +
                                            $"Stack:\n{e.StackTrace}");
             
-            var dlg = new UnhandledExceptionDialog(e);
+            using var dlg = new UnhandledExceptionDialog(e);
             dlg.ShowDialog();
             Application.Exit();
         }
@@ -242,29 +250,6 @@ namespace XCOM2Launcher
                 appSettings.MaxVersion = currentVersion;
             }
 
-            // AML will either be used for XCOM2 or Chimera Squad
-            // Create Steam application id file if it does not exist (depending on game choice of the user)
-            if (!File.Exists(Workshop.APPID_FILENAME))
-            {
-                // Show Welcome Dialog and ask user to opt-in for Sentry error reporting.
-                WelcomeDialog dlg = new WelcomeDialog();
-                dlg.ShowDialog();
-                appSettings.IsSentryEnabled = dlg.UseSentry;
-
-                try
-                {
-                    using (var file = File.CreateText(Workshop.APPID_FILENAME))
-                    {
-                        file.WriteLine((uint)dlg.Game);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Unable to create {Workshop.APPID_FILENAME}. {Environment.NewLine} {ex.Message} ");
-                    return;
-                }
-            }
-
             // Use Steam Application id file to determine which game this AML installation is used for.
             string appIdStr;
 
@@ -296,6 +281,46 @@ namespace XCOM2Launcher
 
 
             appSettings.Save();
+        }
+
+        /// <summary>
+        /// This method checks if a game type (XCOM2 or Chimera Squad) was already set by checking if the application id file exists.
+        /// If it does not exist, the user can choose a game and the file will be created.
+        /// </summary>
+        /// <returns>True, if game type was selected or already set.
+        /// False, if the user aborted or the operation failed.</returns>
+        private static bool InitialGameTypeSelection()
+        {
+            if (File.Exists(Workshop.APPID_FILENAME))
+            {
+                return true;
+            }
+
+            // Show Welcome Dialog and ask user to opt-in for Sentry error reporting.
+            using var dlg = new WelcomeDialog();
+            var result = dlg.ShowDialog();
+
+            if (result != DialogResult.OK)
+            {
+                return false;
+            }
+
+            GlobalSettings.Instance.IsSentryEnabled = dlg.UseSentry;
+            GlobalSettings.Instance.Save();
+
+            try
+            {
+                using var file = File.CreateText(Workshop.APPID_FILENAME);
+                file.WriteLine((uint)dlg.Game);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed to create steam application id file.", ex);
+                MessageBox.Show($"Unable to create {Workshop.APPID_FILENAME}. {Environment.NewLine} {ex.Message} ");
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -502,7 +527,8 @@ namespace XCOM2Launcher
                         {
                             // New version available
                             Log.Info("New version available " + newVersion);
-                            new UpdateAvailableDialog(release, currentVersion, newVersion).ShowDialog();
+                            using var dlg = new UpdateAvailableDialog(release, currentVersion, newVersion);
+                            dlg.ShowDialog();
                             return true;
                         }
                     }

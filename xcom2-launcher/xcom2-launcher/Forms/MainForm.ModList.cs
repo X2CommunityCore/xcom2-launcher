@@ -727,7 +727,7 @@ namespace XCOM2Launcher.Forms
 
             editColor.Click += (sender, e) =>
             {
-                var colorPicker = new ColorDialog
+                using var colorPicker = new ColorDialog
                 {
                     AllowFullOpen = true,
                     Color = tag.Color,
