@@ -34,7 +34,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.ofdFile = new System.Windows.Forms.OpenFileDialog();
-            this.btCompare = new System.Windows.Forms.Button();
             this.fctb1 = new FastColoredTextBoxNS.FastColoredTextBox();
             this.fctb2 = new FastColoredTextBoxNS.FastColoredTextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -92,18 +91,6 @@
             this.label4.Size = new System.Drawing.Size(12, 13);
             this.label4.TabIndex = 21;
             this.label4.Text = " ";
-            // 
-            // btCompare
-            // 
-            this.btCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btCompare.Enabled = true;
-            this.btCompare.Location = new System.Drawing.Point(566, 410);
-            this.btCompare.Name = "btCompare";
-            this.btCompare.Size = new System.Drawing.Size(75, 23);
-            this.btCompare.TabIndex = 25;
-            this.btCompare.Text = "C&ompare";
-            this.btCompare.UseVisualStyleBackColor = true;
-            this.btCompare.Click += new System.EventHandler(this.btCompare_Click);
             // 
             // fctb1
             // 
@@ -262,7 +249,6 @@
             this.ClientSize = new System.Drawing.Size(734, 437);
             this.Controls.Add(this.bClose);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.btCompare);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label5);
@@ -291,7 +277,6 @@
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.OpenFileDialog ofdFile;
-		private System.Windows.Forms.Button btCompare;
 		private FastColoredTextBoxNS.FastColoredTextBox fctb1;
 		private FastColoredTextBoxNS.FastColoredTextBox fctb2;
 		private System.Windows.Forms.SplitContainer splitContainer1;

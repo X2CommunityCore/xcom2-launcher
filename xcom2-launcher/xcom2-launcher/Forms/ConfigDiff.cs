@@ -91,11 +91,6 @@ namespace XCOM2Launcher.Forms
 			_updating++;
 		}
 
-		private void btCompare_Click(object sender, EventArgs e)
-		{
-			Compare();
-		}
-
 		private void Compare()
 		{
 			fctb1.Clear();
