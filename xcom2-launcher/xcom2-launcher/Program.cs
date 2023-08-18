@@ -464,7 +464,11 @@ namespace XCOM2Launcher
                     }
                     else
                     {
-                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- " + string.Join("\n- ", newMissingMods.Select(m => m.Name)) + "\n\nDo you want to hide these mods from the mod list?";
+                        const int displayLimit = 10;
+                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- "
+                                  + string.Join("\n- ", newMissingMods.Take(displayLimit))
+                                  + (newMissingMods.Count > displayLimit ? "\n..." : "")
+                                  + "\n\nDo you want to hide these mods from the mod list?";
                     }
 
                     var result = MessageBox.Show(message, "Missing mods", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
