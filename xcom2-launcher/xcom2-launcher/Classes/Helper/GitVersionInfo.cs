@@ -23,7 +23,7 @@ namespace XCOM2Launcher.Classes.Helper {
         
         static GitVersionInfo() {
             var assembly = Assembly.GetExecutingAssembly();
-            var fields = assembly.GetType("XCOM2Launcher.GitVersionInformation").GetFields();
+            var fields = assembly.GetType("GitVersionInformation").GetFields();
 
             int.TryParse(fields.Single(f => f.Name == "Major").GetValue(null).ToString(), out Major);
             int.TryParse(fields.Single(f => f.Name == "Minor").GetValue(null).ToString(), out Minor);
