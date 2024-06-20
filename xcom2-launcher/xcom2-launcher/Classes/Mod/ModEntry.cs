@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
@@ -347,12 +348,12 @@ namespace XCOM2Launcher.Mod
         {
             BuiltForWOTC = NeedWOTC;
         }
-
-        public void RealizeSize(long newSize)
+        
+        public void CalculateSize()
         {
-            Size = newSize;
+            Size = Tools.CalculateDirectorySize(Path);
         }
-
+        
         public void SetSource(ModSource newSource)
         {
             Source = newSource;
@@ -549,5 +550,5 @@ namespace XCOM2Launcher.Mod
 		}
 
 		#endregion Settings
-	}
+    }
 }
