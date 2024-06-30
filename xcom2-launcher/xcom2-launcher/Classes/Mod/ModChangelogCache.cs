@@ -11,7 +11,12 @@ namespace XCOM2Launcher.Mod
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(ModChangelogCache));
         private static readonly ConcurrentDictionary<long, string> Cache = new ConcurrentDictionary<long, string>();
 
-        private static readonly Regex Regexp = new Regex(@"<div class=""detailBox workshopAnnouncement noFooter changeLogCtn"">\s*<div class=""changelog headline"">\s*(.*)\s*</div>\s*<p id=""[0-9]+"">(.*)</p>", RegexOptions.Compiled);
+        private static readonly Regex Regexp = new Regex(
+            @"<div class=""detailBox workshopAnnouncement noFooter changeLogCtn"">\s*" +
+            @"<div class=""changelog headline"">\s*(.*?)\s*</div>\s*" +
+            @"(?:<div style=""clear: right""></div>\s*)?" +
+            @"<p id=""[0-9]+"">((?:.|\n)*?)</p>",
+            RegexOptions.Compiled);
 
         public static async Task<string> GetChangeLogAsync(long workshopID)
         {
