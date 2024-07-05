@@ -430,15 +430,18 @@ namespace XCOM2Launcher.Forms
 
             async Task PostProcessModUpdateTask()
             {
-                foreach (var mod in Settings.Mods.All)
+                foreach (var mod in mods)
                 {
                     Settings.Mods.UpdatedModDependencyState(mod);
                 }
-                
+
                 RefreshModList();
                 
-                if (afterUpdateAction != null) await afterUpdateAction();
-                
+                if (afterUpdateAction != null)
+                {
+                    await afterUpdateAction();
+                }
+
                 SetStatusIdle();
                 UseWaitCursor = false;
                 

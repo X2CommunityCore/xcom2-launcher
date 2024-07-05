@@ -72,7 +72,6 @@ namespace XCOM2Launcher.Forms
         {
             Text += " " + Program.GetCurrentVersionString(true);
             
-#if !DEBUG
             if (Settings.UpdateModsOnStartup)
             {
                 // Update mod information
@@ -93,9 +92,6 @@ namespace XCOM2Launcher.Forms
             {
                 InitializeInterface();
             }
-#else
-            InitializeInterface();
-#endif
         }
 
         private void InitializeTabImages()

@@ -299,8 +299,6 @@ namespace XCOM2Launcher.Mod
             var steamMods = new List<ModEntry>();
             var localMods = new List<ModEntry>();
             
-            _dependencyCache.Clear();
-
             foreach (var mod in mods)
             {
                 if (!VerifyModState(mod, settings))
@@ -591,8 +589,15 @@ namespace XCOM2Launcher.Mod
             }
         }
 
-        private async Task LoadNotInstalledDependencies(List<long> requiredModIds)
+        /// <summary>
+        /// Load mods into the <see cref="_dependencyCache"/> if they are not part of the main mod list and missing from the cache.
+        /// </summary>
+        /// <param name="requiredModIds">List of mod ids from mods to be checked.</param>
+        /// <returns>List of mods that were added to the cache.</returns>
+        private async Task<List<ModEntry>> LoadNotInstalledDependencies(List<long> requiredModIds)
         {
+            var missingDependencies = new List<ulong>();
+            
             foreach (var requiredModId in requiredModIds)
             {
                 var result = All.FirstOrDefault(m => m.WorkshopID == requiredModId);
@@ -608,17 +613,31 @@ namespace XCOM2Launcher.Mod
                     continue;
                 }
                 
-                var details = await Workshop.GetDetailsAsync((ulong)requiredModId).ConfigureAwait(false);
-                if (details.Details.m_eResult == EResult.k_EResultOK)
+                missingDependencies.Add((ulong)requiredModId);
+            }
+
+            var loadedDependencies = new List<ModEntry>();
+            
+            if (missingDependencies.Any())
+            {
+                var details = await Workshop.GetDetailsAsync(missingDependencies);
+                
+                foreach (var detail in details)
                 {
-                    var newMod = new ModEntry(details);
-                    _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
-                }
-                else
-                {
-                    Log.Warn($"Workshop request for WorkshopId={requiredModId} failed with result '{details.Details.m_eResult}'");
+                    if (detail.Details.m_eResult == EResult.k_EResultOK)
+                    {
+                        var newMod = new ModEntry(detail);
+                        _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
+                        loadedDependencies.Add(newMod);
+                    }
+                    else
+                    {
+                        Log.Warn($"Workshop request for WorkshopId={detail.Details.m_nPublishedFileId} failed with result '{detail.Details.m_eResult}'");
+                    }
                 }
             }
+
+            return loadedDependencies;
         }
 
         public string GetCategory(ModEntry mod)
@@ -657,21 +676,23 @@ namespace XCOM2Launcher.Mod
         /// </summary>
         /// <param name="mod">Mod to check required mods for</param>
         /// <param name="substituteDuplicates">If set to true, the primary duplicate will be returned if the real dependency is a disabled duplicate.</param>
-        /// <param name="checkIgnoredDependencies">If set to true, dependencies that have been set to be ignored are not returned.</param>
+        /// <param name="skipIgnoredDependencies">If set to true, dependencies that have been set to be ignored are not returned.</param>
         /// <returns></returns>
-        public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true, bool checkIgnoredDependencies = false)
+        public List<ModEntry> GetRequiredMods(ModEntry mod, bool substituteDuplicates = true, bool skipIgnoredDependencies = false)
         {
             List<ModEntry> requiredMods = new List<ModEntry>();
             var installedMods = All.ToList();
 
-            var dependecies = mod.Dependencies;
+            var dependencies = mod.Dependencies;
 
-            if (checkIgnoredDependencies)
+            if (skipIgnoredDependencies)
             {
-                dependecies = dependecies.Except(mod.IgnoredDependencies).ToList();
+                dependencies = dependencies.Except(mod.IgnoredDependencies).ToList();
             }
 
-            foreach (var id in dependecies)
+            var missingDependencies = new List<long>();
+            
+            foreach (var id in dependencies)
             {
                 // Check if required mod is already installed and use it if available.
                 var result = installedMods.FirstOrDefault(m => m.WorkshopID == id);
@@ -693,27 +714,23 @@ namespace XCOM2Launcher.Mod
                 }
                 else
                 {
-                    // If the required mod is not installed, we query the workshop details to be able to display some information.
-                    // To prevent unnecessary queries, results are cached.
+                    // Dependencies that are not part of the mod list are cached
                     if (_dependencyCache.TryGetValue(id, out result))
                     {
                         requiredMods.Add(result);
                     }
                     else
                     {
-                        var details = Task.Run(() => Workshop.GetDetailsAsync((ulong)id)).GetAwaiter().GetResult();
-                        if (details.Details.m_eResult == EResult.k_EResultOK)
-                        {
-                            var newMod = new ModEntry(details);
-                            _dependencyCache.TryAdd(newMod.WorkshopID, newMod);
-                            requiredMods.Add(newMod);
-                        }
-                        else
-                        {
-                            Log.Warn($"Workshop request for WorkshopId={id} failed with result '{details.Details.m_eResult}'");
-                        }
+                        missingDependencies.Add(id);
                     }
                 }
+            }
+
+            if (missingDependencies.Any())
+            {
+                // Load and add dependencies that were missing from cache
+                var loadedDependencies = Task.Run(async () => await LoadNotInstalledDependencies(missingDependencies)).GetAwaiter().GetResult();
+                requiredMods.AddRange(loadedDependencies);
             }
 
             return requiredMods;
