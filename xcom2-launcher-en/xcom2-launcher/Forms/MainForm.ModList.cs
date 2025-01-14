@@ -964,10 +964,7 @@ namespace XCOM2Launcher.Forms
             }
 
             // Hide/unhide
-            var toggleVisibility = new ToolStripMenuItem 
-			{
-				Text = m.isHidden ? "Unhide" : "Hide"
-			};
+            var toggleVisibility = new ToolStripMenuItem {Text = m.isHidden ? "Unhide" : "Hide"};
             toggleVisibility.Click += delegate
             {
                 // save as new list so we can remove mods if they are being hidden

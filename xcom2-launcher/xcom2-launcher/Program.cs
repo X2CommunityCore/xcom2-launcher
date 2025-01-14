@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using log4net;
 using Newtonsoft.Json;
 using Semver;
 using Sentry;
@@ -16,18 +14,16 @@ using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Forms;
-using XCOM2Launcher.GitHub;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
-using User = Sentry.User;
 
 namespace XCOM2Launcher
 {
     internal static class Program
     {
-        private static readonly ILog Log = LogManager.GetLogger(nameof(Program));
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Program));
         public static readonly bool IsDebugBuild;
         public static XcomEnvironment XEnv;
 
@@ -153,10 +149,14 @@ namespace XCOM2Launcher
             }
         }
 
-        private static void HandleUnhandledException(Exception e, string source)
+        static void HandleUnhandledException(Exception e, string source)
         {
             Log.Fatal("Unhandled exception", e);
-            File.WriteAllText("error.log", $"Version: {GetCurrentVersionString(true)}\n" + $"Sentry GUID: {GlobalSettings.Instance.Guid}\n" + $"Source: {source}\n" + $"Message: {e.Message}\n\n" + $"Stack:\n{e.StackTrace}");
+            File.WriteAllText("error.log", $"Version: {GetCurrentVersionString(true)}\n" +
+                                           $"Sentry GUID: {GlobalSettings.Instance.Guid}\n" +
+                                           $"Source: {source}\n" +
+                                           $"Message: {e.Message}\n\n" +
+                                           $"Stack:\n{e.StackTrace}");
             var dlg = new UnhandledExceptionDialog(e);
             dlg.ShowDialog();
             Application.Exit();
@@ -194,16 +194,16 @@ namespace XCOM2Launcher
                     o.Debug = false;
                     o.Environment = environment;
                     o.MaxBreadcrumbs = 50;
-                    o.BeforeSend = sentryEvent =>
+                    o.SetBeforeSend(sentryEvent =>
                     {
                         sentryEvent.User.Email = null;
                         return sentryEvent;
-                    };
+                                    });
                 });
 
                 SentrySdk.ConfigureScope(scope =>
                 {
-                    scope.User = new User
+                    scope.User = new SentryUser
                     {
                         Id = GlobalSettings.Instance.Guid,
                         Username = GlobalSettings.Instance.UserName,
@@ -421,7 +421,8 @@ namespace XCOM2Launcher
                     settings.Mods.UpdatedModDependencyState(mod);
                 }
 
-                var newMissingMods = settings.Mods.All.Where(m => (m.State.HasFlag(ModState.NotLoaded) || m.State.HasFlag(ModState.NotInstalled)) && !m.PreviousState.HasFlag(ModState.NotLoaded) && !m.PreviousState.HasFlag(ModState.NotInstalled)).ToList();
+                var newMissingMods = settings.Mods.All.Where(m => (m.State.HasFlag(ModState.NotLoaded) || m.State.HasFlag(ModState.NotInstalled)) &&
+                                                               (!m.PreviousState.HasFlag(ModState.NotLoaded) && !m.PreviousState.HasFlag(ModState.NotInstalled))).ToList();
 
                 // Ask if newly missing mods should be hidden
                 if (newMissingMods.Any(m => !m.isHidden))
@@ -434,7 +435,11 @@ namespace XCOM2Launcher
                     }
                     else
                     {
-                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- " + string.Join("\n- ", newMissingMods.Select(m => m.Name)) + "\n\nDo you want to hide these mods from the mod list?";
+                        const int displayLimit = 10;
+                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- "
+                                  + string.Join("\n- ", newMissingMods.Take(displayLimit))
+                                  + (newMissingMods.Count > displayLimit ? "\n..." : "")
+                                  + "\n\nDo you want to hide these mods from the mod list?";
                     }
 
                     var result = MessageBox.Show(message, "Missing mods", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
@@ -457,24 +462,24 @@ namespace XCOM2Launcher
             Log.Info("Checking for Updates...");
             try
             {
-                using (var client = new WebClient())
+                using (var client = new System.Net.WebClient())
                 {
                     client.Headers.Add("User-Agent: Other");
-                    Release release;
+                    GitHub.Release release;
 
                     if (Settings.Instance.CheckForPreReleaseUpdates)
                     {
                         Log.Info("Pre-Release updates enabled");
                         // fetch all releases including pre-releases and select the first/newest 
                         var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
-                        var allReleases = JsonConvert.DeserializeObject<List<Release>>(jsonAllReleases);
+                        var allReleases = JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
                         release = allReleases.FirstOrDefault();
                     }
                     else
                     {
                         // fetch latest non-pre-release
                         var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                        release = JsonConvert.DeserializeObject<Release>(json);
+                        release = JsonConvert.DeserializeObject<GitHub.Release>(json);
                     }
 
                     if (release == null)
@@ -483,8 +488,8 @@ namespace XCOM2Launcher
                         return false;
                     }
 
-                    bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, out SemVersion currentVersion);
-                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), out SemVersion newVersion);
+                    bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
+                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any ,out SemVersion newVersion);
 
                     if (parsingSucceeded)
                     {
@@ -492,7 +497,7 @@ namespace XCOM2Launcher
                         if (!Settings.Instance.IncludeAlphaVersions && newVersion.Prerelease.Contains("alpha"))
                             return false;
 
-                        if (currentVersion < newVersion)
+                        if (currentVersion.CompareSortOrderTo(newVersion) == -1)
                         {
                             // New version available
                             Log.Info("New version available " + newVersion);
@@ -508,7 +513,7 @@ namespace XCOM2Launcher
                     }
                 }
             }
-            catch (WebException ex)
+            catch (System.Net.WebException ex)
             {
                 Log.Warn("Web request failed", ex);
             }

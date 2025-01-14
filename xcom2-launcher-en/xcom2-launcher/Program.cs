@@ -127,11 +127,11 @@ namespace XCOM2Launcher
                 }
 
                 // clean up old files
-                if (File.Exists(Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
+                if (File.Exists(XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak"))
                 {
                     // Restore backup
-                    File.Copy(Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak", Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini", true);
-                    File.Delete(Program.XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
+                    File.Copy(XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak", XEnv.DefaultConfigDir + @"\DefaultModOptions.ini", true);
+                    File.Delete(XEnv.DefaultConfigDir + @"\DefaultModOptions.ini.bak");
                 }
 
                 Application.Run(new MainForm(settings));
@@ -193,16 +193,16 @@ namespace XCOM2Launcher
                     o.Debug = false;
                     o.Environment = environment;
                     o.MaxBreadcrumbs = 50;
-                    o.BeforeSend = sentryEvent =>
-                    {
-                        sentryEvent.User.Email = null;
-                        return sentryEvent;
-                    };
+                    o.SetBeforeSend(sentryEvent =>
+                                    {
+                                        sentryEvent.User.Email = null;
+                                        return sentryEvent;
+                                    });
                 });
 
                 SentrySdk.ConfigureScope(scope =>
                 {
-                    scope.User = new User
+                    scope.User = new SentryUser
                     {
                         Id = GlobalSettings.Instance.Guid,
                         Username = GlobalSettings.Instance.UserName,
@@ -341,7 +341,7 @@ namespace XCOM2Launcher
 
             // Verify Game Path
             if (!Directory.Exists(settings.GamePath))
-                settings.GamePath = Program.XEnv.DetectGameDir();
+                settings.GamePath = XEnv.DetectGameDir();
 
             if (settings.GamePath == "")
             {
@@ -439,7 +439,11 @@ namespace XCOM2Launcher
                     }
                     else
                     {
-                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- " + string.Join("\n- ", newMissingMods.Select(m => m.Name)) + "\n\nDo you want to hide these mods from the mod list?";
+                        const int displayLimit = 10;
+                        message = $"{newMissingMods.Count} mods no longer exist:\n\n- "
+                                  + string.Join("\n- ", newMissingMods.Take(displayLimit))
+                                  + (newMissingMods.Count > displayLimit ? "\n..." : "")
+                                  + "\n\nDo you want to hide these mods from the mod list?";
                     }
 
                     var result = MessageBox.Show(message, "Missing mods", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
@@ -473,14 +477,14 @@ namespace XCOM2Launcher
                         Log.Info("Pre-Release updates enabled");
                         // fetch all releases including pre-releases and select the first/newest 
                         var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
-                        var allReleases = Newtonsoft.Json.JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
+                        var allReleases = JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
                         release = allReleases.FirstOrDefault();
                     }
                     else
                     {
                         // fetch latest non-pre-release
                         var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                        release = Newtonsoft.Json.JsonConvert.DeserializeObject<GitHub.Release>(json);
+                        release = JsonConvert.DeserializeObject<GitHub.Release>(json);
                     }
 
                     if (release == null)
@@ -489,8 +493,8 @@ namespace XCOM2Launcher
                         return false;
                     }
 
-                    bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, out SemVersion currentVersion);
-                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), out SemVersion newVersion);
+                    bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
+                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any ,out SemVersion newVersion);
 
                     if (parsingSucceeded)
                     {
@@ -498,7 +502,7 @@ namespace XCOM2Launcher
                         if (!Settings.Instance.IncludeAlphaVersions && newVersion.Prerelease.Contains("alpha"))
                             return false;
 
-                        if (currentVersion < newVersion)
+                        if (currentVersion.CompareSortOrderTo(newVersion) == -1)
                         {
                             // New version available
                             Log.Info("New version available " + newVersion);

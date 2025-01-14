@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 namespace XCOM2Launcher.Classes.Helper {
     static class GitVersionInfo
     {
+        public static readonly string cnversion="1.5.1";
+        public static readonly string cnMajor="1";
+        public static readonly string cnMinor="5";
+        public static readonly string cnPatch="1";
+
         public static readonly Version Version;
         public static readonly string SemVer;
         public static readonly string FullSemVer;
@@ -23,7 +28,9 @@ namespace XCOM2Launcher.Classes.Helper {
         
         static GitVersionInfo() {
             var assembly = Assembly.GetExecutingAssembly();
-            var fields = assembly.GetType("XCOM2Launcher.GitVersionInformation").GetFields();
+            var fields = assembly.GetType("GitVersionInformation").GetFields();
+
+            
 
             int.TryParse(fields.Single(f => f.Name == "Major").GetValue(null).ToString(), out Major);
             int.TryParse(fields.Single(f => f.Name == "Minor").GetValue(null).ToString(), out Minor);
@@ -36,7 +43,14 @@ namespace XCOM2Launcher.Classes.Helper {
             MajorMinorPatch = fields.Single(f => f.Name == "MajorMinorPatch").GetValue(null).ToString();
             PreReleaseTag = fields.Single(f => f.Name == "PreReleaseTag").GetValue(null).ToString();
             PreReleaseLabel = fields.Single(f => f.Name == "PreReleaseLabel").GetValue(null).ToString();
-            
+
+
+            //强制指定版本
+                MajorMinorPatch =cnversion;
+                SemVer = cnversion;
+
+
+       
             Version = new Version(MajorMinorPatch);
         }
     }
