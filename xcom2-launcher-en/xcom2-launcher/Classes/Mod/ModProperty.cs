@@ -15,6 +15,12 @@ namespace XCOM2Launcher.Classes.Mod
         private ModEntry modEntry;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        [Browsable(false)] 
+        public ModEntry ModEntry
+        {
+            get { return modEntry; }
+        }
         
         [Category("Mod Status")]
         public int Index
@@ -62,7 +68,6 @@ namespace XCOM2Launcher.Classes.Mod
                 {
                     modEntry.Name = "";
                     modEntry.ManualName = false;
-                    _ = Settings.Instance.Mods.UpdateModAsync(modEntry, Settings.Instance);
                     PropertyChangedEventArgs e = new PropertyChangedEventArgs("Name");
                     PropertyChanged?.Invoke(this, e);
                 }
@@ -94,11 +99,6 @@ namespace XCOM2Launcher.Classes.Mod
         public string Description
         {
             get { return modEntry.Description; }
-            set {
-                modEntry.Description = value;
-                PropertyChangedEventArgs e = new PropertyChangedEventArgs("Description");
-                PropertyChanged?.Invoke(this, e);
-            }
         }
 
         [Category("Mod Properties")]
@@ -142,7 +142,7 @@ namespace XCOM2Launcher.Classes.Mod
         [Category("Mod Properties")]
         public string DateUpdated { get { return modEntry.DateUpdated.HasValue ? modEntry.DateUpdated.Value.ToString() : "Unknown"; } }
 
-        [Category("Mod Info")]
+        [Browsable(false)] 
         public string Note
         {
             get { return modEntry.Note; }

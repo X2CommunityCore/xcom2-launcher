@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bStart = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.shader_groupbox = new System.Windows.Forms.GroupBox();
             this.shadercache_none_radiobutton = new System.Windows.Forms.RadioButton();
@@ -42,6 +42,7 @@
             this.src_none_radiobutton = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.bClose = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.shader_groupbox.SuspendLayout();
             this.source_groupbox.SuspendLayout();
@@ -49,13 +50,13 @@
             // 
             // button1
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.button1.Location = new System.Drawing.Point(296, 135);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "开始";
-            this.button1.UseVisualStyleBackColor = true;
+            this.bStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bStart.Location = new System.Drawing.Point(215, 135);
+            this.bStart.Name = "bStart";
+            this.bStart.Size = new System.Drawing.Size(75, 23);
+            this.bStart.TabIndex = 7;
+            this.bStart.Text = "开始";
+            this.bStart.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
@@ -189,12 +190,22 @@
             this.button2.Text = "开始";
             this.button2.UseVisualStyleBackColor = true;
             // 
+            this.bClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bClose.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.bClose.Location = new System.Drawing.Point(296, 135);
+            this.bClose.Name = "bClose";
+            this.bClose.Size = new System.Drawing.Size(75, 23);
+            this.bClose.TabIndex = 8;
+            this.bClose.Text = "关闭";
+            this.bClose.UseVisualStyleBackColor = true;
+            // 
             // CleanModsForm
             // 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(383, 165);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.bClose);
+            this.Controls.Add(this.bStart);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = global::XCOM2Launcher.Properties.Resources.xcom;
@@ -211,7 +222,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bStart;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox source_groupbox;
         private System.Windows.Forms.RadioButton src_xcomgame_radiobutton;
@@ -224,5 +235,6 @@
         private System.Windows.Forms.RadioButton shadercache_all_radiobutton;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button bClose;
     }
 }

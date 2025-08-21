@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.quickArgumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
@@ -46,6 +47,7 @@
             this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this.updateModsOnStartup = new System.Windows.Forms.CheckBox();
             this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
             this.autoNumberModIndexesCheckBox = new System.Windows.Forms.CheckBox();
             this.neverAdoptTagsAndCatFromprofile = new System.Windows.Forms.CheckBox();
@@ -297,8 +299,20 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(855, 65);
-            this.tableLayoutPanel3.TabIndex = 6;
-            // 
+			this.tableLayoutPanel3.TabIndex = 6;
+			// 
+			// updateModsOnStartup
+			// 
+			this.updateModsOnStartup.AutoSize = true;
+			this.updateModsOnStartup.Location = new System.Drawing.Point(216, 29);
+			this.updateModsOnStartup.Name = "updateModsOnStartup";
+			this.updateModsOnStartup.Padding = new System.Windows.Forms.Padding(3, 3, 0, 0);
+			this.updateModsOnStartup.Size = new System.Drawing.Size(142, 20);
+			this.updateModsOnStartup.TabIndex = 18;
+			this.updateModsOnStartup.Text = "启动时更新Mod";
+			this.toolTip.SetToolTip(this.updateModsOnStartup, resources.GetString("updateModsOnStartup.ToolTip"));
+			this.updateModsOnStartup.UseVisualStyleBackColor = true;
+			this.updateModsOnStartup.CheckedChanged += new System.EventHandler(this.updateModsOnStartup_CheckedChanged);
             // useModSpecifiedCategoriesCheckBox
             // 
             this.useModSpecifiedCategoriesCheckBox.AutoSize = true;
@@ -321,7 +335,7 @@
             this.autoNumberModIndexesCheckBox.Padding = new System.Windows.Forms.Padding(4, 3, 0, 0);
             this.autoNumberModIndexesCheckBox.Size = new System.Drawing.Size(117, 22);
             this.autoNumberModIndexesCheckBox.TabIndex = 14;
-            this.autoNumberModIndexesCheckBox.Text = "自动编号MOD";
+            this.autoNumberModIndexesCheckBox.Text = "自动编号Mod";
             this.toolTip.SetToolTip(this.autoNumberModIndexesCheckBox, "当做出任何修改操作后,将自动编号MOD\r\n(关闭后可手动修改)");
             this.autoNumberModIndexesCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -355,7 +369,6 @@
             // onlyUpdateEnabledAndNew
             // 
             this.onlyUpdateEnabledAndNew.AutoSize = true;
-            this.tableLayoutPanel3.SetColumnSpan(this.onlyUpdateEnabledAndNew, 2);
             this.onlyUpdateEnabledAndNew.Location = new System.Drawing.Point(288, 31);
             this.onlyUpdateEnabledAndNew.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.onlyUpdateEnabledAndNew.Name = "onlyUpdateEnabledAndNew";
@@ -627,12 +640,8 @@
 
         }
 
-        private void PropertyGrid1_Layout(object sender, System.Windows.Forms.LayoutEventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
-
         #endregion
+
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
@@ -649,7 +658,7 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.Button addModPathButton;
         private System.Windows.Forms.Button removeModPathButton;
-        private UserElements.AutoCompleteTextBox argumentsTextBox;
+        private XCOM2Launcher.UserElements.AutoCompleteTextBox argumentsTextBox;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox autoNumberModIndexesCheckBox;
         private System.Windows.Forms.CheckBox neverAdoptTagsAndCatFromprofile;
@@ -661,7 +670,7 @@
 		private System.Windows.Forms.GroupBox groupBox3;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.CheckBox allowMutipleInstances;
-		private UserElements.AutoCompleteTextBox quickArgumentsTextBox;
+		private XCOM2Launcher.UserElements.AutoCompleteTextBox quickArgumentsTextBox;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.CheckBox useDuplicateModWorkaround;
 		private System.Windows.Forms.CheckBox useModSpecifiedCategoriesCheckBox;
@@ -671,5 +680,6 @@
         private System.Windows.Forms.CheckBox hideRunX2Button;
         private System.Windows.Forms.CheckBox hideChallengeModeButton;
         private System.Windows.Forms.CheckBox onlyUpdateEnabledAndNew;
+		private System.Windows.Forms.CheckBox updateModsOnStartup;
 	}
 }

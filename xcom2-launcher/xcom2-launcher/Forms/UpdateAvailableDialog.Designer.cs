@@ -39,7 +39,7 @@
             this.date_label = new System.Windows.Forms.Label();
             this.date_value_label = new System.Windows.Forms.Label();
             this.show_button = new System.Windows.Forms.Button();
-            this.close_button = new System.Windows.Forms.Button();
+			this.bClose = new System.Windows.Forms.Button();
             this.lBetaVersion = new System.Windows.Forms.Label();
             this.releaseNoteBrowser = new System.Windows.Forms.WebBrowser();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -153,16 +153,15 @@
             // 
             // close_button
             // 
-            this.close_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.close_button.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.close_button.Location = new System.Drawing.Point(632, 284);
-            this.close_button.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.close_button.Name = "close_button";
-            this.close_button.Size = new System.Drawing.Size(100, 27);
-            this.close_button.TabIndex = 1;
-            this.close_button.Text = "关闭";
-            this.close_button.UseVisualStyleBackColor = true;
-            this.close_button.Click += new System.EventHandler(this.close_button_Click);
+			this.bClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.bClose.DialogResult = System.Windows.Forms.DialogResult.OK;
+			this.bClose.Location = new System.Drawing.Point(474, 246);
+			this.bClose.Name = "bClose";
+			this.bClose.Size = new System.Drawing.Size(75, 23);
+			this.bClose.TabIndex = 1;
+			this.bClose.Text = "关闭";
+			this.bClose.UseVisualStyleBackColor = true;
+			// 
             // 
             // lBetaVersion
             // 
@@ -218,7 +217,7 @@
             this.Controls.Add(this.version_new_label);
             this.Controls.Add(this.show_button);
             this.Controls.Add(this.changelog_label);
-            this.Controls.Add(this.close_button);
+			this.Controls.Add(this.bClose);
             this.Controls.Add(this.lBetaVersion);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -241,7 +240,7 @@
         private System.Windows.Forms.Button show_button;
         private System.Windows.Forms.Label date_label;
         private System.Windows.Forms.Label date_value_label;
-        private System.Windows.Forms.Button close_button;
+        private System.Windows.Forms.Button bClose;
 		private System.Windows.Forms.Label lBetaVersion;
 		private System.Windows.Forms.WebBrowser releaseNoteBrowser;
         private System.Windows.Forms.Panel panel1;

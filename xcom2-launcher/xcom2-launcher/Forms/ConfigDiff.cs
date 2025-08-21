@@ -35,6 +35,7 @@ namespace XCOM2Launcher.Forms
 		public ConfigDiff()
 		{
 			InitializeComponent();
+			CancelButton = bClose;
 		}
 
 		public void CompareStrings(string s1, string s2)
@@ -90,10 +91,6 @@ namespace XCOM2Launcher.Forms
 			_updating++;
 		}
 
-		private void btCompare_Click(object sender, EventArgs e)
-		{
-			Compare();
-		}
 
 		private void Compare()
 		{
@@ -143,6 +140,10 @@ namespace XCOM2Launcher.Forms
 		private void fctb_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			IniLanguage.Process(e);
+		}
+		private void bClose_Click(object sender, EventArgs e)
+		{
+			Close();
 		}
 	}
 

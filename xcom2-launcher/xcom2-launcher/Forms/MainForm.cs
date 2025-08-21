@@ -8,11 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using XCOM2Launcher.Classes.Steam;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
-using Timer = System.Windows.Forms.Timer;
+using XCOM2Launcher.Classes.Mod;
 
 namespace XCOM2Launcher.Forms
 {
@@ -36,38 +35,22 @@ namespace XCOM2Launcher.Forms
             aboutToolStripMenuItem.DropDownDirection = ToolStripDropDownDirection.BelowLeft;
 
             // Settings
-            SteamAPIWrapper.Init();
             Settings = settings;
 
             // Restore states
             InitMainGui(settings);
+
+            // Init interface
             InitModListView();
             InitDependencyListViews();
-            UpdateInterface();
+            
             RegisterEvents();
+
+            // Other intialization
             InitializeTabImages();
+
+            // Init the argument checkboxes
             InitQuickArgumentsMenu(settings);
-
-            #if !DEBUG
-            // Update mod information
-            var mods = Settings.Mods.All.ToList();
-
-            if (settings.OnlyUpdateEnabledOrNewModsOnStartup)
-            {
-                mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
-            }
-
-            UpdateMods(mods, () =>
-            {
-                modlist_ListObjectListView.RefreshObjects(mods);
-            });
-            #endif
-
-            // Run callbacks
-            var t1 = new Timer();
-            t1.Tick += (sender, e) => { SteamAPIWrapper.RunCallbacks(); };
-            t1.Interval = 10;
-            t1.Start();
 
 /*
             // Check for running downloads
@@ -84,10 +67,33 @@ namespace XCOM2Launcher.Forms
 #endif
 */
         }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             Text += " " + Program.GetCurrentVersionString(true);
+            
+            if (Settings.UpdateModsOnStartup)
+            {
+                // Update mod information
+                var mods = Settings.Mods.All.ToList();
+
+                if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
+                {
+                    mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
+                }
+
+                UpdateMods(mods, () =>
+                {
+                    InitializeInterface();
+                    return Task.CompletedTask;
+                });
+            }
+            else
+            {
+                InitializeInterface();
+            }
         }
+
         private void InitializeTabImages()
         {
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
@@ -224,8 +230,9 @@ namespace XCOM2Launcher.Forms
                 return;
             }
 
-            status_toolstrip_label.Text = "就绪.";
             progress_toolstrip_progressbar.Visible = false;
+            status_toolstrip_label.Text = "就绪.";
+            main_statusstrip.Update();
         }
 
         #endregion
@@ -238,7 +245,7 @@ namespace XCOM2Launcher.Forms
 
             if (!Mods.Active.Any())
             {
-                export_richtextbox.Text = "No active mods.";
+                export_richtextbox.Text = "没有激活MOD.";
                 return;
             }
 			
@@ -442,11 +449,10 @@ namespace XCOM2Launcher.Forms
 
         #region Interface updates
 
-        private void UpdateInterface()
+        private void InitializeInterface()
         {
             error_provider.Clear();
 
-            UpdateConflictInfo();
             UpdateModInfo(modlist_ListObjectListView.SelectedObject as ModEntry);
             UpdateLabels();
             UpdateStateFilterLabels();
@@ -456,7 +462,7 @@ namespace XCOM2Launcher.Forms
         {
             //
             var hasConflicts = NumConflicts > 0;
-            modlist_tab.Text = $"Mod ({Mods.Active.Count()} / {Mods.All.Count()})";
+            modlist_tab.Text = $"模组Mod ({Mods.Active.Count()} / {Mods.All.Count()})";
             conflicts_tab.Text = "覆写" + (hasConflicts ? $" ({NumConflicts} 冲突)" : "");
             conflicts_tab.ImageKey = hasConflicts ? ExclamationIconKey : null;
         }
@@ -491,7 +497,7 @@ namespace XCOM2Launcher.Forms
 
             foreach (var m in Mods.Active)
             {
-                foreach (var classOverride in m.GetOverrides(true))
+                foreach (var classOverride in m.GetOverrides())
                 {
                     var oldClass = classOverride.OldClass;
 
@@ -501,12 +507,13 @@ namespace XCOM2Launcher.Forms
                     conflicts_datagrid.Rows.Add(m.Name, oldClass, classOverride.NewClass);
                 }
             }
+            
+            var changedMods = Mods.UpdateModsConflictState();
+            modlist_ListObjectListView.RefreshObjects(changedMods);
 
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
-
-            // Update interface
-            modlist_ListObjectListView.UpdateObjects(ModList.Objects.ToList());
+            
             UpdateLabels();
         }
 
@@ -520,7 +527,7 @@ namespace XCOM2Launcher.Forms
             {
                 if (m.isActive)
                 {
-                    foreach (var classOverride in m.GetOverrides(true))
+                    foreach (var classOverride in m.GetOverrides())
                     {
                         var oldClass = classOverride.OldClass;
 
@@ -532,7 +539,7 @@ namespace XCOM2Launcher.Forms
                 }
                 else
                 {
-                    foreach (var classOverride in m.GetOverrides(true))
+                    foreach (var classOverride in m.GetOverrides())
                     {
                         foreach (var row in conflicts_datagrid.Rows.Cast<DataGridViewRow>())
                         {
@@ -551,6 +558,8 @@ namespace XCOM2Launcher.Forms
                 }
             }
 
+            var changedMods = Mods.UpdateModsConflictState();
+            modlist_ListObjectListView.RefreshObjects(changedMods);
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
         }
@@ -658,8 +667,6 @@ namespace XCOM2Launcher.Forms
                 modinfo_info_DescriptionRichTextBox.Rtf = m.GetDescription(true);
             }
 
-            btnDescSave.Enabled = false;
-            btnDescUndo.Enabled = false;
         }
 
         private void UpdateDependencyInformation(ModEntry m)
@@ -688,6 +695,8 @@ namespace XCOM2Launcher.Forms
                 modinfo_info_InstalledTextBox.Clear();
                 modinfo_readme_RichTextBox.Clear();
                 modinfo_changelog_richtextbox.Clear();
+                modInfoNotesText.Clear();
+                modInfoNotesText.ReadOnly = true;
                 UpdateModDescription(null);
                 modinfo_image_picturebox.ImageLocation = null;
                 modinfo_inspect_propertygrid.SelectedObject = null;
@@ -709,17 +718,24 @@ namespace XCOM2Launcher.Forms
             modinfo_info_AuthorTextBox.Text = m.Author;
             modinfo_info_DateCreatedTextBox.Text = m.DateCreated?.ToString() ?? "";
             modinfo_info_InstalledTextBox.Text = m.DateAdded?.ToString() ?? "";
+            modInfoNotesText.Text = m.Note;
+            modInfoNotesText.ReadOnly = false;
             UpdateModDescription(m);
             UpdateModChangeLog(m);
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
-            UpdateDependencyInformation(m);
+            
 
             // Init handler for property changes
             var sel_obj = m.GetProperty();
 
-            sel_obj.PropertyChanged += (sender, e) =>
+            sel_obj.PropertyChanged += async (sender, e) =>
             {
+                var prop = (ModProperty)sender;
+                if (e.PropertyName == "Name" && string.IsNullOrEmpty(prop.Name))
+                {
+                    await Mods.UpdateModAsync(prop.ModEntry, Settings);
+                }
                 RefreshModList();
                 modinfo_inspect_propertygrid.Refresh();
             };
@@ -746,6 +762,7 @@ namespace XCOM2Launcher.Forms
             }
 
             #endregion
+            UpdateDependencyInformation(m);
         }
 
         /// <summary>

@@ -66,9 +66,10 @@ namespace XCOM2Launcher.Forms
                     {
                         Invoke(new Action(() => 
                         {
-                            RefreshModList();
                             modlist_ListObjectListView.EnsureModelVisible(importedMods.FirstOrDefault());
                         }));
+                        
+                        return Task.CompletedTask;
                     });
                 }
             };
@@ -198,7 +199,7 @@ namespace XCOM2Launcher.Forms
             editOptionsToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->Options->Settings");
-                var dialog = new SettingsDialog(Settings);
+                using var dialog = new SettingsDialog(Settings);
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
@@ -233,7 +234,11 @@ namespace XCOM2Launcher.Forms
             #region Menu->Tools
 
             // -> Tools
-            cleanModsToolStripMenuItem.Click += delegate { new CleanModsForm(Settings).ShowDialog(); };
+            cleanModsToolStripMenuItem.Click += delegate
+            {
+                using var dlg = new CleanModsForm(Settings);
+                dlg.ShowDialog();
+            };
 
             importFromXCOM2ToolStripMenuItem.Click += delegate
             {
@@ -288,7 +293,7 @@ namespace XCOM2Launcher.Forms
             infoToolStripMenuItem.Click += delegate
             {
                 Log.Info("Menu->About->About");
-                AboutBox about = new AboutBox();
+                using var about = new AboutBox();
                 about.ShowDialog();
             };
 
@@ -355,7 +360,7 @@ namespace XCOM2Launcher.Forms
         {
             Log.Info("Menu->Options->Categories");
 
-            CategoryManager catManager = new CategoryManager(Settings);
+            using var catManager = new CategoryManager(Settings);
             var result = catManager.ShowDialog();
 
             if (result == DialogResult.OK)
@@ -458,7 +463,7 @@ namespace XCOM2Launcher.Forms
 
         private void ExportLoadButtonClick(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog
+            using var dialog = new OpenFileDialog
             {
                 Filter = "Text files|*.txt",
                 DefaultExt = "txt",
@@ -535,7 +540,7 @@ namespace XCOM2Launcher.Forms
             }
 
             // Check entries
-            if (activeMods.Count == 0)
+            if (activeMods.Count == 0 && missingMods.Count == 0)
             {
                 MessageBox.Show("No mods found. Bad profile?", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -607,7 +612,7 @@ namespace XCOM2Launcher.Forms
 
         private void ExportSaveButtonClick(object sender, EventArgs eventArgs)
         {
-            var dialog = new SaveFileDialog
+            using var dialog = new SaveFileDialog
             {
                 Filter = "Text files|*.txt",
                 DefaultExt = "txt",
@@ -811,34 +816,6 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modinfo_info_DescriptionRichTextBox_TextChanged(object sender, EventArgs e)
-        {
-            //var contents = modinfo_info_DescriptionRichTextBox.Text;
-            //if (!CurrentMod.Description.Equals(contents))
-            //    CurrentMod.Description = contents;
-            btnDescSave.Enabled = true;
-            btnDescUndo.Enabled = true;
-        }
-
-        private void btnDescSave_Click(object sender, EventArgs e)
-        {
-            if (CurrentMod != null)
-            {
-                var contents = modinfo_info_DescriptionRichTextBox.Text;
-
-                if (!CurrentMod.Description.Equals(contents))
-                    CurrentMod.Description = contents;
-            }
-
-            btnDescSave.Enabled = false;
-            btnDescUndo.Enabled = false;
-        }
-
-        private void btnDescUndo_Click(object sender, EventArgs e)
-        {
-            UpdateModDescription(CurrentMod);
-        }
-
         private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
         {
             if (modlist_ListObjectListView.OLVGroups == null)
@@ -891,6 +868,15 @@ namespace XCOM2Launcher.Forms
             if (modlist_ListObjectListView.SelectedObject is ModEntry mod)
             {
                 UpdateDependencyInformation(mod);
+            }
+        }
+        
+        private void modInfoNotesText_TextChanged(object sender, EventArgs e)
+        {
+            if (CurrentMod != null)
+            {
+                CurrentMod.Note = modInfoNotesText.Text;
+                modlist_ListObjectListView.RefreshObject(CurrentMod);
             }
         }
 

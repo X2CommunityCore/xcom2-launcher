@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace XCOM2Launcher.Classes.Helper {
     static class GitVersionInfo
     {
-        public static readonly string cnversion="1.5.1";
+        public static readonly string cnversion="1.6.0";
         public static readonly string cnMajor="1";
-        public static readonly string cnMinor="5";
-        public static readonly string cnPatch="1";
+        public static readonly string cnMinor="6";
+        public static readonly string cnPatch="0";
 
         public static readonly Version Version;
         public static readonly string SemVer;

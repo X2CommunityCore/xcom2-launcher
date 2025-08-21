@@ -87,6 +87,7 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.5.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Shell.1.1.5\lib\net472\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -191,10 +192,8 @@
     <Compile Include="Classes\PropertyGrid\PropertyGridExtensions.cs" />
     <Compile Include="Classes\Serialization\ModListConverter.cs" />
     <Compile Include="Classes\Settings.cs" />
-    <Compile Include="Classes\Steam\DownloadItemRequest.cs" />
-    <Compile Include="Classes\Steam\QueryUGCChildren.cs" />
-    <Compile Include="Classes\Steam\ItemDetailsRequest.cs" />
-    <Compile Include="Classes\Steam\SteamAPIWrapper.cs" />
+    <Compile Include="Classes\Steam\SteamManager.cs" />
+    <Compile Include="Classes\Steam\SteamUGCDetails.cs" />
     <Compile Include="Classes\Steam\Workshop.cs" />
     <Compile Include="Classes\WindowSetting.cs" />
     <Compile Include="Classes\XCOM\Xcom2Env.cs" />

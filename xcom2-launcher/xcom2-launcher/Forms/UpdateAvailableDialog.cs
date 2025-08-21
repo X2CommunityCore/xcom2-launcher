@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using HeyRed.MarkdownSharp;
@@ -20,6 +18,8 @@ namespace XCOM2Launcher.Forms
         {
             InitializeComponent();
             
+            AcceptButton = bClose;
+            CancelButton = bClose;
             releaseNoteBrowser.Navigating += Tools.HandleNavigateWebBrowserControl;
 
             CurrentVersion = currentVersion.ToString();
@@ -49,10 +49,6 @@ namespace XCOM2Launcher.Forms
 
         }
 
-        private void close_button_Click(object sender, System.EventArgs e)
-        {
-            Close();
-        }
 
         private void show_button_Click(object sender, System.EventArgs e)
         {

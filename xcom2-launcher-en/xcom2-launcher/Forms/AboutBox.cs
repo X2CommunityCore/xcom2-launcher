@@ -9,6 +9,7 @@ namespace XCOM2Launcher.Forms
         public AboutBox()
         {
             InitializeComponent();
+            CancelButton = okButton;
         }
 
         private void AboutBox_Load(object sender, EventArgs e)

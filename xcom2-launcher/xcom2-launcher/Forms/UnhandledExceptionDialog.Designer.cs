@@ -76,23 +76,23 @@
             // bClose
             // 
             this.bClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.bClose.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.bClose.Location = new System.Drawing.Point(440, 3);
             this.bClose.Name = "bClose";
             this.bClose.Size = new System.Drawing.Size(114, 23);
             this.bClose.TabIndex = 4;
             this.bClose.Text = "关闭";
             this.bClose.UseVisualStyleBackColor = true;
-            this.bClose.Click += new System.EventHandler(this.bClose_Click);
-            // 
-            // linkGithub
-            // 
-            this.linkGithub.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.linkGithub.AutoSize = true;
-            this.linkGithub.Location = new System.Drawing.Point(9, 294);
-            this.linkGithub.Name = "linkGithub";
-            this.linkGithub.Size = new System.Drawing.Size(117, 13);
-            this.linkGithub.TabIndex = 5;
-            this.linkGithub.TabStop = true;
+			// 
+			// linkGithub
+			// 
+			this.linkGithub.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.linkGithub.AutoSize = true;
+			this.linkGithub.Location = new System.Drawing.Point(9, 294);
+			this.linkGithub.Name = "linkGithub";
+			this.linkGithub.Size = new System.Drawing.Size(117, 13);
+			this.linkGithub.TabIndex = 5;
+			this.linkGithub.TabStop = true;
             this.linkGithub.Text = "在GitHub上报告问题";
             this.linkGithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkGithub_LinkClicked);
             // 

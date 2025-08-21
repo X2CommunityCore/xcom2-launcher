@@ -257,6 +257,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "欢迎使用AML";
             this.Load += new System.EventHandler(this.WelcomeDialog_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.WelcomeDialog_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);

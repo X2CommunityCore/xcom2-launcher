@@ -34,7 +34,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.ofdFile = new System.Windows.Forms.OpenFileDialog();
-            this.btCompare = new System.Windows.Forms.Button();
             this.fctb1 = new FastColoredTextBoxNS.FastColoredTextBox();
             this.fctb2 = new FastColoredTextBoxNS.FastColoredTextBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -42,6 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
+            this.bClose = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.fctb1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fctb2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -92,18 +92,6 @@
             this.label4.TabIndex = 21;
             this.label4.Text = " ";
             // 
-            // btCompare
-            // 
-            this.btCompare.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btCompare.Enabled = false;
-			this.btCompare.Location = new System.Drawing.Point(515, 410);
-            this.btCompare.Name = "btCompare";
-			this.btCompare.Size = new System.Drawing.Size(75, 23);
-            this.btCompare.TabIndex = 25;
-            this.btCompare.Text = "比较";
-            this.btCompare.UseVisualStyleBackColor = true;
-            this.btCompare.Click += new System.EventHandler(this.btCompare_Click);
-            // 
             // fctb1
             // 
             this.fctb1.AutoCompleteBracketsList = new char[] {
@@ -131,7 +119,7 @@
             this.fctb1.ReadOnly = true;
             this.fctb1.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.fctb1.ServiceColors = null;
-			this.fctb1.Size = new System.Drawing.Size(349, 366);
+            this.fctb1.Size = new System.Drawing.Size(309, 366);
             this.fctb1.TabIndex = 26;
             this.fctb1.Text = "fastColoredTextBox1";
             this.fctb1.Zoom = 100;
@@ -166,7 +154,7 @@
             this.fctb2.ReadOnly = true;
             this.fctb2.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.fctb2.ServiceColors = null;
-			this.fctb2.Size = new System.Drawing.Size(345, 366);
+            this.fctb2.Size = new System.Drawing.Size(385, 366);
             this.fctb2.TabIndex = 27;
             this.fctb2.Text = "fastColoredTextBox2";
             this.fctb2.Zoom = 100;
@@ -190,7 +178,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel2);
 			this.splitContainer1.Size = new System.Drawing.Size(710, 392);
-			this.splitContainer1.SplitterDistance = 355;
+            this.splitContainer1.SplitterDistance = 315;
             this.splitContainer1.TabIndex = 28;
             // 
             // tableLayoutPanel1
@@ -205,7 +193,7 @@
             this.tableLayoutPanel1.RowCount = 2;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(355, 392);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(315, 392);
             this.tableLayoutPanel1.TabIndex = 30;
             // 
             // label1
@@ -229,7 +217,7 @@
             this.tableLayoutPanel2.RowCount = 2;
 			this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-			this.tableLayoutPanel2.Size = new System.Drawing.Size(351, 392);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(391, 392);
             this.tableLayoutPanel2.TabIndex = 31;
             // 
             // label2
@@ -241,13 +229,26 @@
             this.label2.TabIndex = 30;
             this.label2.Text = "硬盘中的文件";
             // 
+            // bClose
+            // 
+            this.bClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bClose.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.bClose.Enabled = true;
+            this.bClose.Location = new System.Drawing.Point(647, 410);
+            this.bClose.Name = "bClose";
+            this.bClose.Size = new System.Drawing.Size(75, 23);
+            this.bClose.TabIndex = 29;
+            this.bClose.Text = "关闭";
+            this.bClose.UseVisualStyleBackColor = true;
+            this.bClose.Click += new System.EventHandler(this.bClose_Click);
+            // 
             // ConfigDiff
             // 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(734, 437);
+            this.Controls.Add(this.bClose);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.btCompare);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label5);
@@ -276,7 +277,6 @@
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.OpenFileDialog ofdFile;
-		private System.Windows.Forms.Button btCompare;
 		private FastColoredTextBoxNS.FastColoredTextBox fctb1;
 		private FastColoredTextBoxNS.FastColoredTextBox fctb2;
 		private System.Windows.Forms.SplitContainer splitContainer1;
@@ -284,5 +284,6 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.Button bClose;
 	}
 }
