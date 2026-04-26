@@ -12,11 +12,13 @@ namespace XCOM2Launcher.Classes.Mod
     {
         private readonly List<ModState> _States;
         private readonly bool _ShowHiddenMods;
+        private readonly bool _ShowIgnoredDepsOnly;
 
-        public ModListFilter(ObjectListView olv, string text, List<ModState> states, bool showHiddenMods) : base(olv, text)
+        public ModListFilter(ObjectListView olv, string text, List<ModState> states, bool showHiddenMods, bool showIgnoredDepsOnly = false) : base(olv, text)
         {
             _States = states;
             _ShowHiddenMods = showHiddenMods;
+            _ShowIgnoredDepsOnly = showIgnoredDepsOnly;
         }
 
         public override bool Filter(object modelObject)
@@ -51,6 +53,12 @@ namespace XCOM2Launcher.Classes.Mod
             {
                 isAdditionalFilterActive = true;
                 filterMatch |= mod.isHidden;
+            }
+
+            if (_ShowIgnoredDepsOnly)
+            {
+                isAdditionalFilterActive = true;
+                filterMatch |= mod.IgnoredDependencies != null && mod.IgnoredDependencies.Count > 0;
             }
 
             if (!isAdditionalFilterActive)

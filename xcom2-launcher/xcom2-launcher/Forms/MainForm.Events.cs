@@ -858,6 +858,7 @@ namespace XCOM2Launcher.Forms
             cFilterDuplicate.Checked = false;
             cFilterHidden.Checked = false;
             cFilterMissingDependency.Checked = false;
+            cFilterIgnoredDependencies.Checked = false;
             cFilterNew.Checked = false;
             cFilterNotInstalled.Checked = false;
             cFilterNotLoaded.Checked = false;

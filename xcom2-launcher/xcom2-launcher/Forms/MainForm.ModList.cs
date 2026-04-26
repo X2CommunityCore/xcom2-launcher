@@ -689,7 +689,12 @@ namespace XCOM2Launcher.Forms
                 stateFlags.Add(ModState.MissingDependencies);
             }
 
-            modlist_ListObjectListView.ModelFilter = new ModListFilter(modlist_ListObjectListView, modlist_FilterCueTextBox.Text, stateFlags, cFilterHidden.Checked);
+            modlist_ListObjectListView.ModelFilter = new ModListFilter(
+                modlist_ListObjectListView,
+                modlist_FilterCueTextBox.Text,
+                stateFlags,
+                cFilterHidden.Checked,
+                cFilterIgnoredDependencies.Checked);
         }
 
         /// <summary>
@@ -1342,6 +1347,7 @@ namespace XCOM2Launcher.Forms
             }
 
             UpdateStateFilterLabels();
+            RefreshModelFilter();
             UpdateLabels();
             UpdateDependencyInformation(ModList.SelectedObject);
         }
