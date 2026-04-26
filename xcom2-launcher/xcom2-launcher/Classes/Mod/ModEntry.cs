@@ -88,6 +88,14 @@ namespace XCOM2Launcher.Mod
         public List<long> IgnoredDependencies { get; set; } = new List<long>();
 
         /// <summary>
+        /// Workshop ids that this installed mod claims to also satisfy. Bridges dependency
+        /// references when the user has installed a Workshop mod under a custom folder
+        /// (no publishedfileid) or has installed a beta whose Workshop id differs from the
+        /// stable id another mod requires.
+        /// </summary>
+        public List<long> WorkshopIdAliases { get; set; } = new List<long>();
+
+        /// <summary>
         /// Contains the tags that were downloaded from steam.
         /// </summary>
         public List<string> SteamTags { get; set; } = new List<string>();

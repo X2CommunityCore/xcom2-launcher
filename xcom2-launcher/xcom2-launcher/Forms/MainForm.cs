@@ -12,6 +12,7 @@ using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 using JR.Utils.GUI.Forms;
 using XCOM2Launcher.Classes.Mod;
+using XCOM2Launcher.UserElements;
 
 namespace XCOM2Launcher.Forms
 {
@@ -481,7 +482,8 @@ namespace XCOM2Launcher.Forms
             cFilterNew.Text = $"New ({allMods.Count(m => m.State.HasFlag(ModState.New))})";
             cFilterNotInstalled.Text = $"Not installed ({allMods.Count(m => m.State.HasFlag(ModState.NotInstalled))})";
             cFilterNotLoaded.Text = $"Not loaded ({allMods.Count(m => m.State.HasFlag(ModState.NotLoaded))})";
-            cFilterMissingDependency.Text = $"Missing dependencies ({allMods.Count(m => m.isActive && m.State.HasFlag(ModState.MissingDependencies))})";
+            cFilterMissingDependency.Text = $"Missing dep ({allMods.Count(m => m.isActive && m.State.HasFlag(ModState.MissingDependencies))})";
+            cFilterIgnoredDependencies.Text = $"Ignored ({allMods.Count(m => m.IgnoredDependencies != null && m.IgnoredDependencies.Count > 0)})";
             cFilterHidden.Text = $"Hidden ({allMods.Count(m => m.isHidden)})";
         }
 
@@ -817,24 +819,11 @@ namespace XCOM2Launcher.Forms
                 if (CurrentMod == null || !(rowObject is ModEntry mod) || !(value is bool checkState))
                     return;
 
-                // Add the mod id to or remove it from the IgnoredDependencies list.
-                if (checkState)
+                if (IgnoreDependencyOnMod(CurrentMod, mod.WorkshopID, checkState))
                 {
-                    if (!CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID))
-                    {
-                        CurrentMod.IgnoredDependencies.Add(mod.WorkshopID);
-                    }
+                    Mods.UpdatedModDependencyState(CurrentMod);
+                    RefreshDependencyState(new[] { CurrentMod });
                 }
-                else
-                {
-                    if (CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID))
-                    {
-                        CurrentMod.IgnoredDependencies.Remove(mod.WorkshopID);
-                    }
-                }
-
-                Mods.UpdatedModDependencyState(CurrentMod);
-                modlist_ListObjectListView.RefreshObject(CurrentMod);
             };
 
             olvRequiredMods.SubItemChecking += (sender, args) =>
@@ -883,6 +872,332 @@ namespace XCOM2Launcher.Forms
             Contract.Assume(mod != null);
 
             SetModListItemColor(e.Item, mod);
+        }
+
+        /// <summary>
+        /// Adds (ignore=true) or removes (ignore=false) <paramref name="workshopId"/> to/from
+        /// <paramref name="mod"/>'s IgnoredDependencies. Caller is responsible for the state
+        /// recompute and refresh, so multiple calls can batch into a single recompute.
+        /// </summary>
+        /// <returns>true iff the list was modified.</returns>
+        private bool IgnoreDependencyOnMod(ModEntry mod, long workshopId, bool ignore)
+        {
+            if (mod == null || workshopId <= 0) return false;
+
+            if (ignore)
+            {
+                if (mod.IgnoredDependencies.Contains(workshopId)) return false;
+                mod.IgnoredDependencies.Add(workshopId);
+                return true;
+            }
+
+            return mod.IgnoredDependencies.Remove(workshopId);
+        }
+
+        private void BulkIgnoreOnCurrentMod(ModEntry mod, IList<ModEntry> selectedDeps, bool ignore)
+        {
+            if (mod == null || selectedDeps == null || selectedDeps.Count == 0) return;
+
+            var changed = new List<ModEntry>();
+            foreach (var dep in selectedDeps)
+            {
+                if (dep == null || dep.WorkshopID <= 0) continue;
+                if (IgnoreDependencyOnMod(mod, dep.WorkshopID, ignore))
+                    changed.Add(dep);
+            }
+
+            if (changed.Count == 0) return;
+
+            Mods.UpdatedModDependencyState(mod);
+            RefreshDependencyState(new[] { mod });
+            olvRequiredMods.RefreshObjects(changed);
+        }
+
+        private void IgnoreDependencyEverywhereWithConfirm(ModEntry dep, bool ignore)
+        {
+            if (dep == null || dep.WorkshopID <= 0) return;
+
+            if (ignore)
+            {
+                var dependents = Mods.GetDependentMods(dep, false);
+                var count = dependents.Count;
+                if (count == 0) return;
+
+                var prompt = count == 1 && dependents[0] != null
+                    ? $"Ignore '{dep.Name}' as a dependency on '{dependents[0].Name}'?"
+                    : $"Ignore '{dep.Name}' on the {count} mods that require it?";
+
+                if (FlexibleMessageBox.Show(this, prompt, "Confirm bulk ignore", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return;
+            }
+
+            var affected = ignore
+                ? Mods.IgnoreDependencyEverywhere(dep.WorkshopID)
+                : Mods.UnignoreDependencyEverywhere(dep.WorkshopID);
+
+            if (affected.Count == 0) return;
+
+            RefreshDependencyState(affected);
+            olvRequiredMods.RefreshObject(dep);
+        }
+
+        /// <summary>
+        /// Opens a modal picker letting the user toggle which installed mod(s) substitute
+        /// (alias) for the given Workshop dep. Filter-as-you-type, sortable columns, checkbox
+        /// column for current alias state. On close, recomputes dep state for every mod that
+        /// listed the dep's WorkshopID and refreshes the UI once.
+        /// </summary>
+        private void OpenAliasPicker(ModEntry dep)
+        {
+            if (dep == null || dep.WorkshopID <= 0) return;
+
+            var depId = dep.WorkshopID;
+            var candidates = Mods.All
+                .Where(m => m != null && m.WorkshopID != depId)
+                .OrderBy(m => m.Source == ModSource.SteamWorkshop ? 1 : 0)
+                .ThenBy(m => m.Name ?? m.ID ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            using (var picker = new System.Windows.Forms.Form())
+            {
+                picker.Text = $"Substitute for '{dep.Name}'  (Workshop ID {depId})";
+                picker.Size = new System.Drawing.Size(640, 520);
+                picker.StartPosition = FormStartPosition.CenterParent;
+                picker.MinimumSize = new System.Drawing.Size(420, 320);
+                picker.ShowInTaskbar = false;
+                picker.MinimizeBox = false;
+                picker.MaximizeBox = false;
+
+                var instructions = new Label
+                {
+                    Text = "Pick a mod that should satisfy this Workshop dependency, then click Substitute. Click again on the same row (now showing 'Yes') to remove. A real Workshop install of this id always wins over a substitute.",
+                    Dock = DockStyle.Top,
+                    Padding = new Padding(8, 8, 8, 4),
+                    Height = 56,
+                    AutoEllipsis = true
+                };
+
+                var filterBox = new CueTextBox
+                {
+                    Dock = DockStyle.Top,
+                    Margin = new Padding(8, 4, 8, 4),
+                    CueText = "Filter mods (e.g. \"lwotc\", \"highlander\")...",
+                    ShowCueTextWithFocus = true
+                };
+
+                var olv = new ObjectListView
+                {
+                    Dock = DockStyle.Fill,
+                    FullRowSelect = true,
+                    UseFiltering = true,
+                    UseAlternatingBackColors = true,
+                    AlternateRowBackColor = System.Drawing.Color.WhiteSmoke,
+                    View = System.Windows.Forms.View.Details,
+                    UseCompatibleStateImageBehavior = false,
+                    HeaderStyle = ColumnHeaderStyle.Clickable,
+                    OwnerDraw = false,
+                    HasCollapsibleGroups = false,
+                    ShowGroups = false
+                };
+
+                var nameCol = new OLVColumn("Mod", "Name") { Width = 280, Sortable = true };
+                var sourceCol = new OLVColumn("Source", null) { Width = 100, Sortable = true };
+                sourceCol.AspectGetter = m =>
+                {
+                    var entry = m as ModEntry;
+                    if (entry == null) return string.Empty;
+                    if (entry.Source == ModSource.SteamWorkshop) return "Workshop";
+                    if (entry.Source == ModSource.Manual) return "Local / Manual";
+                    return "Unknown";
+                };
+                var workshopIdCol = new OLVColumn("Workshop ID", null) { Width = 110, Sortable = true };
+                workshopIdCol.AspectGetter = m =>
+                {
+                    var entry = m as ModEntry;
+                    if (entry == null || entry.WorkshopID <= 0) return "(none)";
+                    return entry.WorkshopID.ToString();
+                };
+                var aliasCol = new OLVColumn("Substitutes?", null) { Width = 100, Sortable = true };
+                aliasCol.AspectGetter = m =>
+                {
+                    var entry = m as ModEntry;
+                    return entry != null && entry.WorkshopIdAliases.Contains(depId) ? "Yes" : "";
+                };
+
+                olv.AllColumns.Add(nameCol);
+                olv.AllColumns.Add(sourceCol);
+                olv.AllColumns.Add(workshopIdCol);
+                olv.AllColumns.Add(aliasCol);
+                olv.Columns.Add(nameCol);
+                olv.Columns.Add(sourceCol);
+                olv.Columns.Add(workshopIdCol);
+                olv.Columns.Add(aliasCol);
+                olv.MultiSelect = false;
+                olv.SetObjects(candidates);
+                olv.Sort(nameCol, SortOrder.Ascending);
+
+                filterBox.TextChanged += (s, a) =>
+                {
+                    olv.AdditionalFilter = string.IsNullOrEmpty(filterBox.Text)
+                        ? null
+                        : TextMatchFilter.Contains(olv, filterBox.Text);
+                    olv.UpdateColumnFiltering();
+                };
+
+                var bottomPanel = new Panel { Dock = DockStyle.Bottom, Height = 50 };
+                var substituteButton = new Button
+                {
+                    Text = "Substitute",
+                    Enabled = false,
+                    Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                    Size = new System.Drawing.Size(140, 30)
+                };
+                var closeButton = new Button
+                {
+                    Text = "Close",
+                    DialogResult = DialogResult.OK,
+                    Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                    Size = new System.Drawing.Size(100, 30)
+                };
+
+                Action layoutButtons = () =>
+                {
+                    closeButton.Location = new System.Drawing.Point(bottomPanel.ClientSize.Width - 116, 10);
+                    substituteButton.Location = new System.Drawing.Point(bottomPanel.ClientSize.Width - 264, 10);
+                };
+                layoutButtons();
+                bottomPanel.Resize += (s, a) => layoutButtons();
+                bottomPanel.Controls.Add(substituteButton);
+                bottomPanel.Controls.Add(closeButton);
+
+                Action updateButton = () =>
+                {
+                    var sel = olv.SelectedObject as ModEntry;
+                    if (sel == null)
+                    {
+                        substituteButton.Enabled = false;
+                        substituteButton.Text = "Substitute";
+                    }
+                    else
+                    {
+                        substituteButton.Enabled = true;
+                        substituteButton.Text = sel.WorkshopIdAliases.Contains(depId)
+                            ? $"Remove substitute"
+                            : $"Substitute";
+                    }
+                };
+                olv.SelectionChanged += (s, a) => updateButton();
+                updateButton();
+
+                substituteButton.Click += (s, a) =>
+                {
+                    var sel = olv.SelectedObject as ModEntry;
+                    if (sel == null) return;
+
+                    if (sel.WorkshopIdAliases.Contains(depId))
+                    {
+                        sel.WorkshopIdAliases.Remove(depId);
+                        Log.Info($"Removed alias {depId} ('{dep.Name}') from '{sel.Name}'.");
+                    }
+                    else
+                    {
+                        sel.WorkshopIdAliases.Add(depId);
+                        Log.Info($"Added alias {depId} ('{dep.Name}') on '{sel.Name}'.");
+                    }
+                    olv.RefreshObject(sel);
+                    updateButton();
+                };
+
+                picker.AcceptButton = closeButton;
+                picker.Controls.Add(olv);
+                picker.Controls.Add(filterBox);
+                picker.Controls.Add(instructions);
+                picker.Controls.Add(bottomPanel);
+
+                picker.ShowDialog(this);
+            }
+
+            // Single batch state recompute + UI refresh after the picker closes.
+            var affectedDependents = Mods.All
+                .Where(m => m.Dependencies.Contains(depId))
+                .ToList();
+
+            foreach (var m in affectedDependents)
+                Mods.UpdatedModDependencyState(m);
+
+            RefreshDependencyState(affectedDependents);
+            olvRequiredMods.RefreshObject(dep);
+        }
+
+        /// <summary>
+        /// Common refresh tail for any operation that mutates a mod's dependency-state-flags.
+        /// Re-renders affected rows in the main list, recomputes the filter-label counters,
+        /// and re-applies the active filter so a row stops appearing under e.g. "Missing
+        /// dependencies" the moment its state actually changes.
+        /// </summary>
+        private void RefreshDependencyState(IEnumerable<ModEntry> affected)
+        {
+            if (affected != null)
+            {
+                var list = affected as List<ModEntry> ?? affected.ToList();
+                if (list.Count > 0)
+                    modlist_ListObjectListView.RefreshObjects(list);
+            }
+            UpdateStateFilterLabels();
+            RefreshModelFilter();
+        }
+
+        private void RequiredModsCellRightClick(object sender, CellRightClickEventArgs e)
+        {
+            if (CurrentMod == null) return;
+
+            var rightClicked = e.Model as ModEntry;
+            if (rightClicked == null || rightClicked.WorkshopID <= 0) return;
+
+            var selected = olvRequiredMods.SelectedObjects.Cast<ModEntry>().Where(m => m != null).ToList();
+            var menu = CreateRequiredModsContextMenu(CurrentMod, rightClicked, selected);
+            if (menu.Items.Count == 0) return;
+
+            menu.Show(e.ListView, e.Location);
+        }
+
+        private ContextMenuStrip CreateRequiredModsContextMenu(ModEntry currentMod, ModEntry dep, IList<ModEntry> selectedDeps)
+        {
+            var menu = new ContextMenuStrip();
+            if (currentMod == null || dep == null || dep.WorkshopID <= 0)
+                return menu;
+
+            // Phase 3 / Feature B — open a real picker dialog so the user can search & sort.
+            var findSubstitute = new ToolStripMenuItem($"Find substitute for '{dep.Name}'…");
+            findSubstitute.Click += (s, a) => OpenAliasPicker(dep);
+            menu.Items.Add(findSubstitute);
+
+            menu.Items.Add(new ToolStripSeparator());
+
+            // Phase 2 / Feature A — cross-mod ignore toggle for the right-clicked dep.
+            var ignoreAll = new ToolStripMenuItem($"Ignore '{dep.Name}' for all mods that require it");
+            ignoreAll.Click += (s, a) => IgnoreDependencyEverywhereWithConfirm(dep, true);
+            menu.Items.Add(ignoreAll);
+
+            var stopIgnoreAll = new ToolStripMenuItem($"Stop ignoring '{dep.Name}' for all mods");
+            stopIgnoreAll.Click += (s, a) => IgnoreDependencyEverywhereWithConfirm(dep, false);
+            menu.Items.Add(stopIgnoreAll);
+
+            // Phase 1 / Feature C — bulk on selection for the currently-viewed mod.
+            if (selectedDeps != null && selectedDeps.Count > 1)
+            {
+                menu.Items.Add(new ToolStripSeparator());
+
+                var ignoreSelected = new ToolStripMenuItem($"Ignore selected ({selectedDeps.Count}) on this mod");
+                ignoreSelected.Click += (s, a) => BulkIgnoreOnCurrentMod(currentMod, selectedDeps, true);
+                menu.Items.Add(ignoreSelected);
+
+                var unignoreSelected = new ToolStripMenuItem($"Stop ignoring selected ({selectedDeps.Count}) on this mod");
+                unignoreSelected.Click += (s, a) => BulkIgnoreOnCurrentMod(currentMod, selectedDeps, false);
+                menu.Items.Add(unignoreSelected);
+            }
+
+            return menu;
         }
 
         #endregion

@@ -109,6 +109,7 @@
             this.pModsLegend = new System.Windows.Forms.Panel();
             this.bClearStateFilter = new System.Windows.Forms.Button();
             this.cFilterMissingDependency = new System.Windows.Forms.CheckBox();
+            this.cFilterIgnoredDependencies = new System.Windows.Forms.CheckBox();
             this.bRefreshStateFilter = new System.Windows.Forms.Button();
             this.cFilterHidden = new System.Windows.Forms.CheckBox();
             this.cFilterNew = new System.Windows.Forms.CheckBox();
@@ -686,7 +687,7 @@
             // horizontal_splitcontainer
             // 
             this.horizontal_splitcontainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.horizontal_splitcontainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.horizontal_splitcontainer.FixedPanel = System.Windows.Forms.FixedPanel.None;
             this.horizontal_splitcontainer.Location = new System.Drawing.Point(3, 3);
             this.horizontal_splitcontainer.Name = "horizontal_splitcontainer";
             this.horizontal_splitcontainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -702,7 +703,9 @@
             this.horizontal_splitcontainer.Panel2.Controls.Add(this.modinfo_groupbox);
             this.horizontal_splitcontainer.Size = new System.Drawing.Size(970, 656);
             this.horizontal_splitcontainer.SplitterDistance = 382;
-            this.horizontal_splitcontainer.SplitterWidth = 5;
+            this.horizontal_splitcontainer.SplitterWidth = 16;
+            this.horizontal_splitcontainer.Panel1MinSize = 100;
+            this.horizontal_splitcontainer.Panel2MinSize = 150;
             this.horizontal_splitcontainer.TabIndex = 5;
             // 
             // modlist_ListObjectListView
@@ -948,6 +951,7 @@
             // 
             this.pModsLegend.Controls.Add(this.bClearStateFilter);
             this.pModsLegend.Controls.Add(this.cFilterMissingDependency);
+            this.pModsLegend.Controls.Add(this.cFilterIgnoredDependencies);
             this.pModsLegend.Controls.Add(this.bRefreshStateFilter);
             this.pModsLegend.Controls.Add(this.cFilterHidden);
             this.pModsLegend.Controls.Add(this.cFilterNew);
@@ -963,7 +967,7 @@
             // 
             // bClearStateFilter
             // 
-            this.bClearStateFilter.Location = new System.Drawing.Point(906, 3);
+            this.bClearStateFilter.Location = new System.Drawing.Point(940, 3);
             this.bClearStateFilter.Name = "bClearStateFilter";
             this.bClearStateFilter.Size = new System.Drawing.Size(60, 25);
             this.bClearStateFilter.TabIndex = 16;
@@ -981,18 +985,35 @@
             this.cFilterMissingDependency.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cFilterMissingDependency.Location = new System.Drawing.Point(239, 3);
             this.cFilterMissingDependency.Name = "cFilterMissingDependency";
-            this.cFilterMissingDependency.Size = new System.Drawing.Size(173, 24);
+            this.cFilterMissingDependency.Size = new System.Drawing.Size(105, 24);
             this.cFilterMissingDependency.TabIndex = 15;
-            this.cFilterMissingDependency.Text = "Missing dependency";
+            this.cFilterMissingDependency.Text = "Missing dep";
             this.cFilterMissingDependency.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.toolTip.SetToolTip(this.cFilterMissingDependency, "A mod will indicate a \"Missing dependency\", when not all required mods\r\nare enabl" +
         "ed or installed. Check \"Mod Info -> Dependency Tab\".");
             this.cFilterMissingDependency.UseVisualStyleBackColor = false;
             this.cFilterMissingDependency.CheckedChanged += new System.EventHandler(this.cStateFilter_CheckedChanged);
-            // 
+            //
+            // cFilterIgnoredDependencies
+            //
+            this.cFilterIgnoredDependencies.Appearance = System.Windows.Forms.Appearance.Button;
+            this.cFilterIgnoredDependencies.BackColor = System.Drawing.Color.LightYellow;
+            this.cFilterIgnoredDependencies.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
+            this.cFilterIgnoredDependencies.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cFilterIgnoredDependencies.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cFilterIgnoredDependencies.Location = new System.Drawing.Point(348, 3);
+            this.cFilterIgnoredDependencies.Name = "cFilterIgnoredDependencies";
+            this.cFilterIgnoredDependencies.Size = new System.Drawing.Size(100, 24);
+            this.cFilterIgnoredDependencies.TabIndex = 17;
+            this.cFilterIgnoredDependencies.Text = "Ignored (0)";
+            this.cFilterIgnoredDependencies.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.toolTip.SetToolTip(this.cFilterIgnoredDependencies, "Show only mods that have one or more dependencies the user has marked as ignored.\r\nUse this to find and review what was bulk-ignored.");
+            this.cFilterIgnoredDependencies.UseVisualStyleBackColor = false;
+            this.cFilterIgnoredDependencies.CheckedChanged += new System.EventHandler(this.cStateFilter_CheckedChanged);
+            //
             // bRefreshStateFilter
-            // 
-            this.bRefreshStateFilter.Location = new System.Drawing.Point(840, 3);
+            //
+            this.bRefreshStateFilter.Location = new System.Drawing.Point(874, 3);
             this.bRefreshStateFilter.Name = "bRefreshStateFilter";
             this.bRefreshStateFilter.Size = new System.Drawing.Size(60, 25);
             this.bRefreshStateFilter.TabIndex = 14;
@@ -1009,7 +1030,7 @@
             this.cFilterHidden.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cFilterHidden.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cFilterHidden.ForeColor = System.Drawing.Color.Gray;
-            this.cFilterHidden.Location = new System.Drawing.Point(641, 3);
+            this.cFilterHidden.Location = new System.Drawing.Point(675, 3);
             this.cFilterHidden.Name = "cFilterHidden";
             this.cFilterHidden.Size = new System.Drawing.Size(94, 24);
             this.cFilterHidden.TabIndex = 13;
@@ -1026,7 +1047,7 @@
             this.cFilterNew.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
             this.cFilterNew.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cFilterNew.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cFilterNew.Location = new System.Drawing.Point(741, 3);
+            this.cFilterNew.Location = new System.Drawing.Point(775, 3);
             this.cFilterNew.Name = "cFilterNew";
             this.cFilterNew.Size = new System.Drawing.Size(86, 24);
             this.cFilterNew.TabIndex = 12;
@@ -1043,7 +1064,7 @@
             this.cFilterConflicted.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
             this.cFilterConflicted.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cFilterConflicted.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cFilterConflicted.Location = new System.Drawing.Point(418, 3);
+            this.cFilterConflicted.Location = new System.Drawing.Point(452, 3);
             this.cFilterConflicted.Name = "cFilterConflicted";
             this.cFilterConflicted.Size = new System.Drawing.Size(106, 24);
             this.cFilterConflicted.TabIndex = 11;
@@ -1097,7 +1118,7 @@
             this.cFilterDuplicate.FlatAppearance.BorderColor = System.Drawing.Color.DimGray;
             this.cFilterDuplicate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cFilterDuplicate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cFilterDuplicate.Location = new System.Drawing.Point(530, 3);
+            this.cFilterDuplicate.Location = new System.Drawing.Point(564, 3);
             this.cFilterDuplicate.Name = "cFilterDuplicate";
             this.cFilterDuplicate.Size = new System.Drawing.Size(105, 24);
             this.cFilterDuplicate.TabIndex = 8;
@@ -1781,6 +1802,7 @@
             this.olvRequiredMods.View = System.Windows.Forms.View.Details;
             this.olvRequiredMods.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.olvRequiredMods_FormatRow);
             this.olvRequiredMods.ItemActivate += new System.EventHandler(this.olvDependencyMods_ItemActivate);
+            this.olvRequiredMods.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.RequiredModsCellRightClick);
             // 
             // olvColReqModsActive
             // 
@@ -2447,6 +2469,7 @@
 		private System.Windows.Forms.Button bRefreshStateFilter;
 		private System.Windows.Forms.CheckBox cFilterHidden;
 		private System.Windows.Forms.CheckBox cFilterMissingDependency;
+		private System.Windows.Forms.CheckBox cFilterIgnoredDependencies;
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.CheckBox cShowPrimaryDuplicates;
         private BrightIdeasSoftware.OLVColumn olvColReqModsIgnore;

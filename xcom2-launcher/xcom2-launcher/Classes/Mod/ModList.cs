@@ -126,11 +126,60 @@ namespace XCOM2Launcher.Mod
         {
             var requiredMods = GetRequiredMods(mod, true, true);
             var allRequiredModsAvailable = requiredMods.All(m => m.WorkshopID != 0 && m.isActive && !m.State.HasFlag(ModState.NotInstalled) && !m.State.HasFlag(ModState.NotLoaded));
-            
+
             if (allRequiredModsAvailable)
                 mod.RemoveState(ModState.MissingDependencies);
-            else 
+            else
                 mod.AddState(ModState.MissingDependencies);
+        }
+
+        /// <summary>
+        /// Adds <paramref name="workshopId"/> to <see cref="ModEntry.IgnoredDependencies"/> on
+        /// every installed mod whose <see cref="ModEntry.Dependencies"/> contains it, then
+        /// re-evaluates the missing-dependency state for each affected mod.
+        /// </summary>
+        /// <returns>The mods whose IgnoredDependencies was modified (empty if no dependents,
+        /// or every dependent already ignored it).</returns>
+        public List<ModEntry> IgnoreDependencyEverywhere(long workshopId)
+        {
+            var affected = new List<ModEntry>();
+            if (workshopId <= 0) return affected;
+
+            foreach (var mod in All)
+            {
+                if (!mod.Dependencies.Contains(workshopId)) continue;
+                if (mod.IgnoredDependencies.Contains(workshopId)) continue;
+
+                mod.IgnoredDependencies.Add(workshopId);
+                UpdatedModDependencyState(mod);
+                affected.Add(mod);
+            }
+
+            Log.Info($"Bulk-ignored workshop id {workshopId} on {affected.Count} mods.");
+            return affected;
+        }
+
+        /// <summary>
+        /// Removes <paramref name="workshopId"/> from <see cref="ModEntry.IgnoredDependencies"/>
+        /// on every installed mod that currently ignores it, then re-evaluates state.
+        /// </summary>
+        /// <returns>The mods whose IgnoredDependencies was modified.</returns>
+        public List<ModEntry> UnignoreDependencyEverywhere(long workshopId)
+        {
+            var affected = new List<ModEntry>();
+            if (workshopId <= 0) return affected;
+
+            foreach (var mod in All)
+            {
+                if (mod.IgnoredDependencies.Remove(workshopId))
+                {
+                    UpdatedModDependencyState(mod);
+                    affected.Add(mod);
+                }
+            }
+
+            Log.Info($"Bulk-unignored workshop id {workshopId} on {affected.Count} mods.");
+            return affected;
         }
 
         public List<ModEntry> ImportMods(List<string> modPaths)
@@ -601,10 +650,13 @@ namespace XCOM2Launcher.Mod
             
             foreach (var requiredModId in requiredModIds)
             {
-                var result = All.FirstOrDefault(m => m.WorkshopID == requiredModId);
+                // Exact-WorkshopID match wins over an alias match if both exist.
+                var result = All
+                    .OrderBy(m => m.WorkshopID == requiredModId ? 0 : 1)
+                    .FirstOrDefault(m => m.WorkshopID == requiredModId || m.WorkshopIdAliases.Contains(requiredModId));
                 if (result != null)
                 {
-                    // dependency is already installed
+                    // dependency is already installed (or aliased to a local mod)
                     continue;
                 }
 
@@ -676,7 +728,11 @@ namespace XCOM2Launcher.Mod
                 return result;
             }
 
-            return All.Where(m => m.Dependencies.Contains(mod.WorkshopID)).ToList();
+            // A mod is a dependent if it lists this mod's WorkshopID OR any of its declared aliases.
+            return All.Where(m =>
+                m.Dependencies.Contains(mod.WorkshopID) ||
+                (mod.WorkshopIdAliases.Count > 0 && mod.WorkshopIdAliases.Any(a => m.Dependencies.Contains(a)))
+            ).ToList();
         }
 
         /// <summary>
@@ -703,10 +759,18 @@ namespace XCOM2Launcher.Mod
             foreach (var id in dependencies)
             {
                 // Check if required mod is already installed and use it if available.
-                var result = installedMods.FirstOrDefault(m => m.WorkshopID == id);
+                // Exact WorkshopID match wins over an alias match (a real Workshop install
+                // beats a user-declared alias for the same id every time).
+                var result = installedMods
+                    .OrderBy(m => m.WorkshopID == id ? 0 : 1)
+                    .FirstOrDefault(m => m.WorkshopID == id || m.WorkshopIdAliases.Contains(id));
 
                 if (result != null)
                 {
+                    if (result.WorkshopID != id)
+                    {
+                        Log.Info($"Resolved workshop dep {id} via alias on '{result.Name}' (WorkshopID {result.WorkshopID}).");
+                    }
                     // If the required mod is installed but disabled a duplicate, use the primary duplicate
                     if (substituteDuplicates && result.State.HasFlag(ModState.DuplicateDisabled))
                     {
