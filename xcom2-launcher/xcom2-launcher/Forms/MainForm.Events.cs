@@ -446,10 +446,7 @@ namespace XCOM2Launcher.Forms
         }
 
         // Make sure property grid columns are properly sized
-        private void modinfo_inspect_propertygrid_Layout(object sender, LayoutEventArgs e)
-        {
-            modinfo_inspect_propertygrid.SetLabelColumnWidth(100);
-        }
+        private void modinfo_inspect_propertygrid_Layout(object sender, LayoutEventArgs e) => modinfo_inspect_propertygrid.SetLabelColumnWidth(100);
 
         #endregion
 
@@ -460,10 +457,7 @@ namespace XCOM2Launcher.Forms
                 UpdateExport();
         }
 
-        private void ExportCheckboxCheckedChanged(object sender, EventArgs e)
-        {
-            UpdateExport();
-        }
+        private void ExportCheckboxCheckedChanged(object sender, EventArgs e) => UpdateExport();
 
         private void ExportLoadButtonClick(object sender, EventArgs e)
         {
@@ -630,10 +624,7 @@ namespace XCOM2Launcher.Forms
             File.WriteAllText(dialog.FileName, export_richtextbox.Text);
         }
 
-        private void ModInfoTabSelected(object sender, TabControlEventArgs e)
-        {
-            UpdateModChangeLog(ModList.SelectedObject);
-        }
+        private void ModInfoTabSelected(object sender, TabControlEventArgs e) => UpdateModChangeLog(ModList.SelectedObject);
 
         private async void UpdateModChangeLog(ModEntry m)
         {
@@ -644,15 +635,9 @@ namespace XCOM2Launcher.Forms
             modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
         }
 
-        private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
-        {
-            Tools.StartProcess(e.LinkText);
-        }
+        private void ControlLinkClicked(object sender, LinkClickedEventArgs e) => Tools.StartProcess(e.LinkText);
 
-        private void filterMods_TextChanged(object sender, EventArgs e)
-        {
-            RefreshModelFilter();
-        }
+        private void filterMods_TextChanged(object sender, EventArgs e) => RefreshModelFilter();
 
         private void cEnableGrouping_CheckedChanged(object sender, EventArgs e)
         {
@@ -661,10 +646,7 @@ namespace XCOM2Launcher.Forms
             modlist_ListObjectListView.BuildGroups();
         }
 
-        private void cShowLegend_CheckedChanged(object sender, EventArgs e)
-        {
-            pModsLegend.Visible = cShowStateFilter.Checked;
-        }
+        private void cShowLegend_CheckedChanged(object sender, EventArgs e) => pModsLegend.Visible = cShowStateFilter.Checked;
 
         private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
         {
@@ -800,10 +782,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            IniLanguage.Process(e);
-        }
+        private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e) => IniLanguage.Process(e);
 
         private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
         {
@@ -836,10 +815,7 @@ namespace XCOM2Launcher.Forms
                 collapsedGroups.ForEach(g => g.Collapsed = false);
         }
 
-        private void modlist_filterClearButton_Click(object sender, EventArgs e)
-        {
-            modlist_FilterCueTextBox.Text = "";
-        }
+        private void modlist_filterClearButton_Click(object sender, EventArgs e) => modlist_FilterCueTextBox.Text = "";
 
         private void cStateFilter_CheckedChanged(object sender, EventArgs e)
         {
@@ -851,10 +827,7 @@ namespace XCOM2Launcher.Forms
             RefreshModelFilter();
         }
 
-        private void bRefreshStateFilter_Click(object sender, EventArgs e)
-        {
-            RefreshModelFilter();
-        }
+        private void bRefreshStateFilter_Click(object sender, EventArgs e) => RefreshModelFilter();
 
         private void bClearStateFilter_Click(object sender, EventArgs e)
         {

@@ -123,6 +123,7 @@ namespace XCOM2Launcher.Forms
 
         private void SettingsDialog_Shown(object sender, EventArgs e)
         {
+            ThemeManager.Apply(this, Settings.DarkMode);
             // if (Settings.Windows.ContainsKey("settings"))
             //     Bounds = Settings.Windows["settings"].Bounds;
         }

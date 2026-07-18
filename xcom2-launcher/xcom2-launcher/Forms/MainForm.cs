@@ -873,7 +873,7 @@ namespace XCOM2Launcher.Forms
             return newValue;
         }
 
-        private void olvDependencyMods_ItemActivate(object sender, EventArgs e)
+        private void OlvDependencyMods_ItemActivate(object sender, EventArgs e)
         {
             if (sender is ObjectListView olv)
             {
@@ -886,7 +886,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void olvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
+        private void OlvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
         {
             var mod = e.Model as ModEntry;
             Contract.Assume(mod != null);
@@ -901,10 +901,15 @@ namespace XCOM2Launcher.Forms
 
         }
 
-        private void darkModeToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void DarkModeToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             Settings.DarkMode = darkModeToolStripMenuItem.Checked;
             ThemeManager.Apply(this, Settings.DarkMode);
+        }
+
+        private void editOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

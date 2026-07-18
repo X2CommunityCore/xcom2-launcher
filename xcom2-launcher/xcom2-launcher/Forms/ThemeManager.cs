@@ -183,6 +183,7 @@ namespace XCOM2Launcher.Forms
                 case ListBox lb:
                     lb.BackColor = dark ? ControlBackgroundAlt : SystemColors.Window;
                     lb.ForeColor = dark ? Text : SystemColors.WindowText;
+                    lb.BorderStyle = dark ? BorderStyle.None : BorderStyle.Fixed3D;
                     break;
 
                 case ComboBox cb:
