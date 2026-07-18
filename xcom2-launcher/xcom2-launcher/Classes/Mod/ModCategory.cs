@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace XCOM2Launcher.Mod
 {
@@ -8,10 +8,10 @@ namespace XCOM2Launcher.Mod
     {
         [JsonProperty]
         public int Index { get; set; }
-        
+
         [JsonProperty]
         public bool Collapsed { get; set; }
-        
+
         [JsonProperty]
         public List<ModEntry> Entries { get; }
 

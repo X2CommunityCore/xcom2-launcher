@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using log4net.Appender;
 using log4net.Core;
 using Sentry;
 using Sentry.Extensibility;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace XCOM2Launcher.Log4Net
 {

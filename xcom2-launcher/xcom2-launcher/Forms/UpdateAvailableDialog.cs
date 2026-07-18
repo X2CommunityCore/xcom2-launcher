@@ -1,8 +1,8 @@
-﻿using System.Globalization;
+﻿using HeyRed.MarkdownSharp;
+using Semver;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using HeyRed.MarkdownSharp;
-using Semver;
 using XCOM2Launcher.GitHub;
 using XCOM2Launcher.Helper;
 
@@ -33,7 +33,7 @@ namespace XCOM2Launcher.Forms
         {
             version_current_value_label.Text = CurrentVersion;
             version_new_value_label.Text = NewVersion;
-            
+
             Markdown markdown = new Markdown();
             var body = markdown.Transform(Release.body);
             changelog_label.Text = Release.name;

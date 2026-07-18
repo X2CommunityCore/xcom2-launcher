@@ -46,7 +46,7 @@ namespace XCOM2Launcher.UserElements
 
             // update location
             _suggestionsListBox.Location = form.PointToClient(Parent.PointToScreen(Location));
-            
+
             var lastCharIndex = SelectionStart - GetActiveWord().Length;
             var caretPosition = GetPositionFromCharIndex(lastCharIndex);
 
@@ -139,8 +139,8 @@ namespace XCOM2Launcher.UserElements
 
             using (var graphics = _suggestionsListBox.CreateGraphics())
             {
-                _suggestionsListBox.Width = 5 + matches.Max(s => (int) graphics.MeasureString(s, _suggestionsListBox.Font).Width);
-                _suggestionsListBox.Height = _suggestionsListBox.ItemHeight* (1+ matches.Count);
+                _suggestionsListBox.Width = 5 + matches.Max(s => (int)graphics.MeasureString(s, _suggestionsListBox.Font).Width);
+                _suggestionsListBox.Height = _suggestionsListBox.ItemHeight * (1 + matches.Count);
             }
 
             ShowListBox();

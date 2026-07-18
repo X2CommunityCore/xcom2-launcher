@@ -227,6 +227,13 @@
     <Compile Include="Forms\ConfigDiff.Designer.cs">
       <DependentUpon>ConfigDiff.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\DarkGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\DarkTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\ThemeManager.cs" />
     <Compile Include="Forms\UnhandledExceptionDialog.cs">
       <SubType>Form</SubType>
     </Compile>

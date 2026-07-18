@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Forms
@@ -20,7 +14,7 @@ namespace XCOM2Launcher.Forms
         public CategoryManager(Settings settings)
         {
             InitializeComponent();
-            
+
             CancelButton = bClose;
             Settings = settings;
 
@@ -59,7 +53,7 @@ namespace XCOM2Launcher.Forms
             if (index == -1)
                 return;
 
-            var category = (string) categoriesListBox.Items[index];
+            var category = (string)categoriesListBox.Items[index];
 
             if (category == ModInfo.DEFAULT_CATEGORY_NAME)
             {
@@ -98,9 +92,10 @@ namespace XCOM2Launcher.Forms
             if (index == -1)
                 return;
 
-            var oldName = (string) categoriesListBox.Items[index];
+            var oldName = (string)categoriesListBox.Items[index];
 
-            if (oldName == ModInfo.DEFAULT_CATEGORY_NAME) {
+            if (oldName == ModInfo.DEFAULT_CATEGORY_NAME)
+            {
                 MessageBox.Show($"Default category '{ModInfo.DEFAULT_CATEGORY_NAME}' can not be renamed.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -126,9 +121,9 @@ namespace XCOM2Launcher.Forms
 
 
             // Update models
-            var selectedKey = (string) categoriesListBox.SelectedItem;
+            var selectedKey = (string)categoriesListBox.SelectedItem;
             var selectedCat = Settings.Mods.Entries[selectedKey];
-            var prevKey = (string) categoriesListBox.Items[index - 1];
+            var prevKey = (string)categoriesListBox.Items[index - 1];
             var prevCat = Settings.Mods.Entries[prevKey];
 
             var temp = selectedCat.Index;
@@ -148,9 +143,9 @@ namespace XCOM2Launcher.Forms
                 return;
 
             // Update models
-            var selectedKey = (string) categoriesListBox.SelectedItem;
+            var selectedKey = (string)categoriesListBox.SelectedItem;
             var selectedCat = Settings.Mods.Entries[selectedKey];
-            var nextKey = (string) categoriesListBox.Items[index + 1];
+            var nextKey = (string)categoriesListBox.Items[index + 1];
             var nextCat = Settings.Mods.Entries[nextKey];
 
             var temp = selectedCat.Index;

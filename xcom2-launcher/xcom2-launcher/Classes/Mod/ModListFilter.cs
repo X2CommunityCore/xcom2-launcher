@@ -1,9 +1,6 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BrightIdeasSoftware;
 using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Classes.Mod

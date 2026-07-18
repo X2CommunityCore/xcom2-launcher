@@ -7,10 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XCOM2Launcher.Helper {
-    internal static class Tools {
+namespace XCOM2Launcher.Helper
+{
+    internal static class Tools
+    {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Tools));
-        
+
         public static void StartProcess(string fileName, string arguments = "")
         {
             try
@@ -39,7 +41,7 @@ namespace XCOM2Launcher.Helper {
             {
                 return;
             }
-                
+
             //cancel the current event
             args.Cancel = true;
 
@@ -90,10 +92,10 @@ namespace XCOM2Launcher.Helper {
         public static string GetRtfEscapedString(string s)
         {
             var sb = new StringBuilder();
-            
+
             foreach (var c in s)
             {
-                if(c == '\\' || c == '{' || c == '}')
+                if (c == '\\' || c == '{' || c == '}')
                 {
                     // \, { and } are RTF control chars and need to be escaped
                     sb.Append(@"\" + c);
@@ -130,7 +132,7 @@ namespace XCOM2Launcher.Helper {
 
             return result == 0;
         }
-        
+
         public static long CalculateDirectorySize(string path)
         {
             long size = 0;
@@ -140,9 +142,9 @@ namespace XCOM2Launcher.Helper {
             {
                 Interlocked.Add(ref size, new FileInfo(fileName).Length);
             }
-            
+
             var subdirs = Directory.GetDirectories(path);
-            
+
             Parallel.For<long>(0, subdirs.Length, () => 0, (i, loop, subtotal) =>
                 {
                     if ((File.GetAttributes(subdirs[i]) & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint)
@@ -154,7 +156,7 @@ namespace XCOM2Launcher.Helper {
                 },
                 x => Interlocked.Add(ref size, x)
             );
-            
+
             return size;
         }
     }

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 
-namespace XCOM2Launcher.PropertyGrid
+namespace XCOM2Launcher.PropertyGrid0
 {
     class CheckboxEditor : UITypeEditor
     {

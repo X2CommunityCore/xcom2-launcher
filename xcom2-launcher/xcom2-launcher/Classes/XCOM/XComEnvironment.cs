@@ -1,9 +1,9 @@
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Steamworks;
 
 namespace XCOM2Launcher.XCOM
 {
@@ -59,7 +59,7 @@ namespace XCOM2Launcher.XCOM
             }
 
             Log.Error("Steam API failed to detect a valid game directory.");
-            
+
             // Try to deduce game path from available mod directories
             var dirs = DetectModDirs();
             foreach (var dir in dirs.Where<string>(dir => dir.ToLower().Contains("\\steamapps\\")))
@@ -123,7 +123,7 @@ namespace XCOM2Launcher.XCOM
                 Log.Warn("Unable to access 'XComEngine.ini'", ex);
                 return null;
             }
-          
+
             // Add default Steam Workshop mod path if it is missing.
             var appId = SteamAppId.ToString();
             if (!currentModDirs.Any(dir => dir.EndsWith(appId) || dir.EndsWith(appId + "\\")))
@@ -177,12 +177,12 @@ namespace XCOM2Launcher.XCOM
                 // Retrieve entires from XComModOptions
                 var configFile = GetConfigFile("ModOptions");
                 var mods = configFile.Get("Engine.XComModOptions", "ActiveMods") ?? new List<string>();
-                
+
                 // Retrieve entires from DefaultModOptions
                 configFile.Entries.Clear();
                 configFile.CreateFromDefault("ModOptions");
                 mods.AddRange(configFile.Get("Engine.XComModOptions", "ActiveMods")?.ToArray() ?? new string[0]);
-                
+
                 // Prepare result
                 mods = mods.ConvertAll(x => x.TrimStart('"').TrimEnd('"'));     // default config may contain entries encapsulated in ""
                 mods = mods.Distinct().ToList();

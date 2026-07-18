@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Windows.Forms;
 
-namespace XCOM2Launcher.PropertyGrid
+namespace XCOM2Launcher.PropertyGrid0
 {
     static class PropertyGridExtensions
     {

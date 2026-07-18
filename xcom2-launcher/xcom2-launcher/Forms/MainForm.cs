@@ -1,17 +1,17 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
+using JR.Utils.GUI.Forms;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
+using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
-using JR.Utils.GUI.Forms;
-using XCOM2Launcher.Classes.Mod;
 
 namespace XCOM2Launcher.Forms
 {
@@ -19,7 +19,7 @@ namespace XCOM2Launcher.Forms
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(MainForm));
         private const string ExclamationIconKey = "Exclamation";
-        
+
         private Task ModUpdateTask;
         private CancellationTokenSource ModUpdateCancelSource;
         private bool IsModUpdateTaskRunning => (ModUpdateTask != null && !ModUpdateTask.IsCompleted);
@@ -43,7 +43,7 @@ namespace XCOM2Launcher.Forms
             // Init interface
             InitModListView();
             InitDependencyListViews();
-            
+
             RegisterEvents();
 
             // Other intialization
@@ -52,26 +52,34 @@ namespace XCOM2Launcher.Forms
             // Init the argument checkboxes
             InitQuickArgumentsMenu(settings);
 
-/*
-            // Check for running downloads
-#if DEBUG
-            if (Settings.GetWorkshopPath() != null)
-            {
-                CheckSteamForNewMods();
+            darkModeToolStripMenuItem.Checked = Settings.DarkMode;
+            ThemeManager.Apply(this, Settings.DarkMode);
 
-                var t2 = new Timer();
-                t2.Tick += (sender, e) => { CheckSteamForNewMods(); };
-                t2.Interval = 30000;
-                t2.Start();
-            }
-#endif
-*/
+            /*
+                        // Check for running downloads
+            #if DEBUG
+                        if (Settings.GetWorkshopPath() != null)
+                        {
+                            CheckSteamForNewMods();
+
+                            var t2 = new Timer();
+                            t2.Tick += (sender, e) => { CheckSteamForNewMods(); };
+                            t2.Interval = 30000;
+                            t2.Start();
+                        }
+            #endif
+            */
+        }
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            ThemeManager.Apply(this, Settings.DarkMode);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             Text += " " + Program.GetCurrentVersionString(true);
-            
+
             if (Settings.UpdateModsOnStartup)
             {
                 // Update mod information
@@ -99,70 +107,70 @@ namespace XCOM2Launcher.Forms
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
         }
 
-/*
-        // This was only called for DEBUG builds, but currently isn't required (maybe part of an abandoned feature?)
-        private void CheckSteamForNewMods()
-        {
-            SetStatus("Checking for new mods...");
-
-            ulong[] subscribedIDs;
-            try
-            {
-                subscribedIDs = Workshop.GetSubscribedItems();
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Steamworks not initialized?
-                // Game taking over?
-                Log.Error("Error checking for new mods", ex);
-                SetStatus("Error checking for new mods.");
-                return;
-            }
-
-            var change = false;
-            foreach (var id in subscribedIDs)
-            {
-                var status = Workshop.GetDownloadStatus(id);
-
-                if (status.HasFlag(EItemState.k_EItemStateInstalled))
-                    // already installed
-                    continue;
-
-                if (Downloads.Any(d => d.WorkshopID == (long) id))
-                    // already observing
-                    continue;
-
-                // Get info
-                var detailsRequest = new ItemDetailsRequest(id).Send().WaitForResult();
-                var details = detailsRequest.Result[0];
-                var link = detailsRequest.GetPreviewURL();
-
-                var downloadMod = new ModEntry
+        /*
+                // This was only called for DEBUG builds, but currently isn't required (maybe part of an abandoned feature?)
+                private void CheckSteamForNewMods()
                 {
-                    Name = details.m_rgchTitle,
-                    DateCreated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeCreated).DateTime,
-                    DateUpdated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeUpdated).DateTime,
-                    //Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
-                    Image = link,
-                    WorkshopID = (int) id
-                };
+                    SetStatus("Checking for new mods...");
 
-                downloadMod.SetSource(ModSource.SteamWorkshop);
-                downloadMod.AddState(ModState.New | ModState.NotInstalled);
+                    ulong[] subscribedIDs;
+                    try
+                    {
+                        subscribedIDs = Workshop.GetSubscribedItems();
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        // Steamworks not initialized?
+                        // Game taking over?
+                        Log.Error("Error checking for new mods", ex);
+                        SetStatus("Error checking for new mods.");
+                        return;
+                    }
 
-                // Start download
-                Workshop.DownloadItem(id);
-                //
-                Downloads.Add(downloadMod);
-                change = true;
-            }
+                    var change = false;
+                    foreach (var id in subscribedIDs)
+                    {
+                        var status = Workshop.GetDownloadStatus(id);
 
-            if (change)
-                RefreshModList();
+                        if (status.HasFlag(EItemState.k_EItemStateInstalled))
+                            // already installed
+                            continue;
 
-            SetStatusIdle();
-        }
-*/
+                        if (Downloads.Any(d => d.WorkshopID == (long) id))
+                            // already observing
+                            continue;
+
+                        // Get info
+                        var detailsRequest = new ItemDetailsRequest(id).Send().WaitForResult();
+                        var details = detailsRequest.Result[0];
+                        var link = detailsRequest.GetPreviewURL();
+
+                        var downloadMod = new ModEntry
+                        {
+                            Name = details.m_rgchTitle,
+                            DateCreated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeCreated).DateTime,
+                            DateUpdated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeUpdated).DateTime,
+                            //Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
+                            Image = link,
+                            WorkshopID = (int) id
+                        };
+
+                        downloadMod.SetSource(ModSource.SteamWorkshop);
+                        downloadMod.AddState(ModState.New | ModState.NotInstalled);
+
+                        // Start download
+                        Workshop.DownloadItem(id);
+                        //
+                        Downloads.Add(downloadMod);
+                        change = true;
+                    }
+
+                    if (change)
+                        RefreshModList();
+
+                    SetStatusIdle();
+                }
+        */
         #region GUI
 
         /// <summary>
@@ -237,7 +245,7 @@ namespace XCOM2Launcher.Forms
 
         #endregion
 
-		#region Export
+        #region Export
 
         private void UpdateExport()
         {
@@ -248,23 +256,23 @@ namespace XCOM2Launcher.Forms
                 export_richtextbox.Text = "No active mods.";
                 return;
             }
-			
-			var showCategories = export_group_checkbox.Checked;
-			var showLink = export_workshop_link_checkbox.Checked;
-			var showAllMods = export_all_mods_checkbox.Checked;
 
-			var nameLength = showAllMods ? Mods.All.Max(m => m.Name.Length) : Mods.Active.Max(m => m.Name.Length);
-			var idLength = showAllMods ? Mods.All.Max(m => m.ID.Length) : Mods.Active.Max(m => m.ID.Length);
+            var showCategories = export_group_checkbox.Checked;
+            var showLink = export_workshop_link_checkbox.Checked;
+            var showAllMods = export_all_mods_checkbox.Checked;
+
+            var nameLength = showAllMods ? Mods.All.Max(m => m.Name.Length) : Mods.Active.Max(m => m.Name.Length);
+            var idLength = showAllMods ? Mods.All.Max(m => m.ID.Length) : Mods.Active.Max(m => m.ID.Length);
             var workshopIDLength = showAllMods ? Mods.All.Max(m => m.WorkshopID.ToString().Length) : Mods.Active.Max(m => m.WorkshopID.ToString().Length);
 
 
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
             {
                 List<ModEntry> mods;
-	   //         if (showAllMods)
-		  //          mods = entry.Value.Entries.ToList();
-				//else
-					mods = entry.Value.Entries.Where(m => m.isActive).ToList();
+                //         if (showAllMods)
+                //          mods = entry.Value.Entries.ToList();
+                //else
+                mods = entry.Value.Entries.Where(m => m.isActive).ToList();
 
                 if (showCategories)
                     str.AppendLine($"{entry.Key} ({mods.Count()}):");
@@ -279,7 +287,7 @@ namespace XCOM2Launcher.Forms
                     str.Append(string.Format("{0,-" + idLength + "} ", mod.ID));
                     str.Append("\t");
 
-					// add workshop ID or link
+                    // add workshop ID or link
                     if (mod.WorkshopID == -1)
                         str.Append("Unknown");
 
@@ -288,7 +296,7 @@ namespace XCOM2Launcher.Forms
 
                     else
                         str.Append(string.Format("{0,-" + workshopIDLength + "} ", mod.WorkshopID));
-	                str.Append("\t");
+                    str.Append("\t");
 
                     str.Append(string.Join(";", mod.Tags));
 
@@ -302,10 +310,10 @@ namespace XCOM2Launcher.Forms
             export_richtextbox.Text = str.ToString();
         }
 
-		#endregion
+        #endregion
 
 
-		#region Basic
+        #region Basic
 
         private void Reset()
         {
@@ -385,7 +393,7 @@ namespace XCOM2Launcher.Forms
                     return;
                 }
             }
-            
+
             Settings.Instance.LastLaunchedWotC = false;
             ChallengeMode = false;
             Save();
@@ -400,7 +408,7 @@ namespace XCOM2Launcher.Forms
             if (Settings.CloseAfterLaunch)
                 Close();
         }
-        
+
         private void RunWotC()
         {
             if (IsModUpdateTaskRunning)
@@ -424,7 +432,7 @@ namespace XCOM2Launcher.Forms
         }
 
         private bool ChallengeMode = false;
-        
+
         private void RunChallengeMode()
         {
             if (IsModUpdateTaskRunning)
@@ -455,7 +463,7 @@ namespace XCOM2Launcher.Forms
         private void InitializeInterface()
         {
             error_provider.Clear();
-            
+
             UpdateModInfo(modlist_ListObjectListView.SelectedObject as ModEntry);
             UpdateLabels();
             UpdateStateFilterLabels();
@@ -510,13 +518,13 @@ namespace XCOM2Launcher.Forms
                     conflicts_datagrid.Rows.Add(m.Name, oldClass, classOverride.NewClass);
                 }
             }
-            
+
             var changedMods = Mods.UpdateModsConflictState();
             modlist_ListObjectListView.RefreshObjects(changedMods);
 
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
-            
+
             UpdateLabels();
         }
 
@@ -563,7 +571,7 @@ namespace XCOM2Launcher.Forms
 
             var changedMods = Mods.UpdateModsConflictState();
             modlist_ListObjectListView.RefreshObjects(changedMods);
-            
+
             // Conflict log
             conflicts_textbox.Text = GetDuplicatesString() + GetOverridesString();
         }
@@ -572,7 +580,7 @@ namespace XCOM2Launcher.Forms
         {
             var str = new StringBuilder();
 
-            var duplicates = Mods.GetDuplicates().Where(delegate(IGrouping<string, ModEntry> entries)
+            var duplicates = Mods.GetDuplicates().Where(delegate (IGrouping<string, ModEntry> entries)
             {
                 // Only show duplicate-groups that have not been resolved (ModState.DuplicateDisabled / ModState.DuplicatePrimary)
                 return entries?.All(m => m.State.HasFlag(ModState.DuplicateID)) == true;
@@ -729,10 +737,10 @@ namespace XCOM2Launcher.Forms
             UpdateModChangeLog(m);
             modinfo_readme_RichTextBox.Text = m.GetReadMe();
             modinfo_image_picturebox.ImageLocation = m.Image;
-            
+
             // Init handler for property changes
             var sel_obj = m.GetProperty();
-            
+
             sel_obj.PropertyChanged += async (sender, e) =>
             {
                 // Update steam info when clearing the Name
@@ -741,11 +749,11 @@ namespace XCOM2Launcher.Forms
                 {
                     await Mods.UpdateModAsync(prop.ModEntry, Settings);
                 }
-                
-                RefreshModList(); 
+
+                RefreshModList();
                 modinfo_inspect_propertygrid.Refresh();
             };
-            
+
             modinfo_inspect_propertygrid.SelectedObject = sel_obj;
 
             #region Config
@@ -768,7 +776,7 @@ namespace XCOM2Launcher.Forms
             }
 
             #endregion
-            
+
             UpdateDependencyInformation(m);
         }
 
@@ -778,16 +786,17 @@ namespace XCOM2Launcher.Forms
         private void InitQuickArgumentsMenu(Settings settings)
         {
             LauchOptionsPanel.Visible = settings.ShowQuickLaunchArguments && settings.QuickToggleArguments.Any();
-            
+
             quickLaunchToolstripButton.DropDownItems.Clear();
             foreach (var arg in settings.QuickToggleArguments)
             {
-                var item = new ToolStripMenuItem(arg) {CheckOnClick = true};
+                var item = new ToolStripMenuItem(arg) { CheckOnClick = true };
                 item.Click += QuickArgumentItemClick;
                 quickLaunchToolstripButton.DropDownItems.Add(item);
             }
 
-            foreach (ToolStripMenuItem item in quickLaunchToolstripButton.DropDownItems) {
+            foreach (ToolStripMenuItem item in quickLaunchToolstripButton.DropDownItems)
+            {
                 item.Checked = Settings.ArgumentList.Any(arg => arg.Equals(item.Text, StringComparison.OrdinalIgnoreCase));
             }
         }
@@ -803,7 +812,7 @@ namespace XCOM2Launcher.Forms
 
             olvRequiredMods.BooleanCheckStatePutter = BooleanCheckStatePutter;
             olvDependentMods.BooleanCheckStatePutter = BooleanCheckStatePutter;
-            
+
             olvColReqModsIgnore.AspectGetter += rowObject =>
             {
                 if (CurrentMod == null || !(rowObject is ModEntry mod))
@@ -864,7 +873,7 @@ namespace XCOM2Launcher.Forms
             return newValue;
         }
 
-        private void olvDependencyMods_ItemActivate(object sender, EventArgs e)
+        private void OlvDependencyMods_ItemActivate(object sender, EventArgs e)
         {
             if (sender is ObjectListView olv)
             {
@@ -877,7 +886,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void olvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
+        private void OlvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
         {
             var mod = e.Model as ModEntry;
             Contract.Assume(mod != null);
@@ -886,5 +895,21 @@ namespace XCOM2Launcher.Forms
         }
 
         #endregion
+
+        private void darkModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void DarkModeToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.DarkMode = darkModeToolStripMenuItem.Checked;
+            ThemeManager.Apply(this, Settings.DarkMode);
+        }
+
+        private void editOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

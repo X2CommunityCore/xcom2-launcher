@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
@@ -12,7 +12,7 @@ namespace XCOM2Launcher.Serialization
     {
         public override bool CanRead => true;
 
-        public override bool CanConvert(Type objectType) => objectType == typeof (Settings);
+        public override bool CanConvert(Type objectType) => objectType == typeof(Settings);
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {

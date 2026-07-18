@@ -117,8 +117,8 @@ namespace XCOM2Launcher.Mod
             var diff_b = Math.Abs(Source.B - avgColorValue);
             if (diff_r < 20 && diff_g < 20 && diff_b < 20) //The color is a shade of gray
             {
-                inputColor = avgColorValue < 123 
-                           ? Color.FromArgb(Source.A, 220, 230, 50) 
+                inputColor = avgColorValue < 123
+                           ? Color.FromArgb(Source.A, 220, 230, 50)
                            : Color.FromArgb(Source.A, 255, 255, 50);
             }
             var sourceAlphaValue = Source.A;

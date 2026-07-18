@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Steamworks;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Steamworks;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Steam;
 using FilePath = System.IO.Path;
@@ -41,7 +40,7 @@ namespace XCOM2Launcher.Mod
         /// </summary>
         [JsonIgnore]
         public ModState State { get; private set; } = ModState.None;
-        
+
         /// <summary>
         /// The value of <see cref="State"/> is copied to this property when the settings are saved.
         /// This can be used to compare the re-evaluated mod state against its previous state on application start.
@@ -53,9 +52,9 @@ namespace XCOM2Launcher.Mod
         public bool ManualName { get; set; } = false;
 
         public string Author { get; set; } = DEFAULT_AUTHOR_NAME;
-	    public string Description { get; set; } = "";
+        public string Description { get; set; } = "";
 
-	    public string Path { get; set; } = "";
+        public string Path { get; set; } = "";
 
         /// <summary>
         ///     Size in bytes
@@ -92,10 +91,10 @@ namespace XCOM2Launcher.Mod
         /// </summary>
         public List<string> SteamTags { get; set; } = new List<string>();
 
-		[JsonIgnore]
-	    public bool HasBackedUpSettings => Settings.Count > 0;
+        [JsonIgnore]
+        public bool HasBackedUpSettings => Settings.Count > 0;
 
-	    public List<ModSettingsEntry> Settings { get; set; } = new List<ModSettingsEntry>();
+        public List<ModSettingsEntry> Settings { get; set; } = new List<ModSettingsEntry>();
 
         [JsonIgnore]
         public string Image
@@ -104,18 +103,18 @@ namespace XCOM2Launcher.Mod
             set { _image = value; }
         }
 
-	    [JsonIgnore]
-	    public string SteamLink => GetSteamLink();
+        [JsonIgnore]
+        public string SteamLink => GetSteamLink();
 
-	    [JsonIgnore]
-	    public string BrowserLink => GetWorkshopLink();
+        [JsonIgnore]
+        public string BrowserLink => GetWorkshopLink();
 
         [Browsable(false)]
         public IList<string> Tags { get; set; } = new List<string>();
 
         public bool BuiltForWOTC { get; set; } = false;
 
-        public ModEntry() {}
+        public ModEntry() { }
 
         public ModEntry(SteamUGCDetails workshopDetailsWrapper)
         {
@@ -138,12 +137,12 @@ namespace XCOM2Launcher.Mod
             return new Classes.Mod.ModProperty(this);
         }
 
-		#region Mod
+        #region Mod
 
-		public string GetDescription(bool cleanBbCode = false)
-		{
+        public string GetDescription(bool cleanBbCode = false)
+        {
             string dsc;
-            
+
             if (!string.IsNullOrEmpty(Description))
                 dsc = Description;
             else
@@ -216,7 +215,7 @@ namespace XCOM2Launcher.Mod
                 _overrides = GetUIScreenListenerOverrides().Union(GetClassOverrides()).ToList();
             });
         }
-        
+
         public IEnumerable<ModClassOverride> GetOverrides()
         {
             return _overrides;
@@ -283,14 +282,14 @@ namespace XCOM2Launcher.Mod
             {
                 return Array.Empty<ModClassOverride>();
             }
-            
+
             foreach (var file in Directory.GetFiles(configPath, "XComEngine.ini", SearchOption.AllDirectories))
             {
                 var modClassOverrides = from line in File.ReadLines(file)
-                    select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
+                                        select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
                     into m
-                    where m.match.Success
-                    select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
+                                        where m.match.Success
+                                        select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
                 result.AddRange(modClassOverrides);
             }
 
@@ -321,14 +320,14 @@ namespace XCOM2Launcher.Mod
             return "";
         }
 
-	    public string GetSteamLink()
-	    {
+        public string GetSteamLink()
+        {
             if (WorkshopID > 0)
             {
                 return "steam://url/CommunityFilePage/" + WorkshopID;
             }
             return "";
-	    }
+        }
 
         public override string ToString()
         {
@@ -362,12 +361,12 @@ namespace XCOM2Launcher.Mod
         {
             BuiltForWOTC = NeedWOTC;
         }
-        
+
         public void CalculateSize()
         {
             Size = Tools.CalculateDirectorySize(Path);
         }
-        
+
         public void SetSource(ModSource newSource)
         {
             Source = newSource;
@@ -380,9 +379,9 @@ namespace XCOM2Launcher.Mod
 
         public string[] GetConfigFiles()
         {
-			if (Directory.Exists(FilePath.Combine(Path,"Config")))
-				return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini", SearchOption.AllDirectories);
-	        return new string[0];
+            if (Directory.Exists(FilePath.Combine(Path, "Config")))
+                return Directory.GetFiles(FilePath.Combine(Path, "Config"), "*.ini", SearchOption.AllDirectories);
+            return new string[0];
         }
 
         public void EnableModFile()
@@ -427,7 +426,7 @@ namespace XCOM2Launcher.Mod
         internal string GetModInfoFile()
         {
             string path = FilePath.Combine(Path, ID + ".XComMod");
-            
+
             if (File.Exists(path))
                 return path;
 
@@ -457,7 +456,7 @@ namespace XCOM2Launcher.Mod
 
                     return readmeText;
                 }
-                
+
                 if (File.Exists(readmePathMd))
                 {
                     string readmeText = File.ReadAllText(readmePathMd);
@@ -478,60 +477,58 @@ namespace XCOM2Launcher.Mod
             }
         }
 
-		/// <summary>
-		/// Returns a relative path to this mod's folder.
-		/// </summary>
-		/// <param name="target"></param>
-		/// <returns></returns>
-		public string GetPathRelative(string target)
-		{
-			var targetUri = new Uri(target);
-			var modUri = new Uri(Path.TrimEnd(FilePath.DirectorySeparatorChar, FilePath.AltDirectorySeparatorChar) + FilePath.DirectorySeparatorChar);
-			var relativeUri = modUri.MakeRelativeUri(targetUri).ToString();
+        /// <summary>
+        /// Returns a relative path to this mod's folder.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public string GetPathRelative(string target)
+        {
+            var targetUri = new Uri(target);
+            var modUri = new Uri(Path.TrimEnd(FilePath.DirectorySeparatorChar, FilePath.AltDirectorySeparatorChar) + FilePath.DirectorySeparatorChar);
+            var relativeUri = modUri.MakeRelativeUri(targetUri).ToString();
             return Uri.UnescapeDataString(relativeUri);
-		}
+        }
 
-		/// <summary>
-		/// Returns the full path to the provided relative path.
-		/// </summary>
-		/// <param name="relativePath"></param>
-		/// <returns></returns>
-	    public string GetPathFull(string relativePath)
-	    {
-		    return FilePath.Combine(Path, relativePath);
-	    }
+        /// <summary>
+        /// Returns the full path to the provided relative path.
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
+        public string GetPathFull(string relativePath)
+        {
+            return FilePath.Combine(Path, relativePath);
+        }
 
-		#endregion Files
+        #endregion Files
 
 
-		#region Settings
+        #region Settings
 
-		public bool AddSetting(string path, string contents)
-	    {
-			if (Settings == null) Settings = new List<ModSettingsEntry>();
-			// Check if this belongs to this mod
-			var fullpath = GetPathFull(path);
-			if (!File.Exists(fullpath))
-			{
-				MessageBox.Show($"Error!\nThe file {path} does not belong to mod {Name}.\nNothing was saved.", @"Error", MessageBoxButtons.OK);
-				return false;
-			}
+        public bool AddSetting(string path, string contents)
+        {
+            if (Settings == null) Settings = new List<ModSettingsEntry>();
+            // Check if this belongs to this mod
+            var fullpath = GetPathFull(path);
+            if (!File.Exists(fullpath))
+            {
+                MessageBox.Show($"Error!\nThe file {path} does not belong to mod {Name}.\nNothing was saved.", @"Error", MessageBoxButtons.OK);
+                return false;
+            }
 
-			var setting = GetSetting(path);
-			if (setting == null)
-			{
-				setting = new ModSettingsEntry(path, FilePath.GetFileName(path), contents);
-				Settings.Add(setting);
-			}
-			else
-				setting.Contents = contents;
+            var setting = GetSetting(path);
+            if (setting == null)
+            {
+                setting = new ModSettingsEntry(path, FilePath.GetFileName(path), contents);
+                Settings.Add(setting);
+            }
+            else
+                setting.Contents = contents;
 
             try
             {
-                using (var stream = new StreamWriter(fullpath))
-                {
-                    stream.Write(contents);
-                }
+                using var stream = new StreamWriter(fullpath);
+                stream.Write(contents);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -541,28 +538,28 @@ namespace XCOM2Launcher.Mod
 
             return true;
 
-	    }
+        }
 
-	    public bool RemoveSetting(string path)
-	    {
-		    ModSettingsEntry toRemove = Settings.FirstOrDefault(setting => setting.FilePath.Equals(path));
+        public bool RemoveSetting(string path)
+        {
+            ModSettingsEntry toRemove = Settings.FirstOrDefault(setting => setting.FilePath.Equals(path));
 
-		    if (toRemove == null) return false;
-		    Settings.Remove(toRemove);
-		    return true;
-	    }
+            if (toRemove == null) return false;
+            Settings.Remove(toRemove);
+            return true;
+        }
 
-		/// <summary>
-		/// Returns a setting given a fully qualified path to a file
-		/// </summary>
-		/// <param name="path">Path to the setting to retreive</param>
-		/// <returns></returns>
-	    public ModSettingsEntry GetSetting(string path)
-		{
-			if (Settings == null) Settings = new List<ModSettingsEntry>();
-			return Settings.FirstOrDefault(setting => setting.FilePath.Equals(path));
-		}
+        /// <summary>
+        /// Returns a setting given a fully qualified path to a file
+        /// </summary>
+        /// <param name="path">Path to the setting to retreive</param>
+        /// <returns></returns>
+        public ModSettingsEntry GetSetting(string path)
+        {
+            if (Settings == null) Settings = new List<ModSettingsEntry>();
+            return Settings.FirstOrDefault(setting => setting.FilePath.Equals(path));
+        }
 
-		#endregion Settings
+        #endregion Settings
     }
 }

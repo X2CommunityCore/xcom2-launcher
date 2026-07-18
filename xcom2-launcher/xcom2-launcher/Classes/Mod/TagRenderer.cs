@@ -1,10 +1,10 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
 
 namespace XCOM2Launcher.Mod
 {
@@ -17,7 +17,7 @@ namespace XCOM2Launcher.Mod
         public static int rY => rectPadding.Height;
         public static int tX => textPadding.Width;
         public static int tY => textPadding.Height;
-        
+
         public TagRenderInfo(Point offset, Rectangle bounds, Size textSize, Color tagColor)
         {
             var rectWidth = textSize.Width + tX * 2;
@@ -44,8 +44,8 @@ namespace XCOM2Launcher.Mod
     public class TagRenderer : BaseRenderer
     {
         private readonly Dictionary<string, ModTag> _availableTags;
-        
-        
+
+
         public TagRenderer(ObjectListView listView, Dictionary<string, ModTag> availableTags)
         {
             _availableTags = availableTags;

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 
-namespace XCOM2Launcher.PropertyGrid
+namespace XCOM2Launcher.PropertyGrid0
 {
     class DictionaryPropertyGridAdapter : ICustomTypeDescriptor
     {

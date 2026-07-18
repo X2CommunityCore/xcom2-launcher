@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.XCOM;
 
@@ -42,7 +42,7 @@ namespace XCOM2Launcher.Forms
             updateModsOnStartup.Checked = settings.UpdateModsOnStartup;
             onlyUpdateEnabledAndNew.Checked = settings.OnlyUpdateEnabledOrNewModsOnStartup;
             onlyUpdateEnabledAndNew.Enabled = settings.UpdateModsOnStartup;
-            
+
             foreach (var modPath in settings.ModPaths)
                 modPathsListbox.Items.Add(modPath);
 
@@ -59,11 +59,11 @@ namespace XCOM2Launcher.Forms
         {
             using var dialog = new OpenFileDialog
             {
-                RestoreDirectory = true, 
+                RestoreDirectory = true,
                 InitialDirectory = gamePathTextBox.Text,
                 Title = "Select the folder where the XCOM executable is located"
             };
-            
+
             if (Program.XEnv.Game == GameId.X2)
             {
                 dialog.FileName = "XCom2.exe";
@@ -98,7 +98,7 @@ namespace XCOM2Launcher.Forms
                 return;
             }
 
-            var path = (string) modPathsListbox.SelectedItem;
+            var path = (string)modPathsListbox.SelectedItem;
             modPathsListbox.Items.Remove(path);
         }
 
@@ -123,6 +123,7 @@ namespace XCOM2Launcher.Forms
 
         private void SettingsDialog_Shown(object sender, EventArgs e)
         {
+            ThemeManager.Apply(this, Settings.DarkMode);
             // if (Settings.Windows.ContainsKey("settings"))
             //     Bounds = Settings.Windows["settings"].Bounds;
         }
@@ -138,11 +139,12 @@ namespace XCOM2Launcher.Forms
             IsRestartRequired = sentryEnableChanged || gamePathChanged || modFoldersChanged;
 
             // Verify settings
-            if (!Directory.Exists(gamePathTextBox.Text)) {
+            if (!Directory.Exists(gamePathTextBox.Text))
+            {
                 MessageBox.Show("The specified base path does not exist.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             // Apply changes
             Settings.GamePath = Path.GetFullPath(gamePathTextBox.Text);
             Settings.CloseAfterLaunch = closeAfterLaunchCheckBox.Checked;

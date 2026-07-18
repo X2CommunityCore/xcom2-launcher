@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Semver;
+using Sentry;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,11 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Semver;
-using Sentry;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Forms;
@@ -29,11 +28,11 @@ namespace XCOM2Launcher
 
         static Program()
         {
-            #if DEBUG
-                IsDebugBuild = true;
-            #else
+#if DEBUG
+            IsDebugBuild = true;
+#else
                 IsDebugBuild = false;
-            #endif
+#endif
 
             Log.Info($"Application started (AML {GitVersionInfo.FullSemVer} {GitVersionInfo.Sha})");
             Log.Info($"Executable location: '{Application.ExecutablePath}'");
@@ -77,6 +76,7 @@ namespace XCOM2Launcher
             try
             {
                 Application.EnableVisualStyles();
+                ThemeManager.EnableAppDarkModeSupport();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 bool gameTypeSelected = InitialGameTypeSelection();
@@ -89,7 +89,7 @@ namespace XCOM2Launcher
 
                 InitAppSettings();
                 sentrySdkInstance = InitSentry();
-                
+
                 if (!CheckDotNet4_7_2())
                 {
                     Log.Warn(".NET Framework v4.7.2 required");
@@ -102,7 +102,8 @@ namespace XCOM2Launcher
                     return;
                 }
 
-                if (!SteamManager.EnsureInitialized()) {
+                if (!SteamManager.EnsureInitialized())
+                {
                     Log.Warn("Failed to detect Steam");
 
                     StringBuilder message = new StringBuilder();
@@ -125,7 +126,8 @@ namespace XCOM2Launcher
                 }
 
                 // Exit if another instance of AML is already running and multiple instances are disabled.
-                if (!settings.AllowMultipleInstances && !isFirstInstance) {
+                if (!settings.AllowMultipleInstances && !isFirstInstance)
+                {
                     MessageBox.Show("Another instance of AML is already running.", "AML already started", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
@@ -165,7 +167,7 @@ namespace XCOM2Launcher
                                            $"Source: {source}\n" +
                                            $"Message: {e.Message}\n\n" +
                                            $"Stack:\n{e.StackTrace}");
-            
+
             using var dlg = new UnhandledExceptionDialog(e);
             dlg.ShowDialog();
             Application.Exit();
@@ -187,14 +189,14 @@ namespace XCOM2Launcher
             Log.Info("Initializing Sentry");
 
             IDisposable sentrySdkInstance = null;
-            
+
             try
             {
                 string environment = "Release";
-                
-                #if DEBUG
-                    environment = "Debug";
-                #endif
+
+#if DEBUG
+                environment = "Debug";
+#endif
 
                 sentrySdkInstance = SentrySdk.Init(o =>
                 {
@@ -355,7 +357,7 @@ namespace XCOM2Launcher
                     var targetGame = settings.Game == GameId.X2 ? "XCOM 2" : "XCOM Chimera Squad";
                     var activeGame = XEnv.Game == GameId.X2 ? "XCOM 2" : "XCOM Chimera Squad";
                     MessageBox.Show($"The current settings were created for '{targetGame}', but this copy of AML was configured to run '{activeGame}'. " +
-                                    "To resolve this close AML and:\n\n" + 
+                                    "To resolve this close AML and:\n\n" +
                                     "a) delete the file 'settings.json' to reset the settings\n\n" +
                                     "    OR\n\n" +
                                     $"b) delete the file 'steam_appid.txt' and select '{targetGame}' on startup", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Stop);
@@ -457,7 +459,7 @@ namespace XCOM2Launcher
                 if (newMissingMods.Any(m => !m.isHidden))
                 {
                     string message;
-                    
+
                     if (newMissingMods.Count == 1)
                     {
                         message = $"The mod '{newMissingMods.FirstOrDefault()?.Name}' no longer exists.\n\nDo you want to hide this mod from the mod list?";
@@ -482,7 +484,7 @@ namespace XCOM2Launcher
 
             // import mods
             settings.ImportMods();
-            
+
             return settings;
         }
 
@@ -492,56 +494,54 @@ namespace XCOM2Launcher
 
             try
             {
-                using (var client = new System.Net.WebClient())
+                using var client = new System.Net.WebClient();
+                client.Headers.Add("User-Agent: Other");
+                GitHub.Release release;
+
+                if (Settings.Instance.CheckForPreReleaseUpdates)
                 {
-                    client.Headers.Add("User-Agent: Other");
-                    GitHub.Release release;
+                    Log.Info("Pre-Release updates enabled");
+                    // fetch all releases including pre-releases and select the first/newest 
+                    var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
+                    var allReleases = JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
+                    release = allReleases.FirstOrDefault();
+                }
+                else
+                {
+                    // fetch latest non-pre-release
+                    var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
+                    release = JsonConvert.DeserializeObject<GitHub.Release>(json);
+                }
 
-                    if (Settings.Instance.CheckForPreReleaseUpdates)
-                    {
-                        Log.Info("Pre-Release updates enabled");
-                        // fetch all releases including pre-releases and select the first/newest 
-                        var jsonAllReleases = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases");
-                        var allReleases = JsonConvert.DeserializeObject<List<GitHub.Release>>(jsonAllReleases);
-                        release = allReleases.FirstOrDefault();
-                    }
-                    else
-                    {
-                        // fetch latest non-pre-release
-                        var json = client.DownloadString("https://api.github.com/repos/X2CommunityCore/xcom2-launcher/releases/latest");
-                        release = JsonConvert.DeserializeObject<GitHub.Release>(json);
-                    }
+                if (release == null)
+                {
+                    Log.Warn("No release information found");
+                    return false;
+                }
 
-                    if (release == null)
-                    {
-                        Log.Warn("No release information found");
+                bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
+                parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any, out SemVersion newVersion);
+
+                if (parsingSucceeded)
+                {
+                    // If not explicitly enabled, we ignore alpha versions.
+                    if (!Settings.Instance.IncludeAlphaVersions && newVersion.Prerelease.Contains("alpha"))
                         return false;
-                    }
 
-                    bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
-                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any ,out SemVersion newVersion);
-
-                    if (parsingSucceeded)
+                    if (currentVersion.CompareSortOrderTo(newVersion) == -1)
                     {
-                        // If not explicitly enabled, we ignore alpha versions.
-                        if (!Settings.Instance.IncludeAlphaVersions && newVersion.Prerelease.Contains("alpha"))
-                            return false;
-
-                        if (currentVersion.CompareSortOrderTo(newVersion) == -1)
-                        {
-                            // New version available
-                            Log.Info("New version available " + newVersion);
-                            using var dlg = new UpdateAvailableDialog(release, currentVersion, newVersion);
-                            dlg.ShowDialog();
-                            return true;
-                        }
+                        // New version available
+                        Log.Info("New version available " + newVersion);
+                        using var dlg = new UpdateAvailableDialog(release, currentVersion, newVersion);
+                        dlg.ShowDialog();
+                        return true;
                     }
-                    else
-                    {
-                        var message = $"{nameof(CheckForUpdate)}: Error parsing release version information '{release.tag_name}'.";
-                        Log.Error(message);
-                        Debug.Fail(message);
-                    }
+                }
+                else
+                {
+                    var message = $"{nameof(CheckForUpdate)}: Error parsing release version information '{release.tag_name}'.";
+                    Log.Error(message);
+                    Debug.Fail(message);
                 }
             }
             catch (System.Net.WebException ex)

@@ -1,20 +1,24 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
 using XCOM2Launcher.Serialization;
 using XCOM2Launcher.XCOM;
 
+
+
 namespace XCOM2Launcher
 {
+
     public class Settings
     {
+        public bool DarkMode { get; set; } = false;
         [JsonIgnore]
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Settings));
         [JsonIgnore]
@@ -67,7 +71,8 @@ namespace XCOM2Launcher
         public List<string> ModPaths { get; set; } = new List<string>();
 
         // Only required for backwards compatibility to preserve argument list from older versions.
-        [Obsolete][JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        [Obsolete]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         private string Arguments { get; set; }
 
         /// <summary>
@@ -163,23 +168,21 @@ namespace XCOM2Launcher
 
             using (var stream = File.OpenRead(file))
             {
-                using (var reader = new StreamReader(stream))
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Converters.Add(new ModListConverter());
+                using var reader = new StreamReader(stream);
+                var serializer = new JsonSerializer();
+                serializer.Converters.Add(new ModListConverter());
 
-                    settings = (Settings) serializer.Deserialize(reader, typeof(Settings));
-                }
+                settings = (Settings)serializer.Deserialize(reader, typeof(Settings));
             }
 
             // for backwards compatibility, convert obsolete Arguments string to individual list entries and set it to ""
-            #pragma warning disable 612     // disable Obsolete warning for Arguments property
+#pragma warning disable 612     // disable Obsolete warning for Arguments property
             if (!string.IsNullOrEmpty(settings.Arguments))
             {
                 settings._argumentList = settings.Arguments.Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
                 settings.Arguments = null;
             }
-            #pragma warning restore 612
+#pragma warning restore 612
 
             // update mod overrides
             // run on a new thread to not deadlock main thread
@@ -198,7 +201,7 @@ namespace XCOM2Launcher
             var settings = new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Ignore,
-                Converters = new List<JsonConverter> {new ModListConverter()}
+                Converters = new List<JsonConverter> { new ModListConverter() }
             };
 
             Tools.WriteTextToFileSave(file, JsonConvert.SerializeObject(this, Formatting.Indented, settings));

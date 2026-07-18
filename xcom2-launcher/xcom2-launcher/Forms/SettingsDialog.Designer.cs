@@ -30,7 +30,7 @@
         {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.groupBox1 = new XCOM2Launcher.Forms.DarkGroupBox();
 			this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
 			this.quickArgumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
 			this.label2 = new System.Windows.Forms.Label();
@@ -45,7 +45,7 @@
 			this.removeModPathButton = new System.Windows.Forms.Button();
 			this.browseGamePathButton = new System.Windows.Forms.Button();
 			this.argumentsTextBox = new XCOM2Launcher.UserElements.AutoCompleteTextBox();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.groupBox2 = new XCOM2Launcher.Forms.DarkGroupBox();
 			this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this.updateModsOnStartup = new System.Windows.Forms.CheckBox();
 			this.useModSpecifiedCategoriesCheckBox = new System.Windows.Forms.CheckBox();
@@ -63,9 +63,9 @@
 			this.allowMutipleInstances = new System.Windows.Forms.CheckBox();
 			this.bOK = new System.Windows.Forms.Button();
 			this.bCancel = new System.Windows.Forms.Button();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.groupBox3 = new XCOM2Launcher.Forms.DarkGroupBox();
 			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.groupBox4 = new XCOM2Launcher.Forms.DarkGroupBox();
 			this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
 			this.hideRunX2Button = new System.Windows.Forms.CheckBox();
 			this.hideChallengeModeButton = new System.Windows.Forms.CheckBox();
@@ -609,8 +609,8 @@
 
         #endregion
 
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private XCOM2Launcher.Forms.DarkGroupBox groupBox1;
+        private XCOM2Launcher.Forms.DarkGroupBox groupBox2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.CheckBox closeAfterLaunchCheckBox;
         private System.Windows.Forms.CheckBox searchForUpdatesCheckBox;
@@ -634,7 +634,7 @@
 		private System.Windows.Forms.Button bOK;
 		private System.Windows.Forms.CheckBox checkForPreReleaseUpdates;
 		private System.Windows.Forms.CheckBox useSentry;
-		private System.Windows.Forms.GroupBox groupBox3;
+		private XCOM2Launcher.Forms.DarkGroupBox groupBox3;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
 		private System.Windows.Forms.CheckBox allowMutipleInstances;
 		private XCOM2Launcher.UserElements.AutoCompleteTextBox quickArgumentsTextBox;
@@ -642,7 +642,7 @@
 		private System.Windows.Forms.CheckBox useDuplicateModWorkaround;
 		private System.Windows.Forms.CheckBox useModSpecifiedCategoriesCheckBox;
 		private System.Windows.Forms.CheckBox useTranslucentModListSelection;
-        private System.Windows.Forms.GroupBox groupBox4;
+        private XCOM2Launcher.Forms.DarkGroupBox groupBox4;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.CheckBox hideRunX2Button;
         private System.Windows.Forms.CheckBox hideChallengeModeButton;

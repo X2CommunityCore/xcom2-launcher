@@ -22,7 +22,8 @@ namespace XCOM2Launcher.Forms
             Close();
         }
 
-        private void WelcomeDialog_Load(object sender, EventArgs e) {
+        private void WelcomeDialog_Load(object sender, EventArgs e)
+        {
             Text += " " + Program.GetCurrentVersionString(true);
         }
 

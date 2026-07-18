@@ -11,11 +11,11 @@ namespace XCOM2Launcher.XCOM
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Xcom2Env));
         public string DataDir => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM2";
-        public string DataDirWotC => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +  @"\my games\XCOM2 War of the Chosen";
+        public string DataDirWotC => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\my games\XCOM2 War of the Chosen";
         public string LogFilePath => DataDir + @"\XComGame\Logs\Launch.log";
         public string LogFilePathWotC => DataDirWotC + @"\XComGame\Logs\Launch.log";
         private string UserConfigDir => DataDir + @"\XComGame\Config";
-        private string WotCUserConfigDir => DataDirWotC +  @"\XComGame\Config";
+        private string WotCUserConfigDir => DataDirWotC + @"\XComGame\Config";
         public override string DefaultConfigDir => Path.Combine(GameDir, @"XComGame\Config");
         private string WotCDefaultConfigDir => Path.Combine(GameDir, @"XCom2-WarOfTheChosen\XComGame\Config");
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BrightIdeasSoftware;
+using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Drawing;
@@ -10,8 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
-using Microsoft.VisualBasic;
 using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
@@ -42,10 +42,10 @@ namespace XCOM2Launcher.Forms
                 group.Collapsed = Mods.Entries[groupName].Collapsed;
 
                 // Sort Categories
-                parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string) a.Key].Index.CompareTo(Mods.Entries[(string) b.Key].Index));
+                parameters.GroupComparer = Comparer<OLVGroup>.Create((a, b) => Mods.Entries[(string)a.Key].Index.CompareTo(Mods.Entries[(string)b.Key].Index));
             });
 
-            modlist_ListObjectListView.GroupStateChanged += delegate(object o, GroupStateChangedEventArgs args)
+            modlist_ListObjectListView.GroupStateChanged += delegate (object o, GroupStateChangedEventArgs args)
             {
                 // Remember group expanded/collapsed state when grouping by category (name or id column)
                 if (modlist_ListObjectListView.PrimarySortColumn == olvcName || modlist_ListObjectListView.PrimarySortColumn == olvcID)
@@ -72,14 +72,14 @@ namespace XCOM2Launcher.Forms
             olvcOrder.GroupKeyGetter = categoryGroupingDelegate;
             olvcOrder.GroupFormatter = categoryFormatterDelegate;
 
-            olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry) o);
-            
+            olvcCategory.AspectGetter = o => Mods.GetCategory((ModEntry)o);
+
             olvcTags.Renderer = new TagRenderer(modlist_ListObjectListView, AvailableTags);
             olvcTags.AspectPutter = (rowObject, value) =>
             {
-                var tags = ((string) value).Split(';');
+                var tags = ((string)value).Split(';');
 
-                tags.ToList().ForEach(t => AddTag((ModEntry) rowObject, t.Trim()));
+                tags.ToList().ForEach(t => AddTag((ModEntry)rowObject, t.Trim()));
             };
             olvcTags.SearchValueGetter = rowObject => ((ModEntry)rowObject).Tags.Select(s => s.ToLower()).ToArray();
             olvcTags.AspectGetter = rowObject => "";
@@ -116,12 +116,12 @@ namespace XCOM2Launcher.Forms
             // size groupies
             var columns = modlist_ListObjectListView.AllColumns.ToArray();
             columns.Single(c => c.AspectName == "Size").MakeGroupies(
-                new[] {1024, 1024*1024, (long) 50*1024*1024, (long) 100*1024*1024},
-                new[] {"< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB"}
+                new[] { 1024, 1024 * 1024, (long)50 * 1024 * 1024, (long)100 * 1024 * 1024 },
+                new[] { "< 1 KB", "< 1MB", "< 50 MB", "< 100 MB", "> 100 MB" }
                 );
             columns.Single(c => c.AspectName == "isHidden").MakeGroupies(
-                new [] {false, true},
-                new [] { "wut?", "Not Hidden", "Hidden"});
+                new[] { false, true },
+                new[] { "wut?", "Not Hidden", "Hidden" });
             columns.Single(c => c.AspectName == "isActive").MakeGroupies(
                 new[] { false, true },
                 new[] { "wut?", "Disabled", "Enabled" });
@@ -130,7 +130,7 @@ namespace XCOM2Launcher.Forms
             olvcActive.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? 1 : -1) * a.Header.CompareTo(b.Header)); };
 
             olvcName.AutoCompleteEditor = false;
-            
+
             // Sort by Order or WorkshopID column removes groups
             modlist_ListObjectListView.BeforeSorting += (sender, args) =>
             {
@@ -142,9 +142,9 @@ namespace XCOM2Launcher.Forms
             };
 
             modlist_ListObjectListView.BooleanCheckStatePutter = ModListBooleanCheckStatePutter;
-            
+
             // Init DateTime columns
-            foreach (var column in columns.Where(c => c.DataType == typeof (DateTime?)))
+            foreach (var column in columns.Where(c => c.DataType == typeof(DateTime?)))
             {
                 column.AspectToStringConverter = d => (d as DateTime?)?.ToLocalTime().ToString(CultureInfo.CurrentCulture);
                 column.MakeGroupies(
@@ -152,12 +152,12 @@ namespace XCOM2Launcher.Forms
                     new[] { "Older Than One Month", "This Month", "This Week", "Today" });
 
                 // Sord Desc
-                column.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? -1 : 1)*a.Header.CompareTo(b.Header)); };
+                column.GroupFormatter = (g, param) => { param.GroupComparer = Comparer<OLVGroup>.Create((a, b) => (param.GroupByOrder == SortOrder.Descending ? -1 : 1) * a.Header.CompareTo(b.Header)); };
             }
 
             // Start out sorted by name
             modlist_ListObjectListView.Sort(olvcName, SortOrder.Ascending);
-            
+
             // Wrapper
             ModList = new TypedObjectListView<ModEntry>(modlist_ListObjectListView);
 
@@ -177,11 +177,11 @@ namespace XCOM2Launcher.Forms
                 {
                     return "";
                 }
-                    
+
                 var firstLine = new Regex("[^\r\n]*").Match(mod.Note).Value;
                 return firstLine;
             };
-            
+
             modlist_ListObjectListView.CellEditStarting += (sender, args) =>
             {
                 if (!(args.RowObject is ModEntry mod))
@@ -193,12 +193,12 @@ namespace XCOM2Launcher.Forms
                 if (args.Column == olvColNotes)
                 {
                     var tb = new TextBox
-                             {
-                                 Multiline = true,
-                                 ScrollBars = ScrollBars.Both,
-                                 Bounds = args.CellBounds,
-                             };
-                    
+                    {
+                        Multiline = true,
+                        ScrollBars = ScrollBars.Both,
+                        Bounds = args.CellBounds,
+                    };
+
                     tb.Height *= 4;
                     tb.Text = mod.Note?.Replace("\n", "\r\n") ?? "";
                     args.Control = tb;
@@ -218,13 +218,13 @@ namespace XCOM2Launcher.Forms
                     modInfoNotesText.Text = mod.Note;
                 }
             };
-            
+
             RefreshModList();
         }
 
         private object StateAspectGetter(object rowobject)
         {
-            var mod = (ModEntry) rowobject;
+            var mod = (ModEntry)rowobject;
 
             if (mod.State.HasFlag(ModState.Downloading))
                 return "Downloading";
@@ -379,7 +379,7 @@ namespace XCOM2Launcher.Forms
 
         private void ModListCellToolTipShowing(object sender, ToolTipShowingEventArgs e)
         {
-            var mod = (ModEntry) e.Model;
+            var mod = (ModEntry)e.Model;
             if (e.Column.Text != "State")
                 return;
 
@@ -411,22 +411,22 @@ namespace XCOM2Launcher.Forms
             {
                 return;
             }
-            
+
             Log.Info($"Updating {mods.Count} mods...");
             SetStatus($"Updating {mods.Count} mods...");
             progress_toolstrip_progressbar.Visible = true;
             UseWaitCursor = true;
-            
+
             var reporter = new Progress<ModUpdateProgress>();
             reporter.ProgressChanged += UpdateProgress;
 
             void UpdateProgress(object sender, ModUpdateProgress progress)
             {
                 if (InvokeRequired) Invoke(new Action(() => UpdateProgress(sender, progress)));
-                
+
                 try
                 {
-                    
+
                     progress_toolstrip_progressbar.Maximum = progress.Max;
                     progress_toolstrip_progressbar.Value = progress.Current;
                     status_toolstrip_label.Text = progress.Message;
@@ -440,7 +440,7 @@ namespace XCOM2Launcher.Forms
 
             ModUpdateCancelSource = new CancellationTokenSource();
             ModUpdateTask = Settings.Mods.UpdateModsAsync(mods, Settings, reporter, ModUpdateCancelSource.Token);
-                                    
+
             ModUpdateTask.ContinueWith(async e =>
             {
                 switch (e.Status)
@@ -464,21 +464,21 @@ namespace XCOM2Launcher.Forms
 
                         Log.Error("At least one mod failed to update", aggregateException);
                         SetStatus("At least one mod failed to update");
-                        
+
                         await PostProcessModUpdateTask();
 
-                        MessageBox.Show("At least one mod failed to update: " + 
+                        MessageBox.Show("At least one mod failed to update: " +
                                         Environment.NewLine + Environment.NewLine +
                                         aggregateException?.InnerException?.Message +
                                         Environment.NewLine + Environment.NewLine +
                                         "See AML.log for details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
-            
+
             return;
 
             async Task PostProcessModUpdateTask()
@@ -489,7 +489,7 @@ namespace XCOM2Launcher.Forms
                 }
 
                 RefreshModList();
-                
+
                 if (afterUpdateAction != null)
                 {
                     await afterUpdateAction();
@@ -497,7 +497,7 @@ namespace XCOM2Launcher.Forms
 
                 SetStatusIdle();
                 UseWaitCursor = false;
-                
+
                 Log.Info("ModUpdateTask post processing completed");
             }
         }
@@ -522,7 +522,7 @@ namespace XCOM2Launcher.Forms
                     Workshop.Unsubscribe((ulong)mod.WorkshopID);
 
                 if (!keepEntries)
-                { 
+                {
                     // delete model
                     modlist_ListObjectListView.RemoveObject(mod);
                     Mods.RemoveMod(mod);
@@ -538,11 +538,11 @@ namespace XCOM2Launcher.Forms
                 {
                     Directory.Delete(mod.Path, true);
                 }
-                catch (DirectoryNotFoundException) 
+                catch (DirectoryNotFoundException)
                 {
                     // the directory was already removed
-                } 
-                catch (Exception ex) 
+                }
+                catch (Exception ex)
                 {
                     // inform the user if something went wrong
                     string message = $"Error while deleting mod folder: {Environment.NewLine}";
@@ -568,18 +568,19 @@ namespace XCOM2Launcher.Forms
                 : $"Are you sure you want to resubscribe and download {mods.Count} Workshop mods?";
 
             var result = MessageBox.Show(text, "Confirm download", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-            
+
             if (result != DialogResult.OK)
                 return;
 
             foreach (var mod in mods)
             {
-                if (mod.Source == ModSource.SteamWorkshop && mod.State.HasFlag(ModState.NotInstalled)) {
+                if (mod.Source == ModSource.SteamWorkshop && mod.State.HasFlag(ModState.NotInstalled))
+                {
                     Log.Info("Resubscribing to mod " + mod.ID);
                     mod.AddState(ModState.Downloading);
                     modlist_ListObjectListView.RefreshObject(mod);
-                    Workshop.Subscribe((ulong) mod.WorkshopID);
-                    Workshop.DownloadItem((ulong) mod.WorkshopID);
+                    Workshop.Subscribe((ulong)mod.WorkshopID);
+                    Workshop.DownloadItem((ulong)mod.WorkshopID);
                 }
             }
 
@@ -600,7 +601,7 @@ namespace XCOM2Launcher.Forms
                 : $"Are you sure you want to delete {mods.Count} mods?";
 
             var result = MessageBox.Show(text, "Confirm deletion", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-            
+
             if (result != DialogResult.OK)
                 return;
 
@@ -615,7 +616,7 @@ namespace XCOM2Launcher.Forms
             }
 
             mods = mods.Where(mod => mod.Source == ModSource.SteamWorkshop && !mod.State.HasFlag(ModState.NotInstalled)).ToList();
-            
+
             if (!mods.Any())
             {
                 MessageBox.Show("No subscribed Workshop mods selected.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -628,7 +629,7 @@ namespace XCOM2Launcher.Forms
                 : $"Are you sure you want to unsubscribe from {mods.Count} Workshop mods?";
 
             var result = MessageBox.Show(text, "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-            
+
             if (result != DialogResult.OK)
                 return;
 
@@ -638,18 +639,18 @@ namespace XCOM2Launcher.Forms
         private void MoveSelectedModsToCategory(string category)
         {
             modlist_ListObjectListView.BeginUpdate();
-            
+
             // Remember collapsed groups to restore them later, because all groups
             // are expanded when updating a mod from a collapsed group.
             var collapsedGroups = modlist_ListObjectListView.CollapsedGroups.ToList();
-            
+
             foreach (var mod in ModList.SelectedObjects)
             {
                 Mods.RemoveMod(mod);
                 Mods.AddMod(category, mod);
                 modlist_ListObjectListView.UpdateObject(mod);
             }
-            
+
             // Restore previously collapsed groups
             collapsedGroups.ForEach(g => g.Collapsed = true);
             modlist_ListObjectListView.EndUpdate();
@@ -703,7 +704,7 @@ namespace XCOM2Launcher.Forms
                 Invoke(new Action(() => RefreshModList(rebuildColumns)));
                 return;
             }
-            
+
             var selectedMod = ModList.SelectedObject;
 
             // Un-register events
@@ -721,7 +722,7 @@ namespace XCOM2Launcher.Forms
             {
                 modlist_ListObjectListView.RebuildColumns();
             }
-            
+
             modlist_ListObjectListView.Sort();
 
             modlist_ListObjectListView.EndUpdate();
@@ -735,7 +736,7 @@ namespace XCOM2Launcher.Forms
                 modlist_ListObjectListView.SelectObject(selectedMod);
 
             UpdateStateFilterLabels();
-            
+
             UpdateConflictInfo();
         }
 
@@ -751,7 +752,7 @@ namespace XCOM2Launcher.Forms
 
             if (string.IsNullOrEmpty(newTag) || (renameAll && MessageBox.Show($@"Are you sure you want to rename all instances of tag '{tag.Label}' to '{newTag}'?",
                                                                                @"Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes))
-            { 
+            {
                 return;
             }
 
@@ -769,13 +770,13 @@ namespace XCOM2Launcher.Forms
                 }
             }
         }
-        
+
         private ContextMenuStrip CreateModListContextMenu(ModEntry m, ModTag tag)
         {
             var menu = new ContextMenuStrip();
             if (m?.ID == null || tag == null)
                 return menu;
-            
+
             // change color
             var changeColorItem = new ToolStripMenuItem("Change color");
 
@@ -837,7 +838,7 @@ namespace XCOM2Launcher.Forms
 
             removeTagItem.Click += (sender, args) => m.Tags.Remove(tag.Label);
             menu.Items.Add(removeTagItem);
-            
+
             var removeAllTagItem = new ToolStripMenuItem($"Remove all '{tag.Label}'");
 
             removeAllTagItem.Click += (sender, args) =>
@@ -864,8 +865,10 @@ namespace XCOM2Launcher.Forms
 
         private ContextMenuStrip CreateModListContextMenu(ModEntry m, OLVListItem currentItem)
         {
+          
             var menu = new ContextMenuStrip();
-            
+            ThemeManager.ApplyToContextMenuStrip(menu, Settings.DarkMode);
+
             if (m?.ID == null)
                 return menu;
 
@@ -908,7 +911,7 @@ namespace XCOM2Launcher.Forms
                 });
                 Clipboard.SetText(sb.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
             });
-        
+
             copyToClipboard.DropDownItems.Add("Browser URL", null, delegate
             {
                 StringBuilder sb = new StringBuilder();
@@ -1040,7 +1043,7 @@ namespace XCOM2Launcher.Forms
             }
 
             // Hide/unhide
-            var toggleVisibility = new ToolStripMenuItem {Text = m.isHidden ? "Unhide" : "Hide"};
+            var toggleVisibility = new ToolStripMenuItem { Text = m.isHidden ? "Unhide" : "Hide" };
             toggleVisibility.Click += delegate
             {
                 // save as new list so we can remove mods if they are being hidden
@@ -1082,7 +1085,7 @@ namespace XCOM2Launcher.Forms
                 {
                     if (modsToUpdate.Count > 1)
                     {
-                        var result = MessageBox.Show($"Tags from the workshop will replace the existing tags for {modsToUpdate.Count} mods." + 
+                        var result = MessageBox.Show($"Tags from the workshop will replace the existing tags for {modsToUpdate.Count} mods." +
                                                      Environment.NewLine + "Do you want to continue?",
                                                      "Use workshop tags", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -1098,7 +1101,7 @@ namespace XCOM2Launcher.Forms
                         if (tags.Any())
                         {
                             selItem.Tags.Clear();
-                            
+
                             foreach (string tag in tags)
                             {
                                 AddTag(selItem, tag);
@@ -1146,7 +1149,7 @@ namespace XCOM2Launcher.Forms
                         Cursor.Current = Cursors.WaitCursor;
                         UpdateMods(modsNotActive, () =>
                         {
-                            Invoke(new Action(() => 
+                            Invoke(new Action(() =>
                             {
                                 EnabledModsInModList(modsNotActive);
                             }));
@@ -1171,7 +1174,7 @@ namespace XCOM2Launcher.Forms
                     }
                 };
             }
-            
+
             var modsActive = selectedMods.Where(mod => mod.isActive).ToList();
             if (modsActive.Any())
             {
@@ -1299,14 +1302,14 @@ namespace XCOM2Launcher.Forms
             if (modChecked.isActive && (!Settings.UpdateModsOnStartup || Settings.OnlyUpdateEnabledOrNewModsOnStartup) && !_CheckTriggeredFromContextMenu)
             {
                 Log.Info($"Updating mod before enabling because {nameof(Settings.OnlyUpdateEnabledOrNewModsOnStartup)} is enabled");
-                
+
                 Task.Run(() => Mods.UpdateModAsync(modChecked, Settings)).GetAwaiter().GetResult();
             }
 
             _CheckTriggeredFromContextMenu = false;
 
             List<ModEntry> checkedMods = new List<ModEntry>();
-            
+
             // If there is a duplicate id conflict check all
             // at the same time and mark them as updated
             if (modChecked.State.HasFlag(ModState.DuplicateID))
@@ -1337,7 +1340,7 @@ namespace XCOM2Launcher.Forms
                 {
                     Mods.UpdatedModDependencyState(m);
                 }
-                
+
                 modlist_ListObjectListView.RefreshObjects(dependentMods);
             }
 
@@ -1381,9 +1384,9 @@ namespace XCOM2Launcher.Forms
         {
             var mod = e.Model as ModEntry;
             var graphics = e.ListView.CreateGraphics();
-            var selectedTag = e.SubItem != null && e.Column == olvcTags 
+            var selectedTag = e.SubItem != null && e.Column == olvcTags
                             ? HitTest(mod?.Tags, graphics, e) : null;
-            var menu = selectedTag == null 
+            var menu = selectedTag == null
                 ? CreateModListContextMenu(mod, e.Item)
                 : CreateModListContextMenu(mod, selectedTag);
 
@@ -1392,7 +1395,7 @@ namespace XCOM2Launcher.Forms
 
         private bool ModListBooleanCheckStatePutter(object rowobject, bool newValue)
         {
-            if (!(rowobject is ModEntry mod)) 
+            if (!(rowobject is ModEntry mod))
                 return !newValue;
 
             newValue = ProcessNewModState(mod, newValue);
@@ -1440,7 +1443,7 @@ namespace XCOM2Launcher.Forms
             CurrentMod = ModList.SelectedObjects.Count != 1 ? null : ModList.SelectedObject;
 
             UpdateModInfo(CurrentMod);
-            
+
             if (CurrentMod != null)
             {
                 CurrentMod.RemoveState(ModState.New);
@@ -1479,7 +1482,7 @@ namespace XCOM2Launcher.Forms
                 case "Category":
                     MoveSelectedModsToCategory((string)e.NewValue);
                     break;
-                    
+
             }
         }
 
@@ -1497,23 +1500,23 @@ namespace XCOM2Launcher.Forms
             int startPos = (currentIndex > oldIndex) ? oldIndex : currentIndex;
             int endPos = (currentIndex < oldIndex) ? oldIndex : currentIndex;
             int i = 0;
-            
+
             // Make sure the old indexes go from 0 to Length - 1
             mod.Index = oldIndex;
             foreach (var modEntry in modList.OrderBy(m => m.Index))
                 modEntry.Index = i++;
-            
+
             // Fix new indexes outside of the valid range
             if (currentIndex < 0)
                 currentIndex = 0;
             else if (currentIndex >= Mods.All.ToArray().Length)
                 currentIndex = Mods.All.ToArray().Length - 1;
-            
+
             // Set the new indexes
             mod.Index = currentIndex;
             foreach (var modEntry in modList.Where(m => m.Index >= startPos && m.Index <= endPos && m != mod))
                 modEntry.Index += (currentIndex - oldIndex > 0) ? -1 : 1;
-            
+
             RefreshModList();
         }
     }

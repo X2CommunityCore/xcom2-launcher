@@ -35,8 +35,10 @@ namespace XCOM2Launcher.Log4Net
             return null;
         }
 
-        public static BreadcrumbLevel ToBreadcrumbLevel(this LoggingEvent loggingLevel) {
-            switch (loggingLevel.Level) {
+        public static BreadcrumbLevel ToBreadcrumbLevel(this LoggingEvent loggingLevel)
+        {
+            switch (loggingLevel.Level)
+            {
                 case var l when l == Level.Fatal
                                 || l == Level.Emergency
                                 || l == Level.All:

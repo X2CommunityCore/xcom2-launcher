@@ -30,13 +30,13 @@
         {
             this.components = new System.ComponentModel.Container();
             this.bStart = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.shader_groupbox = new System.Windows.Forms.GroupBox();
+            this.groupBox1 = new XCOM2Launcher.Forms.DarkGroupBox();
+            this.shader_groupbox = new XCOM2Launcher.Forms.DarkGroupBox ();
             this.shadercache_none_radiobutton = new System.Windows.Forms.RadioButton();
             this.shadercache_empty_radiobutton = new System.Windows.Forms.RadioButton();
             this.shadercache_all_radiobutton = new System.Windows.Forms.RadioButton();
             this.button3 = new System.Windows.Forms.Button();
-            this.source_groupbox = new System.Windows.Forms.GroupBox();
+            this.source_groupbox = new XCOM2Launcher.Forms.DarkGroupBox();
             this.src_all_radiobutton = new System.Windows.Forms.RadioButton();
             this.src_xcomgame_radiobutton = new System.Windows.Forms.RadioButton();
             this.src_none_radiobutton = new System.Windows.Forms.RadioButton();
@@ -225,13 +225,13 @@
         #endregion
 
         private System.Windows.Forms.Button bStart;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox source_groupbox;
+        private XCOM2Launcher.Forms.DarkGroupBox groupBox1;
+        private XCOM2Launcher.Forms.DarkGroupBox source_groupbox;
         private System.Windows.Forms.RadioButton src_xcomgame_radiobutton;
         private System.Windows.Forms.RadioButton src_none_radiobutton;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.RadioButton src_all_radiobutton;
-        private System.Windows.Forms.GroupBox shader_groupbox;
+        private XCOM2Launcher.Forms.DarkGroupBox shader_groupbox;
         private System.Windows.Forms.RadioButton shadercache_none_radiobutton;
         private System.Windows.Forms.RadioButton shadercache_empty_radiobutton;
         private System.Windows.Forms.RadioButton shadercache_all_radiobutton;

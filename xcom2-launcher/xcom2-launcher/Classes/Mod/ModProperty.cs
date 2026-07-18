@@ -10,23 +10,24 @@ namespace XCOM2Launcher.Classes.Mod
     /// code needed when a field is edited.
     /// </summary>
     public class ModProperty : INotifyPropertyChanged
-    { 
+    {
         [Browsable(false)]
         private ModEntry modEntry;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [Browsable(false)] 
+        [Browsable(false)]
         public ModEntry ModEntry
         {
             get { return modEntry; }
         }
-        
+
         [Category("Mod Status")]
         public int Index
         {
             get { return modEntry.Index; }
-            set {
+            set
+            {
                 modEntry.Index = value;
 
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("Index");
@@ -35,7 +36,8 @@ namespace XCOM2Launcher.Classes.Mod
         }
 
         [Category("Mod Status")]
-        public string State {
+        public string State
+        {
             get
             {
                 if (modEntry.State == ModState.None)
@@ -88,7 +90,8 @@ namespace XCOM2Launcher.Classes.Mod
         public string Author
         {
             get { return modEntry.Author; }
-            set {
+            set
+            {
                 modEntry.Author = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("Author");
                 PropertyChanged?.Invoke(this, e);
@@ -111,7 +114,8 @@ namespace XCOM2Launcher.Classes.Mod
         public bool isActive
         {
             get { return modEntry.isActive; }
-            set {
+            set
+            {
                 modEntry.isActive = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("isActive");
                 PropertyChanged?.Invoke(this, e);
@@ -122,7 +126,8 @@ namespace XCOM2Launcher.Classes.Mod
         public bool isHidden
         {
             get { return modEntry.isHidden; }
-            set {
+            set
+            {
                 modEntry.isHidden = value;
                 PropertyChangedEventArgs e = new PropertyChangedEventArgs("isHidden");
                 PropertyChanged?.Invoke(this, e);
@@ -142,7 +147,7 @@ namespace XCOM2Launcher.Classes.Mod
         [Category("Mod Properties")]
         public string DateUpdated { get { return modEntry.DateUpdated.HasValue ? modEntry.DateUpdated.Value.ToString() : "Unknown"; } }
 
-        [Browsable(false)] 
+        [Browsable(false)]
         public string Note
         {
             get { return modEntry.Note; }

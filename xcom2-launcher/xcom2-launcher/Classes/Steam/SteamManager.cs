@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Steamworks;
+using System;
 using System.Threading.Tasks;
-using Steamworks;
 
 namespace XCOM2Launcher.Steam
 {
@@ -18,24 +18,24 @@ namespace XCOM2Launcher.Steam
                 SteamAPI.RunCallbacks();
             };
         }
-        
+
         public static bool IsSteamRunning()
         {
             return SteamAPI.IsSteamRunning();
         }
-        
+
         public static bool EnsureInitialized()
         {
             // we can avoid taking locks when _initialized is already true
             // ReSharper disable once InconsistentlySynchronizedField
             if (_initialized) return true;
-            
+
             lock (_initlock)
             {
                 if (_initialized) return true;
                 if (_shutdown) return false;
                 if (!SteamAPI.IsSteamRunning()) return false;
-                
+
                 var steamInitialized = SteamAPI.Init();
                 if (steamInitialized)
                 {
@@ -53,10 +53,10 @@ namespace XCOM2Launcher.Steam
             {
                 if (!_initialized) return;
                 if (_shutdown) return;
-                
+
                 // stop timer before shutdown to avoid exceptions from steam
                 _timer.Stop();
-                
+
                 SteamAPI.Shutdown();
                 _shutdown = true;
                 _initialized = false;
