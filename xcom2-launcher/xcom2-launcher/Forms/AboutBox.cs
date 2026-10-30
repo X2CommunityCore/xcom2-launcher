@@ -10,10 +10,6 @@ namespace XCOM2Launcher.Forms
         {
             InitializeComponent();
             CancelButton = okButton;
-        }
-
-        private void AboutBox_Load(object sender, EventArgs e)
-        {
 
             Text = $"About {AssemblyTitle}";
             labelProductName.Text = AssemblyProduct;
@@ -21,7 +17,6 @@ namespace XCOM2Launcher.Forms
             labelCopyright.Text = $"License {AssemblyCopyright}";
             labelCompanyName.Text = $"Created by {AssemblyCompany}";
             textBoxDescription.Text = AssemblyDescription;
-
         }
 
         #region Assembly Attribute Accessors
@@ -103,5 +98,6 @@ namespace XCOM2Launcher.Forms
         }
 
         #endregion
+
     }
 }
