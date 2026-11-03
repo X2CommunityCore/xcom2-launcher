@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
 using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Forms
@@ -30,7 +29,7 @@ namespace XCOM2Launcher.Forms
 
         private void AddCategoryButtonClick(object sender, EventArgs e)
         {
-            var newName = Interaction.InputBox($"Please enter the name for new the category.", "New category", "");
+            var newName = InputBox.Show($"Please enter the name for new the category:", "New category", "New Category");
 
             if (string.IsNullOrEmpty(newName))
                 return;
@@ -105,7 +104,7 @@ namespace XCOM2Launcher.Forms
                 return;
             }
 
-            var newName = Interaction.InputBox($"Enter the new name for the category '{oldName}'.", "Rename category", oldName);
+            var newName = InputBox.Show($"Enter the new name for the category '{oldName}':", "Rename category", oldName);
 
             if (string.IsNullOrEmpty(newName))
                 return;

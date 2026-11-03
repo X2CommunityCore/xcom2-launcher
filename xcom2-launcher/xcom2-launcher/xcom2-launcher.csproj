@@ -52,6 +52,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -227,6 +228,7 @@
     <Compile Include="Forms\ConfigDiff.Designer.cs">
       <DependentUpon>ConfigDiff.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\InputBox.cs" />
     <Compile Include="Forms\UnhandledExceptionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
