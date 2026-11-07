@@ -1,20 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FC343C56-9BC8-483A-A254-3484B2137E24}</ProjectGuid>
+    <TargetFramework>net472</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>XCOM2Launcher</RootNamespace>
     <AssemblyName>XCOM2 Launcher</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,6 +19,10 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
@@ -72,235 +66,39 @@
     <PackageReference Include="System.ValueTuple" Version="4.6.2" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-    <WarningLevel>0</WarningLevel>
+    <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
-    <Reference Include="mscorlib" />
     <Reference Include="Steamworks.NET, Version=13.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Steamworks.NET.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\GitHub\Asset.cs" />
-    <Compile Include="Classes\GitHub\Release.cs" />
-    <Compile Include="Classes\GitHub\User.cs" />
-    <Compile Include="Classes\GlobalSettings.cs" />
-    <Compile Include="Classes\Helper\FileSizeFormatExtension.cs" />
-    <Compile Include="Classes\Helper\GitVersionInfo.cs" />
-    <Compile Include="Classes\Helper\Tools.cs" />
-    <Compile Include="Classes\Log4Net\AssemblyExtensions.cs" />
-    <Compile Include="Classes\Log4Net\Constants.cs" />
-    <Compile Include="Classes\Log4Net\LevelMapping.cs" />
-    <Compile Include="Classes\Log4Net\SentryAppender.cs" />
-    <Compile Include="Classes\Mod\ColorExtensions.cs" />
-    <Compile Include="Classes\Mod\ModChangelogCache.cs" />
-    <Compile Include="Classes\Mod\ModConflict.cs" />
-    <Compile Include="Classes\Mod\ModEntry.cs" />
-    <Compile Include="Classes\Mod\ModCategory.cs" />
-    <Compile Include="Classes\Mod\ModInfo.cs" />
-    <Compile Include="Classes\Mod\ModList.cs" />
-    <Compile Include="Classes\Mod\ModClassOverride.cs" />
-    <Compile Include="Classes\Mod\ModListFilter.cs" />
-    <Compile Include="Classes\Mod\ModProperty.cs" />
-    <Compile Include="Classes\Mod\ModSettingsEntry.cs" />
-    <Compile Include="Classes\Mod\ModState.cs" />
-    <Compile Include="Classes\Mod\ModSource.cs" />
-    <Compile Include="Classes\Mod\ModTag.cs" />
-    <Compile Include="Classes\Mod\TagRenderer.cs" />
-    <Compile Include="Classes\PropertyGrid\DictionaryPropertyGridAdapter.cs" />
-    <Compile Include="Classes\PropertyGrid\PropertyCheckbox.cs" />
-    <Compile Include="Classes\PropertyGrid\PropertyGridExtensions.cs" />
-    <Compile Include="Classes\Serialization\ModListConverter.cs" />
-    <Compile Include="Classes\Settings.cs" />
-    <Compile Include="Classes\Steam\SteamManager.cs" />
-    <Compile Include="Classes\Steam\SteamUGCDetails.cs" />
-    <Compile Include="Classes\Steam\Workshop.cs" />
-    <Compile Include="Classes\WindowSetting.cs" />
-    <Compile Include="Classes\XCOM\Xcom2Env.cs" />
-    <Compile Include="Classes\XCOM\XComChimeraSquadEnv.cs" />
-    <Compile Include="Classes\XCOM\Arguments.cs" />
-    <Compile Include="Classes\XCOM\IniFile.cs" />
-    <Compile Include="Classes\XCOM\IniLanguage.cs" />
-    <Compile Include="Classes\XCOM\DefaultConfigFile.cs" />
-    <Compile Include="Classes\XCOM\XComEnvironment.cs" />
-    <Compile Include="Forms\AboutBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\AboutBox.Designer.cs">
-      <DependentUpon>AboutBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\CategoryManager.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CategoryManager.Designer.cs">
-      <DependentUpon>CategoryManager.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\CleanModsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CleanModsForm.Designer.cs">
-      <DependentUpon>CleanModsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ConfigDiff.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ConfigDiff.Designer.cs">
-      <DependentUpon>ConfigDiff.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\InputBox.cs" />
-    <Compile Include="Forms\UnhandledExceptionDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\UnhandledExceptionDialog.Designer.cs">
-      <DependentUpon>UnhandledExceptionDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MainForm.Events.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MainForm.ModList.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\SettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SettingsDialog.Designer.cs">
-      <DependentUpon>SettingsDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes\Steam\SteamWorkshop.cs" />
-    <Compile Include="Forms\UpdateAvailableDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\UpdateAvailableDialog.Designer.cs">
-      <DependentUpon>UpdateAvailableDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\WelcomeDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\WelcomeDialog.Designer.cs">
-      <DependentUpon>WelcomeDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserElements\AutoCompleteTextBox.cs">
+    <Compile Update="UserElements\AutoCompleteTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UserElements\CueComboBox.cs">
+    <Compile Update="UserElements\CueComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UserElements\CueComboBox.Designer.cs">
-      <DependentUpon>CueComboBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserElements\CueTextBox.cs">
+    <Compile Update="UserElements\CueTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="UserElements\CueTextBox.Designer.cs">
-      <DependentUpon>CueTextBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserElements\FlexibleMessageBox.cs" />
-    <EmbeddedResource Include="Forms\AboutBox.resx">
-      <DependentUpon>AboutBox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CategoryManager.resx">
-      <DependentUpon>CategoryManager.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CleanModsForm.resx">
-      <DependentUpon>CleanModsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ConfigDiff.resx">
-      <DependentUpon>ConfigDiff.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SettingsDialog.resx">
-      <DependentUpon>SettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\UnhandledExceptionDialog.resx">
-      <DependentUpon>UnhandledExceptionDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\UpdateAvailableDialog.resx">
-      <DependentUpon>UpdateAvailableDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\WelcomeDialog.resx">
-      <DependentUpon>WelcomeDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="app.config">
+    <None Update="Classes\Log4Net\log4net.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Classes\Log4Net\log4net.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="GitVersionConfig.yaml" />
-    <None Include="log4net.config">
+    <None Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\cross.png" />
-    <None Include="Resources\wotc.ico" />
     <Content Include="Resources\AML-Logo.png" />
     <Content Include="Resources\document-save-5.png" />
     <Content Include="Resources\X2-Logo.png" />
@@ -324,14 +122,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup Label="Compile items now included by globbing that were not in the original project file">
+    <Compile Remove="Classes\XCOM\old\Config.cs" />
+  </ItemGroup>
   <Target Name="AfterBuild">
     <ItemGroup>
       <MoveToLibFolder Include="$(OutputPath)*.dll ; $(OutputPath)*.pdb ; $(OutputPath)*.xml" />
