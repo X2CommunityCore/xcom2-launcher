@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Sentry;
 using XCOM2Launcher.Helper;
 
 namespace XCOM2Launcher.Classes {
