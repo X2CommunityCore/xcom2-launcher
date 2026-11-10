@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows.Forms;
 
 namespace XCOM2Launcher.Forms
@@ -10,10 +9,7 @@ namespace XCOM2Launcher.Forms
         {
             InitializeComponent();
             CancelButton = okButton;
-        }
 
-        private void AboutBox_Load(object sender, EventArgs e)
-        {
             Text = $"About {AssemblyTitle}";
             labelProductName.Text = AssemblyProduct;
             labelVersion.Text = $"{Program.GetCurrentVersionString(true)}";
@@ -101,5 +97,6 @@ namespace XCOM2Launcher.Forms
         }
 
         #endregion
+
     }
 }

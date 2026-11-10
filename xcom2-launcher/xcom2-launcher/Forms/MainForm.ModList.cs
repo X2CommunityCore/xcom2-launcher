@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using Microsoft.VisualBasic;
 using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Helper;
 using XCOM2Launcher.Mod;
@@ -741,10 +740,10 @@ namespace XCOM2Launcher.Forms
 
         private void RenameTagPrompt(ModEntry m, ModTag tag, bool renameAll)
         {
-            var prompt = renameAll ? $"Enter new name for all instances of tag '{tag.Label}'."
-                                   : $"Enter new name for tag '{tag.Label}' on mod '{m.Name}'.";
+            var prompt = renameAll ? $"Enter new name for all instances of tag '{tag.Label}':"
+                                   : $"Enter new name for tag '{tag.Label}' on mod '{m.Name}':";
 
-            var newTag = Interaction.InputBox(prompt, "Rename tag", tag.Label);
+            var newTag = InputBox.Show(prompt, "Rename tag", tag.Label);
 
             if (newTag == tag.Label)
                 return;
@@ -999,7 +998,7 @@ namespace XCOM2Launcher.Forms
             var addTagItem = new ToolStripMenuItem("Add tag(s)...");
             addTagItem.Click += (sender, args) =>
             {
-                var newTag = Interaction.InputBox($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedMods.Count} selected mod(s).", "Add tag(s)");
+                var newTag = InputBox.Show($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedMods.Count} selected mod(s):", "Add tag(s)", "New Tag");
 
                 if (newTag == "")
                     return;
@@ -1020,7 +1019,7 @@ namespace XCOM2Launcher.Forms
             // ... new category
             moveToCategoryItem.DropDownItems.Add("New category", null, delegate
             {
-                var category = Interaction.InputBox("Please enter the name of the new category", "Create category", "New category");
+                var category = InputBox.Show("Please enter the name of the new category:", "Create category", "New category");
 
                 if (string.IsNullOrEmpty(category))
                     return;

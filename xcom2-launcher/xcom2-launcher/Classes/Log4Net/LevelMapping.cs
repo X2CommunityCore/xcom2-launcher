@@ -40,7 +40,7 @@ namespace XCOM2Launcher.Log4Net
                 case var l when l == Level.Fatal
                                 || l == Level.Emergency
                                 || l == Level.All:
-                    return BreadcrumbLevel.Critical;
+                    return BreadcrumbLevel.Fatal;
                 case var l when l == Level.Alert
                                 || l == Level.Critical
                                 || l == Level.Severe
