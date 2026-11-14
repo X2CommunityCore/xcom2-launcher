@@ -39,19 +39,15 @@ namespace XCOM2Launcher.Helper {
 
         public static void HandleNavigateWebBrowserControl(object sender, WebBrowserNavigatingEventArgs args)
         {
-            string url = args.Url.ToString();
-
-            if (url.Equals("about:blank", System.StringComparison.InvariantCultureIgnoreCase))
+            // Filtering out http and https schemes. Excludes file:// and about:blank schemes
+            if (args.Url.Scheme == Uri.UriSchemeHttp || args.Url.Scheme == Uri.UriSchemeHttps)
             {
-                return;
-            }
-                
-            //cancel the current event
-            args.Cancel = true;
+                // cancel the current event
+                args.Cancel = true;
 
-            // open URLs in the user's default browser
-            //Process.Start(e.Url.ToString());
-            StartProcess(args.Url.ToString());
+                //open URLs in the user's default browser
+                StartProcess(args.Url.ToString());
+            }
         }
 
 

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using XCOM2Launcher.Mod;
+using XCOM2Launcher.Classes.Mod;
 
 namespace XCOM2Launcher.Forms
 {

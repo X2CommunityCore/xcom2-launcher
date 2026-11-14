@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +12,9 @@ using Semver;
 using Sentry;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
+using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Forms;
 using XCOM2Launcher.Helper;
-using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 
@@ -90,18 +89,6 @@ namespace XCOM2Launcher
                 InitAppSettings();
                 sentrySdkInstance = InitSentry();
                 
-                if (!CheckDotNet4_7_2())
-                {
-                    Log.Warn(".NET Framework v4.7.2 required");
-
-                    var result = MessageBox.Show("This program requires Microsoft .NET Framework v4.7.2 or newer. Do you want to open the download page now?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-
-                    if (result == DialogResult.Yes)
-                        Tools.StartProcess("https://dotnet.microsoft.com/download/dotnet-framework");
-
-                    return;
-                }
-
                 if (!SteamManager.EnsureInitialized()) {
                     Log.Warn("Failed to detect Steam");
 
@@ -328,20 +315,7 @@ namespace XCOM2Launcher
         /// Verifies that the method SortedSet.TryGetValue() (which was added with 4.7.2) is available.
         /// </summary>
         /// <returns>true if version 4.7.2 or later is installed</returns>
-        private static bool CheckDotNet4_7_2()
-        {
-            try
-            {
-                return typeof(SortedSet<>).GetMethod("TryGetValue") != null;
-                // return typeof(DateTimeOffset).GetMethod("FromUnixTimeSeconds") != null; // obsolete .NET 4.6 check
-            }
-            catch (AmbiguousMatchException)
-            {
-                // ambiguous means there is more than one result
-                return true;
-            }
-        }
-
+        
         public static Settings InitializeSettings()
         {
             var firstRun = !File.Exists("settings.json");
@@ -380,7 +354,7 @@ namespace XCOM2Launcher
             Log.Info($"GamePath: {settings.GamePath}");
 
             // Make sure, that all mod paths have a trailing backslash
-            var pathsWithMissingTrailingBackSlash = settings.ModPaths.Where(m => !m.EndsWith(@"\")).ToList();
+            var pathsWithMissingTrailingBackSlash = settings.ModPaths.Where(m => !m.EndsWith('\\')).ToList();
             for (var i = 0; i < pathsWithMissingTrailingBackSlash.Count; i++)
             {
                 pathsWithMissingTrailingBackSlash[i] += @"\";
@@ -519,7 +493,7 @@ namespace XCOM2Launcher
                     }
 
                     bool parsingSucceeded = SemVersion.TryParse(GitVersionInfo.SemVer, SemVersionStyles.Any, out SemVersion currentVersion);
-                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any ,out SemVersion newVersion);
+                    parsingSucceeded &= SemVersion.TryParse(release.tag_name.TrimStart('v'), SemVersionStyles.Any, out SemVersion newVersion);
 
                     if (parsingSucceeded)
                     {

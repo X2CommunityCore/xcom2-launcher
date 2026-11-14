@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using XCOM2Launcher.Classes.Mod;
-using XCOM2Launcher.Mod;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
@@ -82,7 +81,7 @@ namespace XCOM2Launcher.Forms
 
                 if (Settings.OnlyUpdateEnabledOrNewModsOnStartup)
                 {
-                    mods = mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New)).ToList();
+                    mods = [.. mods.Where(mod => mod.isActive || mod.State.HasFlag(ModState.New))];
                 }
 
                 UpdateMods(mods, () =>
@@ -102,70 +101,6 @@ namespace XCOM2Launcher.Forms
             tabImageList.Images.Add(ExclamationIconKey, error_provider.Icon);
         }
 
-/*
-        // This was only called for DEBUG builds, but currently isn't required (maybe part of an abandoned feature?)
-        private void CheckSteamForNewMods()
-        {
-            SetStatus("Checking for new mods...");
-
-            ulong[] subscribedIDs;
-            try
-            {
-                subscribedIDs = Workshop.GetSubscribedItems();
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Steamworks not initialized?
-                // Game taking over?
-                Log.Error("Error checking for new mods", ex);
-                SetStatus("Error checking for new mods.");
-                return;
-            }
-
-            var change = false;
-            foreach (var id in subscribedIDs)
-            {
-                var status = Workshop.GetDownloadStatus(id);
-
-                if (status.HasFlag(EItemState.k_EItemStateInstalled))
-                    // already installed
-                    continue;
-
-                if (Downloads.Any(d => d.WorkshopID == (long) id))
-                    // already observing
-                    continue;
-
-                // Get info
-                var detailsRequest = new ItemDetailsRequest(id).Send().WaitForResult();
-                var details = detailsRequest.Result[0];
-                var link = detailsRequest.GetPreviewURL();
-
-                var downloadMod = new ModEntry
-                {
-                    Name = details.m_rgchTitle,
-                    DateCreated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeCreated).DateTime,
-                    DateUpdated = DateTimeOffset.FromUnixTimeSeconds(details.m_rtimeUpdated).DateTime,
-                    //Path = Path.Combine(Settings.GetWorkshopPath(), "" + id),
-                    Image = link,
-                    WorkshopID = (int) id
-                };
-
-                downloadMod.SetSource(ModSource.SteamWorkshop);
-                downloadMod.AddState(ModState.New | ModState.NotInstalled);
-
-                // Start download
-                Workshop.DownloadItem(id);
-                //
-                Downloads.Add(downloadMod);
-                change = true;
-            }
-
-            if (change)
-                RefreshModList();
-
-            SetStatusIdle();
-        }
-*/
         #region GUI
 
         /// <summary>
@@ -244,7 +179,7 @@ namespace XCOM2Launcher.Forms
 
         private void UpdateExport()
         {
-            var str = new StringBuilder();
+            export_richtextbox.WordWrap = false;
 
             if (!Mods.Active.Any())
             {
@@ -256,42 +191,47 @@ namespace XCOM2Launcher.Forms
 			var showLink = export_workshop_link_checkbox.Checked;
 			var showAllMods = export_all_mods_checkbox.Checked;
 
-			var nameLength = showAllMods ? Mods.All.Max(m => m.Name.Length) : Mods.Active.Max(m => m.Name.Length);
-			var idLength = showAllMods ? Mods.All.Max(m => m.ID.Length) : Mods.Active.Max(m => m.ID.Length);
-            var workshopIDLength = showAllMods ? Mods.All.Max(m => m.WorkshopID.ToString().Length) : Mods.Active.Max(m => m.WorkshopID.ToString().Length);
+            var sourceMods = showAllMods ? Mods.All : Mods.Active;
+            var nameLength = sourceMods.Max(m => m.Name.ReplaceLineEndings(" ").Trim().Length);
+            var idLength = sourceMods.Max(m => m.ID.ReplaceLineEndings("").Trim().Length);
+            var workshopIDLength = sourceMods.Max(m => m.WorkshopID.ToString().Length);
+
+            var str = new StringBuilder();
 
 
             foreach (var entry in Mods.Entries.Where(e => e.Value.Entries.Any(m => m.isActive)))
             {
                 List<ModEntry> mods;
-	   //         if (showAllMods)
-		  //          mods = entry.Value.Entries.ToList();
-				//else
-					mods = entry.Value.Entries.Where(m => m.isActive).ToList();
+	   
+				mods = [.. entry.Value.Entries.Where(m => m.isActive)];
 
                 if (showCategories)
-                    str.AppendLine($"{entry.Key} ({mods.Count()}):");
+                    str.AppendLine($"{entry.Key} ({mods.Count}):");
 
                 foreach (var mod in mods)
                 {
                     if (showCategories)
-                        str.Append("\t");
+                        str.Append('\t');
 
-                    str.Append(string.Format("{0,-" + nameLength + "} ", mod.Name));
-                    str.Append("\t");
-                    str.Append(string.Format("{0,-" + idLength + "} ", mod.ID));
-                    str.Append("\t");
+                    var cleanName = mod.Name.ReplaceLineEndings(" ").Trim();
+                    var cleanId = mod.ID.ReplaceLineEndings("").Trim();
+
+                    str.Append($"{cleanName.PadRight(nameLength)} ");
+                    str.Append('\t');
+                    str.Append($"{cleanId.PadRight(idLength)} ");
+                    str.Append('\t');
 
 					// add workshop ID or link
                     if (mod.WorkshopID == -1)
-                        str.Append("Unknown");
+                        str.Append($"{"Unknown".PadRight(workshopIDLength)} ");
 
                     else if (showLink)
-                        str.Append(string.Format("{0,-" + workshopIDLength + "} ", mod.GetWorkshopLink()));
+                        str.Append($"{mod.GetWorkshopLink()} ");
 
                     else
-                        str.Append(string.Format("{0,-" + workshopIDLength + "} ", mod.WorkshopID));
-	                str.Append("\t");
+                        str.Append($"{mod.WorkshopID.ToString().PadRight(workshopIDLength)} ");
+
+	                str.Append('\t');
 
                     str.Append(string.Join(";", mod.Tags));
 
@@ -344,7 +284,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void ShowModUpdateRunningMessageBox()
+        private static void ShowModUpdateRunningMessageBox()
         {
             MessageBox.Show("Mod update in progress, please wait for it to finish.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -374,7 +314,7 @@ namespace XCOM2Launcher.Forms
             }
 
             // Check for WOTC only mods
-            if (Settings.Mods.Active.Count(e => e.BuiltForWOTC) > 0)
+            if (Settings.Mods.Active.Any(e => e.BuiltForWOTC))
             {
                 if (FlexibleMessageBox.Show(this,
                                             "Are you sure you want to proceed? Please be warned that this is very likely to crash your game. Offending mods:\r\n" +
@@ -582,7 +522,9 @@ namespace XCOM2Launcher.Forms
             }).ToList();
 
 
-            if (duplicates.Any())
+            // Use of duplicates.Count > 0 instead of duplicates.Any() to avoid deferred execution
+            // which would cause the grouping to be enumerated multiple times.
+            if (duplicates.Count > 0)
             {
                 str.AppendLine("Mods with identical package ids found!");
                 if (Settings.EnableDuplicateModIdWorkaround)
@@ -617,7 +559,10 @@ namespace XCOM2Launcher.Forms
         private string GetOverridesString()
         {
             var conflicts = Mods.GetActiveConflicts().ToList();
-            if (!conflicts.Any())
+
+            // Use of conflicts.Count == 0 instead of conflicts.Any() to avoid deferred execution
+            // which would cause the grouping to be enumerated multiple times.
+            if (conflicts.Count == 0)
                 return "";
 
             var showUIScreenListenerMessage = false;
@@ -788,7 +733,7 @@ namespace XCOM2Launcher.Forms
         /// </summary>
         private void InitQuickArgumentsMenu(Settings settings)
         {
-            LauchOptionsPanel.Visible = settings.ShowQuickLaunchArguments && settings.QuickToggleArguments.Any();
+            LauchOptionsPanel.Visible = settings.ShowQuickLaunchArguments && settings.QuickToggleArguments.Count > 0;
             
             quickLaunchToolstripButton.DropDownItems.Clear();
             foreach (var arg in settings.QuickToggleArguments)
@@ -817,7 +762,7 @@ namespace XCOM2Launcher.Forms
             
             olvColReqModsIgnore.AspectGetter += rowObject =>
             {
-                if (CurrentMod == null || !(rowObject is ModEntry mod))
+                if (CurrentMod == null || rowObject is not ModEntry mod)
                     return false;
 
                 return CurrentMod.IgnoredDependencies.Contains(mod.WorkshopID);
@@ -825,7 +770,7 @@ namespace XCOM2Launcher.Forms
 
             olvColReqModsIgnore.AspectPutter += (rowObject, value) =>
             {
-                if (CurrentMod == null || !(rowObject is ModEntry mod) || !(value is bool checkState))
+                if (CurrentMod == null || rowObject is not ModEntry mod || value is not bool checkState)
                     return;
 
                 // Add the mod id to or remove it from the IgnoredDependencies list.
@@ -850,7 +795,7 @@ namespace XCOM2Launcher.Forms
 
             olvRequiredMods.SubItemChecking += (sender, args) =>
             {
-                if (CurrentMod == null && !(args.RowObject is ModEntry))
+                if (CurrentMod == null && args.RowObject is not ModEntry)
                 {
                     args.NewValue = args.CurrentValue;
                 }
@@ -875,7 +820,7 @@ namespace XCOM2Launcher.Forms
             return newValue;
         }
 
-        private void olvDependencyMods_ItemActivate(object sender, EventArgs e)
+        private void OlvDependencyMods_ItemActivate(object sender, EventArgs e)
         {
             if (sender is ObjectListView olv)
             {
@@ -888,7 +833,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void olvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
+        private void OlvRequiredMods_FormatRow(object sender, FormatRowEventArgs e)
         {
             var mod = e.Model as ModEntry;
             Contract.Assume(mod != null);

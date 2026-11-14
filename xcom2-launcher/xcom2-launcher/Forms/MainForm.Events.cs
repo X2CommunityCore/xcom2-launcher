@@ -10,8 +10,8 @@ using FastColoredTextBoxNS;
 using JR.Utils.GUI.Forms;
 using Steamworks;
 using XCOM2Launcher.Classes;
+using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Helper;
-using XCOM2Launcher.Mod;
 using XCOM2Launcher.PropertyGrid;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
@@ -390,9 +390,9 @@ namespace XCOM2Launcher.Forms
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            if (Settings.Windows.ContainsKey("main"))
+            // Implementation of TryGetValue to avoid double lookup of the dictionary. This is a performance optimization.
+            if (Settings.Windows.TryGetValue("main", out WindowSettings setting))
             {
-                var setting = Settings.Windows["main"];
                 DesktopBounds = setting.Bounds;
                 WindowState = setting.State;
             }

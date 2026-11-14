@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Steamworks;
 using XCOM2Launcher.Steam;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     public class ModList
     {
@@ -416,10 +416,13 @@ namespace XCOM2Launcher.Mod
             // Check if mod directory exists
             if (!Directory.Exists(m.Path))
             {
-                Log.Warn($"Hiding mod {m.ID} because the directory {m.Path} no longer exists.");
                 m.AddState(ModState.NotInstalled);
                 m.AddState(ModState.NotLoaded);
-                m.isHidden = true;
+
+                // The user is asked later if he wants to hide the mods that are not installed anyway.
+                //Log.Warn($"Hiding mod {m.ID} because the directory {m.Path} no longer exists.");
+                //m.isHidden = true;
+
                 return false;
             }
 
@@ -803,7 +806,11 @@ namespace XCOM2Launcher.Mod
         }
     }
 
-    public class ModUpdateProgress
+    // Using a record type here would be more appropriate, for clarity and maintainability.
+    // (Visual Studio suggestion) (not supported in .NET Framework 4.8)
+    public record ModUpdateProgress(string Message, int Current, int Max = 100);
+
+    /*public class ModUpdateProgress
     {
         public string Message { get; }
         public int Current { get; }
@@ -815,5 +822,6 @@ namespace XCOM2Launcher.Mod
             Current = current;
             Max = max;
         }
-    }
+    }*/
+
 }

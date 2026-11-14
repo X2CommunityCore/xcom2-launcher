@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     public class ModInfo
     {

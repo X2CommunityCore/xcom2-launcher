@@ -27,7 +27,7 @@
     <PackageReference Include="FastColoredTextBox.NET10" Version="2.16.26.9180" />
     <PackageReference Include="GitVersion.MsBuild" Version="6.8.2" PrivateAssets="all" />
     <PackageReference Include="IndexRange" Version="1.1.1" />
-    <PackageReference Include="log4net" Version="3.5.0" />
+    <PackageReference Include="log4net" Version="3.6.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="11.0.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.5" />
@@ -35,7 +35,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="ObjectListView.Repack.NET6Plus" Version="2.9.5" />
     <PackageReference Include="Semver" Version="3.0.0" />
-    <PackageReference Include="Sentry" Version="6.12.1" />
+    <PackageReference Include="Sentry" Version="7.0.0" />
     <PackageReference Include="Steamworks.NET.AnyCPU" Version="2026.165.3" />
     <PackageReference Include="System.Collections.Immutable" Version="11.0.0" />
     <PackageReference Include="System.IO.Pipelines" Version="11.0.0" />
@@ -64,6 +64,10 @@
 
   <ItemGroup Label="Compile items now included by globbing that were not in the original project file">
     <Compile Remove="Classes\XCOM\old\Config.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="gitversion.json" />
   </ItemGroup>
 
 </Project>

@@ -13,7 +13,6 @@ using System.Windows.Forms;
 using BrightIdeasSoftware;
 using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Helper;
-using XCOM2Launcher.Mod;
 using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Forms

@@ -1779,8 +1779,8 @@
             this.olvRequiredMods.UseHyperlinks = true;
             this.olvRequiredMods.UseTranslucentSelection = true;
             this.olvRequiredMods.View = System.Windows.Forms.View.Details;
-            this.olvRequiredMods.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.olvRequiredMods_FormatRow);
-            this.olvRequiredMods.ItemActivate += new System.EventHandler(this.olvDependencyMods_ItemActivate);
+            this.olvRequiredMods.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.OlvRequiredMods_FormatRow);
+            this.olvRequiredMods.ItemActivate += new System.EventHandler(this.OlvDependencyMods_ItemActivate);
             // 
             // olvColReqModsActive
             // 
@@ -1909,8 +1909,8 @@
             this.olvDependentMods.UseHyperlinks = true;
             this.olvDependentMods.UseTranslucentSelection = true;
             this.olvDependentMods.View = System.Windows.Forms.View.Details;
-            this.olvDependentMods.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.olvRequiredMods_FormatRow);
-            this.olvDependentMods.ItemActivate += new System.EventHandler(this.olvDependencyMods_ItemActivate);
+            this.olvDependentMods.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.OlvRequiredMods_FormatRow);
+            this.olvDependentMods.ItemActivate += new System.EventHandler(this.OlvDependencyMods_ItemActivate);
             // 
             // olvColDepModsActive
             // 

@@ -754,7 +754,7 @@ namespace JR.Utils.GUI.Forms
                 try
                 {
                     Cursor.Current = Cursors.WaitCursor;
-                    Process.Start(e.LinkText);
+                    Process.Start(new ProcessStartInfo(e.LinkText) { UseShellExecute = true });
                 }
                 finally // Omit catch -> Let the caller of FlexibleMessageBoxForm decide what to do with this exception.
                 {
@@ -826,14 +826,21 @@ namespace JR.Utils.GUI.Forms
             /// <returns>The dialog result.</returns>
             public static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
             {
+                if (owner is Control control && control.InvokeRequired)
+                {
+                    return (DialogResult)control.Invoke(new Func<DialogResult>(() =>
+                        Show(owner, text, caption, buttons, icon, defaultButton)));
+                }
+
                 //Create a new instance of the FlexibleMessageBox form
                 var flexibleMessageBoxForm = new FlexibleMessageBoxForm();
                 flexibleMessageBoxForm.ShowInTaskbar = false;
 
-                //Bind the caption and the message text
-                flexibleMessageBoxForm.CaptionText = caption;
-                flexibleMessageBoxForm.MessageText = text;
-                flexibleMessageBoxForm.FlexibleMessageBoxFormBindingSource.DataSource = flexibleMessageBoxForm;
+                // Direct assignation prevents error 0xc000041d (.NET 10)
+                flexibleMessageBoxForm.richTextBoxMessage.DataBindings.Clear();
+                flexibleMessageBoxForm.DataBindings.Clear();
+                flexibleMessageBoxForm.Text = caption ?? string.Empty;
+                flexibleMessageBoxForm.richTextBoxMessage.Text = text ?? string.Empty;
 
                 //Set the buttons visibilities and texts. Also set a default button.
                 SetDialogButtons(flexibleMessageBoxForm, buttons, defaultButton);
@@ -842,11 +849,12 @@ namespace JR.Utils.GUI.Forms
                 SetDialogIcon(flexibleMessageBoxForm, icon);
 
                 //Set the font for all controls
-                flexibleMessageBoxForm.Font = FONT;
-                flexibleMessageBoxForm.richTextBoxMessage.Font = FONT;
+                var safeFont = FONT ?? SystemFonts.DefaultFont;
+                flexibleMessageBoxForm.Font = safeFont;
+                flexibleMessageBoxForm.richTextBoxMessage.Font = safeFont;
 
                 //Calculate the dialogs start size (Try to auto-size width to show longest text row). Also set the maximum dialog size. 
-                SetDialogSizes(flexibleMessageBoxForm, text, caption);
+                SetDialogSizes(flexibleMessageBoxForm, text ?? string.Empty, caption ?? string.Empty);
 
                 //Set the dialogs start position when given. Otherwise center the dialog on the current screen.
                 SetDialogStartPosition(flexibleMessageBoxForm, owner);

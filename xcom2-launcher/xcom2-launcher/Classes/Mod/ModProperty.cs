@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using XCOM2Launcher.Mod;
 
 namespace XCOM2Launcher.Classes.Mod
 {

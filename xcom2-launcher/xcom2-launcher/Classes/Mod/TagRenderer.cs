@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     internal class TagRenderInfo
     {

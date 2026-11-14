@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     [Flags]
     public enum ModState

@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
@@ -14,7 +13,7 @@ using XCOM2Launcher.Helper;
 using XCOM2Launcher.Steam;
 using FilePath = System.IO.Path;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     public class ModEntry
     {
@@ -133,9 +132,9 @@ namespace XCOM2Launcher.Mod
             Dependencies = workshopDetailsWrapper.Children.Select(x => (long)x).ToList();
         }
 
-        public Classes.Mod.ModProperty GetProperty()
+        public ModProperty GetProperty()
         {
-            return new Classes.Mod.ModProperty(this);
+            return new ModProperty(this);
         }
 
 		#region Mod
@@ -181,19 +180,19 @@ namespace XCOM2Launcher.Mod
             string output;
             switch (tag)
             {
-                case "h1":  output = @"{\fs24 \b "; break;
-                case "h2":  output = @"{\fs22 \b "; break;
-                case "h3":  output = @"{\fs20 \b "; break;
-                case "b":   output = @"{\b "; break;
-                case "i":   output = @"{\i "; break;
-                case "u":   output = @"{\ul "; break;
-                case "strike": output = @"{\strike "; break;
-                case "*":   output = @"{\bullet \par }"; break;
-                case "list": output = @"{\list \par }"; break;
-                case "/list": output = @"}"; break;
-                case "quote": output = @"{\cf2 \par \qn 1\ql "; break;
-                case "/quote": output = @"{\cf0 \par }"; break;
-                default:    output = ""; break;
+                case "h1":      output = @"{\fs24 \b "; break;
+                case "h2":      output = @"{\fs22 \b "; break;
+                case "h3":      output = @"{\fs20 \b "; break;
+                case "b":       output = @"{\b "; break;
+                case "i":       output = @"{\i "; break;
+                case "u":       output = @"{\ul "; break;
+                case "strike":  output = @"{\strike "; break;
+                case "*":       output = @"{\par \bullet }"; break;
+                case "list":    output = @"{\par \list "; break;
+                case "/list":   output = @"}"; break;
+                case "quote":   output = @"{\cf2 \par \ql \i "; break;
+                case "/quote":  output = @"\cf0 \par }"; break;
+                default:        output = ""; break;
             }   
 
             if (output != "" && close == "/")

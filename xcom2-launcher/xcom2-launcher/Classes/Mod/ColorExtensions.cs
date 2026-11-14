@@ -7,7 +7,7 @@
 using System;
 using System.Drawing;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     public static class ColorExtensions
     {

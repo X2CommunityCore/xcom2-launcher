@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     public class ModConflict
     {
