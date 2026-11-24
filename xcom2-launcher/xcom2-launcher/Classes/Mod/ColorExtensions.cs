@@ -19,7 +19,7 @@ namespace XCOM2Launcher.Classes.Mod
         /// <returns></returns>
         public static Color GetPastelShade(this Color source)
         {
-            return (generateColor(source, true, new HSB { H = 0, S = 0.2d, B = 255 }, new HSB { H = 360, S = 0.5d, B = 255 }));
+            return (GenerateColor(source, true, new HSB { H = 0, S = 0.2d, B = 255 }, new HSB { H = 360, S = 0.5d, B = 255 }));
         }
         /// <summary>
         /// Returns a random color
@@ -28,7 +28,7 @@ namespace XCOM2Launcher.Classes.Mod
         /// <returns></returns>
         public static Color GetRandom(this Color source)
         {
-            return (generateColor(source, false, new HSB { H = 0, S = 0, B = 0 }, new HSB { H = 360, S = 1, B = 255 }));
+            return (GenerateColor(source, false, new HSB { H = 0, S = 0, B = 0 }, new HSB { H = 360, S = 1, B = 255 }));
         }
         /// <summary>
         /// Returns a random color within a brightness boundry
@@ -41,7 +41,7 @@ namespace XCOM2Launcher.Classes.Mod
         {
             if (minBrightness >= 0 && maxBrightness <= 1)
             {
-                return (generateColor(source, false, new HSB { H = 0, S = 1 * minBrightness, B = 255 }, new HSB { H = 360, S = 1 * maxBrightness, B = 255 }));
+                return (GenerateColor(source, false, new HSB { H = 0, S = 1 * minBrightness, B = 255 }, new HSB { H = 360, S = 1 * maxBrightness, B = 255 }));
             }
             throw new ArgumentOutOfRangeException();
         }
@@ -52,7 +52,7 @@ namespace XCOM2Launcher.Classes.Mod
         /// <returns></returns>
         public static Color GetRandomShade(this Color source)
         {
-            return (generateColor(source, true, new HSB { H = 0, S = 1, B = 0 }, new HSB { H = 360, S = 1, B = 255 }));
+            return (GenerateColor(source, true, new HSB { H = 0, S = 1, B = 0 }, new HSB { H = 360, S = 1, B = 255 }));
         }
         /// <summary>
         /// Returns a random color within a brightness boundry
@@ -65,7 +65,7 @@ namespace XCOM2Launcher.Classes.Mod
         {
             if (minBrightness >= 0 && maxBrightness <= 1)
             {
-                return (generateColor(source, true, new HSB { H = 0, S = 1 * minBrightness, B = 255 }, new HSB { H = 360, S = 1 * maxBrightness, B = 255 }));
+                return (GenerateColor(source, true, new HSB { H = 0, S = 1 * minBrightness, B = 255 }, new HSB { H = 360, S = 1 * maxBrightness, B = 255 }));
             }
 
             throw new ArgumentOutOfRangeException();
@@ -78,7 +78,7 @@ namespace XCOM2Launcher.Classes.Mod
         /// <param name="min">Minimum range for HSB</param>
         /// <param name="max">Maximum range for HSB</param>
         /// <returns></returns>
-        private static Color generateColor(Color source, bool isaShadeOfSource, HSB min, HSB max)
+        private static Color GenerateColor(Color source, bool isaShadeOfSource, HSB min, HSB max)
         {
             var hsbValues = ConvertToHSB(new RGB { R = source.R, G = source.G, B = source.B });
             var h_double = randomizer.NextDouble();

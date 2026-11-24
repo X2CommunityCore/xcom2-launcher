@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace XCOM2Launcher.Helper
+namespace XCOM2Launcher.Classes.Helper
 {
     public static class FileSizeFormatExtension
     {

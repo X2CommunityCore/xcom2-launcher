@@ -6,18 +6,20 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using XCOM2Launcher.Classes.Mod;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Forms
 {
-    public partial class MainForm : Form
+    // Dummy class to prevent the designer from trying to load this file,
+    // which would generate a resx file and cause an error.
+    internal class MainForm_ModList_NoDesigner { }
+    public partial class MainForm
     {
         public ModList Mods => Settings.Mods;
         public Dictionary<string, ModTag> AvailableTags => Settings.Tags;
@@ -175,9 +177,8 @@ namespace XCOM2Launcher.Forms
                 {
                     return "";
                 }
-                    
-                var firstLine = new Regex("[^\r\n]*").Match(mod.Note).Value;
-                return firstLine;
+                  
+                return RegexHelper.FirstLineRegex().Match(mod.Note).Value;
             };
             
             modlist_ListObjectListView.CellEditStarting += (sender, args) =>
@@ -555,7 +556,7 @@ namespace XCOM2Launcher.Forms
 
         private void ResubscribeToMods(List<ModEntry> mods)
         {
-            if (mods == null || !mods.Any())
+            if (mods == null || mods.Count == 0)
             {
                 return;
             }
@@ -587,7 +588,7 @@ namespace XCOM2Launcher.Forms
 
         private void ConfirmDeleteMods(List<ModEntry> mods)
         {
-            if (mods == null || !mods.Any())
+            if (mods == null || mods.Count == 0)
             {
                 return;
             }
@@ -607,14 +608,14 @@ namespace XCOM2Launcher.Forms
 
         private void ConfirmUnsubscribeMods(List<ModEntry> mods)
         {
-            if (mods == null || !mods.Any())
+            if (mods == null || mods.Count == 0)
             {
                 return;
             }
 
             mods = mods.Where(mod => mod.Source == ModSource.SteamWorkshop && !mod.State.HasFlag(ModState.NotInstalled)).ToList();
             
-            if (!mods.Any())
+            if (mods.Count == 0)
             {
                 MessageBox.Show("No subscribed Workshop mods selected.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;

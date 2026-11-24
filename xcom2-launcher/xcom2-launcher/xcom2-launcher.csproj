@@ -54,20 +54,12 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-
+	
   <ItemGroup>
     <Content Include="Resources\AML-Logo.png" />
     <Content Include="Resources\document-save-5.png" />
     <Content Include="Resources\X2-Logo.png" />
     <Content Include="Resources\xcom.ico" />
-  </ItemGroup>
-
-  <ItemGroup Label="Compile items now included by globbing that were not in the original project file">
-    <Compile Remove="Classes\XCOM\old\Config.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="gitversion.json" />
   </ItemGroup>
 
 </Project>

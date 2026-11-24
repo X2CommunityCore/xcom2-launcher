@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using XCOM2Launcher.Classes.Mod;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Serialization;
 using XCOM2Launcher.XCOM;
 

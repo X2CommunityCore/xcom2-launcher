@@ -1,6 +1,6 @@
 ﻿namespace XCOM2Launcher.Forms
 {
-    partial class MainForm
+    partial class MainForm 
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -1244,7 +1244,7 @@
             this.modlist_toggleGroupsButton.TabIndex = 0;
             this.modlist_toggleGroupsButton.Text = "Expand/collapse groups";
             this.modlist_toggleGroupsButton.UseVisualStyleBackColor = true;
-            this.modlist_toggleGroupsButton.Click += new System.EventHandler(this.modlist_toggleGroupsButton_Click);
+            this.modlist_toggleGroupsButton.Click += new System.EventHandler(this.Modlist_toggleGroupsButton_Click);
             // 
             // panel3
             // 
@@ -1272,7 +1272,7 @@
             this.modlist_filterClearButton.TabIndex = 1;
             this.toolTip.SetToolTip(this.modlist_filterClearButton, "Clear text filter");
             this.modlist_filterClearButton.UseVisualStyleBackColor = true;
-            this.modlist_filterClearButton.Click += new System.EventHandler(this.modlist_filterClearButton_Click);
+            this.modlist_filterClearButton.Click += new System.EventHandler(this.Modlist_filterClearButton_Click);
             // 
             // modlist_FilterCueTextBox
             // 
@@ -1282,7 +1282,7 @@
             this.modlist_FilterCueTextBox.Name = "modlist_FilterCueTextBox";
             this.modlist_FilterCueTextBox.Size = new System.Drawing.Size(175, 20);
             this.modlist_FilterCueTextBox.TabIndex = 1;
-            this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.filterMods_TextChanged);
+            this.modlist_FilterCueTextBox.TextChanged += new System.EventHandler(this.FilterMods_TextChanged);
             // 
             // modinfo_groupbox
             // 
@@ -1462,7 +1462,7 @@
             this.modInfoNotesText.Size = new System.Drawing.Size(760, 228);
             this.modInfoNotesText.TabIndex = 2;
             this.modInfoNotesText.Text = "";
-            this.modInfoNotesText.TextChanged += new System.EventHandler(this.modInfoNotesText_TextChanged);
+            this.modInfoNotesText.TextChanged += new System.EventHandler(this.ModInfoNotesText_TextChanged);
             // 
             // modinfo_readme_tab
             // 
@@ -1509,7 +1509,7 @@
             this.modinfo_inspect_propertygrid.Name = "modinfo_inspect_propertygrid";
             this.modinfo_inspect_propertygrid.Size = new System.Drawing.Size(754, 222);
             this.modinfo_inspect_propertygrid.TabIndex = 9;
-            this.modinfo_inspect_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.modinfo_inspect_propertygrid_Layout);
+            this.modinfo_inspect_propertygrid.Layout += new System.Windows.Forms.LayoutEventHandler(this.Modinfo_inspect_propertygrid_Layout);
             // 
             // modinfo_config_tab
             // 
@@ -1580,7 +1580,7 @@
             this.modinfo_ConfigFCTB.TabIndex = 11;
             this.modinfo_ConfigFCTB.WordWrap = true;
             this.modinfo_ConfigFCTB.Zoom = 100;
-            this.modinfo_ConfigFCTB.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.modinfo_ConfigFCTB_TextChanged);
+            this.modinfo_ConfigFCTB.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.Modinfo_ConfigFCTB_TextChanged);
             // 
             // modinfo_config_FileSelectCueComboBox
             // 
@@ -1593,7 +1593,7 @@
             this.modinfo_config_FileSelectCueComboBox.TabIndex = 12;
             this.toolTip.SetToolTip(this.modinfo_config_FileSelectCueComboBox, "Select an INI file to view or edit");
             this.modinfo_config_FileSelectCueComboBox.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-            this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
+            this.modinfo_config_FileSelectCueComboBox.SelectedIndexChanged += new System.EventHandler(this.Modinfo_config_FileSelectCueComboBox_SelectedIndexChanged);
             // 
             // modinfo_config_buttonsTableLayoutPanel
             // 
@@ -1627,7 +1627,7 @@
             this.modinfo_config_ExpandButton.Text = "Expand";
             this.toolTip.SetToolTip(this.modinfo_config_ExpandButton, "Expand the INI editor to fill the window");
             this.modinfo_config_ExpandButton.UseVisualStyleBackColor = true;
-            this.modinfo_config_ExpandButton.Click += new System.EventHandler(this.modinfo_config_ExpandButton_Click);
+            this.modinfo_config_ExpandButton.Click += new System.EventHandler(this.Modinfo_config_ExpandButton_Click);
             // 
             // modinfo_config_CompareButton
             // 
@@ -1640,7 +1640,7 @@
             this.modinfo_config_CompareButton.Text = "Compare";
             this.toolTip.SetToolTip(this.modinfo_config_CompareButton, "Compare the current file on disk to the backup file");
             this.modinfo_config_CompareButton.UseVisualStyleBackColor = true;
-            this.modinfo_config_CompareButton.Click += new System.EventHandler(this.modinfo_config_CompareButton_Click);
+            this.modinfo_config_CompareButton.Click += new System.EventHandler(this.Modinfo_config_CompareButton_Click);
             // 
             // modinfo_config_SaveButton
             // 
@@ -1652,7 +1652,7 @@
             this.modinfo_config_SaveButton.Text = "Save";
             this.toolTip.SetToolTip(this.modinfo_config_SaveButton, "Save current settings to the file on disk and the backup file");
             this.modinfo_config_SaveButton.UseVisualStyleBackColor = true;
-            this.modinfo_config_SaveButton.Click += new System.EventHandler(this.modinfo_config_SaveButton_Click);
+            this.modinfo_config_SaveButton.Click += new System.EventHandler(this.Modinfo_config_SaveButton_Click);
             // 
             // modinfo_config_LoadButton
             // 
@@ -1665,7 +1665,7 @@
             this.modinfo_config_LoadButton.Text = "Load";
             this.toolTip.SetToolTip(this.modinfo_config_LoadButton, "Load settings from the backup file");
             this.modinfo_config_LoadButton.UseVisualStyleBackColor = true;
-            this.modinfo_config_LoadButton.Click += new System.EventHandler(this.modinfo_config_LoadButton_Click);
+            this.modinfo_config_LoadButton.Click += new System.EventHandler(this.Modinfo_config_LoadButton_Click);
             // 
             // modinfo_config_RemoveButton
             // 
@@ -1678,7 +1678,7 @@
             this.modinfo_config_RemoveButton.Text = "Remove";
             this.toolTip.SetToolTip(this.modinfo_config_RemoveButton, "Remove settings from the backup file");
             this.modinfo_config_RemoveButton.UseVisualStyleBackColor = true;
-            this.modinfo_config_RemoveButton.Click += new System.EventHandler(this.modinfo_config_RemoveButton_Click);
+            this.modinfo_config_RemoveButton.Click += new System.EventHandler(this.Modinfo_config_RemoveButton_Click);
             // 
             // modinfo_changelog_tab
             // 

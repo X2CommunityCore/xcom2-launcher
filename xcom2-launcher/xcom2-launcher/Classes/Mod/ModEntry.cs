@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Steam;
 using FilePath = System.IO.Path;
 
@@ -25,10 +25,7 @@ namespace XCOM2Launcher.Classes.Mod
         [JsonIgnore] private string _image;
 
         [JsonIgnore] private IEnumerable<ModClassOverride> _overrides;
-        [JsonIgnore] private static readonly Regex s_classOverridesRegex = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)", RegexOptions.Compiled);
-        [JsonIgnore] private static readonly Regex s_whitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
-        [JsonIgnore] private static readonly Regex s_screenClassRegex = new Regex(@"(?i)^\s*ScreenClass\s*=\s*(?:class')?([a-z_]+)", RegexOptions.Compiled);
-
+        
         /// <summary>
         ///     Index to determine mod load order
         /// </summary>
@@ -151,10 +148,8 @@ namespace XCOM2Launcher.Classes.Mod
             if (cleanBbCode)
             {
                 dsc = Tools.GetRtfEscapedString(dsc);
-                var regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
-                dsc = regexp.Replace(dsc, RTFEvaluator);
-                var replaceLinebreaks = new Regex(@"[\r\n]{1,2}");
-                dsc = replaceLinebreaks.Replace(dsc, @"\line ");
+                dsc = RegexHelper.BbCodeTagRegex().Replace(dsc, RTFEvaluator);
+                dsc = RegexHelper.LineBreakRegex().Replace(dsc, @"\line ");
                 return @"{\rtf1\ansi " + dsc + "}";
             }
 
@@ -177,23 +172,22 @@ namespace XCOM2Launcher.Classes.Mod
                     return @"{{{";
             }
 
-            string output;
-            switch (tag)
+            string output = tag switch
             {
-                case "h1":      output = @"{\fs24 \b "; break;
-                case "h2":      output = @"{\fs22 \b "; break;
-                case "h3":      output = @"{\fs20 \b "; break;
-                case "b":       output = @"{\b "; break;
-                case "i":       output = @"{\i "; break;
-                case "u":       output = @"{\ul "; break;
-                case "strike":  output = @"{\strike "; break;
-                case "*":       output = @"{\par \bullet }"; break;
-                case "list":    output = @"{\par \list "; break;
-                case "/list":   output = @"}"; break;
-                case "quote":   output = @"{\cf2 \par \ql \i "; break;
-                case "/quote":  output = @"\cf0 \par }"; break;
-                default:        output = ""; break;
-            }   
+                "h1" =>      @"{\fs24 \b ",
+                "h2" =>      @"{\fs22 \b ",
+                "h3" =>      @"{\fs20 \b ",
+                "b" =>       @"{\b ",
+                "i" =>       @"{\i ",
+                "u" =>       @"{\ul ",
+                "strike" =>  @"{\strike ",
+                "*" =>       @"{\par \bullet }",
+                "list" =>    @"{\par \list ",
+                "/list" =>   @"}",
+                "quote" =>   @"{\cf2 \par \ql \i ",
+                "/quote" =>  @"\cf0 \par }",
+                _ => "",
+            };
 
             if (output != "" && close == "/")
                 output = "}";
@@ -248,7 +242,7 @@ namespace XCOM2Launcher.Classes.Mod
 
                 foreach (var line in File.ReadLines(sourceFile))
                 {
-                    var match = s_screenClassRegex.Match(line);
+                    var match = RegexHelper.ScreenClassRegex().Match(line);
                     if (match.Success)
                     {
                         var oldClass = match.Groups[1].Value;
@@ -279,7 +273,7 @@ namespace XCOM2Launcher.Classes.Mod
             foreach (var file in Directory.GetFiles(configPath, "XComEngine.ini", SearchOption.AllDirectories))
             {
                 var modClassOverrides = from line in File.ReadLines(file)
-                    select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
+                    select (l: line, match: RegexHelper.ClassOverridesRegex().Match(RegexHelper.WhitespaceRegex().Replace(line, "")))
                     into m
                     where m.match.Success
                     select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
@@ -442,7 +436,7 @@ namespace XCOM2Launcher.Classes.Mod
                 {
                     string readmeText = File.ReadAllText(readmePathTxt);
 
-                    if (readmeText.Contains("You created an XCOM 2 Mod Project!"))
+                    if (readmeText.Contains("You created an XCOM 2 Mod Project!") || string.IsNullOrWhiteSpace(readmeText))
                     {
                         return "The mod author did not provide additional information.";
                     }
@@ -454,7 +448,7 @@ namespace XCOM2Launcher.Classes.Mod
                 {
                     string readmeText = File.ReadAllText(readmePathMd);
 
-                    if (readmeText.Contains("Describe specific features of your mod."))
+                    if (readmeText.Contains("Describe specific features of your mod.") || string.IsNullOrWhiteSpace(readmeText))
                     {
                         return "The mod author did not provide additional information.";
                     }

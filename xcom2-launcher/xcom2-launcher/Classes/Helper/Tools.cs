@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XCOM2Launcher.Helper {
+namespace XCOM2Launcher.Classes.Helper {
     internal static class Tools {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Tools));
 

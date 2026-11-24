@@ -14,7 +14,6 @@ using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.Forms;
-using XCOM2Launcher.Helper;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 

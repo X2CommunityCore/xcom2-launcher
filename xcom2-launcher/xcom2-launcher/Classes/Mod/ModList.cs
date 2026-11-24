@@ -419,8 +419,11 @@ namespace XCOM2Launcher.Classes.Mod
                 m.AddState(ModState.NotInstalled);
                 m.AddState(ModState.NotLoaded);
 
-                // The user is asked later if he wants to hide the mods that are not installed anyway.
-                //Log.Warn($"Hiding mod {m.ID} because the directory {m.Path} no longer exists.");
+                Log.Info($"Disabling mod {m.ID} because the directory {m.Path} no longer exists.");
+                m.isActive = false;
+
+                // The user is asked later if he wants to hide the mods that are not installed.
+                //Log.Info($"Hiding mod {m.ID} because the directory {m.Path} no longer exists.");
                 //m.isHidden = true;
 
                 return false;

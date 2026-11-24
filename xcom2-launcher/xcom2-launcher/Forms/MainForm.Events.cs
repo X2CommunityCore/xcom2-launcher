@@ -11,13 +11,16 @@ using JR.Utils.GUI.Forms;
 using Steamworks;
 using XCOM2Launcher.Classes;
 using XCOM2Launcher.Classes.Mod;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.PropertyGrid;
 using XCOM2Launcher.Steam;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
 {
+    // Dummy class to prevent the designer from trying to load this file,
+    // which would generate a resx file and cause an error.
+    internal class MainForm_Events_NoDesigner { }
     partial class MainForm
     {
         internal void RegisterEvents()
@@ -442,7 +445,7 @@ namespace XCOM2Launcher.Forms
         }
 
         // Make sure property grid columns are properly sized
-        private void modinfo_inspect_propertygrid_Layout(object sender, LayoutEventArgs e)
+        private void Modinfo_inspect_propertygrid_Layout(object sender, LayoutEventArgs e)
         {
             modinfo_inspect_propertygrid.SetLabelColumnWidth(100);
         }
@@ -488,9 +491,6 @@ namespace XCOM2Launcher.Forms
             }
             // parse file
 
-            var categoryRegex = new Regex(@"^(?<category>.*?)\s\(\d*\):$", RegexOptions.Compiled | RegexOptions.Multiline);
-            var modEntryRegex = new Regex(@"^\s*(?<name>.*?)[ ]*\t(?<id>.*?)[ ]*\t(?:.*=)?(?<sourceID>\d+)([ ]*\t(?<tags>.*?))?$", RegexOptions.Compiled | RegexOptions.Multiline);
-
             var mods = Mods.All.ToList();
             var activeMods = new List<ModEntry>();
             var missingMods = new List<Match>();
@@ -498,11 +498,11 @@ namespace XCOM2Launcher.Forms
 
             foreach (var line in File.ReadAllLines(dialog.FileName))
             {
-                var categoryMatch = categoryRegex.Match(line);
+                var categoryMatch = RegexHelper.CategoryHeaderRegex().Match(line);
                 if (categoryMatch.Success)
                     categoryName = categoryMatch.Groups["category"].Value;
 
-                var modMatch = modEntryRegex.Match(line);
+                var modMatch = RegexHelper.ModEntryRegex().Match(line);
                 if (!modMatch.Success)
                     continue;
 
@@ -645,7 +645,7 @@ namespace XCOM2Launcher.Forms
             Tools.StartProcess(e.LinkText);
         }
 
-        private void filterMods_TextChanged(object sender, EventArgs e)
+        private void FilterMods_TextChanged(object sender, EventArgs e)
         {
             RefreshModelFilter();
         }
@@ -690,7 +690,7 @@ namespace XCOM2Launcher.Forms
         }
 
 
-        private void modinfo_config_FileSelectCueComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void Modinfo_config_FileSelectCueComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (CurrentMod == null)
                 return;
@@ -725,7 +725,7 @@ namespace XCOM2Launcher.Forms
             modinfo_config_CompareButton.Enabled = exists;
         }
 
-        private void modinfo_config_SaveButton_Click(object sender, EventArgs e)
+        private void Modinfo_config_SaveButton_Click(object sender, EventArgs e)
         {
             // Get necessary data
             if (CurrentMod == null)
@@ -746,7 +746,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modinfo_config_LoadButton_Click(object sender, EventArgs e)
+        private void Modinfo_config_LoadButton_Click(object sender, EventArgs e)
         {
             // Get necessary data
             if (CurrentMod == null) return;
@@ -758,7 +758,7 @@ namespace XCOM2Launcher.Forms
             modinfo_ConfigFCTB.Text = setting.Contents;
         }
 
-        private void modinfo_config_RemoveButton_Click(object sender, EventArgs e)
+        private void Modinfo_config_RemoveButton_Click(object sender, EventArgs e)
         {
             // Get necessary data
             if (CurrentMod == null) return;
@@ -772,7 +772,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modinfo_config_ExpandButton_Click(object sender, EventArgs e)
+        private void Modinfo_config_ExpandButton_Click(object sender, EventArgs e)
         {
             var layout = modinfo_config_TableLayoutPanel;
             if (layout.Parent == modinfo_config_tab)
@@ -796,12 +796,12 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
+        private void Modinfo_ConfigFCTB_TextChanged(object sender, TextChangedEventArgs e)
         {
             IniLanguage.Process(e);
         }
 
-        private void modinfo_config_CompareButton_Click(object sender, EventArgs e)
+        private void Modinfo_config_CompareButton_Click(object sender, EventArgs e)
         {
             string filepath = modinfo_config_FileSelectCueComboBox.Text;
             try
@@ -816,7 +816,7 @@ namespace XCOM2Launcher.Forms
             }
         }
 
-        private void modlist_toggleGroupsButton_Click(object sender, EventArgs e)
+        private void Modlist_toggleGroupsButton_Click(object sender, EventArgs e)
         {
             if (modlist_ListObjectListView.OLVGroups == null)
                 return;
@@ -832,7 +832,7 @@ namespace XCOM2Launcher.Forms
                 collapsedGroups.ForEach(g => g.Collapsed = false);
         }
 
-        private void modlist_filterClearButton_Click(object sender, EventArgs e)
+        private void Modlist_filterClearButton_Click(object sender, EventArgs e)
         {
             modlist_FilterCueTextBox.Text = "";
         }
@@ -871,7 +871,7 @@ namespace XCOM2Launcher.Forms
             }
         }
         
-        private void modInfoNotesText_TextChanged(object sender, EventArgs e)
+        private void ModInfoNotesText_TextChanged(object sender, EventArgs e)
         {
             if (CurrentMod != null)
             {

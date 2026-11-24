@@ -15,7 +15,7 @@ using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Forms
 {
-    public partial class MainForm
+    public partial class MainForm : Form    
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(MainForm));
         private const string ExclamationIconKey = "Exclamation";
