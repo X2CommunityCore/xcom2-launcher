@@ -6,20 +6,20 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using Microsoft.VisualBasic;
 using XCOM2Launcher.Classes.Mod;
-using XCOM2Launcher.Helper;
-using XCOM2Launcher.Mod;
+using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Steam;
 
 namespace XCOM2Launcher.Forms
 {
-    public partial class MainForm : Form
+    // Dummy class to prevent the designer from trying to load this file,
+    // which would generate a resx file and cause an error.
+    internal class MainForm_ModList_NoDesigner { }
+    public partial class MainForm
     {
         public ModList Mods => Settings.Mods;
         public Dictionary<string, ModTag> AvailableTags => Settings.Tags;
@@ -177,9 +177,8 @@ namespace XCOM2Launcher.Forms
                 {
                     return "";
                 }
-                    
-                var firstLine = new Regex("[^\r\n]*").Match(mod.Note).Value;
-                return firstLine;
+                  
+                return RegexHelper.FirstLineRegex().Match(mod.Note).Value;
             };
             
             modlist_ListObjectListView.CellEditStarting += (sender, args) =>
@@ -557,7 +556,7 @@ namespace XCOM2Launcher.Forms
 
         private void ResubscribeToMods(List<ModEntry> mods)
         {
-            if (mods == null || !mods.Any())
+            if (mods == null || mods.Count == 0)
             {
                 return;
             }
@@ -589,7 +588,7 @@ namespace XCOM2Launcher.Forms
 
         private void ConfirmDeleteMods(List<ModEntry> mods)
         {
-            if (mods == null || !mods.Any())
+            if (mods == null || mods.Count == 0)
             {
                 return;
             }
@@ -609,14 +608,14 @@ namespace XCOM2Launcher.Forms
 
         private void ConfirmUnsubscribeMods(List<ModEntry> mods)
         {
-            if (mods == null || !mods.Any())
+            if (mods == null || mods.Count == 0)
             {
                 return;
             }
 
             mods = mods.Where(mod => mod.Source == ModSource.SteamWorkshop && !mod.State.HasFlag(ModState.NotInstalled)).ToList();
             
-            if (!mods.Any())
+            if (mods.Count == 0)
             {
                 MessageBox.Show("No subscribed Workshop mods selected.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -741,10 +740,10 @@ namespace XCOM2Launcher.Forms
 
         private void RenameTagPrompt(ModEntry m, ModTag tag, bool renameAll)
         {
-            var prompt = renameAll ? $"Enter new name for all instances of tag '{tag.Label}'."
-                                   : $"Enter new name for tag '{tag.Label}' on mod '{m.Name}'.";
+            var prompt = renameAll ? $"Enter new name for all instances of tag '{tag.Label}':"
+                                   : $"Enter new name for tag '{tag.Label}' on mod '{m.Name}':";
 
-            var newTag = Interaction.InputBox(prompt, "Rename tag", tag.Label);
+            var newTag = InputBox.Show(prompt, "Rename tag", tag.Label);
 
             if (newTag == tag.Label)
                 return;
@@ -999,7 +998,7 @@ namespace XCOM2Launcher.Forms
             var addTagItem = new ToolStripMenuItem("Add tag(s)...");
             addTagItem.Click += (sender, args) =>
             {
-                var newTag = Interaction.InputBox($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedMods.Count} selected mod(s).", "Add tag(s)");
+                var newTag = InputBox.Show($"Please specify one or more tags (separated by a semicolon) that should be added to {selectedMods.Count} selected mod(s):", "Add tag(s)", "New Tag");
 
                 if (newTag == "")
                     return;
@@ -1020,7 +1019,7 @@ namespace XCOM2Launcher.Forms
             // ... new category
             moveToCategoryItem.DropDownItems.Add("New category", null, delegate
             {
-                var category = Interaction.InputBox("Please enter the name of the new category", "Create category", "New category");
+                var category = InputBox.Show("Please enter the name of the new category:", "Create category", "New category");
 
                 if (string.IsNullOrEmpty(category))
                     return;

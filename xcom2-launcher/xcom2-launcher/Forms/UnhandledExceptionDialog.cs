@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using XCOM2Launcher.Classes;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 
 namespace XCOM2Launcher.Forms {
     public partial class UnhandledExceptionDialog : Form {

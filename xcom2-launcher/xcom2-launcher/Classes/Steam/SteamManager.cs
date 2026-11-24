@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Steamworks;
+using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Steamworks;
 
 namespace XCOM2Launcher.Steam
 {
@@ -63,16 +64,20 @@ namespace XCOM2Launcher.Steam
             }
         }
 
+        // A thread-safe global cache to prevent the Garbage Collector from killing pending callbacks
+        private static readonly ConcurrentDictionary<Guid, object> _pendingReferences = new ConcurrentDictionary<Guid, object>();
+
         public static Task<TResult> QueryResultAsync<TCompleted, TResult>(SteamAPICall_t apiCall, Func<TCompleted, bool, TResult> onCompleted)
+             where TCompleted : struct, ISteamCallbackIdentity
         {
             var tcs = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            var callResult = CallResult<TCompleted>.Create(OnCompleted);
-            callResult.Set(apiCall);
+            // Generate a unique token for this specific async operation
+            var operationId = Guid.NewGuid();
 
-            return tcs.Task;
+            CallResult<TCompleted> callResult = null;
 
-            void OnCompleted(TCompleted completed, bool bIoFailure)
+            callResult = CallResult<TCompleted>.Create((completed, bIoFailure) =>
             {
                 try
                 {
@@ -83,7 +88,21 @@ namespace XCOM2Launcher.Steam
                 {
                     tcs.SetException(ex);
                 }
-            }
+                finally
+                {
+                    // Clean up native allocations and drop the global reference to let the GC collect it
+                    callResult?.Dispose();
+                    _pendingReferences.TryRemove(operationId, out _);
+                }
+            });
+
+            // Attach the API call handle to Steamworks
+            callResult.Set(apiCall);
+
+            // Lock the reference globally so the GC doesn't wipe it out while waiting for Steam's backend response
+            _pendingReferences[operationId] = callResult;
+
+            return tcs.Task;
         }
     }
 }

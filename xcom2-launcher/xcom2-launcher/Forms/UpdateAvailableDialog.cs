@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using HeyRed.MarkdownSharp;
 using Semver;
 using XCOM2Launcher.GitHub;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 
 namespace XCOM2Launcher.Forms
 {
@@ -45,7 +45,7 @@ namespace XCOM2Launcher.Forms
 
             var asset = Release.assets.FirstOrDefault(a => a.name.EndsWith(".zip"));
 
-            filesize_value_label.Text = asset == null ? "No download available yet." : Helper.FileSizeFormatExtension.FormatAsFileSize(asset.size);
+            filesize_value_label.Text = asset == null ? "No download available yet." : FileSizeFormatExtension.FormatAsFileSize(asset.size);
 
         }
 

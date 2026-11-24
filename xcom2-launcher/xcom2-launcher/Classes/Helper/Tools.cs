@@ -7,45 +7,47 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XCOM2Launcher.Helper {
+namespace XCOM2Launcher.Classes.Helper {
     internal static class Tools {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(nameof(Tools));
-        
+
         public static void StartProcess(string fileName, string arguments = "")
         {
             try
             {
                 Cursor.Current = Cursors.WaitCursor;
-                Process.Start(fileName, arguments);
+
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    UseShellExecute = true
+                };
+
+                using var process = Process.Start(startInfo);
             }
             catch (Win32Exception ex)
             {
-                Log.Warn($"Unable start process '{fileName}' {arguments}", ex);
+                Log.Warn($"Unable to start process '{fileName}' {arguments}", ex);
                 MessageBox.Show("Unable to open target process. " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-
                 Cursor.Current = Cursors.Default;
             }
-
         }
 
         public static void HandleNavigateWebBrowserControl(object sender, WebBrowserNavigatingEventArgs args)
         {
-            string url = args.Url.ToString();
-
-            if (url.Equals("about:blank", System.StringComparison.InvariantCultureIgnoreCase))
+            // Filtering out http and https schemes. Excludes file:// and about:blank schemes
+            if (args.Url.Scheme == Uri.UriSchemeHttp || args.Url.Scheme == Uri.UriSchemeHttps)
             {
-                return;
-            }
-                
-            //cancel the current event
-            args.Cancel = true;
+                // cancel the current event
+                args.Cancel = true;
 
-            // open URLs in the user's default browser
-            //Process.Start(e.Url.ToString());
-            StartProcess(args.Url.ToString());
+                //open URLs in the user's default browser
+                StartProcess(args.Url.ToString());
+            }
         }
 
 

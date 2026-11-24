@@ -5,16 +5,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using Steamworks;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 using XCOM2Launcher.Steam;
 using FilePath = System.IO.Path;
 
-namespace XCOM2Launcher.Mod
+namespace XCOM2Launcher.Classes.Mod
 {
     public class ModEntry
     {
@@ -26,10 +25,7 @@ namespace XCOM2Launcher.Mod
         [JsonIgnore] private string _image;
 
         [JsonIgnore] private IEnumerable<ModClassOverride> _overrides;
-        [JsonIgnore] private static readonly Regex s_classOverridesRegex = new Regex("^[+]?ModClassOverrides=\\(BaseGameClass=\"([^\"]+)\",ModClass=\"([^\"]+)\"\\)", RegexOptions.Compiled);
-        [JsonIgnore] private static readonly Regex s_whitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
-        [JsonIgnore] private static readonly Regex s_screenClassRegex = new Regex(@"(?i)^\s*ScreenClass\s*=\s*(?:class')?([a-z_]+)", RegexOptions.Compiled);
-
+        
         /// <summary>
         ///     Index to determine mod load order
         /// </summary>
@@ -133,9 +129,9 @@ namespace XCOM2Launcher.Mod
             Dependencies = workshopDetailsWrapper.Children.Select(x => (long)x).ToList();
         }
 
-        public Classes.Mod.ModProperty GetProperty()
+        public ModProperty GetProperty()
         {
-            return new Classes.Mod.ModProperty(this);
+            return new ModProperty(this);
         }
 
 		#region Mod
@@ -152,10 +148,8 @@ namespace XCOM2Launcher.Mod
             if (cleanBbCode)
             {
                 dsc = Tools.GetRtfEscapedString(dsc);
-                var regexp = new Regex(@"(?<!\\\\)\[(/?)(.*?)(?<!\\\\)\]");
-                dsc = regexp.Replace(dsc, RTFEvaluator);
-                var replaceLinebreaks = new Regex(@"[\r\n]{1,2}");
-                dsc = replaceLinebreaks.Replace(dsc, @"\line ");
+                dsc = RegexHelper.BbCodeTagRegex().Replace(dsc, RTFEvaluator);
+                dsc = RegexHelper.LineBreakRegex().Replace(dsc, @"\line ");
                 return @"{\rtf1\ansi " + dsc + "}";
             }
 
@@ -164,48 +158,40 @@ namespace XCOM2Launcher.Mod
 
         private string RTFEvaluator(Match match)
         {
-            String output;
-            if (match.Groups[2].Value.StartsWith("url"))
+   
+            string tag = match.Groups[2].Value;
+            string close = match.Groups[1].Value;
+
+            if (tag.StartsWith("url"))
             {
-                if (match.Groups[1].Value == "/")
-                {
+                if (close == "/")
                     return @"}}}";
-                }
-                else if (match.Groups[2].Value.Length > 3 && match.Groups[2].Value[3] == '=')
-                {
-                    return @"{\field{\*\fldinst{HYPERLINK """ + match.Groups[2].Value.Substring(4) + @"""}}{\fldrslt{\ul ";
-                }
+                else if (tag.Length > 3 && tag[3] == '=')
+                    return @"{\field{\*\fldinst{HYPERLINK """ + tag.Substring(4) + @"""}}{\fldrslt{\ul ";
                 else
-                {
                     return @"{{{";
-                }
             }
-            else
+
+            string output = tag switch
             {
-                switch (match.Groups[2].Value)
-                {
-                    case "h1":
-                        output = @"{\fs20 \b ";
-                        break;
-                    case "strike":
-                        output = @"{\strike ";
-                        break;
-                    case "b":
-                        output = @"{\b ";
-                        break;
-                    case "i":
-                        output = @"{\i ";
-                        break;
-                    case "u":
-                        output = @"{\ul ";
-                        break;
-                    default:
-                        output = "";
-                        break;
-                }
-            }
-            if (output != "" && match.Groups[1].Value == "/")
+                "h1" =>      @"{\fs24 \b ",
+                "h2" =>      @"{\fs22 \b ",
+                "h3" =>      @"{\fs20 \b ",
+                "b" =>       @"{\b ",
+                "i" =>       @"{\i ",
+                "u" =>       @"{\ul ",
+                "strike" =>  @"{\strike ",
+                "*" =>       @"{\par \bullet }",
+                "list" =>    @"{\par \list ",
+                "/list" =>   @"}",
+                "quote" =>   @"{\cf2 \par \ql \i ",
+                "/quote" =>  @"\cf0 \par }",
+                _ => "",
+            };
+
+            if (output != "" && close == "/")
                 output = "}";
+
             return output;
         }
 
@@ -256,7 +242,7 @@ namespace XCOM2Launcher.Mod
 
                 foreach (var line in File.ReadLines(sourceFile))
                 {
-                    var match = s_screenClassRegex.Match(line);
+                    var match = RegexHelper.ScreenClassRegex().Match(line);
                     if (match.Success)
                     {
                         var oldClass = match.Groups[1].Value;
@@ -287,7 +273,7 @@ namespace XCOM2Launcher.Mod
             foreach (var file in Directory.GetFiles(configPath, "XComEngine.ini", SearchOption.AllDirectories))
             {
                 var modClassOverrides = from line in File.ReadLines(file)
-                    select (l: line, match: s_classOverridesRegex.Match(s_whitespaceRegex.Replace(line, "")))
+                    select (l: line, match: RegexHelper.ClassOverridesRegex().Match(RegexHelper.WhitespaceRegex().Replace(line, "")))
                     into m
                     where m.match.Success
                     select new ModClassOverride(this, m.match.Groups[2].Value, m.match.Groups[1].Value, ModClassOverrideType.Class, m.l);
@@ -450,7 +436,7 @@ namespace XCOM2Launcher.Mod
                 {
                     string readmeText = File.ReadAllText(readmePathTxt);
 
-                    if (readmeText.Contains("You created an XCOM 2 Mod Project!"))
+                    if (readmeText.Contains("You created an XCOM 2 Mod Project!") || string.IsNullOrWhiteSpace(readmeText))
                     {
                         return "The mod author did not provide additional information.";
                     }
@@ -462,7 +448,7 @@ namespace XCOM2Launcher.Mod
                 {
                     string readmeText = File.ReadAllText(readmePathMd);
 
-                    if (readmeText.Contains("Describe specific features of your mod."))
+                    if (readmeText.Contains("Describe specific features of your mod.") || string.IsNullOrWhiteSpace(readmeText))
                     {
                         return "The mod author did not provide additional information.";
                     }

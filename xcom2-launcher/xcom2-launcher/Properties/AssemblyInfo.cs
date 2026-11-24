@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 // General information about an assembly will be available through the following
 // Attributes controlled. Change these attribute values to change the information,
@@ -23,6 +24,11 @@ using System.Runtime.InteropServices;
 
 // Log4Net
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config")]
+
+
+// Target platform and supported OS platform attributes
+[assembly: TargetPlatform("Windows7.0")]
+[assembly: SupportedOSPlatform("Windows7.0")]
 
 // Version information for an assembly consists of the following four values:
 //

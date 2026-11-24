@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Sentry;
-using XCOM2Launcher.Helper;
+using XCOM2Launcher.Classes.Helper;
 
 namespace XCOM2Launcher.Classes {
     [JsonObject(MemberSerialization.OptIn)]
@@ -38,14 +37,18 @@ namespace XCOM2Launcher.Classes {
         /// Returns the actual instance.
         /// </summary>
         public static GlobalSettings Instance {
-            get {
-                lock (_Lock) {
-                    if (_Instance == null) {
-                        _Instance = Load();
+            get
+            {
+                // Implementation of double-checked locking pattern to ensure thread safety and lazy initialization
+                if (_Instance == null)
+                {
+                    lock (_Lock)
+                    {
+                        return _Instance ??= Load();
                     }
-
-                    return _Instance;
                 }
+
+                return _Instance;
             }
         }
 

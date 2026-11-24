@@ -1,4 +1,4 @@
-﻿namespace XCOM2Launcher.Mod
+﻿namespace XCOM2Launcher.Classes.Mod
 {
     public class ModClassOverride
     {

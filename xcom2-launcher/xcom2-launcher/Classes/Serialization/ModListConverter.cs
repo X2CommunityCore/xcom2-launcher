@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using XCOM2Launcher.Mod;
+using XCOM2Launcher.Classes.Mod;
 using XCOM2Launcher.XCOM;
 
 namespace XCOM2Launcher.Serialization
