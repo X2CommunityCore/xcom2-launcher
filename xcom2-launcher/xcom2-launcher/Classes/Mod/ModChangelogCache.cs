@@ -12,11 +12,10 @@ namespace XCOM2Launcher.Mod
         private static readonly ConcurrentDictionary<long, string> Cache = new ConcurrentDictionary<long, string>();
 
         private static readonly Regex Regexp = new Regex(
-            @"<div class=""detailBox workshopAnnouncement noFooter changeLogCtn"">\s*" +
-            @"<div class=""changelog headline"">\s*(.*?)\s*</div>\s*" +
-            @"(?:<div style=""clear: right""></div>\s*)?" +
-            @"<p id=""[0-9]+"">((?:.|\n)*?)</p>",
-            RegexOptions.Compiled);
+            @"<div class=""changelog headline"">\s*(.*?)\s*</div>" +
+            @"(?:(?!<div class=""detailBox).)*?" +
+            @"<p id=""[0-9]+"">(.*?)</p>",
+            RegexOptions.Singleline);
 
         public static async Task<string> GetChangeLogAsync(long workshopID)
         {
