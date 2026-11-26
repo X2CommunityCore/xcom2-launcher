@@ -637,7 +637,7 @@ namespace XCOM2Launcher.Forms
                 return;
 
             modinfo_changelog_richtextbox.Text = "Loading...";
-            modinfo_changelog_richtextbox.Text = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
+            modinfo_changelog_richtextbox.Rtf = await ModChangelogCache.GetChangeLogAsync(m.WorkshopID);
         }
 
         private void ControlLinkClicked(object sender, LinkClickedEventArgs e)
